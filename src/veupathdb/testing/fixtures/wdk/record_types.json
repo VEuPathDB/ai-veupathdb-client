@@ -1,0 +1,36 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/plasmo/service/record-types",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-09-04",
+    "reads": "WDK-HTTP-004"
+  },
+  "body": [
+    "transcript",
+    "gene",
+    "organism",
+    "genomic-sequence",
+    "genomic-segment",
+    "strain-genomic-segment",
+    "variation",
+    "est",
+    "pathway",
+    "compound",
+    "blast-est-ontology",
+    "blast-orf-ontology",
+    "file",
+    "build",
+    "junction",
+    "dfile",
+    "metrics",
+    "jbrowse-gene",
+    "dataset-release-notes",
+    "legacy-dataset",
+    "dataset",
+    "datasource",
+    "userdataset"
+  ]
+}

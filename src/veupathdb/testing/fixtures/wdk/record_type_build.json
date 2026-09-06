@@ -1,0 +1,740 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/plasmo/service/record-types/build",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-09-04",
+    "reads": "WDK-HTTP-004"
+  },
+  "body": {
+    "nativeDisplayName": "VEuPathDB Data Build",
+    "searches": [
+      {
+        "urlSegment": "BuildClasses_BuildRecordClassByRealtimeBasket",
+        "dynamicAttributes": [
+          {
+            "help": "The *search result weight*. This is the sum of the weights you specified for individual searches that found this record.   The more searches that found this record the higher will be its weight.  To give a search a weight, click \"Use Weights\" on the search page, and provide the desired weight.",
+            "isInReport": true,
+            "formats": [
+              {
+                "isInReport": true,
+                "displayName": "Histogram",
+                "name": "wdk_weight-histogram",
+                "description": "Display a histogram of weight distribution",
+                "scopes": [],
+                "type": "histogram"
+              }
+            ],
+            "truncateTo": 100,
+            "displayName": "Search Weight",
+            "name": "wdk_weight",
+            "isSortable": true,
+            "isDisplayable": true,
+            "isRemovable": true,
+            "columnDataType": "NUMBER",
+            "tools": {
+              "reports": [],
+              "filters": []
+            },
+            "properties": {
+              "organisms": [
+                "P. falciparum",
+                "P. vivax",
+                "P. yoelii",
+                "P. berghei",
+                "P. chabaudi",
+                "P. knowlesi"
+              ],
+              "specificAttribution": []
+            }
+          }
+        ],
+        "defaultSorting": [
+          {
+            "attributeName": "primary_key",
+            "direction": "ASC"
+          }
+        ],
+        "isAnalyzable": false,
+        "displayName": "Current VEuPathDB Data Build Basket",
+        "fullName": "InternalQuestions.BuildClasses_BuildRecordClassByRealtimeBasket",
+        "defaultAttributes": [
+          "primary_key",
+          "release_date"
+        ],
+        "groups": [
+          {
+            "displayType": "empty",
+            "displayName": "",
+            "name": "empty",
+            "description": "",
+            "isVisible": true,
+            "parameters": []
+          }
+        ],
+        "filters": [],
+        "shortDisplayName": "VEuPathDB Data Build Basket",
+        "paramNames": [],
+        "isCacheable": true,
+        "outputRecordClassName": "build",
+        "noSummaryOnSingleRecord": false,
+        "queryName": "BuildClasses_BuildRecordClassByRealtimeBasket",
+        "defaultSummaryView": "_default",
+        "properties": {
+          "organisms": [
+            "P. falciparum",
+            "P. vivax",
+            "P. yoelii",
+            "P. berghei",
+            "P. chabaudi",
+            "P. knowlesi"
+          ],
+          "specificAttribution": []
+        },
+        "summaryViewPlugins": [
+          {
+            "displayName": "VEuPathDB Data Build Results",
+            "name": "_default",
+            "description": ""
+          }
+        ]
+      },
+      {
+        "urlSegment": "BuildClasses_BuildRecordClassBySnapshotBasket",
+        "dynamicAttributes": [
+          {
+            "help": "The *search result weight*. This is the sum of the weights you specified for individual searches that found this record.   The more searches that found this record the higher will be its weight.  To give a search a weight, click \"Use Weights\" on the search page, and provide the desired weight.",
+            "isInReport": true,
+            "formats": [
+              {
+                "isInReport": true,
+                "displayName": "Histogram",
+                "name": "wdk_weight-histogram",
+                "description": "Display a histogram of weight distribution",
+                "scopes": [],
+                "type": "histogram"
+              }
+            ],
+            "truncateTo": 100,
+            "displayName": "Search Weight",
+            "name": "wdk_weight",
+            "isSortable": true,
+            "isDisplayable": true,
+            "isRemovable": true,
+            "columnDataType": "NUMBER",
+            "tools": {
+              "reports": [],
+              "filters": []
+            },
+            "properties": {
+              "organisms": [
+                "P. falciparum",
+                "P. vivax",
+                "P. yoelii",
+                "P. berghei",
+                "P. chabaudi",
+                "P. knowlesi"
+              ],
+              "specificAttribution": []
+            }
+          }
+        ],
+        "defaultSorting": [
+          {
+            "attributeName": "primary_key",
+            "direction": "ASC"
+          }
+        ],
+        "isAnalyzable": false,
+        "displayName": "Copy of VEuPathDB Data Build Basket",
+        "fullName": "InternalQuestions.BuildClasses_BuildRecordClassBySnapshotBasket",
+        "defaultAttributes": [
+          "primary_key",
+          "release_date"
+        ],
+        "groups": [
+          {
+            "displayType": "empty",
+            "displayName": "",
+            "name": "empty",
+            "description": "",
+            "isVisible": true,
+            "parameters": [
+              "BuildClasses_BuildRecordClassDataset"
+            ]
+          }
+        ],
+        "filters": [],
+        "shortDisplayName": "Copy of Basket",
+        "paramNames": [
+          "BuildClasses_BuildRecordClassDataset"
+        ],
+        "isCacheable": true,
+        "outputRecordClassName": "build",
+        "noSummaryOnSingleRecord": false,
+        "queryName": "BuildClasses_BuildRecordClassBySnapshotBasket",
+        "defaultSummaryView": "_default",
+        "properties": {
+          "organisms": [
+            "P. falciparum",
+            "P. vivax",
+            "P. yoelii",
+            "P. berghei",
+            "P. chabaudi",
+            "P. knowlesi"
+          ],
+          "specificAttribution": []
+        },
+        "summaryViewPlugins": [
+          {
+            "displayName": "VEuPathDB Data Build Results",
+            "name": "_default",
+            "description": ""
+          }
+        ]
+      },
+      {
+        "urlSegment": "boolean_question_BuildClasses_BuildRecordClass",
+        "dynamicAttributes": [
+          {
+            "help": "The *search result weight*. This is the sum of the weights you specified for individual searches that found this record.   The more searches that found this record the higher will be its weight.  To give a search a weight, click \"Use Weights\" on the search page, and provide the desired weight.",
+            "isInReport": true,
+            "formats": [
+              {
+                "isInReport": true,
+                "displayName": "Histogram",
+                "name": "wdk_weight-histogram",
+                "description": "Display a histogram of weight distribution",
+                "scopes": [],
+                "type": "histogram"
+              }
+            ],
+            "truncateTo": 100,
+            "displayName": "Search Weight",
+            "name": "wdk_weight",
+            "isSortable": true,
+            "isDisplayable": true,
+            "isRemovable": true,
+            "columnDataType": "NUMBER",
+            "tools": {
+              "reports": [],
+              "filters": []
+            },
+            "properties": {
+              "organisms": [
+                "P. falciparum",
+                "P. vivax",
+                "P. yoelii",
+                "P. berghei",
+                "P. chabaudi",
+                "P. knowlesi"
+              ],
+              "specificAttribution": []
+            }
+          }
+        ],
+        "defaultSorting": [
+          {
+            "attributeName": "primary_key",
+            "direction": "ASC"
+          }
+        ],
+        "isAnalyzable": false,
+        "displayName": "Combine VEuPathDB Data Build results",
+        "allowedPrimaryInputRecordClassNames": [
+          "build"
+        ],
+        "fullName": "InternalQuestions.boolean_question_BuildClasses_BuildRecordClass",
+        "defaultAttributes": [
+          "primary_key",
+          "release_date"
+        ],
+        "groups": [
+          {
+            "displayType": "empty",
+            "displayName": "",
+            "name": "empty",
+            "description": "",
+            "isVisible": true,
+            "parameters": [
+              "bq_left_op_BuildClasses_BuildRecordClass",
+              "bq_right_op_BuildClasses_BuildRecordClass",
+              "bq_operator"
+            ]
+          }
+        ],
+        "filters": [],
+        "shortDisplayName": "Combine VEuPathDB Data Build results",
+        "paramNames": [
+          "bq_left_op_BuildClasses_BuildRecordClass",
+          "bq_right_op_BuildClasses_BuildRecordClass",
+          "bq_operator"
+        ],
+        "isCacheable": true,
+        "allowedSecondaryInputRecordClassNames": [
+          "build"
+        ],
+        "outputRecordClassName": "build",
+        "noSummaryOnSingleRecord": false,
+        "queryName": "bq_BuildClasses_BuildRecordClass",
+        "defaultSummaryView": "_default",
+        "properties": {
+          "organisms": [
+            "P. falciparum",
+            "P. vivax",
+            "P. yoelii",
+            "P. berghei",
+            "P. chabaudi",
+            "P. knowlesi"
+          ],
+          "specificAttribution": []
+        },
+        "summaryViewPlugins": [
+          {
+            "displayName": "VEuPathDB Data Build Results",
+            "name": "_default",
+            "description": ""
+          }
+        ]
+      },
+      {
+        "urlSegment": "single_record_question_BuildClasses_BuildRecordClass",
+        "dynamicAttributes": [],
+        "defaultSorting": [
+          {
+            "attributeName": "primary_key",
+            "direction": "ASC"
+          }
+        ],
+        "isAnalyzable": false,
+        "displayName": "Single VEuPathDB Data Build",
+        "fullName": "InternalQuestions.single_record_question_BuildClasses_BuildRecordClass",
+        "defaultAttributes": [
+          "primary_key",
+          "release_date"
+        ],
+        "groups": [
+          {
+            "displayType": "empty",
+            "displayName": "",
+            "name": "empty",
+            "description": "",
+            "isVisible": true,
+            "parameters": [
+              "primaryKeys"
+            ]
+          }
+        ],
+        "filters": [],
+        "shortDisplayName": "Single VEuPathDB Data Build",
+        "paramNames": [
+          "primaryKeys"
+        ],
+        "isCacheable": true,
+        "outputRecordClassName": "build",
+        "noSummaryOnSingleRecord": false,
+        "defaultSummaryView": "_default",
+        "properties": {
+          "organisms": [
+            "P. falciparum",
+            "P. vivax",
+            "P. yoelii",
+            "P. berghei",
+            "P. chabaudi",
+            "P. knowlesi"
+          ],
+          "specificAttribution": []
+        },
+        "summaryViewPlugins": [
+          {
+            "displayName": "VEuPathDB Data Build Results",
+            "name": "_default",
+            "description": ""
+          }
+        ]
+      },
+      {
+        "urlSegment": "AllBuilds",
+        "dynamicAttributes": [
+          {
+            "help": "The *search result weight*. This is the sum of the weights you specified for individual searches that found this record.   The more searches that found this record the higher will be its weight.  To give a search a weight, click \"Use Weights\" on the search page, and provide the desired weight.",
+            "isInReport": true,
+            "formats": [
+              {
+                "isInReport": true,
+                "displayName": "Histogram",
+                "name": "wdk_weight-histogram",
+                "description": "Display a histogram of weight distribution",
+                "scopes": [],
+                "type": "histogram"
+              }
+            ],
+            "truncateTo": 100,
+            "displayName": "Search Weight",
+            "name": "wdk_weight",
+            "isSortable": true,
+            "isDisplayable": true,
+            "isRemovable": true,
+            "columnDataType": "NUMBER",
+            "tools": {
+              "reports": [],
+              "filters": []
+            },
+            "properties": {
+              "organisms": [
+                "P. falciparum",
+                "P. vivax",
+                "P. yoelii",
+                "P. berghei",
+                "P. chabaudi",
+                "P. knowlesi"
+              ],
+              "specificAttribution": []
+            }
+          }
+        ],
+        "defaultSorting": [
+          {
+            "attributeName": "release_date",
+            "direction": "DESC"
+          }
+        ],
+        "isAnalyzable": false,
+        "displayName": "All VEuPathDB Data Builds",
+        "fullName": "BuildQuestions.AllBuilds",
+        "description": "Find all VEuPathDB data builds.",
+        "defaultAttributes": [
+          "primary_key",
+          "release_date"
+        ],
+        "groups": [],
+        "filters": [],
+        "shortDisplayName": "All",
+        "paramNames": [],
+        "isCacheable": true,
+        "outputRecordClassName": "build",
+        "noSummaryOnSingleRecord": true,
+        "queryName": "AllBuilds",
+        "defaultSummaryView": "_default",
+        "properties": {
+          "organisms": [
+            "P. falciparum",
+            "P. vivax",
+            "P. yoelii",
+            "P. berghei",
+            "P. chabaudi",
+            "P. knowlesi"
+          ],
+          "specificAttribution": []
+        },
+        "summaryViewPlugins": [
+          {
+            "displayName": "VEuPathDB Data Build Results",
+            "name": "_default",
+            "description": ""
+          }
+        ]
+      }
+    ],
+    "urlSegment": "build",
+    "useBasket": true,
+    "nativeShortDisplayName": "VEuPathDB Data Build",
+    "formats": [
+      {
+        "isInReport": true,
+        "displayName": "Standard JSON",
+        "name": "standard",
+        "description": "Converts your result to the standard JSON used by the web service.",
+        "scopes": [
+          "results"
+        ],
+        "type": "standard"
+      },
+      {
+        "isInReport": true,
+        "displayName": "Summary - tab delimited",
+        "name": "attributesTabular",
+        "scopes": [
+          "results",
+          "record"
+        ],
+        "type": "attributesTabular"
+      }
+    ],
+    "hasAllRecordsQuery": false,
+    "displayName": "VEuPathDB Data Build",
+    "nativeShortDisplayNamePlural": "VEuPathDB Data Builds",
+    "fullName": "BuildClasses.BuildRecordClass",
+    "description": "",
+    "shortDisplayName": "VEuPathDB Data Build",
+    "shortDisplayNamePlural": "VEuPathDB Data Builds",
+    "tables": [
+      {
+        "isInReport": false,
+        "displayName": "Datasets",
+        "name": "Datasets",
+        "description": "",
+        "attributes": [
+          {
+            "isInReport": true,
+            "formats": [],
+            "truncateTo": 100,
+            "displayName": "build_number",
+            "name": "build_number",
+            "isSortable": true,
+            "isDisplayable": true,
+            "isRemovable": true,
+            "columnDataType": "OTHER",
+            "tools": {
+              "reports": [],
+              "filters": []
+            },
+            "properties": {
+              "organisms": [
+                "P. falciparum",
+                "P. vivax",
+                "P. yoelii",
+                "P. berghei",
+                "P. chabaudi",
+                "P. knowlesi"
+              ],
+              "specificAttribution": []
+            }
+          },
+          {
+            "isInReport": true,
+            "formats": [],
+            "truncateTo": 100,
+            "displayName": "display_name",
+            "name": "display_name",
+            "isSortable": true,
+            "isDisplayable": true,
+            "isRemovable": true,
+            "columnDataType": "OTHER",
+            "tools": {
+              "reports": [],
+              "filters": []
+            },
+            "properties": {
+              "organisms": [
+                "P. falciparum",
+                "P. vivax",
+                "P. yoelii",
+                "P. berghei",
+                "P. chabaudi",
+                "P. knowlesi"
+              ],
+              "specificAttribution": []
+            }
+          },
+          {
+            "isInReport": true,
+            "formats": [],
+            "truncateTo": 100,
+            "displayName": "display_category",
+            "name": "display_category",
+            "isSortable": true,
+            "isDisplayable": true,
+            "isRemovable": true,
+            "columnDataType": "OTHER",
+            "tools": {
+              "reports": [],
+              "filters": []
+            },
+            "properties": {
+              "organisms": [
+                "P. falciparum",
+                "P. vivax",
+                "P. yoelii",
+                "P. berghei",
+                "P. chabaudi",
+                "P. knowlesi"
+              ],
+              "specificAttribution": []
+            }
+          },
+          {
+            "isInReport": true,
+            "formats": [],
+            "truncateTo": 100,
+            "displayName": "description",
+            "name": "description",
+            "isSortable": true,
+            "isDisplayable": true,
+            "isRemovable": true,
+            "columnDataType": "OTHER",
+            "tools": {
+              "reports": [],
+              "filters": []
+            },
+            "properties": {
+              "organisms": [
+                "P. falciparum",
+                "P. vivax",
+                "P. yoelii",
+                "P. berghei",
+                "P. chabaudi",
+                "P. knowlesi"
+              ],
+              "specificAttribution": []
+            }
+          },
+          {
+            "isInReport": true,
+            "formats": [],
+            "truncateTo": 100,
+            "displayName": "note",
+            "name": "note",
+            "isSortable": true,
+            "isDisplayable": true,
+            "isRemovable": true,
+            "columnDataType": "OTHER",
+            "tools": {
+              "reports": [],
+              "filters": []
+            },
+            "properties": {
+              "organisms": [
+                "P. falciparum",
+                "P. vivax",
+                "P. yoelii",
+                "P. berghei",
+                "P. chabaudi",
+                "P. knowlesi"
+              ],
+              "specificAttribution": []
+            }
+          }
+        ],
+        "isDisplayable": true,
+        "properties": {
+          "organisms": [
+            "P. falciparum",
+            "P. vivax",
+            "P. yoelii",
+            "P. berghei",
+            "P. chabaudi",
+            "P. knowlesi"
+          ],
+          "specificAttribution": [],
+          "excludeFromDumper": [
+            "true"
+          ]
+        },
+        "supportsSingleRecordOnly": false,
+        "clientSortSpec": []
+      }
+    ],
+    "nativeDisplayNamePlural": "VEuPathDB Data Builds",
+    "displayNamePlural": "VEuPathDB Data Builds",
+    "recordIdAttributeName": "primary_key",
+    "attributes": [
+      {
+        "isInReport": true,
+        "formats": [],
+        "truncateTo": 100,
+        "displayName": "VEuPathDB Build Number",
+        "name": "primary_key",
+        "isSortable": true,
+        "isDisplayable": true,
+        "isRemovable": false,
+        "columnDataType": "STRING",
+        "tools": {
+          "reports": [
+            "byValue"
+          ],
+          "filters": [
+            "byValue"
+          ]
+        },
+        "properties": {
+          "organisms": [
+            "P. falciparum",
+            "P. vivax",
+            "P. yoelii",
+            "P. berghei",
+            "P. chabaudi",
+            "P. knowlesi"
+          ],
+          "specificAttribution": []
+        }
+      },
+      {
+        "isInReport": true,
+        "formats": [],
+        "truncateTo": 100,
+        "displayName": "build_number",
+        "name": "build_number",
+        "isSortable": true,
+        "isDisplayable": false,
+        "isRemovable": true,
+        "columnDataType": "STRING",
+        "tools": {
+          "reports": [
+            "byValue"
+          ],
+          "filters": [
+            "byValue"
+          ]
+        },
+        "properties": {
+          "organisms": [
+            "P. falciparum",
+            "P. vivax",
+            "P. yoelii",
+            "P. berghei",
+            "P. chabaudi",
+            "P. knowlesi"
+          ],
+          "specificAttribution": []
+        }
+      },
+      {
+        "isInReport": true,
+        "formats": [],
+        "truncateTo": 100,
+        "displayName": "Release date",
+        "name": "release_date",
+        "isSortable": true,
+        "isDisplayable": true,
+        "isRemovable": true,
+        "columnDataType": "DATE",
+        "tools": {
+          "reports": [
+            "byValue"
+          ],
+          "filters": [
+            "byValue"
+          ]
+        },
+        "properties": {
+          "organisms": [
+            "P. falciparum",
+            "P. vivax",
+            "P. yoelii",
+            "P. berghei",
+            "P. chabaudi",
+            "P. knowlesi"
+          ],
+          "specificAttribution": []
+        }
+      }
+    ],
+    "primaryKeyColumnRefs": [
+      "build_number"
+    ],
+    "properties": {
+      "organisms": [
+        "P. falciparum",
+        "P. vivax",
+        "P. yoelii",
+        "P. berghei",
+        "P. chabaudi",
+        "P. knowlesi"
+      ],
+      "specificAttribution": []
+    }
+  }
+}

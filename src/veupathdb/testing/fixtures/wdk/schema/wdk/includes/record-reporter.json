@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "type": "object",
+  "properties": {
+    "isInReport": {
+      "type": "boolean"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "scopes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "record",
+          "results"
+        ]
+      }
+    },
+    "type": {
+      "type": "string"
+    },
+    "newBuild": {
+      "type": "string"
+    },
+    "reviseBuild": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "isInReport",
+    "displayName",
+    "name",
+    "scopes",
+    "type"
+  ],
+  "additionalProperties": false
+}

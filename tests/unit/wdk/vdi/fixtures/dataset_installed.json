@@ -1,0 +1,71 @@
+{
+  "installTargets": [
+    "PlasmoDB"
+  ],
+  "name": "pathfinder-probe-genelist",
+  "summary": "PathFinder probe gene list, deleted immediately after the probe.",
+  "origin": "direct-upload",
+  "dependencies": [],
+  "publications": [],
+  "contacts": [],
+  "linkedDatasets": [],
+  "funding": [],
+  "daysForApproval": -1,
+  "datasetSources": [],
+  "datasetId": "soV5JEQEcF00p",
+  "type": {
+    "name": "genelist",
+    "version": "1.0",
+    "category": "Gene List"
+  },
+  "visibility": "private",
+  "owner": {
+    "userId": 1000000001,
+    "firstName": "Recorded",
+    "lastName": "Owner",
+    "email": "recorded.owner@example.invalid",
+    "affiliation": "Example University"
+  },
+  "created": "2026-09-04T21:36:20.067701896Z",
+  "shortName": "pathfinder-probe-genelist",
+  "relatedDatasets": [],
+  "status": {
+    "upload": {
+      "status": "success"
+    },
+    "import": {
+      "status": "complete"
+    },
+    "install": [
+      {
+        "installTarget": "PlasmoDB",
+        "meta": {
+          "status": "complete"
+        },
+        "data": {
+          "status": "complete"
+        }
+      }
+    ]
+  },
+  "files": {
+    "upload": {
+      "zipSize": 198,
+      "contents": [
+        {
+          "fileName": "pathfinder-probe.txt",
+          "fileSize": 70
+        }
+      ]
+    },
+    "install": {
+      "zipSize": 204,
+      "contents": [
+        {
+          "fileName": "formatted_gene_list.txt",
+          "fileSize": 70
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+# Single-site config for embedded PlasmoDB demo.
+# Use with: VEUPATHDB_SITES_CONFIG=/path/to/sites-plasmodb.yaml
+
+sites:
+  plasmodb:
+    name: PlasmoDB
+    display_name: PlasmoDB (Plasmodium)
+    base_url: https://plasmodb.org/plasmo/service
+    project_id: PlasmoDB
+    is_portal: false
+
+default_site: plasmodb
+
+routing:
+  portal_timeout: 120
+  component_timeout: 30

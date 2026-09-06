@@ -1,0 +1,201 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/plasmo/service/record-types/transcript/searches/GenesByPhenotypeEdaSubset_PlasmoDB_Rod_Mal_Phenotype_RSRC?expandParams=true",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-08-22",
+    "reads": "WDK-PARAM-011"
+  },
+  "body": {
+    "searchData": {
+      "summary": "Filter genes by Phenotype Data.",
+      "urlSegment": "GenesByPhenotypeEdaSubset_PlasmoDB_Rod_Mal_Phenotype_RSRC",
+      "dynamicAttributes": [
+        {
+          "help": "The *search result weight*. This is the sum of the weights you specified for individual searches that found this record.   The more searches that found this record the higher will be its weight.  To give a search a weight, click \"Use Weights\" on the search page, and provide the desired weight.",
+          "isInReport": true,
+          "formats": [
+            {
+              "isInReport": true,
+              "displayName": "Histogram",
+              "name": "wdk_weight-histogram",
+              "description": "Display a histogram of weight distribution",
+              "scopes": [],
+              "type": "histogram"
+            }
+          ],
+          "truncateTo": 100,
+          "displayName": "Search Weight",
+          "name": "wdk_weight",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "columnDataType": "NUMBER",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        }
+      ],
+      "defaultSorting": [
+        {
+          "attributeName": "gene_location_text",
+          "direction": "ASC"
+        }
+      ],
+      "isAnalyzable": true,
+      "displayName": "RMgmDB - Rodent Malaria genetically modified Parasites Phenotype",
+      "fullName": "GeneQuestions.GenesByPhenotypeEdaSubset_PlasmoDB_Rod_Mal_Phenotype_RSRC",
+      "description": "Filter genes by Phenotype Data.  Click on a filter on the left to view data and apply a filter.  You can apply as many filters as you choose.",
+      "defaultAttributes": [
+        "primary_key",
+        "organism",
+        "gene_location_text",
+        "gene_product"
+      ],
+      "groups": [
+        {
+          "displayType": "hidden",
+          "displayName": "",
+          "name": "_hidden",
+          "description": "",
+          "isVisible": false,
+          "parameters": [
+            "eda_dataset_id"
+          ]
+        },
+        {
+          "displayType": "empty",
+          "displayName": "",
+          "name": "empty",
+          "description": "",
+          "isVisible": true,
+          "parameters": [
+            "eda_analysis_spec"
+          ]
+        }
+      ],
+      "filters": [
+        {
+          "isViewOnly": false,
+          "name": "organismFilter"
+        },
+        {
+          "displayName": "Transcripts",
+          "isViewOnly": false,
+          "name": "matched_transcript_filter_array"
+        },
+        {
+          "isViewOnly": false,
+          "name": "genesByPathway"
+        }
+      ],
+      "newBuild": "39.0",
+      "shortDisplayName": "RMgmDB (QP)",
+      "paramNames": [
+        "eda_dataset_id",
+        "eda_analysis_spec"
+      ],
+      "isCacheable": true,
+      "outputRecordClassName": "transcript",
+      "noSummaryOnSingleRecord": false,
+      "queryName": "GenesByEdaSubsetGeneric",
+      "defaultSummaryView": "_default",
+      "parameters": [
+        {
+          "displayName": "EDA Dataset ID",
+          "length": 0,
+          "isVisible": false,
+          "isMultiLine": false,
+          "type": "string",
+          "help": "EDA Dataset ID",
+          "dependentParams": [],
+          "isReadOnly": false,
+          "isNumber": false,
+          "allowEmptyValue": false,
+          "name": "eda_dataset_id",
+          "initialDisplayValue": "DS_53f554ec6a",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "_hidden"
+        },
+        {
+          "displayName": "Filter genes based on phenotype data",
+          "length": 0,
+          "isVisible": true,
+          "isMultiLine": true,
+          "type": "string",
+          "help": "Filter genes based on the data below, and then click Get Answer to see your list of genes.",
+          "visibleHelp": "Specify your set of genes by clicking on one or more variables in the panel at left;\n                            then interact with the variable display on the right to subset on the selected variable.<br>\n                            After subsetting, click <strong>Get Answer</strong> to get the specified set of genes.",
+          "dependentParams": [],
+          "isReadOnly": false,
+          "isNumber": false,
+          "allowEmptyValue": true,
+          "name": "eda_analysis_spec",
+          "initialDisplayValue": "",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        }
+      ],
+      "properties": {
+        "organisms": [
+          "P. falciparum",
+          "P. vivax",
+          "P. yoelii",
+          "P. berghei",
+          "P. chabaudi",
+          "P. knowlesi"
+        ],
+        "specificAttribution": []
+      },
+      "summaryViewPlugins": [
+        {
+          "displayName": "Gene Results",
+          "name": "_default",
+          "description": "View transcripts."
+        },
+        {
+          "displayName": "Genome View",
+          "name": "genomic-view",
+          "description": "View your hits mapped to their corresponding largest assembled genomic DNA segment, often a chromosome, but\n sometimes a contig or scaffold."
+        }
+      ]
+    },
+    "validation": {
+      "level": "DISPLAYABLE",
+      "isValid": true
+    }
+  }
+}

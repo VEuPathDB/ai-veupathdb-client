@@ -1,0 +1,29 @@
+{
+    "histogram": [
+        {
+            "value": 4011,
+            "binStart": "P. berghei",
+            "binEnd": "P. berghei",
+            "binLabel": "P. berghei"
+        },
+        {
+            "value": 4130,
+            "binStart": "P. falciparum",
+            "binEnd": "P. falciparum",
+            "binLabel": "P. falciparum"
+        },
+        {
+            "value": 268,
+            "binStart": "P. yoelii",
+            "binEnd": "P. yoelii",
+            "binLabel": "P. yoelii"
+        }
+    ],
+    "statistics": {
+        "subsetSize": 4279,
+        "numVarValues": 8409,
+        "numDistinctValues": 3,
+        "numDistinctEntityRecords": 4279,
+        "numMissingCases": 0
+    }
+}

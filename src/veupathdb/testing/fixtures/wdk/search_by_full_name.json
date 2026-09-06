@@ -1,0 +1,12 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/plasmo/service/record-types/transcript/searches/GeneQuestions.GenesByMolecularWeight",
+    "status": 404,
+    "content_type": "text/plain",
+    "recorded_at": "2026-08-22",
+    "reads": "WDK-SEARCH-002"
+  },
+  "text": "Resource 'search: GeneQuestions.GenesByMolecularWeight' does not exist."
+}

@@ -1,0 +1,1078 @@
+{
+    "perDataset": {
+        "DS_16bc228c8e": {
+            "studyId": "STUDY_16bc228c8e",
+            "sha1Hash": "16bc228c8ea7332e8b7a2df47e333ccc51c7f3cd",
+            "isUserStudy": false,
+            "displayName": "The role of the SREBP pathway in the secretion of lignocellulolytic enzymes",
+            "shortDisplayName": "RNA-Seq WT, delta sah-2, Mclr-2 and Mclr-2 delta sah-2 strains",
+            "description": "The SREBP pathway functions in ergosterol biosynthesis and adaptation to hypoxia. WT, delta sah-2, Mclr-2 and Mclr-2 delta \nsah-2 strains were grown in sucrose minimal media for 24 hours after a shift from 16 hours in VMM. \nThree biological replicates were taken for each sample. RNA-Seq libraries were sequenced on the Illumina Genome Analyzer \nIIx and HiSeq 4000 platforms.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_7a3acef4f3": {
+            "studyId": "STUDY_d76b3643cc",
+            "sha1Hash": "7a3acef4f3e06da2e43198bfa17724ceb0bf9977",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - 12 strains of hybrids",
+            "description": "Whole genome resequencing data from 12 strains of hybrids of <i>Leishmania infantum</i> were analyzed for single \n        nucleotide polymorphisms and copy number variation using <i>L. infantum</i> JPCM5 as a reference. <br><br>\n        \n        SNP analysis<br>\n        Reads are aligned to the reference genome using Bowtie 2 and realigned around indels using GATK. SNPs,\n        indels and concensus sequence are generated with VARSCAN and stored in the database.<br><br>\n        \n        CNV analysis<br>\n        The median read depth is set to the organism's ploidy and each chromosome's median read depth is normalized \n        to this value. Contigs that are not assigned to chromosome are excluded from this analysis.  Gene copy number \n        is similarly calculated using a normalized read depth for each gene.  To compare the number of genes in the resequenced \n        genome to the reference genome, genes are grouped into clusters that are inferred to have originated by \n        tandem duplication.<br>\n        \n        Isolate information<br>\n         Whole genome analysis of population diversity from vector-derived strains. \n         12 strains of <i>L. infantum</i> that were isolated from a focus of cutaneous leishmaniasis (CL) \n         in the Cukurova province of southeast Turkey as part of a large-scale survey of both vectors and patients in this \n         region. There are no visceral leishmaniasis (VL) cases reported in this region. \n         11 of these 12 CUK strains were isolated from sand flies (specifically <i>Phlebotomus tobbi</i>), while \n         only a single isolate was of human origin. <br>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_2b50907514": {
+            "studyId": "STUDY_344e129529",
+            "sha1Hash": "2b5090751433cafa4dced6365d4ace24d88737fe",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strain MHOMPA94PSC-1",
+            "description": "Whole genome resequencing data from  <i>Leishmania panamensis</i> MHOMPA94PSC-1 were analyzed for single\n        nucleotide polymorphisms and copy number variation using <i>Leishmania mexicana</i> MHOMCOL81L13 as a reference. <br><br>\n\n        SNP analysis<br>\n        Reads are aligned to the reference genome using Bowtie 2 and realigned around indels using GATK. SNPs,\n        indels and concensus sequence are generated with VARSCAN and stored in the database.<br><br>\n\n        CNV analysis<br>\n        The median read depth is set to the organism's ploidy and each chromosome's median read depth is normalized\n        to this value. Contigs that are not assigned to chromosome are excluded from this analysis.  Gene copy number\n        is similarly calculated using a normalized read depth for each gene.  To compare the number of genes in the resequenced\n        genome to the reference genome, genes are grouped into clusters that are inferred to have originated by\n        tandem duplication.<br>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_1807478a9a": {
+            "studyId": "STUDY_ef8b5d5512",
+            "sha1Hash": "1807478a9a7acfff511a316f34fbc2597c086432",
+            "isUserStudy": false,
+            "displayName": "SNP calls on WGS of Candida auris in the United States (CDC)",
+            "shortDisplayName": "Cauris_CDC-2023",
+            "description": "<b>General Description:</b> Sequencing was performed by CDC Mycotic Diseases Branch Candida auris pathogen surveillance. <br><br><b>Methodology used:</b> Illumina NovaSeq 6000",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_3b1640237f": {
+            "studyId": "STUDY_3b1640237f",
+            "sha1Hash": "3b1640237f62a2c3cd03517b37810698ece22c1d",
+            "isUserStudy": false,
+            "displayName": "Host specific transcriptional response in Sclerotinia sclerotiorum (SE)",
+            "shortDisplayName": "SsUF-70_plant_s",
+            "description": "<b>General Description:</b> The host range of parasites is an important factor in assessing the dynamics of disease epidemics. The evolution of pathogens to accommodate new hosts may lead to host range expansion, a process the molecular bases of which are largely enigmatic. The fungus S. sclerotiorum parasitizes more than 400 plant species from diverse eudicot families.\n<br><br><b>Methodology used:</b> Periphery and center of <i>S. sclerotiorum</i> disease lesions on <i>A. thaliana</i> (Ath), <i>S. lycopersicum</i> (Sly), <i>H. annuus</i> (Han). Periphery and center of colony growth on Potato Dextrose Agar plates and in Potato Dextrose Broth serves as control samples collected in three independent replicates. Library strategy: RNA-Seq. Layout: SINGLE. Sequencing: Illumina HiSeq 2500. 27 samples analyzed from in planta host infections and in vitro cultures.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "EDAUD_Y9I5UEJtdp0JU": {
+            "studyId": "STUDY_aeed24b566",
+            "sha1Hash": "",
+            "isUserStudy": true,
+            "displayName": "T. gondii genotyping in Sea Otters & Carnivores",
+            "shortDisplayName": "T. gondii genotyping in Sea Otters & Carnivores",
+            "description": "This dataset comprises 218 records from studies of Toxoplasma gondii infection in California coastal wildlife, combining sea otter (Enhydra lutris nereis) and terrestrial carnivore samples collected primarily along the central California coast. Sea otter records include multi-locus sequence typing (MLST) genotype data across six loci (B1, L358, PK1, SAG1, BTUB, GRA6), stranding location, year, and cause of death. Carnivore records span four species groups \u2014 bobcats, canids, feral cats, and mountain lions \u2014 and include serological data (antibody titers and seropositivity indicators for T. gondii, Sarcocystis neurona, and Neospora caninum), retroviral screening results (FIV and FeLV), B1 gene genotyping, and predominant habitat classification.\n\nTogether, the two components of this dataset support investigation of T. gondii transmission dynamics at the wildlife-domestic animal interface in coastal California. The shared genotyping variables (B1 genotype, ToxoDB genotype) and geographic coordinates (latitude/longitude) allow direct comparison of parasite strains circulating in marine and terrestrial hosts, enabling assessment of whether land-based carnivores \u2014 particularly those in urban and agricultural habitats \u2014 serve as a source of T. gondii strains reaching the nearshore marine environment and infecting sea otters.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_e506a29817": {
+            "studyId": "STUDY_95184850fb",
+            "sha1Hash": "e506a29817e68955d1dee955a53f802065a0b32b",
+            "isUserStudy": false,
+            "displayName": "SNP calls on WGS of six clinical isolates of A. lentulus",
+            "shortDisplayName": "Alentulus SNPs",
+            "description": "<b>General Description:</b>\nAspergillosis can also be caused by organisms that are phenotypically similar to <i>A. fumigatus</i> but genetically distinct, such as <i>Aspergillus lentulus</i> and <i>Aspergillus fumigatiaffinis</i>. As a result of their near identical morphological characteristics, most of these cryptic species have only recently been described. For example, <i>Aspergillus lentulus</i> was first described in 2005 in a case of human aspergillosis.\n<br><br><b>Methodology used:</b> Sequencing technology: PacBio RSII",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_d02be049d4": {
+            "studyId": "STUDY_d02be049d4",
+            "sha1Hash": "d02be049d46cc3f1d07ba32885b52deb77e361c7",
+            "isUserStudy": false,
+            "displayName": "Fresh whole blood infected with Candida tropicalis",
+            "shortDisplayName": "blood Ctropicalis",
+            "description": "<b>General Description:</b> RNA-pool of both species extracted at 0min (control), 15, 30, 60, 120, 240 min. Samples are rRNA depleted. Measurement of <i>Candida tropicalis</i> gene expression. \n    <br><br><b>Methodology used:</b> Examination of three biological replicates for each of the 6 time points. Illumina HiSeq 2500 (<i>Candida tropicalis</i>; <i>Homo sapiens</i>).\n    <br><br>The fungal component of this data set is available on FungiDB: \n\t\t\t<a href=\"https://fungidb.org/fungidb/app/record/dataset/DS_1d4b3f2f63\">Fresh human whole blood infected with Candida tropicalis</a>.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_11607eef19": {
+            "studyId": "STUDY_11607eef19",
+            "sha1Hash": "11607eef19d3a75dcbd1a498370fb8354859a68f",
+            "isUserStudy": false,
+            "displayName": "Mouse transcriptomes during oropharyngeal candidiasis infection",
+            "shortDisplayName": "Calb_Galleria_mouse",
+            "description": "<b>General Description:</b> The experimental model of oropharyngeal candidiasis (OPC) in mice is used to understand the interaction of the fungal pathogen <i>C. albicans</i> with the host at mucosal surfaces. Mouse was infected with <i>Candida albicans</i> isolates SC5314 and 101 and gene expression was studied using RNA sequencing and analysis.\n<br><b>Methodology used: </b>Illumina HiSeq 2500.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_205e526137": {
+            "studyId": "STUDY_205e526137",
+            "sha1Hash": "205e526137b400d19ce6753b7a31e754358dc8d9",
+            "isUserStudy": false,
+            "displayName": "Male reproductive organs",
+            "shortDisplayName": "Male reproductive organs",
+            "description": "Gene expression was determined for Male accessory gland and testes in different members of the <i>Anopheles gambiae</i> complex. <br><br>\n\n        <i>An. quadriannulatus</i> (MRA-1155) mosquitoes were allowed to mate naturally within the cage, containing 50 males and twice as many females. To ensure the mating of all the male individuals, mosquitoes were left to mate for 4 d before dissection. MAGs and testes were dissected in PBS from 30 mated males at 5 d old.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_b041354581": {
+            "studyId": "STUDY_b041354581",
+            "sha1Hash": "b0413545818a949f48445c19ef3106fa28df17fe",
+            "isUserStudy": false,
+            "displayName": "Fresh whole blood infected with Candida parapsilosis",
+            "shortDisplayName": "blood Cparapsilosis",
+            "description": "<b>General Description:</b> RNA-pool of both species extracted at 0min (control), 15, 30, 60, 120, 240 min. Samples are rRNA depleted. Measurement of <i>Candida parapsilosis</i> gene expression.\n<br><br><b>Methodology used:</b> Examination of three biological replicates for each of the 6 time points. Illumina HiSeq 2500 (<i>Candida parapsilosis</i>; <i>Homo sapiens</i>)",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_5781e07160": {
+            "studyId": "STUDY_5781e07160",
+            "sha1Hash": "5781e0716078b8de59948d7c268757f328352ca4",
+            "isUserStudy": false,
+            "displayName": "Transcriptomic investigation of CLR-1, CLR-2, and XLR-1 roles in plant cell wall degradation",
+            "shortDisplayName": "Ncra role of the transcription factors in plant cell wall degradations",
+            "description": "RNA-Seq analysis was performed in WT (FGSC 2489), <i>&#916;xlr-1</i> (6971), and <i>xlr-1-A828V</i> strains. \n    Both WT and <i>&#916;xlr-1</i> were grown for 16h in VMM and switched to xylan for 4h (_4X_Vogels).  <i>xlr-1-A828V</i> strain was also grown  for 16h in VMM and switched for 4h to sucrose \n    (_4S_Vogels) or no carbon media (_4N_Vogels).",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_bf29d66362": {
+            "studyId": "STUDY_bf29d66362",
+            "sha1Hash": "bf29d66362ed096b8e483cb9714c9ef3defc13de",
+            "isUserStudy": false,
+            "displayName": "Sporulation in two stains of E maxima (APU-1, APU02)",
+            "shortDisplayName": "emax sporulatn",
+            "description": "Two strains of <i>Eimeria maxima</i> (APU-1 and APU-2) differ in pathogenesis <i>in vivo</i>: the APU-1 strain is consistently more pathogenic than the APU-2 strain. This study compares the strains' transcriptomes to delineate shared and distinct extrinsic development in two strains of Eimeria exhibiting contrasting virulence in their natural host. RNA sequencing we performed on biological triplicate of each strain at 0, 6, 12, 18, 24, 36, and 48 hours during sporulation.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_ecf7f76ba2": {
+            "studyId": "STUDY_08c972bf09",
+            "sha1Hash": "ecf7f76ba2138b1a2ddd83371aec3ca0903cb7b7",
+            "isUserStudy": false,
+            "displayName": "SNP calls on WGS of C. gattii from North American Pacific Northwest",
+            "shortDisplayName": "Cg_TGen_2014",
+            "description": "<b>General Description: </b>Cryptococcus gattii in North American Pacific Northwest: whole population genome analysis provides insights into species evolution and dispersal <br><br><b>Methodology used: </b>Illumina HiSeq 2000.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_79549674a3": {
+            "studyId": "STUDY_79549674a3",
+            "sha1Hash": "79549674a3a0fae60f66a0dff4bbb19f66513920",
+            "isUserStudy": false,
+            "displayName": "Global transcriptional response to various environmental stresses, alone and in combinations",
+            "shortDisplayName": "Calb_envstress",
+            "description": "<b>General Description:</b> A study was carried out to characterise the global transcriptional response of Candida albicans to various environmental stresses, alone and in combinations.\n<br><br><b>Methodology used:</b> <i>Candida albicans</i> (strain CAI4-CIp10) was grown in YPD-T (Tris buffered YPD: 2% w/v glucose, 2% w/v mycological peptone, 1% w/v yeast extract, 100 mM Tris.HCl, pH 7.4) to mid-exponential phase Cultures were split and exposed to stresses in fresh medium at an OD600 of 0.2. Biological triplicate cultures were processed After 10 min cells were flash frozen in liquid nitrogen and RNA was extracted using Qiazol (phenol/chloroform method). An unstressed sample (timepoint 0 min) was used as control. RNA was DNase treated using Ambion Turbo DNAfree kit before being sent to GenePool. Libraries were prepared using standard Illumina RNAseq library preparation kit.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_dd73524c7e": {
+            "studyId": "STUDY_bf43a6913c",
+            "sha1Hash": "dd73524c7e2b9842de9f640f6e8fa5f96d059975",
+            "isUserStudy": false,
+            "displayName": "SNP calls of WGS of Parastagonospora nodorum isolates",
+            "shortDisplayName": "WGS_Pn",
+            "description": "<b>General Description: </b>Fragments of mycelium from 4-day-old colonies growing on PDA media were transferred to 50\u2009ml Potato Dextrose Broth (PDB) media and cultured for 4\u20136\u2009days at 24\u2009\u00b0C while shaking at 120\u2009rpm. The resulting mycelial colonies were filtered through sterile cheesecloth and lyophilized for 72\u2009h. Dried fungal material was used for DNA extraction with the DNeasy Plant Mini Kit (Qiagen) following the manufacturer\u2019s standard protocol. We sequenced the genomes for all 159 isolates included in this study. \u2028<br><br><b>Methodology used:</b> The sequencing was performed on an Illumina HiSeq 2500 platform producing paired-end reads of 150\u2009bp. Preparation of sequencing libraries and sequencing was performed at the Functional Genomics Center in Zurich.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_c788cd2be6": {
+            "studyId": "STUDY_c788cd2be6",
+            "sha1Hash": "c788cd2be600118401a25bc44b2d91345afbf250",
+            "isUserStudy": false,
+            "displayName": "Transcriptomes of Phytophthora infestans at mycelium stage",
+            "shortDisplayName": "pinfestans_geo",
+            "description": "<b>General Description:</b> The potato late blight pathogen <i>Phytophthora infestans</i> has both an asexual and a sexual mode of reproduction. In Scandinavia, the pathogen is reproducing sexually on a regular basis, whereas clonal lineages dominate in other geographical regions. This study aimed at elucidating events or key genes underlying this difference in sexual behavior. Eight <i>P. infestans</i> strains from potato were included in the mating experiments; four from Sweden (Sw1_A1, Sw2_A2, Sw3_A1, and Sw4_A2), two from the Netherlands (F80029_A1 and IPO82001_A2) and two from the United Kingdom (Pink 6_A1 and Blue 13/3928A_A2). <br><br>\n\t\t\n\t\t<b>Methodology used:</b> Isolates with A1 and A2 mating types from Sweden, the Netherlands and the UK, were used for this purpose because mating frequencies are known to differ among European countries. RNA was prepared from the \u201cmating-zone\u201d between the 4 Swedish, 1 Dutch and 1 British pairs. In total 14 samples were analyzed. The mating samples (m3-m10) contained 3 biological replicates, while the control samples (s1-s8) contained 2 biological replicates. Illumina HiSeq 2500 (Phytophthora infestans).",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_ef6e3fd812": {
+            "studyId": "STUDY_932ce5b4a1",
+            "sha1Hash": "ef6e3fd8121c94c8d693da851323849421e86412",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strain M2904",
+            "description": "Whole genome resequencing data from <i>Leishmania major</i> strain M2904 were analyzed for single \n        nucleotide polymorphisms and copy number variation using <i>L. braziliensis </i> M2904 as a reference. <br><br>\n        \n        SNP analysis<br>\n        Reads are aligned to the reference genome using Bowtie 2 and realigned around indels using GATK. SNPs,\n        indels and concensus sequence are generated with VARSCAN and stored in the database.<br><br>\n        \n        CNV analysis<br>\n        The median read depth is set to the organism's ploidy and each chromosome's median read depth is normalized \n        to this value. Contigs that are not assigned to chromosome are excluded from this analysis.  Gene copy number \n        is similarly calculated using a normalized read depth for each gene.  To compare the number of genes in the resequenced \n        genome to the reference genome, genes are grouped into clusters that are inferred to have originated by \n        tandem duplication.<br>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_29465e6433": {
+            "studyId": "STUDY_f33d182745",
+            "sha1Hash": "29465e64331f177e6261e13382dcc3ffd316db08",
+            "isUserStudy": false,
+            "displayName": "SNP calls on WGS of Coccidioides isolates from the Western Hemisphere",
+            "shortDisplayName": "Coccidioides isolates",
+            "description": "<i>Coccidioides immitis</i> and <i>C. posadasii</i> are pathogenic environmental fungi causing \n    coccidioidomycosis primarily in the desert Southwest of the United States, with scattered endemic foci throughout the \n    Western Hemisphere. The complexities of their recombining genomes has, until recently, limited the development of tools \n    for molecular epidemiology and phylogeographic analysis at both the regional and local levels.  Here we perform whole \n    genome sequence analyses of 64 new and 28 previously published genomes to ascertain the population structure of Coccidioides, \n    particularly within local subpopulations of <i>C. posadasii</i>.  The results provide evidence of substantial population \n    structure in <i>C. posadasii</i> and demonstrate presence of distinct geographic clades in Central and Southern Arizona \n    as well as dispersed populations in Texas, Mexico and South and Central America.  Although a smaller number of \n    <i>C. immitis</i> strains were included in the analyses, some evidence of phylogeographic structure was detected in this \n    species as well. Specifically, newly identified clinical and environmental strains from Washington State formed a \n    distinct well-supported clade on <i>C. immitis</i> genomic phylogeny. Phylogenetic analyses indicated that <i>C. posadasii</i> \n    is the most ancient of the two species, and Southern Arizona contains the most diverse subpopulations.  A model for \n    distribution of <i>C. posadasii</i> out of the Southern Arizona region is proposed.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_43f8972148": {
+            "studyId": "STUDY_43f8972148",
+            "sha1Hash": "43f8972148d18dfc83bf6ba20efe9b3a94a08f8d",
+            "isUserStudy": false,
+            "displayName": "Individual Hawaiian mosquitoes response to the avian malaria parasite Plasmodium relictum",
+            "shortDisplayName": "Individual Hawaiian mosquitoes response to P. relictum",
+            "description": "<p>Offspring of wild-collected Hawaiian <i>Cx. quinquefasciatus</i> were fed on a domestic canary infected with a fresh isolate of <i>Plasmodium relictum</i> GRW4 from a wild-caught Hawaiian honeycreeper (Hawai\u02bbi \u2018amakihi, <i>Chlorodrepanis virens</i>). \nControl mosquitoes were fed on an uninfected canary (<i>Serinus canaria</i>). \nTranscriptomes of five infected and three uninfected individual mosquitoes were sequenced at each of the three stages of the parasite life cycle. \nAll 48 libraries were pooled in an equimolar fashion and submitted to Genewiz (South Plainfield, NJ, USA) for paired-end sequencing (2\u2009\u00d7\u2009150 bp) in one lane of Illumina HiSeq 2500 (BioProject: PRJNA779986).\n</p>\n<br>\n\nSamples:\n<ul>\n<li>24 h post feeding (hpf) during ookinete invasion</li>\n<li>days post feeding (dpf) when oocysts are developing</li>\n<li>10 dpf when sporozoites are released and invade the salivary glands</li>\n</ul>\n\n<p>Our study is the first to analyze non-<i>Anopheles</i> transcriptome responses to Plasmodium, and will allow comparisons between mammalian and avian malaria systems.</p>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_1b46735880": {
+            "studyId": "STUDY_1b46735880",
+            "sha1Hash": "1b46735880d1365154f5cc36434768682292d566",
+            "isUserStudy": false,
+            "displayName": "Antennae vs maxillary palps",
+            "shortDisplayName": "Antennae vs maxillary palps",
+            "description": "The malaria mosquito <i>Anopheles gambiae</i> has a high preference for human hosts, a characteristic that contributes greatly to its capacity for transmitting human malaria. A sibling species, <i>An. quadriannulatus</i>, has a quite different host preference and feeds mostly on bovids. For this reason it does not contribute to human malaria transmission. Host seeking in mosquitoes is modulated by the olfactory system, which is primarily housed in the antennae and maxillary palps. Therefore, the detection of differing host odors by sibling species may be reflected in the expression level of the olfactory genes involved. Accordingly, we compared the transcriptomes of the antennae and maxillary palps of <i>An. gambiae</i> and <i>An. quadriannulatus</is>.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_e454d418a8": {
+            "studyId": "STUDY_e454d418a8",
+            "sha1Hash": "e454d418a8d173e9d955b7608791afded6bc2c5b",
+            "isUserStudy": false,
+            "displayName": "Characterization of light regulated genes",
+            "shortDisplayName": "Ncra light-regulated RNA-Seq",
+            "description": "Comprehensive analysis of Neurospora crassa\u2019s light-controlled gene regulatory networks were accessed by RNA-Seq analysis at 5 time points of light induction, with 2 replicates for each. \n     cDNA libraries were sequenced on an Illumina HiSequation 2000 for 57 cycles and processed with Illumina pipeline RTA 1.13.48 and CASAVA v1.8.2. \n     Data were obtained from dark-grown cells were compared to cells exposed to light for 15, 60, 120, and 240 min.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_0ef6c17001": {
+            "studyId": "STUDY_0ef6c17001",
+            "sha1Hash": "0ef6c170013d578428f0f12da6a93c95f4787bee",
+            "isUserStudy": false,
+            "displayName": "Chicken macrophage-like cells (HD11) infected in vitro with Eimeria tenella",
+            "shortDisplayName": "Ggal during Eten infect RNASeq",
+            "description": "Transcriptome of macrophage-like cell line HD11 cultures infected <i>in vitro</i> with purified <i>E. tenella</i> sporozoites. Triplicate cultures were harvested cultures at 2, 4, 12, 24, 48 and 72 hr post-infection and mRNA was extracted and sequenced in addition to control cultures.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_eed7a85cbd": {
+            "studyId": "STUDY_eed7a85cbd",
+            "sha1Hash": "eed7a85cbd4416e1df970d0654a9fa15f039ca5d",
+            "isUserStudy": false,
+            "displayName": "Liver stage hypnozoite vs schizont transcriptomes (primary culture)",
+            "shortDisplayName": "PcynM Liver HvsS RNA-Seq",
+            "description": "Transcriptomics of hypnozoite and sporozoite stages from <i>Plasmodium cynomolgi</i><br>\nSix to seven days after <i>P. cynomolgi</i> strain M sporozoite infection of primary simian hepatocytes, FACS-purified hepatocytes containing hypnozoites and liver schizonts were prepared for high-throughput RNA-Seq. The dataset contains three independent schizont samples and four independent hypnozoite samples.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_79b90cb45e": {
+            "studyId": "STUDY_79b90cb45e",
+            "sha1Hash": "79b90cb45e7a95d5fb93aa8e9c014b403aea6c19",
+            "isUserStudy": false,
+            "displayName": "Alternative sex determining genotypes",
+            "shortDisplayName": "Alternative sex determining genotypes",
+            "description": "Sex determination evolves rapidly, often because of turnover of the genes at the top of the pathway. The house fly, Musca domestica, has a multifactorial sex determination system, allowing us to identify the selective forces responsible for the evolutionary turnover of sex determination in action. There is a male determining factor, M, on the Y chromosome (Y^M), which is probably the ancestral state. An M factor on the third chromosome (III^M) has reached high frequencies in multiple populations across the world, but the evolutionary forces responsible for the invasion of III^M are not resolved. To test if the III^M chromosome invaded because of sex-specific selection pressures, we used mRNA-Seq to determine if isogenic males that differ only in the presence of the Y^M or III^M chromosome have different gene expression profiles.\n\n<br><br> Overall design: 3 replicates of testes and male heads from a Y^M and a III^M strain, and one sample of head and ovary from each of the strains.\n<br><br>\nStrain  Info: We compared gene expression between two nearly isogenic house fly strains that differ only in the chromosome carrying M. The first, Cornell susceptible (CS), is an inbred, lab adapted strain with XX males that are heterozygous for a IIIM chromosome and a standard third chromosome that lacks an M factor (X/X; IIIM/IIICS) . CS females are XX and homozygous for the standard third chromosome (X/X; IIICS/IIICS). We created a strain with YM males that has the X chromosome and all standard autosomes from the CS strain. To do so, we used a backcrossing approach to move the Y chromosome from the genome strain (aabys) onto the CS background, creating the strain CS-aabys-Y (CSaY). CSaY males are XY and homozygous for the standard CS third chromosome (X/Y; IIICS/IIICS). The aabys strain has a recessive phenotypic marker on each of the five autosomes.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_7f0af00084": {
+            "studyId": "STUDY_7f0af00084",
+            "sha1Hash": "7f0af00084cb56626ca713f95bb613f3d735512b",
+            "isUserStudy": false,
+            "displayName": "Musca domestica Infection-Regulated Transcriptome",
+            "shortDisplayName": "Musca domestica Infection-Regulated Transcriptome",
+            "description": "A study to identify genes and transcripts regulated by bacterial infection in house flies.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_12e8cb1139": {
+            "studyId": "STUDY_12e8cb1139",
+            "sha1Hash": "12e8cb1139720b6f9bfff530ef4c342b6ca1dbd3",
+            "isUserStudy": false,
+            "displayName": "Single-cell RNA-Seq reveals vesicle-mediated communication between mosquito blood cells",
+            "shortDisplayName": "Single-cell RNA-Seq reveals vesicle-mediated communication between mosquito blood cells",
+            "description": "Abstract",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_ce8c1476a5": {
+            "studyId": "STUDY_2e233c91a8",
+            "sha1Hash": "ce8c1476a54d1728a487213a7467b71f310e3b31",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strains Cl3 and JRc14",
+            "description": "High throughput sequencing data from strain Cl3 and JRc14\n    were analyzed for single nucleotide polymorphisms\n    using <i>T. cruzi</i> CL Brener as a reference genome.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_0fdca599cd": {
+            "studyId": "STUDY_0fdca599cd",
+            "sha1Hash": "0fdca599cd04711a426c271af217645b578a37de",
+            "isUserStudy": false,
+            "displayName": "Treatment-time to reinfection cohort from Kisumu area, Kenya collected in 2003",
+            "shortDisplayName": "Treatment-time to reinfection",
+            "description": "Protein microarrays were probed with plasma from residents of a community in Kenya monitored for 12 weeks for reinfection and symptomatic malaria after administration of antimalarial drugs. P. falciparum proteins recognized by Abs from 88 children, aged 1-14 years, and 86 adults, aged 18 years, measured at the beginning of the observation period, were ranked by Ab signal intensity.\n       \n       <br><br>\n       These data are the result of a collaborative effort in multiple International Centers of Excellence in Malaria Research (ICEMRs) to develop tests using malaria-specific antibody responses as biosignatures of transmission and immunity.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_64fa10a3d2": {
+            "studyId": "STUDY_7e4578410a",
+            "sha1Hash": "64fa10a3d2fc2ab8f15769f905b7b346a171b646",
+            "isUserStudy": false,
+            "displayName": "Cryptosporidium hominis genetic diversity in isolates from Bangladesh (C parvum aligned)",
+            "shortDisplayName": "Cpar SNPs Bangladesh",
+            "description": "Genome sequencing of <i>Cryptosporidium hominis</i> from infants in slum dwelling from Dhaka Bangladesh. <i>Cryptosporidium</i> oocysts were purified directly from stool samples of 2 grams of semi-solid stool or approximately 2 mL of liquid stool material using the protocol of Hadfield et al. In 32 samples the sequences were both derived from C. hominis and had >80% genome coverage of 10X. Fifteen of these were diarrheal isolates and seventeen were isolated from subclinical infections as defined by Steiner et al.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_113b047941": {
+            "studyId": "STUDY_113b047941",
+            "sha1Hash": "113b0479415a95fd328f65fca521622ef3fd0271",
+            "isUserStudy": false,
+            "displayName": "Dengue vs non--infectious blood meal",
+            "shortDisplayName": "Aedes aegypti Transcriptome or Gene expression",
+            "description": "Comparison of the transcriptional profile of specific-tissues of the <i>Aedes aegypti</i> mosquitoes following a not-infectious or a DENV2-Jam1409 infectious blood-meal.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_42159a7b38": {
+            "studyId": "STUDY_a57aec8d85",
+            "sha1Hash": "42159a7b38c78c6fa8d4144f3fb9a43b2854f18d",
+            "isUserStudy": false,
+            "displayName": "SNP calls on WGS of six F. graminearum strains collected from wheat fields in France",
+            "shortDisplayName": "6Fg",
+            "description": "<b>General Description:</b> Six strains of <i>Fusarium graminearum</i> sensu stricto were isolated from wheat plants cultivated in several French regions (Cher, Meuse, Eure, Gers, and Seine Maritime) between 2001 and 2002. These strains exhibit various trends of pathogenicity and quantitative profiles of DON/15-ADON production that are representative of the genotypic and phenotypic diversity\nobserved within a larger French collection of isolates (for more information refer to Table 5).\n<br><br><b>Methodology used:</b> Illumina HiSeq 2000",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_b15b7077f9": {
+            "studyId": "STUDY_b15b7077f9",
+            "sha1Hash": "b15b7077f967d7c9321fa482671434ff6dcef688",
+            "isUserStudy": false,
+            "displayName": "Transcriptional landscape of Cryptococcus-host response",
+            "shortDisplayName": "Cryptococcus - M.musculus",
+            "description": "<b>General Description:</b>\n    The paired-end dual RNA-seq was performed between C<i>ryptococcus neoformans</i> H99 and the rodent (<i>Mus musculus</i>) and primate host (<i>Macaca fascicularis</i>) using three biological replicates.\n    <br><br><b>Methodology used:</b>\n    Expression profiling by high throughput sequencing - Illumina NextSeq 500.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_ed416e9e01": {
+            "studyId": "STUDY_ed416e9e01",
+            "sha1Hash": "ed416e9e01786e80cc3a716178fb8478b5049651",
+            "isUserStudy": false,
+            "displayName": "Male versus female",
+            "shortDisplayName": "Male versus Female",
+            "description": "<p>\n      Mosquitoes that emerged over a 24-h period were either directly collected as 0- to 1-day-old adults, or isolated for later collection time points of 1- to 2-day-old and 2- to 3-day-old adults. For each time point, five mosquitoes were homogenized in 300 \u00b5l RNA lysis buffer (Zymo Research) and stored at \u221280 \u00b0C until RNA isolation. For RNA isolation, equal volumes of homogenate from each time point were combined to represent 0- to 3-day-old mosquitoes. These steps were performed in biological triplicates for males and virgin nonblood-feed females of both An. stephensi and Ae. aegypti. Illumina paired-end libraries for the resulting samples were prepared using the manufacturer\u2019s specific protocol. The libraries were then sequenced using Illumina HiSeq.\u00a0\n      </p>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_16686ed2dc": {
+            "studyId": "STUDY_16686ed2dc",
+            "sha1Hash": "16686ed2dc700a89e8ee8328435befea1dc312b1",
+            "isUserStudy": false,
+            "displayName": "Malpighian tubules transcriptome, blood vs sugar fed",
+            "shortDisplayName": "Malpighian tubules, blood vs sugar fed",
+            "description": "Twelve replicates were collected for non-blood-fed mosquitoes and\n  3 replicates each were collected for blood-fed mosquitoes at 3h, 12h, and 24h post-blood meal.\n  <br>Paired-end libraries were sequenced in one lane using Illumina HiSeq 2000 platform. <br><br>\n\n    <i>Aedes albopictus</i> (ALBOPICTUS, MRA-804, deposited by Sandra Allan) were obtained from the Malaria Research and Reference Reagent Resource Center (MR4) as part of BEI Resources Repository, NIAID, NIH. <br><br>\n\n      For a given experimental trial, 90 adult female mosquitoes were transferred from the main colony to two small containers (45 females per container) and starved for 24 h by removing their sucrose solution. After 24 h, one container of mosquitoes was provided with access to 10% sucrose for 30 min (non-blood-fed treatment, NBF) and the other was provided with access to heparinized rabbit blood (Hemostat Laboratories, Dixon, CA, USA) through a membrane feeder (Hemotek, Blackburn, UK) for 30 min. After 3 h, 12 h, or 24 h, mosquitoes were immobilized on ice for \u223c15 min and the Malpighian tubules were isolated with fine forceps under Ringer solution\n\n    <br><br>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_200bf199c6": {
+            "studyId": "STUDY_805020846d",
+            "sha1Hash": "200bf199c6c7d8594ef09c36d319230900010063",
+            "isUserStudy": false,
+            "displayName": "Whole genome sequencing of T. cruzi TcI isolates and clones",
+            "shortDisplayName": "Tcru TcI isolates",
+            "description": "34 different <i>T. cruzi</i> TcI isolates and clones from different geographic regions were Illumina sequenced and mapped against the assembled <i>T. cruzi</i> Sylvio X10/1 genome to identify SNPs.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_85213de859": {
+            "studyId": "STUDY_85213de859",
+            "sha1Hash": "85213de85944648789ad867e356472f095e2be67",
+            "isUserStudy": false,
+            "displayName": "Blood (with and without parasites) at 1, 4, or 9 days post blood meal",
+            "shortDisplayName": "Blood at different days",
+            "description": "Sand flies aged 5 to 9 days were fed blood or parasite-containing blood, resulting in four treatment groups of Phlebotomus papatasi females: \n<ol type=\"i\">\n  <li>blood meal only</li>\n  <li>blood meal + L. major,</li>\n  <li>blood meal + L. donovani and</li>\n  <li>blood meal + Herpetomonas muscarum.</li>\n</ol>\n<i>Leishmania</i> and <i>Herpetomonas muscarum</i> promastigotes from log-phase cultures (3\u20134 days post inoculation) were resuspended in defibrinated and heat-inactivated rabbit blood at concentration of 1 \u00d7 106 promastigotes/ml, which corresponds to 500\u20131000 promastigotes per Phlebotomus papatasi female. Sand fly females (5\u20139 days old) were infected by feeding on the suspension through a chick-skin membrane. Engorged sand flies were maintained under the same conditions as the colony.\n<br><br>\nFlies were then left to develop an infection or digest their non-infected blood meal for 1, 4 or 9 days (actual age = 18\u201319 days on ninth day PBM). Across infections, flies were compared at the same time point (same age) unless flies with the same infection were being compared.\n<br><br>\nRNA was purified from whole sand flies at 1, 4 and 9 days PBM, with the aim to identify any systemic responses over and above tissue-specific signals. Each time point analyzed included 20 flies; thus, 3 (time points) \u00d7 20 sand flies were processed per treatment group. This experiment was independently repeated three times for each treatment group so that ultimately 3 (replicates) \u00d7 60 (sand flies) =180 sand flies were processed for each treatment group in all three experiments. The goal of our experiment was to determine whether there was a difference between blood meal versus infected blood meal. Therefore, the non-infected blood meal served as the control (BioProject: PRJEB35592).",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_4362334059": {
+            "studyId": "STUDY_4362334059",
+            "sha1Hash": "4362334059deb5cd8ca73260a13b37908714fd2e",
+            "isUserStudy": false,
+            "displayName": "Parasite transcriptome during infection in mouse brain.",
+            "shortDisplayName": "TGME49 Injected neurons RNA-Seq",
+            "description": "Transcriptional profiles generated from RNA seq analysis of laser capture microdissected neurons from mice inoculated with saline (control), type II (Pru-Cre), or type III (CEP-Cre) Toxoplasma gondii parasites. Samples include Toxoplasma-injected neurons (TINs), Bystander neurons (nearby non-Toxoplasma-injected neurons), and neurons from uninfected mice (controls).",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_a03298576e": {
+            "studyId": "STUDY_a03298576e",
+            "sha1Hash": "a03298576ec1fcb1128039ea8ce2c3550530c29e",
+            "isUserStudy": false,
+            "displayName": "Comparative transcriptome of Neurospora crassa WT and delta mus52 strains",
+            "shortDisplayName": "NCrad52",
+            "description": "<b>General Description:</b> All <i>N. crassa</i> strains were maintained on Vogel\u2019s minimal medium, pH 5.8, at 30\u00b0C. Conidia from each strain were germinated for 5 h at 30\u00b0C in an orbital shaker (200 rpm), in low-Pi (10\u00b5M) and high-Pi (10mM) media. Total RNA was isolated from both strains and a total of 4\n<br><br><b>Methodology used:</b> cDNA libraries were sequenced, with their respective biological triplicates corresponding to the paired libraries, using an Illumina HiSeq2000 sequencer, to generate 100 bp paired-end reads.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_4d3aadae16": {
+            "studyId": "STUDY_4d3aadae16",
+            "sha1Hash": "4d3aadae16f346bd537767e3ce4f07482d100f1f",
+            "isUserStudy": false,
+            "displayName": "Mouse transcriptome during early and late chronic infection with T. gondii",
+            "shortDisplayName": "Mmus Early-Late Tgondii Infect RNA-Seq",
+            "description": "Host (Mus musculus) transcriptional profile of age- and sex-matched mice during very early (21 days), early (28 days), mid (3 months), \n\t\t   and late (6 months) chronic infection.  <br><br>\n\n           A similar study by the same authors produced parasite transcriptome and proteome data:\n           ToxoDB proteomics: <a href=\"https://toxodb.org/toxo/app/record/dataset/DS_8ab03f0b79\">Mouse brain bradyzoite proteomics time course</a>\n           ToxoDB RNA-Seq:",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_63f587b71a": {
+            "studyId": "STUDY_c9c59bd88a",
+            "sha1Hash": "63f587b71a99544885922b27d669abef30e04922",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strain TevSTIB805",
+            "description": "llumina reads for T. evansi strain TevSTIB805.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_0f355382bc": {
+            "studyId": "STUDY_c66bb8d26a",
+            "sha1Hash": "0f355382bc752c34113d9f202a6e9835fa9fabf6",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - Sri Lanka Isolates, CL vs VL",
+            "description": "Whole genome resequencing data from Sri Lanka <i>Leishmania donovani</i> Isolates, CL vs VL were analyzed for single \n        nucleotide polymorphisms and copy number variation using <i>Leishmania donovani</i> BPK282A1 as a reference. <br><br>\n        \n        SNP analysis<br>\n        Reads are aligned to the reference genome using Bowtie 2 and realigned around indels using GATK. SNPs,\n        indels and concensus sequence are generated with VARSCAN and stored in the database.<br><br>\n        \n        CNV analysis<br>\n        The median read depth is set to the organism's ploidy and each chromosome's median read depth is normalized \n        to this value. Contigs that are not assigned to chromosome are excluded from this analysis.  Gene copy number \n        is similarly calculated using a normalized read depth for each gene.  To compare the number of genes in the resequenced \n        genome to the reference genome, genes are grouped into clusters that are inferred to have originated by \n        tandem duplication.<br>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_57468051b4": {
+            "studyId": "STUDY_b420851acc",
+            "sha1Hash": "57468051b44ba38a191a5635b0de2fc39b67b853",
+            "isUserStudy": false,
+            "displayName": "Genomic diversity of 56 Trypanosoma congolense field isolates from 10 African countries",
+            "description": "56 <i>Trypanosoma congolense</i> isolates collected between 1971 and 2014 were maintained in OF-1 mice. Blood samples were obtained once parasitemia reached 30-60 trypanosomes/field in wet blood films at 400x magnification. To separate parasites from the blood, parasites were eluted from an anion exchanger DEAE-cellulose resin with phosphate saline glucose (PSG). DNA was extracted using the QIAamp DNA Blood Mini Kit, and next-generation sequencing libraries were made from 1 ng DNA using the Nextera XT kit. Each library underwent a MiSeq run with a 500 or 600 cycles kit. Paired-end sequence reads were mapped to the <i>T. congolnse</i> IL3000 reference genome.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_5e49da75b2": {
+            "studyId": "STUDY_466b82970e",
+            "sha1Hash": "5e49da75b28926769a2fe5d32f22a10d35632004",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strains Friedlin and LV39",
+            "description": "Whole genome resequencing data from <i>Leishmania major</i> strains Friedlin and LV39 were analyzed for single \n        nucleotide polymorphisms and copy number variation using <i>L. major</i> Friedlin as a reference. <br><br>\n        \n        SNP analysis<br>\n        Reads are aligned to the reference genome using Bowtie 2 and realigned around indels using GATK. SNPs,\n        indels and concensus sequence are generated with VARSCAN and stored in the database.<br><br>\n        \n        CNV analysis<br>\n        The median read depth is set to the organism's ploidy and each chromosome's median read depth is normalized \n        to this value. Contigs that are not assigned to chromosome are excluded from this analysis.  Gene copy number \n        is similarly calculated using a normalized read depth for each gene.  To compare the number of genes in the resequenced \n        genome to the reference genome, genes are grouped into clusters that are inferred to have originated by \n        tandem duplication.<br>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_9f1f924268": {
+            "studyId": "STUDY_d76b3643cc",
+            "sha1Hash": "9f1f924268bd6c3d1e93870e006134e61f47ea91",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strain LV9",
+            "description": "Whole genome resequencing data from  <i>Leishmania infantum</i> LV9 were analyzed for single \n        nucleotide polymorphisms and copy number variation using <i>L. infantum</i> JPCM5 as a reference. <br><br>\n        \n        SNP analysis<br>\n        Reads are aligned to the reference genome using Bowtie 2 and realigned around indels using GATK. SNPs,\n        indels and concensus sequence are generated with VARSCAN and stored in the database.<br><br>\n        \n        CNV analysis<br>\n        The median read depth is set to the organism's ploidy and each chromosome's median read depth is normalized \n        to this value. Contigs that are not assigned to chromosome are excluded from this analysis.  Gene copy number \n        is similarly calculated using a normalized read depth for each gene.  To compare the number of genes in the resequenced \n        genome to the reference genome, genes are grouped into clusters that are inferred to have originated by \n        tandem duplication.<br>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_abfcde62f4": {
+            "studyId": "STUDY_466b82970e",
+            "sha1Hash": "abfcde62f4e381d5dc2e2189a8cd62665487c4ca",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strains LV39cl5 and Seidman751",
+            "description": "Whole genome resequencing data from <i>Leishmania major</i> strains LV39cl5 and Seidman751 were analyzed for single \n        nucleotide polymorphisms and copy number variation using <i>L. major</i> Friedlin as a reference. <br><br>\n        \n        SNP analysis<br>\n        Reads are aligned to the reference genome using Bowtie 2 and realigned around indels using GATK. SNPs,\n        indels and concensus sequence are generated with VARSCAN and stored in the database.<br><br>\n        \n        CNV analysis<br>\n        The median read depth is set to the organism's ploidy and each chromosome's median read depth is normalized \n        to this value. Contigs that are not assigned to chromosome are excluded from this analysis.  Gene copy number \n        is similarly calculated using a normalized read depth for each gene.  To compare the number of genes in the resequenced \n        genome to the reference genome, genes are grouped into clusters that are inferred to have originated by \n        tandem duplication.<br>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_a2aec67038": {
+            "studyId": "STUDY_466b82970e",
+            "sha1Hash": "a2aec67038caaec5d679479464702127137d087c",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strain V1",
+            "description": "Whole genome resequencing data from <i>Leishmania major</i> V1 were analyzed for single \n        nucleotide polymorphisms and copy number variation using <i>Leishmania major</i> Friedlin as a reference. <br><br>\n        \n        SNP analysis<br>\n        Reads are aligned to the reference genome using Bowtie 2 and realigned around indels using GATK. SNPs,\n        indels and concensus sequence are generated with VARSCAN and stored in the database.<br><br>\n        \n        CNV analysis<br>\n        The median read depth is set to the organism's ploidy and each chromosome's median read depth is normalized \n        to this value. Contigs that are not assigned to chromosome are excluded from this analysis.  Gene copy number \n        is similarly calculated using a normalized read depth for each gene.  To compare the number of genes in the resequenced \n        genome to the reference genome, genes are grouped into clusters that are inferred to have originated by \n        tandem duplication.<br>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_2d4e503dcc": {
+            "studyId": "STUDY_c3ef6891ac",
+            "sha1Hash": "2d4e503dcc984167d50e12c1ff8c524c0521d549",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strains Cl3 and JRc14",
+            "description": "High throughput sequencing data from strain Cl3 and JRc14\n    were analyzed for single nucleotide polymorphisms\n    using <i>T. cruzi</i> CL Brener Non-Esmeraldo-like as a reference genome.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "EDAUD_J0N5BNAJwN0Np": {
+            "studyId": "STUDY_03b0e24af7",
+            "sha1Hash": "",
+            "isUserStudy": true,
+            "displayName": "test-dt-b2-july15-2026-1",
+            "shortDisplayName": "test-dt-b2-july15-2026-1",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_f2d320a16d": {
+            "studyId": "STUDY_719019678d",
+            "sha1Hash": "f2d320a16db3a191fbfc0f0aec4004d17e2ab1ae",
+            "isUserStudy": false,
+            "displayName": "Aligned Genomic Sequence Reads - 42 global isolates from human, tick and rodent",
+            "description": "The complete genomes of 42 <i>Babesia microti</i> isolates, including 32 human cases, two samples from ticks and four from rodents were sequenced. Geographic location of sample origins include Northeastern USA, Midwestern USA, Alaska, Russia and Japan. The 6.4\u2005Mb genome was sequenced to a mean depth of 153-fold on Illumina HiSeq instruments using a paired-end protocol. The data were used to calculate SNPs against the <i>B microti</i> reference genome.<br><br>\n        \n        Data were used to determine single nucleotide polymorphisms against the <i>B. microti</i> RI reference.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_714b0674fc": {
+            "studyId": "STUDY_8117acf44f",
+            "sha1Hash": "714b0674fc83c9050c805e3ec0c7b414f2c57bc0",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strain U1103",
+            "description": "Whole genome resequencing data from  <i>Leishmania mexicana</i> MHOMGT2001U1103 were analyzed for single \n        nucleotide polymorphisms and copy number variation using <i>Leishmania mexicana</i> MHOMGT2001U1103 as a reference. <br><br>\n        \n        SNP analysis<br>\n        Reads are aligned to the reference genome using Bowtie 2 and realigned around indels using GATK. SNPs,\n        indels and concensus sequence are generated with VARSCAN and stored in the database.<br><br>\n        \n        CNV analysis<br>\n        The median read depth is set to the organism's ploidy and each chromosome's median read depth is normalized \n        to this value. Contigs that are not assigned to chromosome are excluded from this analysis.  Gene copy number \n        is similarly calculated using a normalized read depth for each gene.  To compare the number of genes in the resequenced \n        genome to the reference genome, genes are grouped into clusters that are inferred to have originated by \n        tandem duplication.<br>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "EDAUD_ZpN54Y0MoV108": {
+            "studyId": "STUDY_3698961d66",
+            "sha1Hash": "",
+            "isUserStudy": true,
+            "displayName": "test-vizes-jul8-2026-1",
+            "shortDisplayName": "test-vizes-jul8-2026-1",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_2184f85560": {
+            "studyId": "STUDY_c66bb8d26a",
+            "sha1Hash": "2184f855600421ed1b91734953d4d34a5e04bc67",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - 16 clinical isolates",
+            "description": "Whole genome resequencing data from 16 clinical isolates of <i>Leishmania donovani</i> were analyzed for single \n        nucleotide polymorphisms and copy number variation using <i>L. donovani</i> BPK282A1 as a reference. <br><br>\n        \n        SNP analysis<br>\n        Reads are aligned to the reference genome using Bowtie 2 and realigned around indels using GATK. SNPs,\n        indels and concensus sequence are generated with VARSCAN and stored in the database.<br><br>\n        \n        CNV analysis<br>\n        The median read depth is set to the organism's ploidy and each chromosome's median read depth is normalized \n        to this value. Contigs that are not assigned to chromosome are excluded from this analysis.  Gene copy number \n        is similarly calculated using a normalized read depth for each gene.  To compare the number of genes in the resequenced \n        genome to the reference genome, genes are grouped into clusters that are inferred to have originated by \n        tandem duplication.<br>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_53f554ec6a": {
+            "studyId": "STUDY_53f554ec6a",
+            "sha1Hash": "53f554ec6aee372f6489f0bccc0b58fbdb7ad643",
+            "isUserStudy": false,
+            "displayName": "RMgmDB - Rodent Malaria genetically modified Parasites",
+            "shortDisplayName": "RMgmDB",
+            "description": "The Rodent Malaria genetically modified Parasites database is a web-based, manually curated, repository \n    containing information on genetically modified rodent-malaria parasites generated \n    by many labs worldwide. It contains data of 3 rodent malaria parasites: <i>Plasmodium berghei</i>, \n    <i>P. yoelii</i> and <i>P. chabaudi</i>. The aim of this database is to provide the research community access \n    to detailed information on the generation (e.g. disruption, tagging, mutation, transgene expression) \n    and phenotype of mutant malaria parasites. The database also provides information on unpublished \n    mutants without a clear phenotype and negative trials to modify genes.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_56a3d96a79": {
+            "studyId": "STUDY_aa4c9a8d92",
+            "sha1Hash": "56a3d96a79735d1e2b86dee14a6e6e1f7d5d4bf2",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strains Cf-Cl",
+            "description": "Whole Genome Sequencing of Crithidia fasciculata",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_2a1c4a9eb0": {
+            "studyId": "STUDY_932ce5b4a1",
+            "sha1Hash": "2a1c4a9eb00907783d3b605400c18fdda2ff6f6d",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strain M2903",
+            "description": "Whole genome resequencing data from <i>Leishmania braziliensis </i> strain M2903 were analyzed for single nucleotide polymorphisms and copy number variation using <i>L. braziliensis</i> M2904 as a reference. <br><br>\n        \n        SNP analysis<br>\n        Reads are aligned to the reference genome using Bowtie 2 and realigned around indels using GATK. SNPs,\n        indels and concensus sequence are generated with VARSCAN and stored in the database.<br><br>\n        \n        CNV analysis<br>\n        The median read depth is set to the organism's ploidy and each chromosome's median read depth is normalized \n        to this value. Contigs that are not assigned to chromosome are excluded from this analysis.  Gene copy number \n        is similarly calculated using a normalized read depth for each gene.  To compare the number of genes in the resequenced \n        genome to the reference genome, genes are grouped into clusters that are inferred to have originated by \n        tandem duplication.<br>",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_da3f73bd80": {
+            "studyId": "STUDY_0ba9ac184b",
+            "sha1Hash": "da3f73bd80bbe7324215f9a098f98f88dd6d3f19",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strains Cl3 and JRc14",
+            "description": "High throughput sequencing data from strain Cl3 and JRc14\n    were analyzed for single nucleotide polymorphisms\n    using <i>T. cruzi</i> CL Brener Esmeraldo-like as a reference genome.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_7452ca12ac": {
+            "studyId": "STUDY_59941a54bb",
+            "sha1Hash": "7452ca12ac138da8ef37af808ccd3e70e7ca846a",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strain gambiense",
+            "description": "High throughput sequencing data from strain <i>T. gambiense</i> DAL972\n    were analyzed for single nucleotide polymorphisms\n    using <i>T. brucei</i> TREU927 as a reference genome.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_d612ba1215": {
+            "studyId": "STUDY_59941a54bb",
+            "sha1Hash": "d612ba121581c0d15fc178180b34c0e75ba24a57",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads - strain TREU927",
+            "description": "High throughput sequencing data from strain TREU927\n    were analyzed for single nucleotide polymorphisms\n    using <i>T. brucei</i> TREU927 as a reference genome.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_0642f51826": {
+            "studyId": "STUDY_2cb069638b",
+            "sha1Hash": "0642f5182611921cc126fd8a491bd358d0718433",
+            "isUserStudy": false,
+            "displayName": "Aligned genomic sequence reads for strain DAL972",
+            "description": "High throughput sequencing data from strain DAL972\n    were analyzed for single nucleotide polymorphisms\n    using <i>T. gambiense</i> DAL972 as a reference genome.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        },
+        "DS_67744a62ee": {
+            "studyId": "STUDY_d34814ec50",
+            "sha1Hash": "67744a62eecaf69e81904243134d51c6f808130f",
+            "isUserStudy": false,
+            "displayName": "SNP calls on WGS of Candida albicans clinical isolates (oropharyngeal candidiasis)",
+            "description": "Forty three <i>C. albicans</i> isolates were collected from eleven HIV-infected patients treated with flucanosole. \nGenomic DNA was sequenced using 101 base paired-end Illumina sequencing.",
+            "type": "end-user",
+            "actionAuthorization": {
+                "studyMetadata": true,
+                "subsetting": true,
+                "visualizations": true,
+                "resultsFirstPage": true,
+                "resultsAll": true
+            },
+            "isManager": false,
+            "accessRequestStatus": "unrequested"
+        }
+    }
+}

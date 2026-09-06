@@ -1,0 +1,21 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "POST",
+    "url": "https://plasmodb.org/plasmo/service/record-types/transcript/searches/GenesByLocation/refreshed-dependent-params",
+    "status": 422,
+    "content_type": "text/plain",
+    "recorded_at": "2026-08-22",
+    "reads": "WDK-VOCAB-006, WDK-VALID-001, WDK-VALID-006, WDK-HTTP-002"
+  },
+  "body": {
+    "level": "UNSPECIFIED",
+    "isValid": false,
+    "errors": {
+      "general": [
+        "The passed changed param value 'Nope' is invalid."
+      ],
+      "byKey": {}
+    }
+  }
+}

@@ -1,0 +1,521 @@
+{
+    "studies": [
+        {
+            "id": "STUDY_ccab256dfb",
+            "datasetId": "DS_ccab256dfb",
+            "sha1hash": "ccab256dfb7c9562dfa35f36345348ad2f2d5dfa",
+            "sourceType": "curated",
+            "displayName": "S. cerevisiae transcriptomes in hypoxia and normoxia conditions",
+            "shortDisplayName": "Schypoxia",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "<b>General Description:</b>Examination of hypoxia condition in one cell type and 4 different experimental conditions\n<br><br>\n<b>Methodology used:</b> Expression profiling by high throughput sequencing. Illumina HiSeq 2500."
+        },
+        {
+            "id": "STUDY_bf43a6913c",
+            "datasetId": "DS_dd73524c7e",
+            "sha1hash": "dd73524c7e2b9842de9f640f6e8fa5f96d059975",
+            "sourceType": "curated",
+            "displayName": "SNP calls of WGS of Parastagonospora nodorum isolates",
+            "shortDisplayName": "WGS_Pn",
+            "lastModified": "2026-08-07T20:00:00-04:00",
+            "description": "<b>General Description: </b>Fragments of mycelium from 4-day-old colonies growing on PDA media were transferred to 50\u2009ml Potato Dextrose Broth (PDB) media and cultured for 4\u20136\u2009days at 24\u2009\u00b0C while shaking at 120\u2009rpm. The resulting mycelial colonies were filtered through sterile cheesecloth and lyophilized for 72\u2009h. Dried fungal material was used for DNA extraction with the DNeasy Plant Mini Kit (Qiagen) following the manufacturer\u2019s standard protocol. We sequenced the genomes for all 159 isolates included in this study. \u2028<br><br><b>Methodology used:</b> The sequencing was performed on an Illumina HiSeq 2500 platform producing paired-end reads of 150\u2009bp. Preparation of sequencing libraries and sequencing was performed at the Functional Genomics Center in Zurich."
+        },
+        {
+            "id": "STUDY_3d00996d17",
+            "datasetId": "DS_3d00996d17",
+            "sha1hash": "3d00996d17826b716fa3ff704b4cbb4168c1d0d6",
+            "sourceType": "curated",
+            "displayName": "Intraerythrocytic development cycle for P. vinckei CY",
+            "shortDisplayName": "PvinCY IDC RNASeq",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "<p>Transcriptome time course during the intraerythrocytic cycle of <i>P. vinckei</i> CY</p>\n\n<p>Plasmodium vinckei infections were initiated in CBA mice. On day four post infection, 20 \u03bcL blood was collected via tail snip at four time points; 06:00 h, 12:00 h, 18:00 h and 24:00 h. Strand-specific Illumina mRNA sequencing was performed from total RNA. </p>"
+        },
+        {
+            "id": "STUDY_71f2c2118b",
+            "datasetId": "DS_71f2c2118b",
+            "sha1hash": "71f2c2118b4028d3ecd38d70e5c8228745465efe",
+            "sourceType": "curated",
+            "displayName": "Chromatin Immunoprecipitation (RH PLK CTG) - Active Transcriptome",
+            "shortDisplayName": "Chromatn ChIP-chip",
+            "lastModified": "2026-01-14T20:00:00-04:00",
+            "description": "Type I (RH) / Type II (PLK) / Type III (CTG) tachyzoites; green=H3K4Me3; orange=H3K9ac; (Einstein)\nEvidence of expression in Type I (RH) tachyzoites based on ChIP-chip peaks.<br><br>\nTwo different antibodies were used identifying different chromatin marks which indicate active transcription. \nCoincident Histone 3 Lysine 4 trimethylation (H3K4me3) and Histone 3 Lysine 9 acetylation (H3K9ac) peaks are \nhighly correlated with active promoters, with H3K4me3 marks oriented closer to the 5' end of the gene. \nExperiments were performed in duplicate -- H3K4Me3 replicas are in shades of green and H3K9ac replicas \nare in shades of orange."
+        },
+        {
+            "id": "STUDY_a0a3c648be",
+            "datasetId": "DS_a0a3c648be",
+            "sha1hash": "a0a3c648be44e04c2ca14136f754212bf56a1d43",
+            "sourceType": "curated",
+            "displayName": "Transcriptome and Translatome of epimastigote and metacyclic stages (Esmo aligned)",
+            "shortDisplayName": "TcruEsmo Epi_Meta transc and transl RNA-Seq",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "RNA-Seq and ribosome profiling of <i>Trypanosoma cruzi</i> DM28c non-infective\n(epimastigote) and infective (metacyclic trypomastigote) life stages.  Sequencing was\ndone using ABI Solid and resulting FASTQ data was mapped to <i>T. cruzi</i>\nCL Brener Esmeraldo like in TriTrypDB. Expression results are displayed on ortholog gene pages in\n<i>T. cruzi</i> CL Brener."
+        },
+        {
+            "id": "STUDY_66f9e70b8a",
+            "datasetId": "DS_66f9e70b8a",
+            "sha1hash": "66f9e70b8a4a9a7efebfe58e0303f2c7f84ec907",
+            "sourceType": "curated",
+            "displayName": "Transcriptomes of 7 sexual and asexual life stages",
+            "shortDisplayName": "3D7 7Stages RNA-Seq",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "Illumina-based sequencing of <i>P.falciparum</i> 3D7 mRNA from two gametocyte stages (II and V), \n      ookinete, and four time points of erythrocytic stages representing ring, early trophozoite, late \n      trophozoite, and schizont.<br> <br>\n      \n    Using synchronized <i>Plasmodium falciparum</i> 3D7 parasites cultured for one full cycle, samples \n    were harvested at 8, 19, 30, and 42 h post infection corresponding to ring, early trophozoite, late trophozoite, \n    and schizont stages, respectively. Gametocytes were produced from asexual cultures harvested at day 8 (stage II gametocytes) \n    and day 15 (stage V gametocytes). Ookinete were harvested from 30 mosquito midguts 24 h after a <i>P. falciparum</i> infected blood meal.\n    <br> <br>\n    Seven bidirectional libraries from ring, early and late trophozoite, schizont, gametocyte II, gametocyte V, \n    and ookinete, were sequenced using Illumina methods."
+        },
+        {
+            "id": "STUDY_dfae3769c3",
+            "datasetId": "DS_dfae3769c3",
+            "sha1hash": "dfae3769c3ba7aaca3374d9b2df7e65a02c0b004",
+            "sourceType": "curated",
+            "displayName": "Fitness during <i>in vitro</i> cell culture and <i>in vivo</i> murine <i>T. gondii</i> acute infection (Genome-wide CRISPR screen)",
+            "shortDisplayName": "Fitness during acute infection",
+            "lastModified": "2026-01-14T20:00:00-04:00",
+            "description": "Functional profiling of the entire <i>T. gondii</i> genome during murine infection using a CRISPR-based screen.  <i>T. gondii</i> RH strain was utilized for the whole genome screens in this study and all data was mapped to the GT1 strain. Samples were collected from six cell culture passages (Cell culture P4-P10; 2-day passages) and parasites from cell culture P4 were used to infect outbred CD-1 mice intraperitoneally. Six days after infection, parasites were harvested from mice by outgrowth of peritoneal exudates (p.e.), liver, spleen, lung, heart (data not available in ToxoDB), and brain samples in cell culture, before isolating genomic DNA. <br><br>\n\tRelavent scores:\n<ul>\n\t<li>Fitness: This is how much the gRNA dropped out relative to the start of the screen - the average fold change in gRNA abundance for gRNAs targeting a given gene.</li>\n\n\t<li>Tissue vs. Cell Culture Differential Fitness: This is a metric that compares the gene score in a tissue vs. cell culture.</li>\n\n\t<li>Tissue p-value: p-value generated as part of our differential fitness calculation.</li>\n\n\t<li>Tissue Composite Score: This is the product of multiplying the (Differential Fitness Score)( \u2013log10(p-value)). </li>\n\t</ul>   <br><br>\n  <i><b>Note:</b> Data plotted here represent scores for all genes, including those with fitness defects in cell culture. For this reason, plots may not directly match those presented in Giuliano et al.</i>"
+        },
+        {
+            "id": "STUDY_29940f3f82",
+            "datasetId": "DS_29940f3f82",
+            "sha1hash": "29940f3f82990343dc09d9d69d0eaacc0c6b9f27",
+            "sourceType": "curated",
+            "displayName": "High resolution intraerythrocytic time course transcriptome by RNA-Seq",
+            "shortDisplayName": "Pfal 3D7 RBC RNAseq",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "The time course transcriptome of Plasmodium falciparum 3D7 parasite strain was generated by collecting RNA samples every 2 hours during full Intraerythrocytic Developmental Cycle.<br>\nPrior to time-point experiment, parasites were double-synchronized with 5% sorbitol solution to achieve a synchrony of\u2009\u00b1\u20096 h and cultured under constant agitation. <br>\nFor sampling of highly synchronous parasites during the asexual life cycle, the first time point was considered as the TP1 (Time Point 1) when\u2009&gt;\u200995% of early ring stage parasites (approx. 4 hours post invasion (hpi)) were present in the culture.<br>\nStarting from TP1, parasites were collected every 2 h for 25 successive time points."
+        },
+        {
+            "id": "STUDY_972d01eef2",
+            "datasetId": "DS_972d01eef2",
+            "sha1hash": "972d01eef29535552a2cc6852a1c79ee80884d5f",
+            "sourceType": "curated",
+            "displayName": "Transcriptional profiling of Z. tritici isolates during wheat infection",
+            "shortDisplayName": "Ztritici_wheat",
+            "lastModified": "2026-07-27T20:00:00-04:00",
+            "description": "<b>General Description:</b> Samples were grown in YPD and harvested at log phase growth. For each sample three biological replicate samples were generated. <br><br><b>Methodology used:</b> Illumina HiSeq 4000."
+        },
+        {
+            "id": "STUDY_ef796385a0",
+            "datasetId": "DS_ef796385a0",
+            "sha1hash": "ef796385a001d79b4beed828307e3f2c469c5333",
+            "sourceType": "curated",
+            "displayName": "Transcriptional responses to macrophage phagocytosis",
+            "shortDisplayName": "Clus_mac",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "<b>General Description:</b> The transcriptional responses to phagocytosis was analysed by incubating fungal cells in mammalian medium in the presence or absence of primary macrophages for 1 hour, followed by RNA extraction and sequencing.\n<br><br><b>Methodology used:</b> This experiment was performed in duplicate. Illumina HiSeq 2000."
+        },
+        {
+            "id": "STUDY_614ce17f3f",
+            "datasetId": "DS_614ce17f3f",
+            "sha1hash": "614ce17f3f1d42f3f1db6ccb6fa63ca349aca495",
+            "sourceType": "curated",
+            "displayName": "Visceral vs cutaneous isolate transcriptomes",
+            "shortDisplayName": "Ld visce vs cutaneous RNA-Seq",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "<u>Transcriptome of Visceral vs cutaneous leishmaniasis isolates</u><br><br>\n    \n    Isolates<br>\n    The cutaneous leishmaniasis (CL) clinical isolate was derived from a skin lesion \n    on the nose from a 28 year old male. The visceral leishmaniasis clinical isolate was from a bone \n    marrow aspirate from a 53-year-old male with chronic fever, \n    hepatosplenomegaly, low haemoglobin and seropositivity for rK39 anti-Leishmania antibodies. <br><br>\n    \n    Spliced Leader RNA-Seq<br>\n     cDNA libraries were prepared using mRNA derived from axenic promastigotes (Pro), axenic amastigotes \n     (Ax) and macrophage-derived amastigotes (Am) and RNA-Seq was performed on the two isolates. \n     Libraries were sequenced using the Genome Analyzer IIx (Illumina) at the High Throughput Genomics \n     Unit at the University of Washington to generate 36-nt long single-end reads. The SL RNA-Seq data \n     have been submitted to the GEO database under accession no. GSE48475.<br><br>\n     \n     Samples:<br>\n     \n    VL-Pro  axenic promastigotes from the strain causing visceral leishmaniasis<br>\n    VL-Ax   axenic amastigotes from the strain causing visceral leishmaniasis <br>\n    VL-Am   macrophage derived amastigotes from the strain causing visceral leishmaniasis <br>\n    CL-Pro  axenic promastigotes from the strain causing cutaneous leishmaniasis<br>\n    CL-Ax   axenic amastigotes from the strain causing cutaneous leishmaniasis <br>\n    CL-Am   macrophage derived amastigotes from the strain causing visceral leishmaniasis <br>"
+        },
+        {
+            "id": "STUDY_ea62256dac",
+            "datasetId": "DS_ea62256dac",
+            "sha1hash": "ea62256dac552125b132f98f2d753570bf6f6388",
+            "sourceType": "curated",
+            "displayName": "Male and female carcass",
+            "shortDisplayName": "Male and female carcass",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "<i>Aedes aegypti</i> male vs female adult (Liverpool strain) carcass transcriptomes.\n\n<br><br>Mosquitoes that emerged over a 24-h period were either directly collected as 0- to 1-day-old adults, or isolated for later collection time points of 1- to 2-day-old and 2- to 3-day-old adults. For each time point, five mosquitoes were homogenized in 300 \u00b5l RNA lysis buffer (Zymo Research) and stored at \u221280 \u00b0C until RNA isolation. For RNA isolation, equal volumes of homogenate from each time point were combined to represent 0- to 3-day-old mosquitoes. These steps were performed in biological triplicates. Illumina paired-end libraries for the resulting samples were prepared using the manufacturer\u2019s specific protocol. The libraries were then sequenced using Illumina HiSeq."
+        },
+        {
+            "id": "STUDY_c37639bde3",
+            "datasetId": "DS_c37639bde3",
+            "sha1hash": "c37639bde3f6d96188053bd50fda52474cd2591f",
+            "sourceType": "curated",
+            "displayName": "Transcriptome profiling data of Botrytis cinerea infection on whole tomato plant",
+            "shortDisplayName": "Bcin_tom",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "<b>General Description:</b> <i>Botrytis cinerea</i> is a foliar necrotrophic fungal-pathogen capable of infecting &gt;580 genera of plants, is often used as model organism for studying fungal-host interactions. RNAseq was used to study transcriptome of <i>B. cinerea</i> infection on a major (worldwide) vegetable crop, tomato (<i>Solanum lycopersicum</i>).\n<br><br><b>Methodology used:</b> <i>B. cinerea</i> transcriptome was investigated at 0, 16, 23, 40, and 47 hpi."
+        },
+        {
+            "id": "STUDY_c66bb8d26a",
+            "datasetId": "DS_2184f85560",
+            "sha1hash": "2184f855600421ed1b91734953d4d34a5e04bc67",
+            "sourceType": "curated",
+            "displayName": "Aligned genomic sequence reads - 16 clinical isolates",
+            "lastModified": "2026-08-07T20:00:00-04:00",
+            "description": "Whole genome resequencing data from 16 clinical isolates of <i>Leishmania donovani</i> were analyzed for single \n        nucleotide polymorphisms and copy number variation using <i>L. donovani</i> BPK282A1 as a reference. <br><br>\n        \n        SNP analysis<br>\n        Reads are aligned to the reference genome using Bowtie 2 and realigned around indels using GATK. SNPs,\n        indels and concensus sequence are generated with VARSCAN and stored in the database.<br><br>\n        \n        CNV analysis<br>\n        The median read depth is set to the organism's ploidy and each chromosome's median read depth is normalized \n        to this value. Contigs that are not assigned to chromosome are excluded from this analysis.  Gene copy number \n        is similarly calculated using a normalized read depth for each gene.  To compare the number of genes in the resequenced \n        genome to the reference genome, genes are grouped into clusters that are inferred to have originated by \n        tandem duplication.<br>"
+        },
+        {
+            "id": "STUDY_8f28b19c39",
+            "datasetId": "DS_8f28b19c39",
+            "sha1hash": "8f28b19c39b095415fe6ef735c4d418c30fd708d",
+            "sourceType": "curated",
+            "displayName": "Spatial proteomics of T. brucei BSF and PCF",
+            "shortDisplayName": "T. brucei927 spatial proteomics",
+            "lastModified": "2026-01-14T20:00:00-04:00",
+            "description": "Two different <i>T. brucei</i> life-stages- the mammalian bloodstream form (BSF) and the insect midgut procyclic form (PCF), were analyzed by hyperLOPIT spatial proteomics to provide evidence of protein expression and assignment of subcellular location of thousands of proteins per cell-type."
+        },
+        {
+            "id": "STUDY_1373afc053",
+            "datasetId": "DS_1373afc053",
+            "sha1hash": "1373afc053f84a2e27b1d15753c8b6d8f11fcdf4",
+            "sourceType": "curated",
+            "displayName": "HP1 localization at virulence clusters",
+            "shortDisplayName": "Pf3D7 PfHP1 ChIP-Chip",
+            "lastModified": "2026-01-14T20:00:00-04:00",
+            "description": "Genome-wide localization of heterochromatin protein 1 (PfHP1) and association with virulence clusters \n      as determined by high-density ChIP-on-chip.<br><br>\n   \n      \n      High-resolution analysis by genome-wide chromatin immunoprecipitation (ChIP-on-chip) revealed a \n      striking PfHP1 occupancy pattern restricted to 425 genes, most of which are members of <i>P. falciparum</i>-specific \n      exported virulence families including var genes, \n      rifs, stevor, pfmc-2tm and others.<br>\n      \n      <br>Contact Till Voss, till.voss@unibas.ch, for further information"
+        },
+        {
+            "id": "STUDY_f2c1ca711d",
+            "datasetId": "DS_f2c1ca711d",
+            "sha1hash": "f2c1ca711de5bf07749a02a53acf8bb79533bb1c",
+            "sourceType": "curated",
+            "displayName": "Uninfected (control) vs infected with Anaplasma phagocytophilum human NY18 isolate",
+            "shortDisplayName": "Uninfected vs infected with A. phagocytophilum",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "The I. scapularis embryo-derived tick cell line ISE6 was first inoculated with Anaplasma phagocytophilum (human NY18 isolate)-infected HL-60 cells, until infection was established and routinely passaged. Infected ISE6 cells were frozen in liquid nitrogen and served as inoculum for uninfected cells. Uninfected and infected cultures (n = 3 independent cultures with \u223c107 cells each) were sampled at 7 days postinfection (percentage infected cells 71\u201377% (Ave1 \u00b1 SD, 74 \u00b1 3). The cells were centrifuged and cell pellets were lyophilized or frozen in liquid nitrogen until used for protein and RNA extraction. Total RNA was extracted from aliquots of the same cell cultures. For RNAseq were sequenced using Illumina, two biological replicates were used for each of uninfected and infected tick cells, obtaing 100 bp pair-end reads per sample. BioProject: PRJNA283969."
+        },
+        {
+            "id": "STUDY_dd71eb8985",
+            "datasetId": "DS_dd71eb8985",
+            "sha1hash": "dd71eb8985cc200acb8fd9602ffb77e6ab1233c1",
+            "sourceType": "curated",
+            "displayName": "RNA-Seq from male and female Anopheles coluzzii, Anopheles arabiensis, Anopheles quadriannulatus, and their hybrids.",
+            "shortDisplayName": "RNA-Seq from male and female Anopheles coluzzii, Anopheles arabiensis, Anopheles quadriannulatus, and their hybrids.",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "RNA-Seq of member species of the Anopheles gambiae species complex and their F1 hybrids."
+        },
+        {
+            "id": "STUDY_89881c5ea0",
+            "datasetId": "DS_89881c5ea0",
+            "sha1hash": "89881c5ea0d3642fd456540667ff53a0d887e8bd",
+            "sourceType": "curated",
+            "displayName": "RNA-Seq Trichophyton rubrum and HaCat Keratinocyte Co-Culture",
+            "shortDisplayName": "Trichophyton_Keratinocyte",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "<b>General Description:</b> <i>T. rubrum</i> and HaCat cells line were co-cultured in RPMI medium supplemented with 5% of fetal bovine serum and were incubated for 24 h at 37\u00baC in a humidified atmosphere containing 5% CO2 , followed RNA by extraction of both organisms, libraries construction and sequence.\n<br><br><b>Methodology used:</b> Illumina HiSeq 2000."
+        },
+        {
+            "id": "STUDY_ab6b90c097",
+            "datasetId": "DS_ab6b90c097",
+            "sha1hash": "ab6b90c0974958eb5e78beacd9d48bea6f698db7",
+            "sourceType": "curated",
+            "displayName": "Musca domestica Raw sequence reads",
+            "shortDisplayName": "Musca domestica Raw sequence reads",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "Analysis of differentially expressed genes related to resistance in spinosad- and neonicotinoid-resistant Musca domestica L. (Diptera: Muscidae) strains"
+        },
+        {
+            "id": "STUDY_c620b25386",
+            "datasetId": "DS_c620b25386",
+            "sha1hash": "c620b25386f644b4a140ac6188896bc6f4c30399",
+            "sourceType": "curated",
+            "displayName": "Forest (guinea pig-preferring)  vs Domestic (human-preferring) antenna",
+            "shortDisplayName": "Forest vs Domestic forms",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "We sequenced the female antennal transcriptomes of forest and domestic forms of the Dengue Fever mosquito, <i>Aedes aegypti</i>, and their F2 hybrids in order to gain insight into the genetic basis of preference for human odor. The domestic and forest forms coexist in Rabai, Kenya, where most of these samples were collected. The domestic form specializes on biting humans, is strongly attracted to human odor, and is derived from populations of the non-African subspecies <i>Aedes aegypti aegypti</i>. The forest form is opportunistic, prefers the odor of non-human animals in laboratory assays, and belongs to the native African subspecies <i>Aedes aegypti formosus</i>. We sequenced Illumina RNA-Seq libraries derived from the antennae of 100-150 females from each of 3 domestic colonies from Rabai, Kenya (K2, K4, K14), 3 forest colonies from Rabai, Kenya (K18, K19, K27), 1 colony of <i>Aedes aegypti aegypti</i> from Thailand (T32) and 1 colony of <i>Aedes aegypti formosus</i> from Uganda (U30). Colonies from Kenya and Thailand/Uganda were derived from 2-20 and 50-200 field caught individuals, respectively, and had been reared in the lab for 3-8 generations. We also sequenced Illumina RNA-Seq libraries derived from the antennae of 50-60 females from 2 strongly human-preferring and 2 strongly guinea pig preferring pools of F2 hybrids (HU1, HU2, GP1, GP2). The F2 hybrids were isolated from a large population of ~2500 F2 females generated from a cross between multiple individuals of 1 forest and 1 domestic colony. More information on these samples can be found in the associated publication.\n<br><br>\n\n<b>GP1</b> Guinea pig-preferring F2 hybrids derived from cross between colonies K14 and K27 <br><br>\n\n<b>GP2</b> Guinea pig-preferring F2 hybrids derived from cross between colonies K14 and K27 <br><br>\n\n<b>HU2</b> Human-preferring F2 hybrids derived from cross between colonies K14 and K27 <br><br>\n\n<b>HU1</b> Human-preferring F2 hybrids derived from cross between colonies K14 and K27 <br><br>\n\n<img src=\"/a/images/McBride2014.png\"\n    alt=\"map of collection locations and strain host preference graph\">"
+        },
+        {
+            "id": "STUDY_3a8f35b31c",
+            "datasetId": "DS_3a8f35b31c",
+            "sha1hash": "3a8f35b31c0141e63ad3560307e7b9c4f876c76c",
+            "sourceType": "curated",
+            "displayName": "KC cell line under 11 different conditions",
+            "shortDisplayName": "KC cell line under 11 different conditions",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "C. sonorensis KC cell line under 11 different conditions (one biological replicate): \nProstagalndin E1, Prostaglandin A1, 20 Hydroxyecdysome, <i>Staphylococcus aureus</i> Lipoteichoic acid, <i>E. coli</i> Lipopolysaccharide, Polyinosinic:polycytidylic acid, Insulin, Transcription growth factor \u03b21, fMLP, heat-shock at 36 C and a control. \nTrueSeq libraries were barcoded and sequenced on a single lane of the Illumina HiSeq 2000 platform using 100 bp paired-end reads (BioProject: PRJEB7006).\n<br><br>\n\n<p>Samples</p>\n<ul>\n<li>Control</li>\n<li>Transcription growth factor \u03b21: TGF B1</li>\n<li>Insulin: Insulin</li>\n<li>20 Hydroxyecdysome: 20e</li>\n<li>Prostaglandin E1: PGE1</li>\n<li>Prostaglandin A1: PGA1</li>\n<li>Heat-shock at 36 C: Heatshock</li>\n<li>fMLP: fMLP</li>\n<li>Polyinosinic: polycytidylic acid: Poly IC</li>\n<li><i>Staphylococcus aureus</i> Lipoteichoic acid: LTA</li>\n<li><i>Escherichia coli</i> Lipopolysaccharide: LPS</li>\n</ul>"
+        },
+        {
+            "id": "STUDY_83f0431b9b",
+            "datasetId": "DS_83f0431b9b",
+            "sha1hash": "83f0431b9b9fc8b9ae9987361c3684e6d309a197",
+            "sourceType": "curated",
+            "displayName": "Mosquito gene expression after ivermectin ingestion",
+            "shortDisplayName": "Mosquito gene expression after ivermectin ingestion",
+            "lastModified": "2026-08-17T20:00:00-04:00",
+            "description": "Three age groups of <i>Anopheles gambiae</i> were reared and assayed for IVM-induced mortality; 2 days-post-emergence (DPE), 6DPE and 14DPE. Each group was split into treatment and control groups, receiving an IVM or control blood meal at the specified age. Feeding was done using defibrinated calf blood (Colorado Serum Company, Denver, CO) containing 11.75 ng/ml IVM. For the 6DPE and 14DPE groups, mosquitoes were fed normal blood meals and allowed to oviposit as they aged to emulate natural conditions; only those that engorged on these normal blood meals were carried into later age classes to maintain intergroup similarities. Thus, for 2DPE groups, the IVM blood meal (or corresponding control) they ingested on day 2 was their first and only blood meal. 6DPE groups received one normal blood meal on day 2, allowed to oviposit on day 4, and then were given their IVM-containing blood meal (or corresponding control) on day 6. 14DPE groups received three normal blood meals on days 2, 6, and 10, allowed to oviposit 2 days after each, and then were given their IVM or control blood meal on day 14. Transcript expression was assayed via paired-end Illumina sequencing with quantification through a simple tophat2/cufflinks pipeline."
+        },
+        {
+            "id": "STUDY_e9682e8acc",
+            "datasetId": "DS_e9682e8acc",
+            "sha1hash": "e9682e8acc1e8c9fe1310fcdf15530db54613c27",
+            "sourceType": "curated",
+            "displayName": "Copper acquisition in Fusarium oxysporum f. sp. lycopersici 4287 during plant infection",
+            "shortDisplayName": "fo_copperStress",
+            "lastModified": "2026-07-27T20:00:00-04:00",
+            "description": "<b>General Description:</b> RNA-seq analysis comparing wild-type and macA knockout strains of <i>Fusarium oxysporum</i> f. sp. <i>lycopersici</i> 4287 under two experimental conditions: (1) in vitro copper stress (copper-depleted vs copper-supplemented media, 6 hours), and (2) in planta infection of tomato roots at 2 and 6 days post inoculation.\n<br><br><b>Samples:</b> 24 samples total (8 conditions x 3 biological replicates): WT +Cu 6h, WT -Cu 6h, macA mutant +Cu 6h, macA mutant -Cu 6h, WT tomato root 2 dpi, WT tomato root 6 dpi, macA mutant tomato root 2 dpi, macA mutant tomato root 6 dpi.\n<br><br><b>Methodology:</b> Total RNA was extracted using the RNeasy Plant Mini Kit (Qiagen) with DNase I treatment. Libraries were prepared using the TruSeq RNA Library Preparation Kit (Illumina) and sequenced on Illumina NovaSeq 6000 (paired-end reads)."
+        },
+        {
+            "id": "STUDY_5bab66cd23",
+            "datasetId": "DS_5bab66cd23",
+            "sha1hash": "5bab66cd2386ef776811d09d1003e2eca7492aff",
+            "sourceType": "curated",
+            "displayName": "Gene expression in reproductive organs of tsetse females",
+            "shortDisplayName": "Gene expression in reproductive organs of tsetse females",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "Tsetse flies are vectors of African trypanosomes, and their vectorial capacity results in a major public health emergency and vast economic losses in sub-Saharan Africa. Given the limited ability of trypanosome prevention and eradication, tsetse vectors remain major targets of control efforts. The past few years have witnessed the emergence of approaches based on knockdown of genes involved in milk production, resulting in a significant reduction of fecundity.In order to identify further genes applicable in the control of tsetse flies, we determined the expression of protein-coding genes in ovaries and uteri from both virgin and heavily pregnant Glossina morsitans morsitans females. Comparison of expression profiles allowed us to identify candidate genes with increased expression in pregnant individuals. This data needs to be considered initial, as a single replicate was employed in each condition, and the virgins were not age-matched to their pregnant counterparts (5-day old virgins vs. roughly 20-day old primiparas)."
+        },
+        {
+            "id": "STUDY_cb6310bab8",
+            "datasetId": "DS_cb6310bab8",
+            "sha1hash": "cb6310bab8ed9ad8d68d54ba55f90889ceb0da0f",
+            "sourceType": "curated",
+            "displayName": "Male and female sex-tissues vs carcass in adults and larvae",
+            "shortDisplayName": "Male and female sex-tissues vs carcass",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "Male and female sex-tissues vs carcass transcriptomes. Samples comprised larvae and 3-4 day old adult <i>Anopheles gambiae</i>  males and 48 hour blood-fed females from a mixed cage. Reproductive tissues collected from females included the ovaries and the common oviduct and for males included the testis and accessory glands. The remaining carcass (CA) included the head, thorax and abdomen."
+        },
+        {
+            "id": "STUDY_047c56768c",
+            "datasetId": "DS_047c56768c",
+            "sha1hash": "047c56768c32382a56ae90f7c975d0048c1c6b03",
+            "sourceType": "curated",
+            "displayName": "Mosquito midguts (MGs) and salivary glands (SGs) infected with P. falciparum",
+            "shortDisplayName": "Mosquito MGs and SGs infected with P. falciparum",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "Five-day-old female A. gambiae s.s. Kisumu mosquitoes from a genetically outbred laboratory colony in the University of Glasgow were used for experimental infections. Mosquitoes were maintained under standard insectary conditions (27 +- 2\u00b0C, 80 +- 5% relative humidity, 12:12 LD). Females were fed through membrane feeders on blood containing gametocytes of P. falciparum clone 3D7, prepared according to standard protocols. Thereafter the mosquitoes were given access to a solution of 5% glucose/0.05% 4-aminobenzoic acid ad libitum. Three independent experimental infections (Infections 1, 2 and 3) were carried out. Prevalence (percentage of infected mosquitoes) and intensity of infection (median number of oocysts) are described in Supplementary Table S1. We performed dissection of MGs on adults at 7 days post-infection and of SGs at 14 days post-blood meal.\n\nWe prepared RNA-seq libraries from P. falciparum-infected MGs and SGs obtained in two independent experimental infections (Infections 2 and 3; Supplementary Table S1). Total RNA was extracted from a pool of aprox. 30 MGs and a pool of aprox. 60 SGs from 30 mosquitoes. Libraries were sequenced at Cabimer (Spain) using an Illumina NextSeq500 for both 2 \u00d7 150 bp paired-end and 1 \u00d7 75 bp single-end reads."
+        },
+        {
+            "id": "STUDY_26174084d7",
+            "datasetId": "DS_26174084d7",
+            "sha1hash": "26174084d7cdd7a80574b6d7c24730b4953b4b45",
+            "sourceType": "curated",
+            "displayName": "Saprobic vs Parasitic Growth",
+            "shortDisplayName": "C.p. Saprobic/Parasitic RNA-Seq",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "Comparative transcriptomics were used to identify gene expression differences between the saprobic and parasitic growth phases of <i>Coccidiodes immitis</i> and <i>C. posadasii</i>. Of the 9,910 total predicted genes in Coccidioides, 1,298 genes were observed to be up-regulated in the saprobic phase of both <i>C. immitis</i> and <i>C. posadasii</i> and 1,880 genes were observed to be up-regulated in the parasitic phase of both species."
+        },
+        {
+            "id": "STUDY_5c2a732639",
+            "datasetId": "DS_5c2a732639",
+            "sha1hash": "5c2a7326393e25762d34c3f00d9abea00ac1d28b",
+            "sourceType": "curated",
+            "displayName": "Investigation of mdivi-1-driven metabolic reprogramming and levels of endogenous nitric oxide (NO) on gene expression",
+            "shortDisplayName": "Koch_Calb_NO",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "<b>General Description:</b> Cells were grown in YPD to log phase and hyphal morphogenesis was assessed in the presence of DMSO (control) or 100 \u03bcM mdivi-1 at 15min, 30min, 34min, 1h, and 2h.\n<br><br><b>Methodology used: </b>Illumina HiSeq 1500."
+        },
+        {
+            "id": "STUDY_f210d58388",
+            "datasetId": "DS_f210d58388",
+            "sha1hash": "f210d583889d66ffba27e669941aab15c857464a",
+            "sourceType": "curated",
+            "displayName": "Transcriptional profiles induced by exposure to crystalline cellulose",
+            "shortDisplayName": "N.c. comparitive RNA-Seq analysis",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "Biological triplicates were harvested at 4 hours after a switch to media of interest. Sequencing was performed on sequencing on the Illumina Genome Analyzer IIx platform"
+        },
+        {
+            "id": "STUDY_c77205c1ee",
+            "datasetId": "DS_c77205c1ee",
+            "sha1hash": "c77205c1eec716f65efa9bb0d650956e4c72a397",
+            "sourceType": "curated",
+            "displayName": "Effect of Dicer mutants on small RNA expression",
+            "shortDisplayName": "S.p. Dicer RNA-Seq",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "<i>Schizosaccharomyces pombe</i> data from Pierre Barraud, Marc Buhler et al. from ETH Zurich and FMI Basel on nuclear retention of fission yeast Dicer. Dicer proteins function in RNA interference (RNAi) pathways by generating small RNAs (sRNAs). The solution structure of the C-terminal domain of <i>Schizosaccharomyces pombe</i> Dicer (Dcr1) is reported here. The C-terminal domain of S pombe Dicer (Dcr1) structure reveals an unusual double-stranded RNA binding domain (dsRBD) fold embedding a novel zinc-binding motif that is conserved among dicers in yeast and constitutes a novel regulatory module that might represent a potential target for therapeutic intervention with fungal diseases."
+        },
+        {
+            "id": "STUDY_e9c1ea4a8d",
+            "datasetId": "DS_e9c1ea4a8d",
+            "sha1hash": "e9c1ea4a8d8b61cedfa5a6d0fd88036638c5ef99",
+            "sourceType": "curated",
+            "displayName": "Hypnozoite, schizont and blood stage transcriptomes (laser microdissection)",
+            "shortDisplayName": "Pcyn LCM hypno-schizo-blood RNA-Seq",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "Comparative transcriptome analysis of <i>P. cynomolgi</i> hypnozoites and liver schizonts.  To overcome \n          the challenges of low number and small size of hypnozoites, a laser capture microdissection (LCM) \n          technique was adapted to isolate these forms. Isolated <i>Plasmodium cynomolgi</i> hypnozoites and schizonts from \n          infected monkey hepatocytes were analyzed by RNA\u2010seq along with RNA extracted from frozen, \n          infected <i>M. fascicularis</i> blood samples."
+        },
+        {
+            "id": "STUDY_3c88ca2150",
+            "datasetId": "DS_3c88ca2150",
+            "sha1hash": "3c88ca215035ec0d5ec5406d6a2af7db6aad3b51",
+            "sourceType": "curated",
+            "displayName": "Quiescent and diapausing mosquitoes",
+            "shortDisplayName": "Quiescent and diapausing mosquitoes",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "Dormancy is a crucial adaptation allowing insects to withstand harsh environmental conditions. The pre-programmed developmental arrest of diapause is a form of dormancy that is distinct from quiescence, in which development arrests in immediate response to hardship. The Asian tiger mosquito, <i>Aedes albopictus<i>, presents an ideal model for such a study, as diapausing and quiescent eggs can be staged and collected for global gene expression profiling using a newly developed transcriptome. RNA-Seq to contrast gene expression during diapause with quiescence to identify transcriptional changes specific to the diapause response. Transcriptome data was collected from <i>Aedes albopictus<i> pharate larvae, at 11, 21 and 40 days post-oviposition and reared under diapause-inducing and non-diapause inducing photoperiods. Briefly, paired-end, barcoded Illumina mRNA-Seq libraries were constructed from each of the 17 RNA samples, and a proportion of each library was sequenced on three lanes on an Illumina HiSeq 2000 sequencer by the University of Maryland Genomics Institute."
+        },
+        {
+            "id": "STUDY_0941d3180e",
+            "datasetId": "DS_0941d3180e",
+            "sha1hash": "0941d3180e5d3af006b599b5e72ebf5b8596a3e9",
+            "sourceType": "curated",
+            "displayName": "Tick Cell Lines ISE6, ISE18, IDE2, IDE8, IDE12 and IRE11",
+            "shortDisplayName": "Cell Lines ISE6, ISE18, IDE2, IDE8, IDE12 and IRE11",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "<p>Unpublished transcriptome sequencing of tick cell lines.<p/>\n<br>\n\n<p><i>Ixodes scapularis</i> ISE6 and ISE18 cell lines, the ticks were originally collected on 9/8/1990 and 9/10/1990, respectively, both in Statesboro, GA, USA.<p/> \n<ul>\n<li>ISE6: PRJNA238753, PRJNA238754, PRJNA238755, PRJNA238756</li>\n<li>ISE18: PRJNA238757, PRJNA238758, PRJNA238759, PRJNA238760</li>\n</ul>\n<br>\n\n<p><i>Ixodes scapularis</i> IDE2, IDE8 and IDE12 cell lines originally collected on 15th, 18th and 22nd December 1989, respectively, all in St Croix, MN/WI, USA.<p/>\n<ul>\n<li>IDE2: PRJNA238761, PRJNA238762, PRJNA238763, PRJNA238764</li>\n<li>IDE8: PRJNA238777, PRJNA238778, PRJNA238779, PRJNA238780</li>\n<li>IDE12: PRJNA238765, PRJNA238766, PRJNA238767, PRJNA238768</li>\n</ul>\n<br>\n\n<p><i>Ixodes ricinus</i> IRE11 cell line. The ticks were originally collected on 7/11/1998, in Munich, Germany.<p/>\n<ul>\n<li>IRE11: PRJNA238785, PRJNA238786, PRJNA238787, PRJNA238788</li>\n</ul>\n<br>\n\n<p>In each cell line, one BioProject corresponds to one biological replicate (BR) to a total of four BRs.<p/>"
+        },
+        {
+            "id": "STUDY_672da12264",
+            "datasetId": "DS_672da12264",
+            "sha1hash": "672da12264befa42ae29bde148276ba399b65ccf",
+            "sourceType": "curated",
+            "displayName": "Transcriptomes of mouse macrophages infected with Leishmania mexicana",
+            "shortDisplayName": "Mmus infected w/ Lmex RNA-Seq",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "Transcriptomes of mouse macrophages (BMDM) infected with <i>Leishmania mexicana</i><br>\n        <i>Mus musculus</i> bone marrow derived macrophage were infected with promastigotes and harvested 24h later along with \n        uninfected control cultures.  Three biological replicates were collected for each sample. Total RNA was extracted, \n        enriched for polyA mRNA and sequenced using Illumina technology.<br><br>\n        \n      !!! Reads mapping to the <i>Leishmania mexicana</i> genome were also analyzed and are available in TriTrypDB under the data \n      set name 'Promastigote, Axenic Amastigote and Intracellular Amastigote Transcriptomes'. <br><br>"
+        },
+        {
+            "id": "STUDY_0ebd844b49",
+            "datasetId": "DS_9ef65f8f6d",
+            "sha1hash": "9ef65f8f6d81193cb853d3df95c846592c20e6c0",
+            "sourceType": "curated",
+            "displayName": "Aligned genomic sequence reads - HhCatGer041 Strain",
+            "shortDisplayName": "",
+            "lastModified": "2026-08-07T20:00:00-04:00",
+            "description": "Whole genome resequencing data from <i>Hammondia hammondi</i> strain H.H.34 were analyzed for single \n        nucleotide polymorphisms and copy number variation using <i>Hammondia hammondi</i> strain H.H.34 as a reference. <br><br>\n        \n        SNP analysis<br>\n        Reads are aligned to the reference genome using Bowtie 2 and realigned around indels using GATK. SNPs,\n        indels and concensus sequence are generated with VARSCAN and stored in the database.<br><br>\n        \n        CNV analysis<br>\n        The median read depth is set to the organism's ploidy and each chromosome's median read depth is normalized \n        to this value. Contigs that are not assigned to chromosomes are excluded from this analysis.  Gene copy number \n        is similarly calculated using a normalized read depth for each gene.  To compare the number of genes in the resequenced \n        genome to the reference genome, genes are grouped into clusters that are inferred to have originated by \n        tandem duplication.<br>"
+        },
+        {
+            "id": "STUDY_4fb286d98f",
+            "datasetId": "DS_4fb286d98f",
+            "sha1hash": "4fb286d98f41382001e8f19b062cd555313e3b41",
+            "sourceType": "curated",
+            "displayName": "Fresh human whole blood infected with Candida albicans",
+            "shortDisplayName": "blood Calbicans",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "<b>General Description:</b> RNA-pool of both species extracted at 0min (control), 15, 30, 60, 120, 240 min. Samples are rRNA depleted. Measurement of <i>Candida albicans</i> gene expression.\n<br><br><b>Methodology used:</b> Examination of three biological replicates for each of the 6 time points. Illumina HiSeq 2500 (<i>Candida albicans</i>; <i>Homo sapiens</i>)"
+        },
+        {
+            "id": "STUDY_2962dcf64d",
+            "datasetId": "DS_2962dcf64d",
+            "sha1hash": "2962dcf64d674420229b93d7c72aa4040a9d7841",
+            "sourceType": "curated",
+            "displayName": "Anopheles stephensi transcriptome project (aligned to Indian strain)",
+            "shortDisplayName": "Anopheles stephensi transcriptome project",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "This transcriptome project is being performed at the University of Tokyo, Department of Medical Genome Sciences."
+        },
+        {
+            "id": "STUDY_b6cdce990b",
+            "datasetId": "DS_b6cdce990b",
+            "sha1hash": "b6cdce990b5ae3446206925db23676474a7af9f6",
+            "sourceType": "curated",
+            "displayName": "Ring, Oocyst and Sporozoite Transcriptomes",
+            "shortDisplayName": "Pfal Oocyst/Sporo/Ring RNA-Seq",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "<u>Transcriptomes of oocyst, ring and sporozoite stages in <i>P. falciparum</i>. </u><br>\nTotal RNA from sporozoites, oocysts,\nor asexual ring stage parasites was extracted using the miRNeasy Mini Kit (QIAGEN) according to the manufacturer\u2019s instructions, including on-column DNase digestion. Poly(A)-enriched total RNA was subjected to strand-specific RNA-Seq library preparation using the TruSeq Stranded mRNA Library Prep Kit (Illumina). The libraries were multiplexed and subjected to 150-bp single end sequencing on an Illumina NextSeq 500. A minimum of two biological replicates was analyzed for each parasite stage"
+        },
+        {
+            "id": "STUDY_09d688636a",
+            "datasetId": "DS_09d688636a",
+            "sha1hash": "09d688636ab3aed80d0e31b60fbfc161989745c3",
+            "sourceType": "curated",
+            "displayName": "Mapping TSS with TSS-Seq",
+            "shortDisplayName": "TSS-Seq_KN99",
+            "lastModified": "2026-05-27T20:00:00-04:00",
+            "description": "<b>General Description:</b> Cells were grown on YPD at 30C in exponential and stationary phases. Total RNA was extracted and sequenced.\n<br><b>Methodology used:</b> Illumina HiSeq 2500."
+        },
+        {
+            "id": "STUDY_d77d15d7a5",
+            "datasetId": "EDAUD_hpI5oZNAwl0AY",
+            "sha1hash": "",
+            "sourceType": "user_submitted",
+            "displayName": "T. gondii PCR-RFLP genotypes in sea birds (Brazil), chickens (Mexico), and dolphins (Australia) - HARMONIZED",
+            "shortDisplayName": "T. gondii PCR-RFLP genotypes in sea birds (Brazil), chickens (Mexico), and dolphins (Australia) - HARMONIZED",
+            "lastModified": "2026-08-17T20:00:00-04:00",
+            "description": "The PCR-RFLP genotype tables from the three publications were downloaded and combined into a single dataset.\n\nVEuPathDB staff harmonized these PCR-RFLP genotype tables by ensuring standardized variable labels and values were used.  Metadata such as country, GIS coordinates, host species, PMID were also added."
+        },
+        {
+            "id": "STUDY_e565651c83",
+            "datasetId": "EDAUD_dsI5JFEBF50ks",
+            "sha1hash": "",
+            "sourceType": "user_submitted",
+            "displayName": "Toxo Seroprevalence in Animals",
+            "shortDisplayName": "Toxo Seroprevalence in Animals",
+            "lastModified": "2026-08-17T20:00:00-04:00",
+            "description": "This dataset contains serological testing results for Toxoplasma gondii (T. gondii) across 528 animals submitted to diagnostic laboratories. Five species are represented: dogs (n=127), cats (n=122), wild birds (n=116), alpacas (n=98), and horses (n=65). For each animal, the dataset includes species, breed, sex, age, date of birth, date of submission, and submitting location (ZIP code with centroid coordinates). Serological status is recorded as an antibody titer (0=negative through 8=1:3200) and a derived categorical variable (0=negative, 1=low, 2=medium, 3=high). Of 528 animals tested, 142 (26.9%) were seropositive."
+        },
+        {
+            "id": "STUDY_876642f81d",
+            "datasetId": "EDAUD_dFI50INM400w8",
+            "sha1hash": "",
+            "sourceType": "user_submitted",
+            "displayName": "T. gondii PCR-RFLP genotypes in sea birds (Brazil), chickens (Mexico), and dolphins (Australia) - RAW",
+            "shortDisplayName": "T. gondii PCR-RFLP genotypes in sea birds (Brazil), chickens (Mexico), and dolphins (Australia) - RAW",
+            "lastModified": "2026-08-17T20:00:00-04:00",
+            "description": "The PCR-RFLP genotype tables from the three publications were downloaded and combined into a single dataset without any harmonization or standardization of variables or values. \n\nColumns were matched solely based on exact column names; therefore, variables representing the same concept but labeled differently across studies were retained as separate columns in the combined dataset. \n\nWhen columns shared the same name, their records were merged into a single variable field regardless of differences in value coding or terminology. As a result, values that represent the same category but were recorded using different labels (e.g., alternative abbreviations, spellings, or nomenclature) remain distinct and are not automatically grouped or reconciled. \n\nThe combined \u201cRaw\u201d dataset should therefore be considered a direct aggregation of the source tables rather than a harmonized cross-study resource."
+        },
+        {
+            "id": "STUDY_03b0e24af7",
+            "datasetId": "EDAUD_J0N5BNAJwN0Np",
+            "sha1hash": "",
+            "sourceType": "user_submitted",
+            "displayName": "test-dt-b2-july15-2026-1",
+            "shortDisplayName": "test-dt-b2-july15-2026-1",
+            "lastModified": "2026-08-17T20:00:00-04:00"
+        },
+        {
+            "id": "STUDY_97c945b28b",
+            "datasetId": "EDAUD_QBQ5BkFABx0Y5",
+            "sha1hash": "",
+            "sourceType": "user_submitted",
+            "displayName": "Soil-transmitted helminthiasis in China: A national survey in 2014-2015",
+            "shortDisplayName": "Soil-transmitted helminthiasis in China: A national survey in 2014-2015",
+            "lastModified": "2026-08-17T20:00:00-04:00",
+            "description": "Soil-transmitted helminthiasis (STH) had decreased significantly in China based on the two national surveys implemented in 1988\u20131992 and 2001\u20132004, respectively. In 2014\u20132015, an updated national survey on STH was implemented in rural areas in 31 provinces in mainland China. Multiple-stage stratified cluster sampling was employed; data from provinces is available here. \n\nStool samples were collected and the Kato-Katz method was applied for helminth eggs detection. Samples with hookworm eggs were selected and hatched to differentiate the species based on larval morphology. \n\nBetween June 2014 and May 2015, a total of 484,210 participants from 604 counties were enrolled. The weighted prevalence of STH overall was 4.49% (95% confidential interval (CI): 2.45%-6.53%), including 2.62% (95% CI: 0.86%-4.38%) hookworm infections, 1.36% (95% CI: 0.49%-2.23%) ascariasis, and 1.02% (95% CI: 0.15%-1.89%) trichuriasis. The estimated population infected was 29.12 million (95% CI: 15.88 million-42.32 million) for all STH; 16.97 million (95% CI: 5.57 million-28.39 million) for hookworm infections; 8.83 million (95% CI: 3.18 million-14.45 million) for ascariasis; and 6.60 million (95% CI: 0.97 million-12.25 million) for trichuriasis. \n\nSTH was highly prevalent in western China, and moderately in central areas, but low in eastern and northern regions. Out of 3,579 hookworm cases with species differentiation, 479 cases (13.38%) were infected with only Ancylostoma spp., 2,808 cases (78.46%) with only Necator americanus, and another 292 cases (8.16%) with both species.\n\nFurther efforts are needed to control STH in China.\n\nData from PMID: 34665821"
+        },
+        {
+            "id": "STUDY_bdec75a4d2",
+            "datasetId": "EDAUD_1wI55kM500081",
+            "sha1hash": "",
+            "sourceType": "user_submitted",
+            "displayName": "T. gondii PCR-RFLP genotypes in ToxoDB rel. 68",
+            "shortDisplayName": "T. gondii PCR-RFLP genotypes in ToxoDB rel. 68",
+            "lastModified": "2026-08-17T20:00:00-04:00",
+            "description": "This dataset contains PCR-RFLP genotyping data for Toxoplasma gondii isolates. Each record represents a single isolate characterized by its geographic origin, host animal, and allelic patterns across 11 standard RFLP markers used to assign ToxoDB genotypes.\n\nProvenance & scope: Sample metadata includes collection country, continent, and coordinates, as well as the common and scientific names of the host animal. A PMID links each record to its source publication.\n\nGenotyping: The ToxoDB genotype column gives the consensus genotype classification based on the full marker panel. The remaining 11 columns (SAG1, 5'3' SAG2, alt. SAG2, SAG3, CS3, BTUB, GRA6, c22-8, c29-2, L358, PK1, Apico) record the allele observed at each individual RFLP locus, enabling fine-grained population structure analysis beyond the consensus type."
+        },
+        {
+            "id": "STUDY_c1816d92a6",
+            "datasetId": "EDAUD_oZI5RNFcwc09J",
+            "sha1hash": "",
+            "sourceType": "user_submitted",
+            "displayName": "STH infection in Bangladesh, 2012",
+            "shortDisplayName": "STH infection in Bangladesh, 2012",
+            "lastModified": "2026-08-17T20:00:00-04:00",
+            "description": "Investigators at UC Berkeley and the International Centre for Diarrhoeal Disease Research, Bangladesh conducted a cross-sectional survey in 2012 in 100 villages in rural Bangladesh to measure three exposures: self-reported deworming consumption in the past 6 months, access to a hygienic latrine, and household flooring material. We collected stool samples from children 1-4 years, 5-12 years, and women 15-49 years. We performed mini-FLOTAC on preserved stool samples to detect Ascaris lumbricoides, Enterobius vermicularis, hookworm, and Trichuris trichiura ova. This dataset contains the results of this cross-sectional study."
+        },
+        {
+            "id": "STUDY_2122a1ddbf",
+            "datasetId": "EDAUD_VcJ5w1Zdl50pJ",
+            "sha1hash": "",
+            "sourceType": "user_submitted",
+            "displayName": "A. lumbricoides burden in Ethiopia, 2022",
+            "shortDisplayName": "A. lumbricoides burden in Ethiopia, 2022",
+            "lastModified": "2026-08-17T20:00:00-04:00",
+            "description": "Data from: Molecular epidemiology of Ascaris lumbricoides following multiple rounds of community-wide treatment\n\nControl and elimination of the parasite Ascaris lumbricoides relies on mass drug administration (MDA) using a limited number of anti-helminthics. Whilst these programs have reduced the infection intensity and prevalence within many endemic regions, patterns of transmission remain poorly understood. Reinfection commonly occurs following cessation of treatment due to the absence of acquired immunity post infection. Here, we utilise genomic data to understand parasite transmission within and between households in a community and the genomic impact of repeated MDA. We sequenced 54 whole-genomes from Ascaris worms obtained from individuals in a longitudinal cohort epidemiological study of transmission and drug treatment extending over 6 years. We found that fine-scale population structure exists in spatially distinct clusters of infected individuals with reinfection occurring within or between geographically close households. This observation helps inform the policy for future control in low prevalence settings suggesting more targeted treatment of infection hotspots. We found evidence of positive selection acting on members of gene families previously implicated in reduced drug efficacy but detected no impactful variants. As efforts to eliminate A. lumbricoides intensify, our study provides a foundation for genomic surveillance to help identify both who infects whom and the impact of repeated drug treatment.\n\nPMID: 40346057"
+        },
+        {
+            "id": "STUDY_3698961d66",
+            "datasetId": "EDAUD_ZpN54Y0MoV108",
+            "sha1hash": "",
+            "sourceType": "user_submitted",
+            "displayName": "test-vizes-jul8-2026-1",
+            "shortDisplayName": "test-vizes-jul8-2026-1",
+            "lastModified": "2026-08-17T20:00:00-04:00"
+        },
+        {
+            "id": "STUDY_0b02633514",
+            "datasetId": "EDAUD_EEI5woEgQl0wo",
+            "sha1hash": "",
+            "sourceType": "user_submitted",
+            "displayName": "Brazil congenital toxoplasmosis case notifications, 2019-2026",
+            "shortDisplayName": "Brazil congenital toxoplasmosis case notifications, 2019-2026",
+            "lastModified": "2026-08-17T20:00:00-04:00",
+            "description": "Brazil's Information System for Notifiable Diseases, also known as SINAN (Sistema de Informa\u00e7\u00e3o de Agravos de Notifica\u00e7\u00e3o), provides data on the number of confirmed cases of nationally notifiable diseases, and other select conditions in Brazil from 2001 to the present. Case notification data in SINAN come from data collected at health facilities via epidemiological disease surveillance reporting forms.\nSince 2015, the Ministry of Health has been coordinating integrated surveillance of gestational, congenital, and acquired toxoplasmosis in outbreaks with state and other institutions. The goal is to standardize concepts, methods, and care already adopted by states and the Federal Government. Data on congenital toxoplasmosis is presented here. Investigation in newborns allows for early intervention in cases where the disease is confirmed. Isolated cases of the disease are not subject to mandatory reporting .\n\nHow this dataset was created:\n-Congenital toxoplasmosis data for 2019-2026 was downloaded from the Brazilian Ministry of Health DATASUS platform / SINAN - Notifiable Disease Information System as compressed .dbc files. \n-Live birth data for 2019-2023 was downloaded from the SINASC - Live Birth Information System (national birth registry) as compressed .dbc files to provide denominators for incidence calculations.\n\nData preparation:\nThese files were read into R using the read.dbc package, converted into dataframes, and combined across years into a single dataset. \n\nThe preparation steps included decoding SINAN-specific encoded fields (especially infant age, which is stored using mixed units such as hours, days, weeks, and months), extracting epidemiological week values, translating many coded variables into human-readable English labels (sex, pregnancy status, race, education, case classification, outcome, etc.). Unneeded administrative variables were removed. Brazilian state codes (UFs) were mapped to state names and geographic coordinates. Livebirth counts and congenital toxoplasmosis case counts were aggregated by state and year to calculate incidence rates per 10,000 live births. \n\nFinally, variables were renamed with descriptive English labels, missing values standardized, and the cleaned dataset plus accompanying variable annotation/codebook files were exported as CSVs.\n\nState-level summary statistics (live births, confirmed congenital toxoplasmosis cases, and incidence rates) were calculated separately and inserted into a single representative row for each state-year combination, rather than duplicated across all individual case records from that state and year."
+        },
+        {
+            "id": "STUDY_aeed24b566",
+            "datasetId": "EDAUD_Y9I5UEJtdp0JU",
+            "sha1hash": "",
+            "sourceType": "user_submitted",
+            "displayName": "T. gondii genotyping in Sea Otters & Carnivores",
+            "shortDisplayName": "T. gondii genotyping in Sea Otters & Carnivores",
+            "lastModified": "2026-08-17T20:00:00-04:00",
+            "description": "This dataset comprises 218 records from studies of Toxoplasma gondii infection in California coastal wildlife, combining sea otter (Enhydra lutris nereis) and terrestrial carnivore samples collected primarily along the central California coast. Sea otter records include multi-locus sequence typing (MLST) genotype data across six loci (B1, L358, PK1, SAG1, BTUB, GRA6), stranding location, year, and cause of death. Carnivore records span four species groups \u2014 bobcats, canids, feral cats, and mountain lions \u2014 and include serological data (antibody titers and seropositivity indicators for T. gondii, Sarcocystis neurona, and Neospora caninum), retroviral screening results (FIV and FeLV), B1 gene genotyping, and predominant habitat classification.\n\nTogether, the two components of this dataset support investigation of T. gondii transmission dynamics at the wildlife-domestic animal interface in coastal California. The shared genotyping variables (B1 genotype, ToxoDB genotype) and geographic coordinates (latitude/longitude) allow direct comparison of parasite strains circulating in marine and terrestrial hosts, enabling assessment of whether land-based carnivores \u2014 particularly those in urban and agricultural habitats \u2014 serve as a source of T. gondii strains reaching the nearshore marine environment and infecting sea otters."
+        },
+        {
+            "id": "STUDY_93178bd525",
+            "datasetId": "EDAUD_BNR5Y9Zx5R0FA",
+            "sha1hash": "",
+            "sourceType": "user_submitted",
+            "displayName": "Lookup Table: PCR-RFLP to Genotype #",
+            "shortDisplayName": "Lookup Table: PCR-RFLP to Genotype #",
+            "lastModified": "2026-08-19T20:00:00-04:00",
+            "description": "This list of unique PCR-RFLP genotypes was collated by Dr. Chunlei Su, University of Tennessee, Knoxville, USA.\n\nIt is being made available as a community resource and is intended for use as a reference table only. It was last updated on August 12, 2026."
+        }
+    ]
+}

@@ -1,0 +1,101 @@
+{
+  "compute_job_lookup": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/computes/differentialexpression",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "jobID,status",
+    "recorded_at": "2026-09-04",
+    "trim": ""
+  },
+  "count_filtered": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/studies/STUDY_53f554ec6a/entities/GENE_PHENOTYPE_DATA_ENTITY/count",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "count",
+    "recorded_at": "2026-09-04",
+    "trim": ""
+  },
+  "count_unfiltered": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/studies/STUDY_53f554ec6a/entities/GENE_PHENOTYPE_DATA_ENTITY/count",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "count",
+    "recorded_at": "2026-09-04",
+    "trim": ""
+  },
+  "distribution_categorical": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/studies/STUDY_53f554ec6a/entities/GENE_PHENOTYPE_DATA_ENTITY/variables/VAR_035294d0/distribution",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "histogram,statistics",
+    "recorded_at": "2026-09-04",
+    "trim": ""
+  },
+  "permissions": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "GET",
+    "url": "https://plasmodb.org/eda/permissions",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "perDataset",
+    "recorded_at": "2026-09-04",
+    "trim": "the first 40 perDataset entries, plus every entry that omits shortDisplayName or description, plus DS_53f554ec6a"
+  },
+  "studies_list": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "GET",
+    "url": "https://plasmodb.org/eda/studies",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "studies",
+    "recorded_at": "2026-09-04",
+    "trim": "the first 40 studies entries plus every entry whose sha1hash is the empty string"
+  },
+  "study_detail_de": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "GET",
+    "url": "https://plasmodb.org/eda/studies/STUDY_e973eadd57",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "study",
+    "recorded_at": "2026-09-04",
+    "trim": ""
+  },
+  "study_detail_phenotype": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "GET",
+    "url": "https://plasmodb.org/eda/studies/STUDY_53f554ec6a",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "study",
+    "recorded_at": "2026-09-04",
+    "trim": ""
+  },
+  "volcano_statistics": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/computes/differentialexpression/statistics",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "adjustedPValueFloor,effectSizeLabel,pValueFloor,statistics",
+    "recorded_at": "2026-09-04",
+    "trim": "the first 200 statistics rows plus the one row that omits pValue"
+  }
+}

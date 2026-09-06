@@ -1,0 +1,13 @@
+{
+  "repo": "VEuPathDB/service-eda",
+  "sha": "b3bb8bac06de4340b4b2c21d9aa4a94d9b3de61f",
+  "root": "schema",
+  "vendored_at": "2026-09-04",
+  "files": {
+    "hash-id.raml": "79c409316c180e8d097278351a1464434910bf97caee7c271970fc0fc13cf61f",
+    "library.raml": "c441f7d5674685a148b47197ad5b7d112e6d77170c7619b626722d610bc49db3"
+  },
+  "includes": {
+    "https://raw.githubusercontent.com/VEuPathDB/lib-hash-id/v1.1.0/schema/hash-id.raml": "hash-id.raml"
+  }
+}

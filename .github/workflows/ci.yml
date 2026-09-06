@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    name: veupathdb-py
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - uses: astral-sh/setup-uv@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # The lock names no sibling, so a science import fails to resolve here
+      # rather than failing a lint rule.
+      - name: Install the package alone
+        run: uv sync --frozen
+
+      - name: Run ruff
+        run: uv run ruff check src tests
+
+      - name: Check formatting
+        run: uv run ruff format --check src tests
+
+      - name: Run mypy
+        run: uv run mypy --strict src
+
+      - name: Run the hermetic suite
+        run: uv run pytest tests/unit
+
+      - name: Verify the recorded bodies against the vendored schemas
+        run: |
+          uv run python -m veupathdb.devtools.fixtures verify
+          uv run python -m veupathdb.devtools.eda_schemas verify
+
+      - name: Check that the wheel carries the recorded stores
+        run: uv run pytest tests/packaging -m wheel --override-ini addopts=''
+
+      - name: Check the knowledge bundle
+        run: |
+          node scripts/check-knowledge.mjs
+          node --test scripts/check-knowledge.test.mjs
+          node scripts/check-wdk-rules.mjs
+          node --test scripts/check-wdk-rules.test.mjs
+
+  live:
+    name: Live WDK lane
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - uses: astral-sh/setup-uv@v7
+      - name: Install the package alone
+        run: uv sync --frozen
+      - name: Run the live lane
+        env:
+          WDK_TEST_EMAIL: ${{ secrets.WDK_TEST_EMAIL }}
+          WDK_TEST_PASSWORD: ${{ secrets.WDK_TEST_PASSWORD }}
+        run: uv run pytest tests/live -m live_wdk --override-ini addopts=''

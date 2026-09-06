@@ -1,0 +1,61 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "POST",
+    "url": "https://plasmodb.org/plasmo/service/record-types/gene/searches/single_record_question_GeneRecordClasses_GeneRecordClass/reports/aiExpression",
+    "status": 200,
+    "content_type": "text/plain",
+    "recorded_at": "2026-09-04",
+    "reads": "WDK-ANS-009"
+  },
+  "body": {
+    "PF3D7_0709000": {
+      "resultStatus": "experiments_incomplete",
+      "numExperimentsComplete": 0,
+      "experimentStatus": {
+        "DS_8ecf65d1b7": "missing",
+        "DS_26bc402eec": "missing",
+        "DS_fef2fd0098": "missing",
+        "DS_715bf2deda": "missing",
+        "DS_416070059c": "missing",
+        "DS_74bf6512eb": "missing",
+        "DS_b95a38be5e": "missing",
+        "DS_0cabe39833": "missing",
+        "DS_2aa311d6a0": "missing",
+        "DS_29940f3f82": "missing",
+        "DS_aae60e6bf7": "missing",
+        "DS_0fa4237b4b": "missing",
+        "DS_1556ad1e1e": "missing",
+        "DS_090793ccdd": "missing",
+        "DS_d18037ecc4": "missing",
+        "DS_6d6cf09eae": "missing",
+        "DS_87e4fcafff": "missing",
+        "DS_7349a4c6a5": "missing",
+        "DS_c6622915ff": "missing",
+        "DS_75698b88ac": "missing",
+        "DS_28ef9b0494": "missing",
+        "DS_6b6033af33": "missing",
+        "DS_3ef554e244": "missing",
+        "DS_fe2b5a278f": "missing",
+        "DS_3f06ca816e": "missing",
+        "DS_ee181c11b8": "missing",
+        "DS_84d52f99c7": "missing",
+        "DS_198bfa8376": "missing",
+        "DS_a518f45975": "missing",
+        "DS_e973eadd57": "missing",
+        "DS_9c91e450ac": "missing",
+        "DS_a239464cb4": "missing",
+        "DS_cf291e2adb": "missing",
+        "DS_ee861a9187": "missing",
+        "DS_57b027468b": "missing",
+        "DS_66f9e70b8a": "missing",
+        "DS_4f365680c8": "missing",
+        "DS_b6cdce990b": "missing",
+        "DS_5bb820a874": "missing",
+        "DS_c28828ce84": "missing",
+        "DS_4582562a4b": "missing"
+      },
+      "numExperiments": 41
+    }
+  }
+}

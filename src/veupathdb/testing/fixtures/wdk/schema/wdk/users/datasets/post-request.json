@@ -1,0 +1,167 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "oneOf": [
+    {
+      "id": "dataset-from-id-list",
+      "type": "object",
+      "properties": {
+        "sourceType": {
+          "type": "string",
+          "pattern": "^idList$"
+        },
+        "sourceContent": {
+          "type": "object",
+          "properties": {
+            "ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "ids"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "sourceType",
+        "sourceContent"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "id": "dataset-from-basket",
+      "type": "object",
+      "properties": {
+        "sourceType": {
+          "type": "string",
+          "pattern": "^basket$"
+        },
+        "sourceContent": {
+          "type": "object",
+          "properties": {
+            "basketName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "basketName"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "sourceType",
+        "sourceContent"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "id": "dataset-from-strategy",
+      "type": "object",
+      "properties": {
+        "sourceType": {
+          "type": "string",
+          "pattern": "^strategy$"
+        },
+        "sourceContent": {
+          "type": "object",
+          "properties": {
+            "strategyId": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "strategyId"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "sourceType",
+        "sourceContent"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "id": "dataset-from-file",
+      "type": "object",
+      "properties": {
+        "sourceType": {
+          "type": "string",
+          "pattern": "^file$"
+        },
+        "sourceContent": {
+          "type": "object",
+          "properties": {
+            "temporaryFileId": {
+              "type": "string"
+            },
+            "parser": {
+              "type": "string"
+            },
+            "parameterName": {
+              "type": "string"
+            },
+            "searchName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "temporaryFileId",
+            "parser",
+            "parameterName",
+            "searchName"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "sourceType",
+        "sourceContent"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "id": "dataset-from-url",
+      "type": "object",
+      "properties": {
+        "sourceType": {
+          "type": "string",
+          "pattern": "^url$"
+        },
+        "sourceContent": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string"
+            },
+            "parser": {
+              "type": "string"
+            },
+            "parameterName": {
+              "type": "string"
+            },
+            "searchName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "url",
+            "parser",
+            "parameterName",
+            "searchName"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "sourceType",
+        "sourceContent"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

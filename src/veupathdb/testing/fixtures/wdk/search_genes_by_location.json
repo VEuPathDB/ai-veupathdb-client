@@ -1,0 +1,662 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/plasmo/service/record-types/transcript/searches/GenesByLocation?expandParams=true",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-08-22",
+    "reads": "WDK-PARAM-001, WDK-VOCAB-003, WDK-SEARCH-004"
+  },
+  "body": {
+    "searchData": {
+      "summary": "Find genes within a given genomic region such as a chromosome, scaffold or supercontig.",
+      "urlSegment": "GenesByLocation",
+      "dynamicAttributes": [
+        {
+          "isInReport": true,
+          "formats": [],
+          "truncateTo": 100,
+          "displayName": "Genomic Location(s)",
+          "name": "dynamic_location",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "columnDataType": "STRING",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "isInReport": true,
+          "formats": [],
+          "truncateTo": 100,
+          "displayName": "Met Search Criteria",
+          "name": "matched_result",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "columnDataType": "STRING",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "help": "The *search result weight*. This is the sum of the weights you specified for individual searches that found this record.   The more searches that found this record the higher will be its weight.  To give a search a weight, click \"Use Weights\" on the search page, and provide the desired weight.",
+          "isInReport": true,
+          "formats": [
+            {
+              "isInReport": true,
+              "displayName": "Histogram",
+              "name": "wdk_weight-histogram",
+              "description": "Display a histogram of weight distribution",
+              "scopes": [],
+              "type": "histogram"
+            }
+          ],
+          "truncateTo": 100,
+          "displayName": "Search Weight",
+          "name": "wdk_weight",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "columnDataType": "NUMBER",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        }
+      ],
+      "defaultSorting": [
+        {
+          "attributeName": "organism",
+          "direction": "ASC"
+        },
+        {
+          "attributeName": "gene_location_text",
+          "direction": "ASC"
+        }
+      ],
+      "isAnalyzable": true,
+      "displayName": "Genomic Location",
+      "fullName": "GeneQuestions.GenesByLocation",
+      "description": "Find genes that are located within a specified genomic region. Use either the Chromosome Tab or Sequence ID Tab \n         to define the genomic location you wish to query. The search returns all genes found \n         within your specified genomic location. <br><br>\n         \n         Chromosome Tab:<br>          \n         First select the Organism and Chromosome that you want to query. Then indicate the boundaries of \n         the genomic location by entering the Start and End nucleotide coordinates of your region. Choosing \n         Start=1 and End=0 will retrieve all genes on the chromosome.<br><br>\n         \n           \n         Sequence ID Tab:<br>\n         First enter the Genomic Sequence ID of the contig or chromosome that you \n         want to query. Example genomic sequence IDs are: Pf3D7_04_v3, AABL01000036, PviS_CM000452, berg12. Then indicate the boundaries of \n         the genomic location by entering the Start and End nucleotide coordinates of your region. Choosing \n         Start=1 and End=0 will retrieve all genes on the genomic sequence.<br>",
+      "defaultAttributes": [
+        "primary_key",
+        "organism",
+        "dynamic_location",
+        "gene_product"
+      ],
+      "groups": [
+        {
+          "displayType": "empty",
+          "displayName": "",
+          "name": "empty",
+          "description": "",
+          "isVisible": true,
+          "parameters": [
+            "organismSinglePick",
+            "chromosomeOptional",
+            "sequenceId",
+            "start_point",
+            "end_point"
+          ]
+        }
+      ],
+      "filters": [
+        {
+          "isViewOnly": false,
+          "name": "organismFilter"
+        },
+        {
+          "displayName": "Transcripts",
+          "isViewOnly": false,
+          "name": "matched_transcript_filter_array"
+        },
+        {
+          "isViewOnly": false,
+          "name": "genesByPathway"
+        }
+      ],
+      "shortDisplayName": "Genomic Loc",
+      "paramNames": [
+        "organismSinglePick",
+        "chromosomeOptional",
+        "sequenceId",
+        "start_point",
+        "end_point"
+      ],
+      "isCacheable": true,
+      "outputRecordClassName": "transcript",
+      "noSummaryOnSingleRecord": false,
+      "queryName": "GenesByLocation",
+      "defaultSummaryView": "_default",
+      "parameters": [
+        {
+          "displayName": "Organism",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "multi-pick-vocabulary",
+          "help": "Select the organism you wish to query against.",
+          "dependentParams": [
+            "chromosomeOptional"
+          ],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "Plasmodium adleri G01",
+              "Plasmodium adleri G01",
+              null
+            ],
+            [
+              "Plasmodium berghei ANKA",
+              "Plasmodium berghei ANKA",
+              null
+            ],
+            [
+              "Plasmodium billcollinsi G01",
+              "Plasmodium billcollinsi G01",
+              null
+            ],
+            [
+              "Plasmodium blacklocki G01",
+              "Plasmodium blacklocki G01",
+              null
+            ],
+            [
+              "Plasmodium brasilianum strain Bolivian I",
+              "Plasmodium brasilianum strain Bolivian I",
+              null
+            ],
+            [
+              "Plasmodium chabaudi chabaudi",
+              "Plasmodium chabaudi chabaudi",
+              null
+            ],
+            [
+              "Plasmodium chabaudi chabaudi CB",
+              "Plasmodium chabaudi chabaudi CB",
+              null
+            ],
+            [
+              "Plasmodium coatneyi Hackeri",
+              "Plasmodium coatneyi Hackeri",
+              null
+            ],
+            [
+              "Plasmodium cynomolgi strain B",
+              "Plasmodium cynomolgi strain B",
+              null
+            ],
+            [
+              "Plasmodium cynomolgi strain M",
+              "Plasmodium cynomolgi strain M",
+              null
+            ],
+            [
+              "Plasmodium falciparum 3D7",
+              "Plasmodium falciparum 3D7",
+              null
+            ],
+            [
+              "Plasmodium falciparum 7G8",
+              "Plasmodium falciparum 7G8",
+              null
+            ],
+            [
+              "Plasmodium falciparum CD01",
+              "Plasmodium falciparum CD01",
+              null
+            ],
+            [
+              "Plasmodium falciparum Dd2",
+              "Plasmodium falciparum Dd2",
+              null
+            ],
+            [
+              "Plasmodium falciparum GA01",
+              "Plasmodium falciparum GA01",
+              null
+            ],
+            [
+              "Plasmodium falciparum GB4",
+              "Plasmodium falciparum GB4",
+              null
+            ],
+            [
+              "Plasmodium falciparum GN01",
+              "Plasmodium falciparum GN01",
+              null
+            ],
+            [
+              "Plasmodium falciparum HB3",
+              "Plasmodium falciparum HB3",
+              null
+            ],
+            [
+              "Plasmodium falciparum IT",
+              "Plasmodium falciparum IT",
+              null
+            ],
+            [
+              "Plasmodium falciparum KE01",
+              "Plasmodium falciparum KE01",
+              null
+            ],
+            [
+              "Plasmodium falciparum KH01",
+              "Plasmodium falciparum KH01",
+              null
+            ],
+            [
+              "Plasmodium falciparum KH02",
+              "Plasmodium falciparum KH02",
+              null
+            ],
+            [
+              "Plasmodium falciparum ML01",
+              "Plasmodium falciparum ML01",
+              null
+            ],
+            [
+              "Plasmodium falciparum SD01",
+              "Plasmodium falciparum SD01",
+              null
+            ],
+            [
+              "Plasmodium falciparum SN01",
+              "Plasmodium falciparum SN01",
+              null
+            ],
+            [
+              "Plasmodium falciparum TG01",
+              "Plasmodium falciparum TG01",
+              null
+            ],
+            [
+              "Plasmodium gaboni strain G01",
+              "Plasmodium gaboni strain G01",
+              null
+            ],
+            [
+              "Plasmodium gaboni strain SY75",
+              "Plasmodium gaboni strain SY75",
+              null
+            ],
+            [
+              "Plasmodium knowlesi strain A1H1",
+              "Plasmodium knowlesi strain A1H1",
+              null
+            ],
+            [
+              "Plasmodium knowlesi strain H",
+              "Plasmodium knowlesi strain H",
+              null
+            ],
+            [
+              "Plasmodium malariae UG01",
+              "Plasmodium malariae UG01",
+              null
+            ],
+            [
+              "Plasmodium ovale curtisi GH01",
+              "Plasmodium ovale curtisi GH01",
+              null
+            ],
+            [
+              "Plasmodium ovale wallikeri PowCR01",
+              "Plasmodium ovale wallikeri PowCR01",
+              null
+            ],
+            [
+              "Plasmodium praefalciparum strain G01",
+              "Plasmodium praefalciparum strain G01",
+              null
+            ],
+            [
+              "Plasmodium reichenowi CDC",
+              "Plasmodium reichenowi CDC",
+              null
+            ],
+            [
+              "Plasmodium reichenowi G01",
+              "Plasmodium reichenowi G01",
+              null
+            ],
+            [
+              "Plasmodium relictum SGS1-like",
+              "Plasmodium relictum SGS1-like",
+              null
+            ],
+            [
+              "Plasmodium vinckei brucechwatti DA",
+              "Plasmodium vinckei brucechwatti DA",
+              null
+            ],
+            [
+              "Plasmodium vinckei Cameroon EL",
+              "Plasmodium vinckei Cameroon EL",
+              null
+            ],
+            [
+              "Plasmodium vinckei lentum DE",
+              "Plasmodium vinckei lentum DE",
+              null
+            ],
+            [
+              "Plasmodium vinckei petteri CR 2020",
+              "Plasmodium vinckei petteri CR 2020",
+              null
+            ],
+            [
+              "Plasmodium vinckei vinckei CY",
+              "Plasmodium vinckei vinckei CY",
+              null
+            ],
+            [
+              "Plasmodium vivax-like Pvl01",
+              "Plasmodium vivax-like Pvl01",
+              null
+            ],
+            [
+              "Plasmodium vivax P01",
+              "Plasmodium vivax P01",
+              null
+            ],
+            [
+              "Plasmodium vivax Sal-1",
+              "Plasmodium vivax Sal-1",
+              null
+            ],
+            [
+              "Plasmodium yoelii yoelii 17X",
+              "Plasmodium yoelii yoelii 17X",
+              null
+            ],
+            [
+              "Plasmodium yoelii yoelii 17XNL 2023",
+              "Plasmodium yoelii yoelii 17XNL 2023",
+              null
+            ],
+            [
+              "Plasmodium yoelii yoelii YM",
+              "Plasmodium yoelii yoelii YM",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "organismSinglePick",
+          "initialDisplayValue": "[\"Plasmodium falciparum 3D7\"]",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "maxRecommendedMsg": [
+              "<p>\n          You are selecting more than five organisms.\n        </p>\n        <p>\n          Selecting a large number of organisms may impact performance and make results harder to interpret.\n        </p>\n        <p>\n          <b>Please select five or fewer organisms where possible.</b>\n        </p>\n        <p>\n          For the best experience, use <i>My Organism Preferences</i> in the page header to focus on the organisms you care about most.\n        </p>"
+            ],
+            "specificAttribution": [],
+            "organismProperties": [
+              "pruneNodesWithSingleExtendingChild",
+              "showOnlyPreferredOrganisms",
+              "highlightReferenceOrganisms"
+            ],
+            "maxRecommended": [
+              "5"
+            ]
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "Chromosome",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "Select chromosome(s)",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "Choose chromosome",
+              "Choose chromosome",
+              null
+            ],
+            [
+              "01",
+              "01",
+              null
+            ],
+            [
+              "02",
+              "02",
+              null
+            ],
+            [
+              "03",
+              "03",
+              null
+            ],
+            [
+              "04",
+              "04",
+              null
+            ],
+            [
+              "05",
+              "05",
+              null
+            ],
+            [
+              "06",
+              "06",
+              null
+            ],
+            [
+              "07",
+              "07",
+              null
+            ],
+            [
+              "08",
+              "08",
+              null
+            ],
+            [
+              "09",
+              "09",
+              null
+            ],
+            [
+              "10",
+              "10",
+              null
+            ],
+            [
+              "11",
+              "11",
+              null
+            ],
+            [
+              "12",
+              "12",
+              null
+            ],
+            [
+              "13",
+              "13",
+              null
+            ],
+            [
+              "14",
+              "14",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "chromosomeOptional",
+          "initialDisplayValue": "Choose chromosome",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "Genomic sequence ID",
+          "length": 100,
+          "isVisible": true,
+          "isMultiLine": false,
+          "type": "string",
+          "help": "Enter an identifier for a genomic contig. Genomic Sequence IDs correspond to the \n            accession numbers supplied by the sequencing centers.",
+          "dependentParams": [],
+          "isReadOnly": false,
+          "isNumber": false,
+          "allowEmptyValue": true,
+          "name": "sequenceId",
+          "initialDisplayValue": "(Example: Pf3D7_04_v3)",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "Start at",
+          "length": 0,
+          "isVisible": true,
+          "isMultiLine": false,
+          "type": "string",
+          "help": "Enter the coordinate of the nucleotide that begins the genomic region you wish to query.",
+          "dependentParams": [],
+          "isReadOnly": false,
+          "isNumber": true,
+          "allowEmptyValue": false,
+          "name": "start_point",
+          "initialDisplayValue": "1",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "End Location (0 = end)",
+          "length": 0,
+          "isVisible": true,
+          "isMultiLine": false,
+          "type": "string",
+          "help": "Enter the coordinate of the last nucleotide in the genomic region that you wish to query. (0 = end)",
+          "dependentParams": [],
+          "isReadOnly": false,
+          "isNumber": true,
+          "allowEmptyValue": false,
+          "name": "end_point",
+          "initialDisplayValue": "0",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        }
+      ],
+      "properties": {
+        "organisms": [
+          "P. falciparum",
+          "P. vivax",
+          "P. yoelii",
+          "P. berghei",
+          "P. chabaudi",
+          "P. knowlesi"
+        ],
+        "specificAttribution": []
+      },
+      "summaryViewPlugins": [
+        {
+          "displayName": "Gene Results",
+          "name": "_default",
+          "description": "View transcripts."
+        },
+        {
+          "displayName": "Genome View",
+          "name": "genomic-view",
+          "description": "View your hits mapped to their corresponding largest assembled genomic DNA segment, often a chromosome, but\n sometimes a contig or scaffold."
+        }
+      ]
+    },
+    "validation": {
+      "level": "DISPLAYABLE",
+      "isValid": true
+    }
+  }
+}

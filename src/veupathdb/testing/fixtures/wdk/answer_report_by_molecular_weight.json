@@ -1,0 +1,79 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "POST",
+    "url": "https://plasmodb.org/plasmo/service/record-types/transcript/searches/GenesByMolecularWeight/reports/standard",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-09-04",
+    "reads": "WDK-HTTP-004"
+  },
+  "body": {
+    "records": [
+      {
+        "tables": {},
+        "displayName": "PF3D7_0103200",
+        "recordClassName": "TranscriptRecordClasses.TranscriptRecordClass",
+        "attributes": {
+          "primary_key": "PF3D7_0103200"
+        },
+        "id": [
+          {
+            "name": "gene_source_id",
+            "value": "PF3D7_0103200"
+          },
+          {
+            "name": "source_id",
+            "value": "PF3D7_0103200.1"
+          },
+          {
+            "name": "project_id",
+            "value": "PlasmoDB"
+          }
+        ],
+        "tableErrors": []
+      },
+      {
+        "tables": {},
+        "displayName": "PF3D7_0901900",
+        "recordClassName": "TranscriptRecordClasses.TranscriptRecordClass",
+        "attributes": {
+          "primary_key": "PF3D7_0901900"
+        },
+        "id": [
+          {
+            "name": "gene_source_id",
+            "value": "PF3D7_0901900"
+          },
+          {
+            "name": "source_id",
+            "value": "PF3D7_0901900.1"
+          },
+          {
+            "name": "project_id",
+            "value": "PlasmoDB"
+          }
+        ],
+        "tableErrors": []
+      }
+    ],
+    "meta": {
+      "displayViewTotalCount": 4,
+      "tables": [],
+      "pagination": {
+        "offset": 0,
+        "numRecords": 2
+      },
+      "cachePreviouslyExisted": true,
+      "viewTotalCount": 4,
+      "sorting": [],
+      "recordClassName": "transcript",
+      "responseCount": 2,
+      "attributes": [
+        "primary_key"
+      ],
+      "totalCount": 4,
+      "displayTotalCount": 4
+    }
+  }
+}
