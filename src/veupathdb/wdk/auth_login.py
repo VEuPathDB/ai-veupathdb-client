@@ -12,6 +12,12 @@ import httpx
 import jwt
 from jwt import PyJWK
 from pydantic import BaseModel, ConfigDict, Field
+from tenacity import (
+    AsyncRetrying,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_fixed,
+)
 
 from veupathdb.errors import ExternalServiceError
 from veupathdb.logging import get_logger
@@ -25,7 +31,9 @@ _IDENTITY_PROVIDER = "VEuPathDB identity provider"
 _JWKS_PATH = "/jwks"
 _JWKS_TIMEOUT_SECONDS = 15.0
 _OAUTH_ALGORITHM = "ES512"
-_SIGNING_KEY_CACHE_SECONDS = 120.0
+_SIGNING_KEY_CACHE_SECONDS = 3600.0
+_JWKS_ATTEMPTS = 3
+_JWKS_RETRY_WAIT_SECONDS = 0.25
 
 
 def _is_guest_jwt(token: str) -> bool:
@@ -145,7 +153,7 @@ async def _fetch_oauth_signing_key(oauth_url: str) -> PyJWK:
             response.raise_for_status()
             jwks = _JWKS.model_validate(response.json())
     except (httpx.HTTPError, ValueError) as exc:
-        raise _unavailable(jwks_url, str(exc)) from exc
+        raise _unavailable(jwks_url, str(exc) or type(exc).__name__) from exc
 
     key = jwks.elliptic_curve_key()
     if key is None:
@@ -165,15 +173,50 @@ async def _fetch_oauth_signing_key(oauth_url: str) -> PyJWK:
         raise _unavailable(jwks_url, f"the published key is unusable: {exc}") from exc
 
 
+async def _read_signing_key(oauth_url: str) -> PyJWK:
+    """Read the signing key, retrying a transport failure of the OAuth server."""
+    retrying = AsyncRetrying(
+        stop=stop_after_attempt(_JWKS_ATTEMPTS),
+        wait=wait_fixed(_JWKS_RETRY_WAIT_SECONDS),
+        retry=retry_if_exception_type(ExternalServiceError),
+        reraise=True,
+    )
+    return await retrying(_fetch_oauth_signing_key, oauth_url)
+
+
 async def _get_oauth_signing_key(oauth_url: str) -> PyJWK:
-    """Return the OAuth signing key, refetching it when the cached one expires."""
+    """Return the OAuth signing key, refetching it when the cached one expires.
+
+    A key the server published once answers while the server cannot be read,
+    because a signing key outlives one outage and a turn must not.
+    """
     cached = _signing_keys.get(oauth_url)
     if cached is not None and cached[0] > time.monotonic():
         return cached[1]
 
-    key = await _fetch_oauth_signing_key(oauth_url)
+    try:
+        key = await _read_signing_key(oauth_url)
+    except ExternalServiceError:
+        if cached is None:
+            raise
+        logger.warning(
+            "Serving the last signing key the OAuth server published",
+            oauth_url=oauth_url,
+        )
+        return cached[1]
     _signing_keys[oauth_url] = (time.monotonic() + _SIGNING_KEY_CACHE_SECONDS, key)
     return key
+
+
+def forget_signing_keys() -> None:
+    """Drop every cached signing key. For a test that owns the cache."""
+    _signing_keys.clear()
+
+
+def expire_signing_keys() -> None:
+    """Age every cached key out of its window, keeping it as the last good one."""
+    for oauth_url, (_, key) in list(_signing_keys.items()):
+        _signing_keys[oauth_url] = (time.monotonic() - 1.0, key)
 
 
 async def validate_oauth_token(token: str, oauth_url: str) -> VEuPathDBClaims | None:
