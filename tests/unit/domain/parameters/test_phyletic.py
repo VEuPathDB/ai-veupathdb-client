@@ -278,8 +278,10 @@ class TestARefusalNamesTheParameter:
             {
                 "param": "profile_pattern",
                 "messages": [
-                    "'Plasmodium falciparum AND NOT Homo sapiens' is not built "
-                    "from census tokens."
+                    (
+                        "'Plasmodium falciparum AND NOT Homo sapiens' is not built "
+                        "from census tokens."
+                    )
                 ],
             }
         ]

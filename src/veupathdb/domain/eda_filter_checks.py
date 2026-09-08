@@ -181,8 +181,10 @@ def _wrong_variable_type(site: Site) -> list[str]:
     if site.variable.type in allowed:
         return []
     return [
-        f"{_at(site)} is refused: the variable type is {site.variable.type}, and "
-        f"{site.entry.type} applies to a variable of type {listed(sorted(allowed))}."
+        (
+            f"{_at(site)} is refused: the variable type is {site.variable.type}, and "
+            f"{site.entry.type} applies to a variable of type {listed(sorted(allowed))}."
+        )
     ]
 
 
@@ -202,9 +204,11 @@ def _string_set_errors(site: Site) -> list[str]:
     if not unknown:
         return []
     return [
-        f"{_at(site)} names {listed(unknown)}, which the vocabulary does not "
-        f"carry. The vocabulary is {listed(vocabulary)}. An unknown value returns "
-        f"count 0 rather than an error."
+        (
+            f"{_at(site)} names {listed(unknown)}, which the vocabulary does not "
+            f"carry. The vocabulary is {listed(vocabulary)}. An unknown value returns "
+            f"count 0 rather than an error."
+        )
     ]
 
 
@@ -223,8 +227,10 @@ def _number_set_errors(site: Site) -> list[str]:
     if not fractional:
         return []
     return [
-        f"{_at(site)} names {listed(fractional)}, and the variable is an integer, "
-        f"so every member must be whole."
+        (
+            f"{_at(site)} names {listed(fractional)}, and the variable is an integer, "
+            f"so every member must be whole."
+        )
     ]
 
 
@@ -241,8 +247,10 @@ def _date_set_errors(site: Site) -> list[str]:
     if not bare:
         return []
     return [
-        f"{_at(site)} names {listed(bare)} without a time part. Write every member "
-        f"as YYYY-MM-DDTHH:mm:ss, for example {bare[0]}T00:00:00."
+        (
+            f"{_at(site)} names {listed(bare)} without a time part. Write every member "
+            f"as YYYY-MM-DDTHH:mm:ss, for example {bare[0]}T00:00:00."
+        )
     ]
 
 
@@ -257,8 +265,10 @@ def _number_range_errors(site: Site) -> list[str]:
         return [f"{_at(site)} needs a numeric min and a numeric max."]
     if low > high:
         return [
-            f"{_at(site)} has min {low} above max {high}, which returns count 0 "
-            f"rather than an error."
+            (
+                f"{_at(site)} has min {low} above max {high}, which returns count 0 "
+                f"rather than an error."
+            )
         ]
     return _outside_declared_range(site, low, high)
 
@@ -272,8 +282,10 @@ def _outside_declared_range(site: Site, low: float, high: float) -> list[str]:
     if not outside:
         return []
     return [
-        f"{_at(site)} has {listed(outside)} outside the declared range "
-        f"{range_min} to {range_max}."
+        (
+            f"{_at(site)} has {listed(outside)} outside the declared range "
+            f"{range_min} to {range_max}."
+        )
     ]
 
 
@@ -286,8 +298,10 @@ def _date_range_errors(site: Site) -> list[str]:
     high = _as_text(high_bound)
     if low is None or high is None:
         return [
-            f"{_at(site)} needs a min and a max written as YYYY-MM-DDTHH:mm:ss, "
-            f"for example {_BARE_DATE_EXAMPLE}."
+            (
+                f"{_at(site)} needs a min and a max written as YYYY-MM-DDTHH:mm:ss, "
+                f"for example {_BARE_DATE_EXAMPLE}."
+            )
         ]
     bare = [
         f"{_at(site)} has the bound {bound} without a time part. Write it as "
@@ -299,8 +313,10 @@ def _date_range_errors(site: Site) -> list[str]:
         return bare
     if low > high:
         return [
-            f"{_at(site)} has min {low} above max {high}, which returns count 0 "
-            f"rather than an error."
+            (
+                f"{_at(site)} has min {low} above max {high}, which returns count 0 "
+                f"rather than an error."
+            )
         ]
     return []
 
@@ -315,9 +331,11 @@ def _longitude_range_errors(site: Site) -> list[str]:
     if abs(left - right) >= _DEGENERATE_LONGITUDE:
         return []
     return [
-        f"{_at(site)} has left {left} equal to right {right} within "
-        f"{_DEGENERATE_LONGITUDE}, and the service reads an equal pair as a no-op "
-        f"that keeps every row."
+        (
+            f"{_at(site)} has left {left} equal to right {right} within "
+            f"{_DEGENERATE_LONGITUDE}, and the service reads an equal pair as a no-op "
+            f"that keeps every row."
+        )
     ]
 
 
@@ -330,8 +348,10 @@ def _multi_filter_errors(site: Site) -> list[str]:
         return [f"{_at(site)} carries no subFilters, which the service refuses."]
     if operation not in _MULTIFILTER_OPERATIONS:
         return [
-            f"{_at(site)} names operation {operation}, and the service accepts "
-            f"{listed(sorted(_MULTIFILTER_OPERATIONS))}."
+            (
+                f"{_at(site)} names operation {operation}, and the service accepts "
+                f"{listed(sorted(_MULTIFILTER_OPERATIONS))}."
+            )
         ]
     return [error for sub in sub_filters for error in _sub_filter_errors(site, sub)]
 
@@ -341,9 +361,11 @@ def _wrong_multifilter_target(site: Site) -> list[str]:
     if is_category and site.variable.display_type == _MULTIFILTER_DISPLAY:
         return []
     return [
-        f"{_at(site)} is refused: the target must be a category variable whose "
-        f"displayType is {_MULTIFILTER_DISPLAY}, and this variable is type "
-        f"{site.variable.type} with displayType {site.variable.display_type}."
+        (
+            f"{_at(site)} is refused: the target must be a category variable whose "
+            f"displayType is {_MULTIFILTER_DISPLAY}, and this variable is type "
+            f"{site.variable.type} with displayType {site.variable.display_type}."
+        )
     ]
 
 
@@ -356,13 +378,17 @@ def _sub_filter_errors(site: Site, sub: SubFilterFacts) -> list[str]:
             if variable.parent_id == site.variable.id
         ]
         return [
-            f"{_at(site)} names sub-filter variable {sub.variable_id}, which is not "
-            f"a child of that category. Its children are {listed(children)}."
+            (
+                f"{_at(site)} names sub-filter variable {sub.variable_id}, which is not "
+                f"a child of that category. Its children are {listed(children)}."
+            )
         ]
     if not sub.string_set:
         return [
-            f"{_at(site)} gives sub-filter variable {sub.variable_id} no members, "
-            f"and the service refuses an empty set."
+            (
+                f"{_at(site)} gives sub-filter variable {sub.variable_id} no members, "
+                f"and the service refuses an empty set."
+            )
         ]
     vocabulary = vocabulary_of(child)
     if vocabulary is None:
@@ -371,9 +397,11 @@ def _sub_filter_errors(site: Site, sub: SubFilterFacts) -> list[str]:
     if not unknown:
         return []
     return [
-        f"{_at(site)} gives sub-filter variable {sub.variable_id} the values "
-        f"{listed(unknown)}, which its vocabulary does not carry. The vocabulary "
-        f"is {listed(vocabulary)}."
+        (
+            f"{_at(site)} gives sub-filter variable {sub.variable_id} the values "
+            f"{listed(unknown)}, which its vocabulary does not carry. The vocabulary "
+            f"is {listed(vocabulary)}."
+        )
     ]
 
 

@@ -68,7 +68,7 @@ def _convert_params_for_httpx(
     params: JSONObject | None,
 ) -> (
     Mapping[
-        str, str | int | float | bool | None | Sequence[str | int | float | bool | None]
+        str, str | int | float | bool | Sequence[str | int | float | bool | None] | None
     ]
     | None
 ):
@@ -76,7 +76,7 @@ def _convert_params_for_httpx(
     if params is None:
         return None
     result: dict[
-        str, str | int | float | bool | None | Sequence[str | int | float | bool | None]
+        str, str | int | float | bool | Sequence[str | int | float | bool | None] | None
     ] = {}
     for k, v in params.items():
         if v is None:
