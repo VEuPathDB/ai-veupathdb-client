@@ -96,6 +96,32 @@ shape; the client never builds one.
 for every WDK request, so a host adds latency and error metrics without the
 client depending on a metrics library. The default is `NoObserver`.
 
+An OpenTelemetry sink ships with the `otel` extra, which takes the API and never
+the SDK:
+
+```
+uv add "veupathdb-py[otel]"
+```
+
+```
+from veupathdb.observability.otel import OpenTelemetryObserver
+from veupathdb.observer import set_observer
+
+set_observer(OpenTelemetryObserver())
+```
+
+It feeds `veupathdb.wdk.requests`, `veupathdb.wdk.request_retries`,
+`veupathdb.wdk.request_duration` and the three `veupathdb.site_search.*`
+counterparts, and records nothing until the host configures a `MeterProvider`.
+
+## Who the request is
+
+`veupathdb.wdk.current_user.fetch_current_user(site_id)` reads
+`GET /users/current` under the token in `veupathdb_auth_token_ctx` and answers a
+typed `WDKUserInfo`, or `None` when there is no token and when WDK cannot answer.
+`resolve_registered_email(token, site_id)` names the account behind a token and
+answers `None` for a guest.
+
 ## Logging
 
 `veupathdb.logging.get_logger` returns a bound `structlog` logger and nothing

@@ -19,7 +19,7 @@ access management, staff, metrics, and download endpoints.
 ## Authentication
 
 Same WDK bearer token PathFinder already holds
-(`integrations/veupathdb/auth_login.py:password_login`). Verified live:
+(`src/veupathdb/wdk/auth_login.py:password_login`). Verified live:
 
 - No credential -> `401 {"status":"unauthorized"}` even for `/studies`.
   Guest access is refused, consistent with
@@ -205,6 +205,8 @@ upstream forces this table to shrink. The converter reads the constructs this
 library uses and refuses the rest, so a facet the service adds fails the parse
 rather than passing unchecked.
 
-Anchor: `apps/api/src/pathfinder/tests/unit/devtools/test_eda_fixture_schemas.py`
-(the bodies, the ten rows, and the mutations that prove the gate bites) and
-`test_eda_raml_converter.py` (the RAML-to-draft-07 rules).
+Anchor: `src/veupathdb/devtools/eda_schemas.py` (the converter and the ten rows),
+with `tests/unit/devtools/test_eda_raml_converter.py` for the RAML-to-draft-07
+rules and `tests/unit/devtools/test_eda_schema_vendor.py` for what the vendor
+command writes. The recorded bodies are gated in the consuming application, at
+`pathfinder: apps/api/src/pathfinder/tests/unit/devtools/test_eda_fixture_schemas.py`.

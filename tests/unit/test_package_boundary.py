@@ -39,6 +39,9 @@ FORBIDDEN_ROOTS = {
 WIRE_MODEL_MODULES = {f"{CLIENT}.wdk.wdk_models", f"{CLIENT}.eda.models"}
 ALLOWED_WIRE_MODEL_IMPORTS = {"pydantic"}
 
+# One module per optional extra may name the distribution that extra installs.
+OPTIONAL_EXTRA_MODULES = {f"{CLIENT}.observability.otel": {"opentelemetry"}}
+
 
 def _client_modules() -> list[ModuleType]:
     return [
@@ -72,7 +75,21 @@ def _distributions(names: set[str]) -> set[str]:
 
 @pytest.mark.parametrize("module", _client_modules(), ids=lambda m: m.__name__)
 def test_no_module_reaches_a_host_or_a_database(module: ModuleType) -> None:
-    assert _distributions(_imported_names(module)) & FORBIDDEN_ROOTS == set()
+    allowed = OPTIONAL_EXTRA_MODULES.get(module.__name__, set())
+    reached = _distributions(_imported_names(module)) & FORBIDDEN_ROOTS
+
+    assert reached == reached & allowed
+
+
+def test_an_optional_distribution_is_named_by_its_own_module_and_no_other() -> None:
+    """The base install carries no OTEL, so only the adapter may import it."""
+    reached = {
+        module.__name__
+        for module in _client_modules()
+        if "opentelemetry" in _distributions(_imported_names(module))
+    }
+
+    assert reached == {f"{CLIENT}.observability.otel"}
 
 
 def test_the_domain_opens_no_connection() -> None:

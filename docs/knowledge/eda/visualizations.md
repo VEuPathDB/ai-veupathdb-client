@@ -112,7 +112,7 @@ visualization body is a `STUDY_xxx`, as it is for computes.
 
 ## volcanoplot (live-verified)
 
-The flagship for PathFinder. Request type
+The flagship compute-backed visualization. Request type
 `DifferentialExpressionVolcanoplotPostRequest`:
 
 ```json
@@ -422,20 +422,3 @@ carries a FIXME saying conversion to `LabeledRange`
 (`{min, max, label}`) would need a database migration. Compute
 comparators use the `LabeledRange` form; some visualization payloads use the
 legacy one. The two are not interchangeable.
-
-## What this means for PathFinder
-
-- **EDA sends data, never images.** Every response above is JSON arrays. Our own
-  chart components can render all of it, and nothing from
-  `web-monorepo`'s React needs importing.
-- **The volcanoplot endpoint adds nothing over the compute's statistics file.**
-  They were byte-identical live. A client can read `/computes/{name}/statistics`
-  and skip the app endpoint for this app.
-- **Thresholding is a client concern for volcano, a server concern for network.**
-  The volcanoplot `config` is an empty object; the bipartitenetwork `config`
-  filters. Do not build one abstraction over both.
-- **Visualization `config` validation is weak.** A missing required field
-  returned 500. Validate the spec against the app's
-  `dataElementConstraints` from `GET /eda/apps` before posting.
-- **Per-project availability is data, from `GET /eda/apps`.** It changes between
-  releases and is already returned in one call; do not hardcode the table above.

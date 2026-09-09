@@ -72,3 +72,16 @@ def test_a_blank_path_is_not_a_path(named_config: Path) -> None:
     del named_config
 
     assert "plasmodb" in load_sites_config("   ").sites
+
+
+def test_the_oauth_server_that_signs_bearer_tokens_has_a_default() -> None:
+    """One OAuth server signs every site's token, and the client validates against it."""
+    assert VEuPathDBSettings().veupathdb_oauth_url == "https://auth.veupathdb.org"
+
+
+def test_the_oauth_server_is_read_from_the_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("VEUPATHDB_OAUTH_URL", "https://auth.example/oauth")
+
+    assert VEuPathDBSettings().veupathdb_oauth_url == "https://auth.example/oauth"

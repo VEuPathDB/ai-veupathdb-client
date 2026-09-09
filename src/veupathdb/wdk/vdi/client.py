@@ -99,7 +99,7 @@ class VdiClient:
             return self._client
 
     def _auth(self) -> dict[str, str]:
-        """The one credential form the service accepts from PathFinder."""
+        """The one credential form the service accepts."""
         token = veupathdb_auth_token_ctx.get()
         if not token:
             raise WDKLoginRequiredError

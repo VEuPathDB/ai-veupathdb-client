@@ -11,12 +11,14 @@ import httpx
 import jwt
 import pytest
 import respx
+import structlog.testing
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from jwt.algorithms import ECAlgorithm
 
 from veupathdb.errors import ExternalServiceError
 from veupathdb.wdk.auth_login import (
+    password_logout,
     validate_oauth_token,
 )
 
@@ -223,3 +225,41 @@ async def test_the_signing_key_is_fetched_once_for_many_tokens() -> None:
     assert await validate_oauth_token(_token(private_key), OAUTH_URL) is not None
 
     assert route.call_count == 1
+
+
+@respx.mock
+async def test_the_logout_sends_the_token_as_the_authorization_cookie() -> None:
+    route = respx.get("https://plasmodb.org/plasmo/service/logout").mock(
+        return_value=httpx.Response(302, headers={"location": "/"})
+    )
+
+    assert await password_logout("plasmodb", "a-token") is True
+    assert route.calls.last.request.headers["cookie"] == "Authorization=a-token"
+
+
+@respx.mock
+async def test_a_refused_logout_reports_that_no_session_ended() -> None:
+    respx.get("https://plasmodb.org/plasmo/service/logout").mock(
+        return_value=httpx.Response(500, text="boom")
+    )
+
+    with structlog.testing.capture_logs() as entries:
+        assert await password_logout("plasmodb", "a-token") is False
+
+    assert [entry["event"] for entry in entries if entry["log_level"] == "warning"] == [
+        "VEuPathDB did not end the session"
+    ]
+
+
+@respx.mock
+async def test_an_unreachable_site_reports_that_no_session_ended() -> None:
+    respx.get("https://plasmodb.org/plasmo/service/logout").mock(
+        side_effect=httpx.ConnectError("refused")
+    )
+
+    with structlog.testing.capture_logs() as entries:
+        assert await password_logout("plasmodb", "a-token") is False
+
+    assert [entry["event"] for entry in entries if entry["log_level"] == "warning"] == [
+        "VEuPathDB did not end the session"
+    ]

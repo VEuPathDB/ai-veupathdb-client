@@ -191,12 +191,12 @@ with one input is [WDK-STEP-004](#wdk-step-004---a-step-inside-a-strategy-must-h
 a 500. The parent must either be given a replacement input or be omitted too. There is no
 call that removes one step and leaves WDK to work out the rest.
 
-PathFinder's own ordering is currently the wrong way round.
-`services/strategies/commit.py` deletes the WDK steps for dropped nodes before
-`sync_strategy_for_site` pushes the new tree, so every such DELETE hits a step that is still
-referenced by the strategy in WDK. `delete_step` only swallows 404, so the 409 propagates,
-`delete_orphaned_wdk_steps` catches it and logs `Failed to delete orphaned WDK step`, and
-the row is left behind. It is not a data-loss bug - the tree push that follows orphans the
+The consuming application's own ordering is currently the wrong way round.
+`pathfinder: apps/api/src/pathfinder/services/strategies/commit.py` deletes the WDK steps
+for dropped nodes before `sync_strategy_for_site` pushes the new tree, so every such DELETE
+hits a step that is still referenced by the strategy in WDK. `delete_step` only swallows
+404, so the 409 propagates, `delete_orphaned_steps` catches it and logs `Failed to delete
+orphaned WDK step`, and the row is left behind. It is not a data-loss bug - the tree push that follows orphans the
 step anyway - but the cleanup never runs and the orphans accumulate.
 
 Source-only: read off the pinned sha, not confirmed against a running site. See
@@ -291,11 +291,13 @@ root is a step no other step names as an input.
 **The uncovered half is the wire boundary, and it is the half that matters.** Every tree
 the test sees came out of `flatten_tree` on a single node, so single-rootedness holds *by
 construction* - the test constrains `root_ids` against `flatten_tree`, not against
-anything WDK requires. PathFinder genuinely does build multi-root step maps:
-`services/strategies/session_factory.py` loads `flatten_tree(payload.root)` and then
-merges `flatten_tree(detached)` for every entry in `payload.detached_roots`, which is a
-map with as many roots as the canvas has disconnected subtrees. What keeps that off the
-wire is `services/strategies/sync.py`, which calls `pushable_root_id` and then
+anything WDK requires. The consuming application genuinely does build multi-root step
+maps: `pathfinder: apps/api/src/pathfinder/services/strategies/session_factory.py` loads
+`flatten_tree(payload.root)` and then merges `flatten_tree(detached)` for every entry in
+`payload.detached_roots`, which is a map with as many roots as the canvas has disconnected
+subtrees. What keeps that off the wire is
+`pathfinder: apps/api/src/pathfinder/services/strategies/sync.py`, which calls
+`pushable_root_id` and then
 `rebuild_tree` on the single id it returns
 ([WDK-STEP-004](#wdk-step-004---a-step-inside-a-strategy-must-have-every-answer-parameter-filled-a-half-wired-combine-is-not-a-degraded-combine)).
 No test asserts that selection. This is the same gap

@@ -1,5 +1,6 @@
 """Step creation, update, and deletion methods for the Strategy API."""
 
+import asyncio
 from http import HTTPStatus
 
 from veupathdb.errors import DataParsingError, VEuPathDBError
@@ -322,6 +323,30 @@ class StepsMixin(StrategyAPIBase):
             if exc.status == HTTPStatus.NOT_FOUND:
                 return
             raise
+
+    async def delete_orphaned_steps(self, step_ids: list[int]) -> list[int]:
+        """Delete step rows in parallel and name the ids WDK kept.
+
+        One refusal does not abort the others: the caller decides what to do
+        with the leftovers.
+        """
+        if not step_ids:
+            return []
+
+        async def one(step_id: int) -> int | None:
+            try:
+                await self.delete_step(step_id)
+            except VEuPathDBError as exc:
+                logger.warning(
+                    "Failed to delete orphaned WDK step",
+                    step_id=step_id,
+                    error=str(exc),
+                )
+                return step_id
+            return None
+
+        results = await asyncio.gather(*(one(step_id) for step_id in step_ids))
+        return [step_id for step_id in results if step_id is not None]
 
     async def update_step_properties(
         self,

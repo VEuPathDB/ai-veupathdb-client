@@ -104,7 +104,8 @@ naming the repeated code, because one species has one state in the census; both 
 the wire raise it, the expansion in `base.py:_expand_profile_pattern_groups` and
 `sort_profile_pattern` under `_normalize_parameters`. A code the phyletic tree does not
 carry is a second 422, raised by `validate_phyletic_codes`. All three run at
-`set_criterion` time as well, from `services/catalog/param_validation.py`, because the
+`set_criterion` time as well, from
+`veupathdb-mcp: src/veupathdb_mcp/catalog/param_validation.py`, because the
 pattern the model states is otherwise accepted by the pre-flight and refused one tool call
 later. Guarded by
 `tests/unit/wdk/test_strategy_api_base.py`,
@@ -393,7 +394,8 @@ purpose.
 PathFinder writes all three together, and the two lists are the input rather than a
 by-product. The parameter sheet gives `included_species` and `excluded_species` the clade
 tree as their vocabulary, so the model proposes species and clades by code or by label;
-`services/catalog/param_phyletic.py:derive_phyletic_overrides` resolves both proposals
+`veupathdb-mcp: src/veupathdb_mcp/catalog/param_phyletic.py:derive_phyletic_overrides`
+resolves both proposals
 against the tree and returns the two canonical lists beside the pattern derived from them,
 and `set_criterion` binds all three. `species_lists` keeps the granularity the reference
 client stores - a clade stays one term in the list while its leaves are the tokens in the

@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: Step analyses - types, forms, and the four-call async protocol
-description: What a step analysis is, why its form defaults are advisory rather than applied, the create-run-poll-fetch sequence and the two non-200 successes in it, and which parts of the surface PathFinder uses today.
+description: What a step analysis is, why its form defaults are advisory rather than applied, the create-run-poll-fetch sequence and the two non-200 successes in it, and which parts of the surface a consuming application uses today.
 tags: [wdk-alignment, step-analyses, enrichment, async, model]
 generated: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
 verified: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
@@ -181,7 +181,7 @@ client can render an unfamiliar column instead of dropping it.
 All three verbs on `.../analyses/{analysisId}/result` route through
 `StepAnalysisLookupMixin.getAnalysis`, which does its ownership check by hand in
 two stages: a bad id or a path user who does not own the step is a 404, and a
-third party without a matching `accessToken` is a 403. PathFinder can only ever
+third party without a matching `accessToken` is a 403. A caller can only ever
 reach the first stage. The full account, including why that is a consequence of
 addressing concrete user ids, is in
 [users, auth and sessions](users-auth-and-sessions.md) and is not repeated here.
@@ -189,35 +189,37 @@ addressing concrete user ids, is in
 Confirmed live on both sites on 2026-08-10: `GET .../analyses/999999999/result`
 returns **404** `Resource 'step analysis: 999999999' does not exist.`
 
-# What PathFinder runs today
+# What the consuming applications run today
 
-PathFinder uses the analysis surface for one thing: enrichment.
-`services/wdk/enrichment/parser.py:ANALYSIS_TYPE_MAP` maps five internal analysis
-types onto the three WDK plugins - the three GO flavours all resolve to
-`go-enrichment` and are separated by the `goAssociationsOntologies` parameter.
-The lifecycle in `integrations/veupathdb/strategy_api/analyses.py:run_step_analysis`
-is create, run, poll, fetch, preceded by a zero-record standard report to force
-the step's answer to be materialised, and `services/wdk/enrichment/params.py:extract_default_params`
+The analysis surface reaches one feature: enrichment.
+`veupathdb-mcp: src/veupathdb_mcp/wdk/enrichment/parser.py:ANALYSIS_TYPE_MAP` maps
+five internal analysis types onto the three WDK plugins - the three GO flavours
+all resolve to `go-enrichment` and are separated by the
+`goAssociationsOntologies` parameter. The lifecycle in
+`src/veupathdb/wdk/strategy_api/analyses.py:run_step_analysis` is create, run,
+poll, fetch, preceded by a zero-record standard report to force the step's answer
+to be materialised, and
+`veupathdb-mcp: src/veupathdb_mcp/wdk/enrichment/params.py:extract_default_params`
 reads the form document and sends its defaults back, which is the behaviour the
 `NO_FILL` rule above requires.
 
-The near frontier is everything else the platform already exposes and PathFinder
-does not touch:
+The near frontier is everything else the platform already exposes and no caller
+touches:
 
 - `PATCH .../analyses/{id}` - rename an instance or attach user notes, so a
   researcher can label two enrichments of the same step.
-- `DELETE .../analyses/{id}` - PathFinder creates a new instance per run and
-  never removes one.
+- `DELETE .../analyses/{id}` - a new instance is created per run and none is
+  ever removed.
 - `GET .../analyses/{id}/resources?path=...` and `.../properties` - the
   `downloadUrl` and `propertiesUrl` already handed back in every result body,
   unused.
 - `POST .../analysis-types/{name}/refreshed-dependent-params` and the two
   ontology-term-summary endpoints on the same path - the analysis form has the
-  same dependent-parameter machinery as a search, and PathFinder currently reads
-  the form once and never refreshes it, which is the same defect class as
+  same dependent-parameter machinery as a search, and the form is currently read
+  once and never refreshed, which is the same defect class as
   a dependent vocabulary read without its parents
   (`pathfinder: docs/knowledge/decisions/a-dependent-vocabulary-is-read-under-its-parents.md`).
 - Non-enrichment plugins. The three seen here are what a transcript search
   offers on these two sites; the set is a property of the question, so a
-  different record class can offer a different list and PathFinder assumes it
-  cannot.
+  different record class can offer a different list, and a caller that assumes
+  otherwise is wrong.

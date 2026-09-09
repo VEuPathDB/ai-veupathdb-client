@@ -141,6 +141,16 @@ which reads `value` with `getString`, so a client that sends a multi-pick array
 as a real JSON array here - rather than as the stringified array the wire
 format demands - gets a 400 rather than a wrong vocabulary.
 
+**The refresh endpoint can refuse a value the run endpoint accepts.** Measured on
+plasmodb.org against `GenesByOrthologPattern`: a refresh carrying
+`organism: ["Plasmodium falciparum 3D7"]` together with a `profile_pattern`
+answered **500**, while running the search with the same values answered 200 with
+a large `totalCount`. Narrowing a vocabulary is an enrichment, not a
+precondition. A client that loses the narrowing loses vocabulary precision and
+must not lose the search, which is the platform-side reason the consuming
+application gives that operation one owner and one fallback policy
+(`pathfinder: docs/knowledge/decisions/contextualizing-params-is-an-enrichment.md`).
+
 # The ordering constraint, which is the whole point
 
 A dependent parameter's vocabulary is a function of its parents' values. Read it

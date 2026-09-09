@@ -462,19 +462,3 @@ Identical to the rest of the service, see
 `Authorization: Bearer {token}` returned 200 (this is the form the WDK bridge
 plugins send), and no credential returned 401. Both forms work; the bearer form
 is confirmed, so the note in [rest-surface.md](rest-surface.md) is settled.
-
-## What this means for PathFinder
-
-The compute model maps cleanly onto the existing durable-task architecture, and
-nothing here needs a browser:
-
-- A compute job is addressable by a **client-derivable** MD5. A tool can compute
-  the id, ask with `autostart=false`, and skip the job entirely on a cache hit.
-- `queued | in-progress | complete | failed | expired | no-such-job` is a
-  six-state machine with polling only, which is what `@durable_tool` plus
-  `TaskProgressEmitter` already expresses.
-- Submission validates almost nothing semantic. Entity pairing, vocabulary
-  membership and group non-emptiness are the caller's job, exactly the trust
-  posture already applied to WDK parameters.
-- The output-file split per plugin (`/statistics` against `/{file}`) means a
-  typed client needs a per-compute reader, not one generic one.

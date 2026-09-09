@@ -70,7 +70,7 @@ def topological_fill_order(specs: dict[str, ParamSpecNormalized]) -> list[str]:
 
 
 def _is_hidden_required_fill(spec: ParamSpecNormalized) -> bool:
-    """Whether this parameter is one PathFinder supplies on the caller's behalf."""
+    """Whether this parameter is one the client supplies on the caller's behalf."""
     return (
         not spec.is_visible
         and not spec.allow_empty_value

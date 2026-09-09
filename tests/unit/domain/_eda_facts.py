@@ -33,6 +33,82 @@ class Study:
     root_entity: Ent
 
 
+@dataclass(frozen=True)
+class Sub:
+    variable_id: str
+    string_set: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class Filt:
+    entity_id: str
+    variable_id: str
+    type: str
+    string_set: list[str] = field(default_factory=list)
+    number_set: list[float] = field(default_factory=list)
+    date_set: list[str] = field(default_factory=list)
+    min: float | str | None = None
+    max: float | str | None = None
+    left: float | None = None
+    right: float | None = None
+    operation: str = "union"
+    sub_filters: list[Sub] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class BareFilt:
+    entity_id: str
+    variable_id: str
+    type: str
+
+
+GENE_PHENOTYPE = "GENE_PHENOTYPE_DATA_ENTITY"
+
+
+def phenotype_study() -> Study:
+    """One entity carrying every variable type the filter checks branch on."""
+    return Study(
+        id="STUDY_53f554ec6a",
+        root_entity=Ent(
+            id=GENE_PHENOTYPE,
+            variables=[
+                Var(
+                    id="VAR_a8ad31c0",
+                    type="string",
+                    display_name="Success of Genetic Modification",
+                    vocabulary=["no", "yes"],
+                ),
+                Var(
+                    id="EUPATH_0043064",
+                    type="integer",
+                    display_name="count",
+                    data_shape="continuous",
+                ),
+                Var(
+                    id="EUPATH_0043256",
+                    type="date",
+                    display_name="Collection date",
+                    vocabulary=["2017-05-05", "2017-05-11"],
+                ),
+                Var(id="OBI_0001621", type="longitude", display_name="longitude"),
+                Var(
+                    id="CAT_1",
+                    type="category",
+                    display_name="Diagnosis",
+                    display_type="multifilter",
+                ),
+                Var(
+                    id="CHILD_1",
+                    type="string",
+                    display_name="Malaria",
+                    parent_id="CAT_1",
+                    vocabulary=["Yes"],
+                ),
+            ],
+        ),
+    )
+
+
 def counts_study() -> Study:
     """A samples entity above a gene-counts entity, the differential-expression shape."""
     counts = Ent(

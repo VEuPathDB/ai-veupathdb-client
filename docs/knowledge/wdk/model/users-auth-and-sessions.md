@@ -35,12 +35,12 @@ single most important fact on this page.
 WDK looks for the token in an
 [`Authorization` header first and an `Authorization` cookie second](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/filter/CheckLoginFilter.java#L208-L218).
 The cookie is the path everything in practice uses, and PathFinder uses it too:
-`_inject_auth_cookie` in `integrations/veupathdb/_http.py` writes exactly one such pair
+`_inject_auth_cookie` in `src/veupathdb/wdk/_http.py` writes exactly one such pair
 onto each outgoing request ([WDK-AUTH-002](../rules/auth-and-transport.md)).
 
 The token is a JWT. Its payload carries `is_guest`, which is how a guest token is told
 from a real one without asking the server;
-`integrations/veupathdb/auth_login.py:_is_guest_jwt` decodes exactly that claim, and
+`src/veupathdb/wdk/auth_login.py:_is_guest_jwt` decodes exactly that claim, and
 treats anything it cannot decode as a guest, because the failure of an undecodable token
 should be "no privileges" rather than "assume privileges".
 

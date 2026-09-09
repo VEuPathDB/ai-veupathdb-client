@@ -1,5 +1,19 @@
 # Knowledge log
 
+## 2026-09-08 - The small client moves arrive, and the app prose leaves
+
+`GET /users/current` and its typed profile, the two EDA validation predicates, the
+OpenTelemetry observer adapter, the WDK capture transport and the orphaned-step delete
+moved in from the consuming application. `veupathdb_oauth_url` moved in from the MCP
+server's settings, because the function that reads it is this client's.
+
+Four sections that spoke about the consuming application left: the three EDA
+"what this means" sections and the step-analysis usage note. What names a module in
+another repository is now written as a citation - `pathfinder:` or `veupathdb-mcp:` -
+and every path that still spelled the pre-split `integrations/veupathdb/` tree names
+this package instead. WDK-AUTH-004 is enforced here now that `password_logout` has a
+test in this suite.
+
 ## 2026-09-08 - ruff format owns the bundle's Python blocks
 
 `ruff format` formats Python code blocks inside markdown from ruff 0.16, so

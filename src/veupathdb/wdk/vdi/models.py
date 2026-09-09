@@ -1,4 +1,4 @@
-"""The VDI wire types PathFinder sends and reads."""
+"""The VDI wire types the client sends and reads."""
 
 from __future__ import annotations
 

@@ -6,6 +6,8 @@ from functools import lru_cache
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+DEFAULT_OAUTH_URL = "https://auth.veupathdb.org"
+
 
 class VEuPathDBSettings(BaseSettings):
     """What the client needs to reach a site.
@@ -26,6 +28,10 @@ class VEuPathDBSettings(BaseSettings):
         description="Optional path to a YAML file for site list and base URLs; defaults to bundled sites.yaml if unset.",
     )
     veupathdb_auth_token: str | None = Field(default=None, repr=False)
+    veupathdb_oauth_url: str = Field(
+        default=DEFAULT_OAUTH_URL,
+        description="The OAuth server that signs VEuPathDB bearer tokens. One server serves every site.",
+    )
 
 
 @lru_cache

@@ -16,6 +16,14 @@ Every claim here is pinned to the upstream that can prove it wrong, and `scripts
 
 - [EDA](eda/) - VEuPathDB's Exploratory Data Analysis platform and how it reaches WDK steps
 
+## Decisions
+
+- [Decisions](decisions/) - choices with a real alternative
+
+## Conventions
+
+- [Conventions](conventions/) - how this bundle is kept honest
+
 ## History
 
 - [log.md](log.md) - dated record of significant changes to this bundle

@@ -47,6 +47,24 @@ test("an anchor whose symbol is absent is rejected", () => {
   assert.match(errors[0], /anchor symbol not found/);
 });
 
+test("an anchor and a status naming another repository are cited, not resolved", () => {
+  assert.deepEqual(errorsFor("cited-repository"), []);
+});
+
+test("a citation of a repository this bundle does not name is rejected", () => {
+  const errors = errorsFor("unknown-repository");
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /anchor file does not exist -> some-other-repo$/);
+});
+
+test("a cited rule counts as enforced elsewhere, not here", () => {
+  const coverage = new Coverage();
+  collect(join(FIXTURES, "cited-repository"), join(FIXTURES, "cited-repository"), coverage);
+
+  assert.equal(coverage.enforced, 1);
+  assert.equal(coverage.cited, 1);
+});
+
 test("an ENFORCED status naming a missing test is rejected", () => {
   const errors = errorsFor("missing-test");
   assert.equal(errors.length, 1);

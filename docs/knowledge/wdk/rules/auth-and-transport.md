@@ -31,7 +31,8 @@ reachability under a correct token, a loud 403 under a wrong one. That is the en
 argument for the rule, and it is the only part of it that is checkable.
 
 `_ensure_session` resolves the id once per client from `GET /users/current` and every
-later call reuses it.
+later call reuses it. `src/veupathdb/wdk/current_user.py` is the other module allowed to
+name the alias: reading who the token is has no concrete id to address yet.
 
 The docstring on `_ensure_session` gives a different reason: that some deployments answer
 405 to PUT, PATCH and DELETE on `/users/current`. That is unconfirmed. WDK does not
@@ -161,7 +162,7 @@ branch rejects. Last touched 2019-08-09.
 So the rule has two halves. Where WDK annotates a body and the service holds to it, the
 published schema is authority and drift against it is a gate failure. Everywhere else -
 the parameter union above all - PathFinder's own models in
-`integrations/veupathdb/wdk_models.py` and `wdk_parameters.py` are the contract, falsified
+`src/veupathdb/wdk/wdk_models.py` and `wdk_parameters.py` are the contract, falsified
 by a live payload rather than by a schema file. The parameter discriminants come from
 [`JsonKeys.java:146-156`](https://github.com/VEuPathDB/WDK/blob/f0a04136b658617a07c66151a49dd0787688084f/Model/src/main/java/org/gusdb/wdk/core/api/JsonKeys.java#L146-L156),
 edited 2026-08-03, which declares eleven; the schemas declare eight and include
@@ -258,8 +259,7 @@ deliberately not a rule here - see
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/SessionService.java#L277-L311
 - anchor: src/veupathdb/wdk/auth_login.py:password_logout
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/transport/test_logout_carries_the_token.py::TestTheRequestCarriesTheCredential::test_the_token_is_sent_as_the_authorization_cookie
+- status: ENFORCED by tests/unit/wdk/test_auth_login.py::test_the_logout_sends_the_token_as_the_authorization_cookie
 
 `processLogout` resolves the requesting user and returns early when that user is a guest.
 A request carrying no credential is a guest ([WDK-AUTH-001](#wdk-auth-001---a-request-with-no-credential-is-not-rejected-wdk-mints-a-new-guest-user-for-it)),
@@ -283,9 +283,9 @@ and nothing observed here shortens it.
 
 Two consequences, and the second is the one to carry:
 
-- A logout that forwards no credential is a no-op that reports success. That part is
-  PathFinder's to get right, and `password_logout` now sends the token and reports what
-  WDK answered.
+- A logout that forwards no credential is a no-op that reports success. That part is the
+  caller's to get right, and `password_logout` sends the token, reports what WDK answered,
+  and warns when no session ended.
 - **A logout that does everything right still leaves the token working.** "Log out" means
   the browser forgot the credential, on every VEuPathDB site, and a copy of that cookie
   taken beforehand keeps working. No client can fix this; the platform exposes no

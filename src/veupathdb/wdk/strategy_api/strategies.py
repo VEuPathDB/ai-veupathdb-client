@@ -11,9 +11,9 @@ from veupathdb.wdk.strategy_api.base import StrategyAPIBase
 from veupathdb.wdk.strategy_api.helpers import (
     tag_internal_wdk_strategy_name,
 )
+from veupathdb.wdk.wdk_base import WDKModel
 from veupathdb.wdk.wdk_models import (
     WDKIdentifier,
-    WDKModel,
     WDKStepTree,
     WDKStrategyDetails,
     WDKStrategySummary,

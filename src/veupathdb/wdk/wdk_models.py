@@ -23,22 +23,14 @@ from veupathdb.domain.wdk_values import (
 from veupathdb.json_types import JSONObject
 from veupathdb.model import CamelModel
 from veupathdb.wdk.value_decoding import encode_params
+from veupathdb.wdk.wdk_base import WDKModel
+from veupathdb.wdk.wdk_parameters import WDKParameter
 
 
 def encode_wdk_params(params: dict[str, ParamValue] | None) -> dict[str, str]:
     if params is None:
         return {}
     return encode_params(params)
-
-
-class WDKModel(CamelModel):
-    """Base for all WDK REST API response models."""
-
-    model_config = ConfigDict(
-        alias_generator=to_camel,
-        extra="ignore",
-        frozen=True,
-    )
 
 
 class WDKFilterValue(WDKModel):
@@ -421,13 +413,20 @@ class WDKTemporaryResult(WDKModel):
     id: str
 
 
+class WDKUserProperties(WDKModel):
+    """The profile fields nested under ``properties`` of a user record."""
+
+    first_name: str | None = None
+    last_name: str | None = None
+
+
 class WDKUserInfo(WDKModel):
     """WDK user profile (from ``GET /users/current``)."""
 
     id: int
     email: str | None = None
     is_guest: bool = True
-    properties: dict[str, str] = Field(default_factory=dict)
+    properties: WDKUserProperties = Field(default_factory=WDKUserProperties)
 
 
 # Dataset config: discriminated union over the source types.
@@ -601,13 +600,3 @@ class CombinedStepSpec(PatchStepSpec):
     secondary_step_id: int
     boolean_operator: BooleanOperator
     wdk_weight: int | None = None
-
-
-# Imported last to resolve the WDKParameter forward reference.
-from veupathdb.wdk.wdk_parameters import WDKParameter  # noqa: E402
-
-WDKSearch.model_rebuild()
-WDKSearchResponse.model_rebuild()
-WDKRecordType.model_rebuild()
-WDKStepAnalysisType.model_rebuild()
-WDKStepAnalysisTypeResponse.model_rebuild()

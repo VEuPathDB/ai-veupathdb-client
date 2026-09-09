@@ -47,7 +47,7 @@ false alarm once.
   any WDK prefix, so the column-reporter row appears uncalled. Join consecutive lines from
   the same file before deciding.
 - **Grep the whole backend, not one package.** The first version of this column was
-  derived from `integrations/veupathdb/strategy_api/` alone and got two rows wrong, both
+  derived from `src/veupathdb/wdk/strategy_api/` alone and got two rows wrong, both
   of them outside it: the callers live in `catalog_metadata.py` and
   `transport/http/routers/`. A narrowed extraction does not just miss rows, it makes the
   reverse check pass vacuously, so nothing reports the gap.

@@ -96,7 +96,7 @@ back to the static `GET`, whose echoed values are the published defaults
 ([WDK-PARAM-008](../rules/parameters-and-vocabularies.md)). PathFinder therefore adds the
 published `initialDisplayValue` of **every** hidden parameter that allows empty to the
 context of a metadata read, by shape rather than by name
-(`apps/api/src/pathfinder/services/catalog/search_context.py:context_for_metadata_read`).
+(`veupathdb-mcp: src/veupathdb_mcp/catalog/search_context.py:context_for_metadata_read`).
 A hidden parameter that forbids empty is a different case and is decided by
 `fill_hidden_required_defaults`, because its value reaches the step's `searchConfig` and
 chooses the science.

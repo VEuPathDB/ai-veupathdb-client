@@ -71,7 +71,7 @@ ENFORCED_SCHEMAS: tuple[str, ...] = (
     "wdk.users.strategies.id.put-request",
     "wdk.users.strategies.post-request",
 )
-"""The schema annotations WDK binds to an endpoint PathFinder calls.
+"""The schema annotations WDK binds to an endpoint this client calls.
 
 Twelve endpoints, fourteen names, and the vendored tree is their transitive
 ``$ref`` closure. A name here is not a promise that the live service holds to

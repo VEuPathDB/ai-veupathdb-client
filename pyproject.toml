@@ -1,6 +1,6 @@
 [project]
 name = "veupathdb-py"
-version = "0.1.0a3"
+version = "0.1.0a4"
 description = "Python client for the VEuPathDB WDK and EDA services"
 requires-python = ">=3.14"
 dependencies = [
@@ -13,6 +13,10 @@ dependencies = [
     "json5>=0.14.0",
     "structlog>=25.0.0",
 ]
+
+[project.optional-dependencies]
+# The OTEL observer adapter. The API only: a library never installs an SDK.
+otel = ["opentelemetry-api>=1.44.0"]
 
 [build-system]
 requires = ["hatchling"]
@@ -33,6 +37,7 @@ dev = [
     "hypothesis>=6.167.1",
     "jsonschema>=4.26.0",
     "mypy>=2.3.1",
+    "opentelemetry-sdk>=1.44.0",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
     "referencing>=0.37.0",

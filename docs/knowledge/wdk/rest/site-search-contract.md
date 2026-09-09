@@ -81,8 +81,8 @@ WDK before showing it.
 The pinned response is
 `src/veupathdb/testing/fixtures/wdk/site_search_stream_genes.json`, recorded from
 plasmodb.org on 2026-09-04. Re-record it with the request in
-`apps/api/src/pathfinder/tests/live/test_site_search_stream_drift.py`, which is also what
-checks it against the live service.
+`pathfinder: apps/api/src/pathfinder/tests/live/test_site_search_stream_drift.py`, which
+is also what checks it against the live service.
 
 # The 100,000 ceiling is in the source and not in the deployment
 
@@ -145,7 +145,7 @@ scores to five decimal places.
 
 # What PathFinder calls, and where
 
-`integrations/veupathdb/site_search_client.py` has one method per form: `search` for the
+`src/veupathdb/wdk/site_search_client.py` has one method per form: `search` for the
 paged one and `stream_records` for the streaming one.
 
 | Caller | Form | Why |

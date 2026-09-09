@@ -314,7 +314,7 @@ paragraph exists so that writing it later is transcription rather than
 redesign.
 
 It needs no network. `WDKStep` and `WDKStrategyDetails` in
-`integrations/veupathdb/wdk_models.py` are plain Pydantic models, so four
+`src/veupathdb/wdk/wdk_models.py` are plain Pydantic models, so four
 `model_validate` calls over hand-built dicts cover the whole rule:
 
 | Fixture | Assertion |

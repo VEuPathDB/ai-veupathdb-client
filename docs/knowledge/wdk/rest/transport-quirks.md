@@ -139,7 +139,7 @@ the weaker argument and should not be the one anyone relies on.
 # The JSESSIONID silent-zero, which is unverified
 
 The belief, stated in `CLAUDE.md`, in two docstrings in
-`integrations/veupathdb/_http.py`, in `devtools/diagnosis.py` and in `devtools/README.md`:
+`src/veupathdb/wdk/_http.py`, and in the consuming application's own devtools:
 a WDK process query such as `GenesByOrthologPattern` returns zero results rather than an
 error when the request carries no Tomcat `JSESSIONID`.
 

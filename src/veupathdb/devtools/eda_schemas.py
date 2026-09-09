@@ -526,7 +526,7 @@ SPEC_DEFECTS: tuple[SpecDefect, ...] = (
 )
 """Where the pinned RAML describes a service that does not exist.
 
-Every entry is a defect in the specification: PathFinder's own models already
+Every entry is a defect in the specification: this client's own models already
 match the wire at each of these ten members. The gate applies them so that
 whatever it still reports is drift.
 """

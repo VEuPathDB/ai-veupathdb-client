@@ -91,18 +91,21 @@ async def password_logout(site_id: str, auth_token: str) -> bool:
     site = get_site(site_id)
     try:
         async with httpx.AsyncClient(
-            base_url=site.service_url, follow_redirects=False
+            base_url=site.service_url,
+            follow_redirects=False,
+            cookies={"Authorization": auth_token},
         ) as client:
-            response = await client.get(
-                "/logout", cookies={"Authorization": auth_token}
-            )
+            response = await client.get("/logout")
+        ended = response.status_code < HTTPStatus.BAD_REQUEST
     except httpx.HTTPError:
-        return False
-    return response.status_code < HTTPStatus.BAD_REQUEST
+        ended = False
+    if not ended:
+        logger.warning("VEuPathDB did not end the session", site_id=site_id)
+    return ended
 
 
 class VEuPathDBClaims(BaseModel):
-    """The claims PathFinder reads from a VEuPathDB bearer token."""
+    """The claims a host reads from a VEuPathDB bearer token."""
 
     model_config = ConfigDict(extra="ignore")
 

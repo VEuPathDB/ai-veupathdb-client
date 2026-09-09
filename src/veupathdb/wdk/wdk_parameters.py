@@ -9,7 +9,7 @@ from veupathdb.domain.parameters.wdk_vocab import (
     WDKFilterOntologyTerm,
     WDKVocabulary,
 )
-from veupathdb.wdk.wdk_models import WDKModel
+from veupathdb.wdk.wdk_base import WDKModel
 
 
 class WDKBaseParameter(WDKModel):

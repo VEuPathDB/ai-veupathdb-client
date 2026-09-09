@@ -442,21 +442,3 @@ For comparison, the same search over the already-complete job used for the
 `totalCount` 1571 and `displayTotalCount` 1543, matching the 1543 rows that pass
 the same thresholds in the raw volcanoplot response (see
 [visualizations.md](visualizations.md)).
-
-## What this means for PathFinder
-
-- **Handle 202 explicitly.** `POST .../reports/standard` on an EDA
-  compute-backed search has three outcomes, not two: 202 delayed, 200 answer,
-  or a plugin error. Treating 202 as an answer produces a silent empty result.
-- **Prefer driving the compute first.** Because the job id is a derivable MD5
-  (see [computes-and-jobs.md](computes-and-jobs.md)), a tool can poll
-  `/computes/{name}?autostart=true` inside a `@durable_tool` job and create the
-  step only once `complete`. The step then never surfaces a 202, and progress is
-  reportable. This is now measured rather than assumed.
-- **The presets are the authoring sheets.** Three of the four encode which
-  compute, which reserved variable ids and which comparator shape make sense for
-  a data type. They are the direct template for typed authoring sheets, in the
-  same spirit as `set_criterion`'s `params_template`.
-- **Do not plan a generic compute-to-step bridge.** Upstream's is volcano-only
-  by construction. WGCNA reaches WDK through an ordinary SQL query on a
-  pre-loaded table, and any other compute has no WDK path at all today.

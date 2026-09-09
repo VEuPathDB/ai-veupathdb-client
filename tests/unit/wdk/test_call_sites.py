@@ -18,8 +18,8 @@ _SOURCE_ROOT = Path(__file__).resolve().parents[3] / "src" / "veupathdb"
 _INTEGRATION = "wdk"
 _SITE_SOURCES = ("get_site", "SiteInfo", "service_url")
 _CURRENT_ALIAS = "/users/current"
-# The two calls whose whole job is resolving the concrete id.
-_RESOLVERS = ("wdk/strategy_api/helpers.py",)
+# The calls whose whole job is reading the current user.
+_RESOLVERS = ("wdk/strategy_api/helpers.py", "wdk/current_user.py")
 
 
 @dataclass(frozen=True)

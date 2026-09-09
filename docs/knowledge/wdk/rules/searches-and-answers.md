@@ -74,7 +74,8 @@ and [WDK-ANS-001](#wdk-ans-001---the-unpersisted-report-endpoint-requires-both-s
 means you cannot omit the key. The search document's `defaultAttributes` is a suggestion to
 the client, and the client has to act on it. If you want the defaults, send them.
 
-PathFinder relies on this deliberately in one place - `services/wdk/step_preview.py` retries
+One caller relies on this deliberately -
+`veupathdb-mcp: src/veupathdb_mcp/wdk/step_preview.py` retries
 with no attributes to get an id-only preview when a record class rejects the ones it asked for
 - and
 that works because record identity is not an attribute (see
