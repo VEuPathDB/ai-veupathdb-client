@@ -5,7 +5,7 @@
     "url": "https://plasmodb.org/plasmo/service/record-types/transcript/searches/GenesByPhenotypeEdaSubset_PlasmoDB_Rod_Mal_Phenotype_RSRC?expandParams=true",
     "status": 200,
     "content_type": "application/json",
-    "recorded_at": "2026-08-22",
+    "recorded_at": "2026-09-09",
     "reads": "WDK-PARAM-011"
   },
   "body": {

@@ -47,7 +47,10 @@ class AiExpressionReportConfig(CamelModel):
 
 
 class AiExperimentSummary(BaseModel):
-    """One experiment's line. The keys are the summarizer's JSON schema."""
+    """One experiment's line. The keys are the summarizer's JSON schema.
+
+    That schema is snake_case on the wire, unlike the entry around it.
+    """
 
     model_config = ConfigDict(extra="ignore", frozen=True)
 
@@ -56,6 +59,8 @@ class AiExperimentSummary(BaseModel):
     confidence: int = 0
     biological_importance: int = 0
     dataset_id: str = ""
+    experiment_name: str = ""
+    assay_type: str = ""
     experiment_keywords: list[str] = Field(default_factory=list)
 
 
@@ -80,15 +85,20 @@ class AiExpressionSummary(BaseModel):
 
 
 class AiExpressionGeneResponse(CamelModel):
-    """What the site holds for one gene. The summary is absent unless generated."""
+    """What the site holds for one gene. The summary is absent unless generated.
+
+    Counts ride only a status that answers no summary, so ``None`` is a count the
+    site did not send. ``based_on_incomplete_data`` rides the summary.
+    """
 
     model_config = ConfigDict(extra="ignore", frozen=True)
 
     result_status: AiExpressionStatus
-    num_experiments: int = 0
-    num_experiments_complete: int = 0
+    num_experiments: int | None = None
+    num_experiments_complete: int | None = None
     experiment_status: dict[str, AiExpressionStatus] = Field(default_factory=dict)
     expression_summary: AiExpressionSummary | None = None
+    based_on_incomplete_data: bool | None = None
 
 
 class AiExpressionReport(RootModel[dict[str, AiExpressionGeneResponse]]):

@@ -361,10 +361,35 @@ and `"PF3D7_1133400,PlasmoDB"` returns **200**. The same call anonymously return
 user's token both answer 200, so this is a user-independent read.
 
 A cache miss is a 200, not a 404. The body is one object per record keyed by gene id, and
-the entry carries `resultStatus` plus `numExperiments`, `numExperimentsComplete` and an
-`experimentStatus` map; `expressionSummary` is present only for `resultStatus: "present"`.
-Measured on 2026-09-04 on plasmodb, PF3D7_1133400 answered `"expired"` with 41 of 41
-experiments `present`, and PF3D7_0709000 answered `"experiments_incomplete"` with 0 of 41.
+the entry carries `resultStatus` plus, on a status that answers no summary, `numExperiments`,
+`numExperimentsComplete` and an `experimentStatus` map; `expressionSummary` is present only
+for `resultStatus: "present"`. Measured on 2026-09-04 on plasmodb, PF3D7_1133400 answered
+`"expired"` with 41 of 41 experiments `present`, and PF3D7_0709000 answered
+`"experiments_incomplete"` with 0 of 41.
+
+**A `present` entry carries no counts.** Its keys are `resultStatus`, `expressionSummary`
+and `basedOnIncompleteData`, and nothing else: measured on 2026-09-09 on plasmodb, both
+PF3D7_0709000 and PF3D7_0108500 answered `"present"` with exactly those three keys.
+[`AiExpressionCache.readSummary`](https://github.com/VEuPathDB/ApiCommonWebsite/blob/18c54ba811ae1dd12125ab4483a3251b19a1a639/Model/src/main/java/org/apidb/apicommon/model/report/ai/expression/AiExpressionCache.java)
+writes the two counts and the `experimentStatus` map on the branches that cannot answer a
+summary, so the counts ride the non-`present` statuses only. A reader that types them as
+plain integers cannot tell "the site said zero" from "the site said nothing"; the client
+types them as `int | None` and answers `None` for an absent count. `basedOnIncompleteData`
+is the site's own statement about the summary it sends, and the client reads it as
+`bool | None`, so a body that omits the key answers `None` and not a claim of completeness.
+
+**Inside `expressionSummary` the keys are snake_case**, because they are the summarizer's
+own JSON schema and not WDK's wire. The recorded `present` body groups 41 experiment lines
+under 4 topics, and every one of the 41 carries `assay_type`, `experiment_name`,
+`dataset_id`, `one_sentence_summary`, `notes`, `confidence`, `biological_importance` and
+`experiment_keywords`. `experiment_name` is the only human-readable name of the experiment
+a line describes; `dataset_id` alone does not name it.
+
+One gene's status is not stable. The two genes measured on 2026-09-04 answered the other
+way round on 2026-09-09: PF3D7_0709000 answered `"present"` with
+`basedOnIncompleteData: false`, and PF3D7_1133400 answered `"experiments_incomplete"` with
+0 of 41 experiments, every one of them `expired`. Those two bodies are the recorded
+fixtures `ai_expression_summary_present` and `ai_expression_experiments_incomplete`.
 A reader must treat every non-`present` status as "no summary to quote" rather than as an
 error, because the status also goes stale when upstream changes model or prompt version.
 

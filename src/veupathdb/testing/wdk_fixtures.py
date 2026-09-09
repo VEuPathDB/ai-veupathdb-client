@@ -141,7 +141,7 @@ FIXTURES: tuple[FixtureRequest, ...] = (
         reads="WDK-HTTP-004",
     ),
     FixtureRequest(
-        name="ai_expression_every_experiment_cached",
+        name="ai_expression_experiments_incomplete",
         path=AI_EXPRESSION_REPORT_PATH,
         method="POST",
         body={
@@ -151,7 +151,7 @@ FIXTURES: tuple[FixtureRequest, ...] = (
         reads="WDK-ANS-009",
     ),
     FixtureRequest(
-        name="ai_expression_nothing_cached",
+        name="ai_expression_summary_present",
         path=AI_EXPRESSION_REPORT_PATH,
         method="POST",
         body={

@@ -5,7 +5,7 @@
     "url": "https://plasmodb.org/plasmo/service/record-types",
     "status": 200,
     "content_type": "application/json",
-    "recorded_at": "2026-09-04",
+    "recorded_at": "2026-09-09",
     "reads": "WDK-HTTP-004"
   },
   "body": [

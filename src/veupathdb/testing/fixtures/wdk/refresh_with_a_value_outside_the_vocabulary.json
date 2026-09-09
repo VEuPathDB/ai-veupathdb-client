@@ -5,7 +5,7 @@
     "url": "https://plasmodb.org/plasmo/service/record-types/transcript/searches/GenesByLocation/refreshed-dependent-params",
     "status": 422,
     "content_type": "text/plain",
-    "recorded_at": "2026-08-22",
+    "recorded_at": "2026-09-09",
     "reads": "WDK-VOCAB-006, WDK-VALID-001, WDK-VALID-006, WDK-HTTP-002"
   },
   "body": {

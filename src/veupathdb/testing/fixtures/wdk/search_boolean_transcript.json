@@ -5,7 +5,7 @@
     "url": "https://plasmodb.org/plasmo/service/record-types/transcript/searches/boolean_question_TranscriptRecordClasses_TranscriptRecordClass?expandParams=true",
     "status": 200,
     "content_type": "application/json",
-    "recorded_at": "2026-08-22",
+    "recorded_at": "2026-09-09",
     "reads": "WDK-STEP-006, WDK-STEP-008"
   },
   "body": {

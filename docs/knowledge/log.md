@@ -1,6 +1,6 @@
 # Knowledge log
 
-## 2026-09-09 - The refusal base takes the host's code enum, and the strategy prefix leaves
+## 2026-09-09 - The refusal base takes the host's code enum, the strategy prefix leaves, and an absent experiment count reads None
 
 `VEuPathDBError` is generic in its code enum, so a host application puts its own
 error hierarchy under this base instead of maintaining a parallel one. The client's
@@ -16,6 +16,22 @@ account unmatched.
 `env_ignore_empty=True` is stated in the settings docstring and asserted in the
 suite, because a blank environment variable resolving to the field default is the
 behaviour that keeps a validator unnecessary.
+
+An `aiExpression` entry that answers `present` carries the summary and
+`basedOnIncompleteData` and no experiment counts; the site writes `numExperiments`,
+`numExperimentsComplete` and the `experimentStatus` map only on the branches that answer
+no summary. The two counts are `int | None` now, so a reader tells an absent count from a
+count of zero. A consumer that compares them handles `None` as "the site stated nothing".
+`basedOnIncompleteData` is modelled beside them as `bool | None`, so a consumer can caveat
+a summary the site generated over part of the experiment set. WDK-ANS-009 states the
+measured `present` shape. The recorded aiExpression bodies now hold a `present` entry and
+an `experiments_incomplete` one, and their fixture names say which is which.
+
+Each experiment line of that summary also names its experiment and its assay, so
+`AiExperimentSummary` reads `experiment_name` and `assay_type` beside the six keys it
+already read. Those keys are snake_case on the wire, so the model states them as they
+arrive. A tool that quotes a summary line can now say which experiment it came from
+instead of quoting a dataset id.
 
 ## 2026-09-08 - The small client moves arrive, and the app prose leaves
 
