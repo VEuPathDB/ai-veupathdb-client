@@ -7,6 +7,7 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 DEFAULT_OAUTH_URL = "https://auth.veupathdb.org"
+DEFAULT_INTERNAL_STRATEGY_NAME_PREFIX = "__internal__:"
 
 
 class VEuPathDBSettings(BaseSettings):
@@ -14,6 +15,9 @@ class VEuPathDBSettings(BaseSettings):
 
     A host application extends this class with its own settings and installs
     the extended instance through ``use_veupathdb_settings_source``.
+
+    ``env_ignore_empty=True`` is what makes a variable that is set but blank
+    resolve to the field default, so no field needs a validator for that.
     """
 
     model_config = SettingsConfigDict(
@@ -32,6 +36,10 @@ class VEuPathDBSettings(BaseSettings):
         default=DEFAULT_OAUTH_URL,
         description="The OAuth server that signs VEuPathDB bearer tokens. One server serves every site.",
     )
+    veupathdb_internal_strategy_name_prefix: str = Field(
+        default=DEFAULT_INTERNAL_STRATEGY_NAME_PREFIX,
+        description="Prefix that tags a helper strategy this deployment created. It is written into a real VEuPathDB account, so a deployment states its own.",
+    )
 
 
 @lru_cache
@@ -48,6 +56,9 @@ class _SettingsSource:
     def use(self, read: Callable[[], VEuPathDBSettings]) -> None:
         self._read = read
 
+    def source(self) -> Callable[[], VEuPathDBSettings]:
+        return self._read
+
     def read(self) -> VEuPathDBSettings:
         return self._read()
 
@@ -58,6 +69,11 @@ _source = _SettingsSource()
 def use_veupathdb_settings_source(read: Callable[[], VEuPathDBSettings]) -> None:
     """Read settings from the host application instead of the environment."""
     _source.use(read)
+
+
+def veupathdb_settings_source() -> Callable[[], VEuPathDBSettings]:
+    """The callable this process reads settings through."""
+    return _source.source()
 
 
 def get_veupathdb_settings() -> VEuPathDBSettings:

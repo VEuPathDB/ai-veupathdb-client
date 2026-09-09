@@ -5,48 +5,49 @@ Internal strategy name tagging utilities and shared constants.
 
 import pydantic
 
+from veupathdb.settings import get_veupathdb_settings
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.wdk_models import WDKUserInfo
-
-# Internal (Pathfinder-created) WDK strategies.
-#
-# WDK doesn't support arbitrary metadata on a strategy. To reliably identify
-# "internal helper" strategies (step counts, etc.) later, we tag the WDK name
-# with a reserved prefix. This avoids incorrectly treating *all* unsaved
-# strategies (`isSaved=false`) as internal.
-PATHFINDER_INTERNAL_STRATEGY_NAME_PREFIX = "__pathfinder_internal__:"
 
 # Use current user session (guest or authenticated)
 CURRENT_USER = "current"
 
 
-def is_internal_wdk_strategy_name(name: str | None) -> bool:
-    """Check if a WDK strategy name is a Pathfinder internal helper strategy.
+def _internal_prefix() -> str:
+    """The prefix this deployment tags its own helper strategies with."""
+    return get_veupathdb_settings().veupathdb_internal_strategy_name_prefix
 
-    Internal strategies are used for control tests and step counts.
-    They are tagged with ``__pathfinder_internal__:`` prefix.
+
+def is_internal_wdk_strategy_name(name: str | None) -> bool:
+    """Check if a WDK strategy name is an internal helper strategy.
+
+    WDK carries no metadata on a strategy, so a helper strategy for a step
+    count or a control test is tagged by a reserved prefix on its name. An
+    unsaved strategy is not internal by itself.
 
     :param name: WDK strategy name or None.
-    :returns: True if the name indicates an internal strategy.
+    :returns: True if the name carries this deployment's internal prefix.
     """
-    return bool(name) and str(name).startswith(PATHFINDER_INTERNAL_STRATEGY_NAME_PREFIX)
+    return bool(name) and str(name).startswith(_internal_prefix())
 
 
 def tag_internal_wdk_strategy_name(name: str) -> str:
     """Add the internal strategy name prefix if not already present."""
-    if name.startswith(PATHFINDER_INTERNAL_STRATEGY_NAME_PREFIX):
+    prefix = _internal_prefix()
+    if name.startswith(prefix):
         return name
-    return f"{PATHFINDER_INTERNAL_STRATEGY_NAME_PREFIX}{name}"
+    return f"{prefix}{name}"
 
 
 def strip_internal_wdk_strategy_name(name: str) -> str:
     """Remove the internal strategy name prefix if present.
 
-    :param name: WDK strategy name (may include internal prefix).
-    :returns: Display name without the ``__pathfinder_internal__:`` prefix.
+    :param name: WDK strategy name (may include the internal prefix).
+    :returns: Display name without the prefix.
     """
-    if name.startswith(PATHFINDER_INTERNAL_STRATEGY_NAME_PREFIX):
-        return name[len(PATHFINDER_INTERNAL_STRATEGY_NAME_PREFIX) :]
+    prefix = _internal_prefix()
+    if name.startswith(prefix):
+        return name[len(prefix) :]
     return name
 
 
@@ -68,7 +69,6 @@ async def resolve_wdk_user_id(client: VEuPathDBClient) -> str | None:
 
 __all__ = [
     "CURRENT_USER",
-    "PATHFINDER_INTERNAL_STRATEGY_NAME_PREFIX",
     "is_internal_wdk_strategy_name",
     "resolve_wdk_user_id",
     "strip_internal_wdk_strategy_name",

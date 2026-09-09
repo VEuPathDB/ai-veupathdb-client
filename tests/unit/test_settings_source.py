@@ -9,9 +9,11 @@ from pathlib import Path
 import pytest
 
 from veupathdb.settings import (
+    DEFAULT_OAUTH_URL,
     VEuPathDBSettings,
     get_veupathdb_settings,
     use_veupathdb_settings_source,
+    veupathdb_settings_source,
 )
 from veupathdb.wdk.site_router import load_sites_config
 
@@ -42,6 +44,17 @@ def test_the_host_settings_serve_the_client() -> None:
     use_veupathdb_settings_source(lambda: installed)
 
     assert get_veupathdb_settings() is installed
+
+
+def test_the_installed_source_is_read_back_and_restored() -> None:
+    """A host that swaps the source puts back the callable that was there."""
+    previous = veupathdb_settings_source()
+    installed = VEuPathDBSettings(veupathdb_auth_token="a-service-token")
+    use_veupathdb_settings_source(lambda: installed)
+    use_veupathdb_settings_source(previous)
+
+    assert veupathdb_settings_source() is previous
+    assert get_veupathdb_settings() is not installed
 
 
 def test_the_bundled_sites_file_ships_inside_the_package() -> None:
@@ -85,3 +98,12 @@ def test_the_oauth_server_is_read_from_the_environment(
     monkeypatch.setenv("VEUPATHDB_OAUTH_URL", "https://auth.example/oauth")
 
     assert VEuPathDBSettings().veupathdb_oauth_url == "https://auth.example/oauth"
+
+
+def test_a_blank_oauth_url_reads_as_the_default(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """``env_ignore_empty=True`` is what turns a blank variable into the default."""
+    monkeypatch.setenv("VEUPATHDB_OAUTH_URL", "")
+
+    assert VEuPathDBSettings().veupathdb_oauth_url == DEFAULT_OAUTH_URL

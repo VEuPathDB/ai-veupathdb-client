@@ -1,4 +1,4 @@
-"""Every body PathFinder sends, against the WDK schema its endpoint annotates.
+"""Every body this client sends, against the WDK schema its endpoint annotates.
 
 WDK validates a request body where the JAX-RS method carries ``@InSchema``, so
 for those seven names the published schema is the contract and a body that

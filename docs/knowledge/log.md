@@ -1,5 +1,22 @@
 # Knowledge log
 
+## 2026-09-09 - The refusal base takes the host's code enum, and the strategy prefix leaves
+
+`VEuPathDBError` is generic in its code enum, so a host application puts its own
+error hierarchy under this base instead of maintaining a parallel one. The client's
+own refusals name `VEuPathDBErrorCode`; a handler that takes any refusal names the
+bound.
+
+The reserved prefix that marks a helper strategy is now a settings field with a
+neutral default. It named one product and was written into the user's real VEuPathDB
+account. A deployment that already wrote helper strategies states its historical
+prefix in the same change that takes this release, or those strategies stay in the
+account unmatched.
+
+`env_ignore_empty=True` is stated in the settings docstring and asserted in the
+suite, because a blank environment variable resolving to the field default is the
+behaviour that keeps a validator unnecessary.
+
 ## 2026-09-08 - The small client moves arrive, and the app prose leaves
 
 `GET /users/current` and its typed profile, the two EDA validation predicates, the

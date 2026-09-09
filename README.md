@@ -83,12 +83,51 @@ EDA base URLs are derived, not configured: they are `<site origin>/eda`.
 
 ## The `VEuPathDBError` taxonomy
 
-`VEuPathDBError` carries everything a problem+json response needs: a
-`VEuPathDBErrorCode`, a title, an HTTP status, a detail and a list of field
-errors. The eight codes are `DATA_PARSING_ERROR`, `EXTERNAL_SERVICE_ERROR`,
-`INTERNAL_ERROR`, `SEARCH_NOT_FOUND`, `SITE_NOT_FOUND`, `VALIDATION_ERROR`,
-`WDK_ERROR` and `WDK_LOGIN_REQUIRED`. A host maps the code to its own response
-shape; the client never builds one.
+`VEuPathDBError` carries everything a problem+json response needs: a code, a
+title, an HTTP status, a detail and a list of field errors. The client's own
+refusals are `VEuPathDBError[VEuPathDBErrorCode]`, and the eight codes are
+`DATA_PARSING_ERROR`, `EXTERNAL_SERVICE_ERROR`, `INTERNAL_ERROR`,
+`SEARCH_NOT_FOUND`, `SITE_NOT_FOUND`, `VALIDATION_ERROR`, `WDK_ERROR` and
+`WDK_LOGIN_REQUIRED`. The client never builds a response.
+
+The base is generic in its code enum, so a host that has its own `StrEnum` of
+codes puts its whole error hierarchy under the same base and keeps `code`
+typed as its own enum. `code` is read-only:
+
+```
+from enum import StrEnum
+
+from veupathdb.errors import VEuPathDBError
+
+
+class AppErrorCode(StrEnum):
+    QUOTA_EXCEEDED = "QUOTA_EXCEEDED"
+
+
+class AppError(VEuPathDBError[AppErrorCode]):
+    """Every refusal this application raises."""
+
+
+def status_of(refusal: VEuPathDBError[StrEnum]) -> int:
+    """One handler for the host's refusals and the client's."""
+    return refusal.status
+```
+
+## Helper strategies
+
+WDK carries no metadata on a strategy, so a strategy this client creates for a
+step count or a control test is tagged by a reserved prefix on its name:
+`create_strategy(..., is_internal=True)` applies it, and
+`is_internal_wdk_strategy_name` / `strip_internal_wdk_strategy_name` read it
+back. The name reaches a real VEuPathDB account, so the prefix is the
+deployment's own: `veupathdb_internal_strategy_name_prefix`, environment
+variable `VEUPATHDB_INTERNAL_STRATEGY_NAME_PREFIX`, default `__internal__:`.
+
+A deployment that has already written internal strategies MUST set this field to
+the prefix it has always written, in the same change that takes this release.
+Otherwise it writes and matches `__internal__:` from that moment, and every
+helper strategy already in a researcher's VEuPathDB account under the old value
+is permanently unmatched: no run recognises it, and no run removes it.
 
 ## Metrics
 

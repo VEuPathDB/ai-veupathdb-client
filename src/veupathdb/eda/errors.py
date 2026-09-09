@@ -25,7 +25,7 @@ _OTHER_ACCOUNT_HINT = (
 )
 
 
-class EdaError(VEuPathDBError):
+class EdaError(VEuPathDBError[VEuPathDBErrorCode]):
     """Base for every EDA refusal."""
 
     def __init__(

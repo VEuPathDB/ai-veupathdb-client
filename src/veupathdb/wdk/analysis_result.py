@@ -5,7 +5,7 @@ from __future__ import annotations
 from veupathdb.errors import VEuPathDBError, VEuPathDBErrorCode
 
 
-class WDKAnalysisNotReadyError(VEuPathDBError):
+class WDKAnalysisNotReadyError(VEuPathDBError[VEuPathDBErrorCode]):
     """WDK holds no execution result for the analysis instance."""
 
     def __init__(self, step_id: int, analysis_id: int) -> None:

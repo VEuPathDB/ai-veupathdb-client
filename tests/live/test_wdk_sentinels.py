@@ -1,6 +1,6 @@
-"""Whether the science PathFinder relies on is still there.
+"""Whether the science a consuming assistant relies on is still there.
 
-A sentinel is a named search, a pinned vocabulary value, or a count PathFinder
+A sentinel is a named search, a pinned vocabulary value, or a count a consumer
 builds strategies out of. Counts move with each data release, so a count is
 checked against a band rather than a number.
 """
@@ -20,7 +20,7 @@ pytestmark = [pytest.mark.live_wdk, pytest.mark.asyncio]
 
 _TRANSCRIPT = "/record-types/transcript/searches"
 
-# Searches PathFinder names in prompts, tests and the gold corpus.
+# Searches a consuming assistant names in prompts, tests and gold strategies.
 _REQUIRED_SEARCHES = (
     "GenesByText",
     "GenesByGoTerm",
@@ -57,7 +57,7 @@ def _terms(vocabulary: JsonValue) -> set[str]:
 
 
 @pytest.mark.parametrize("site", VERIFICATION_SITES)
-class TestTheSearchesPathFinderNamesExist:
+class TestTheNamedSearchesAreStillPublished:
     @pytest.mark.parametrize("search", _REQUIRED_SEARCHES)
     async def test_a_named_search_is_still_published(
         self, site: str, search: str, probe: Probe, drift_log: DriftLog

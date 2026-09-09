@@ -2,6 +2,7 @@
 
 from collections.abc import Mapping, Sequence
 from enum import StrEnum
+from typing import Final
 
 import pydantic
 from pydantic import BaseModel, ConfigDict
@@ -22,18 +23,23 @@ class VEuPathDBErrorCode(StrEnum):
     WDK_LOGIN_REQUIRED = "WDK_LOGIN_REQUIRED"
 
 
-class VEuPathDBError(Exception):
-    """Base refusal. Carries everything a problem+json response needs."""
+class VEuPathDBError[C: StrEnum](Exception):
+    """Base refusal. Carries everything a problem+json response needs.
+
+    The code enum is the type parameter, so a host application subclasses this
+    base with its own ``StrEnum`` and keeps ``code`` typed as that enum. A
+    handler that takes any refusal annotates ``VEuPathDBError[StrEnum]``.
+    """
 
     def __init__(
         self,
-        code: VEuPathDBErrorCode,
+        code: C,
         title: str,
         status: int = 400,
         detail: str | None = None,
         errors: JSONArray | None = None,
     ) -> None:
-        self.code = code
+        self.code: Final[C] = code
         self.title = title
         self.status = status
         self.detail = detail
@@ -42,7 +48,7 @@ class VEuPathDBError(Exception):
         super().__init__(msg)
 
 
-class ValidationError(VEuPathDBError):
+class ValidationError(VEuPathDBError[VEuPathDBErrorCode]):
     """A value a search parameter does not accept."""
 
     def __init__(
@@ -60,7 +66,7 @@ class ValidationError(VEuPathDBError):
         )
 
 
-class SiteNotFoundError(VEuPathDBError):
+class SiteNotFoundError(VEuPathDBError[VEuPathDBErrorCode]):
     """A site identifier this deployment does not serve."""
 
     def __init__(self, site_id: str, available: Sequence[str]) -> None:
@@ -72,7 +78,7 @@ class SiteNotFoundError(VEuPathDBError):
         )
 
 
-class WDKError(VEuPathDBError):
+class WDKError(VEuPathDBError[VEuPathDBErrorCode]):
     """Error from VEuPathDB WDK service.
 
     ``errors`` carries the per-parameter messages a refusal named, when it
@@ -94,7 +100,7 @@ class WDKError(VEuPathDBError):
         )
 
 
-class WDKLoginRequiredError(VEuPathDBError):
+class WDKLoginRequiredError(VEuPathDBError[VEuPathDBErrorCode]):
     """The request names no registered VEuPathDB user.
 
     VEuPathDB serves the WDK service to registered users only, so a guest or
@@ -110,7 +116,7 @@ class WDKLoginRequiredError(VEuPathDBError):
         )
 
 
-class ExternalServiceError(VEuPathDBError):
+class ExternalServiceError(VEuPathDBError[VEuPathDBErrorCode]):
     """A non-WDK external service is unreachable or answers unexpectedly."""
 
     def __init__(self, service: str, detail: str, status: int = 502) -> None:
@@ -122,7 +128,7 @@ class ExternalServiceError(VEuPathDBError):
         )
 
 
-class DataParsingError(VEuPathDBError):
+class DataParsingError(VEuPathDBError[VEuPathDBErrorCode]):
     """An external API returned data that does not match the expected shape."""
 
     def __init__(self, detail: str) -> None:

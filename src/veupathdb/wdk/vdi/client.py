@@ -30,7 +30,7 @@ _FIRST_ERROR_STATUS = 400
 _GONE_STATUSES = frozenset({HTTPStatus.NOT_FOUND, HTTPStatus.GONE})
 
 
-class VdiServiceError(VEuPathDBError):
+class VdiServiceError(VEuPathDBError[VEuPathDBErrorCode]):
     """The dataset service refused a request or could not answer it."""
 
     def __init__(self, detail: str, status: int = 502) -> None:
