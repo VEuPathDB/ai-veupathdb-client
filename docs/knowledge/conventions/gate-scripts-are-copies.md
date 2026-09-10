@@ -26,6 +26,10 @@ drifted is a gate that passes in one repository and fails in the other.
 
 # What the citation support is for
 
+`check-knowledge.mjs` resolves a prefixed citation of a page in another repository
+against a sibling checkout when one is present, fails on a page that does not exist
+there, and reports the citation as unverified when the checkout is absent.
+
 `check-wdk-rules.mjs` reads an anchor or a status prefixed with a repository name -
 `veupathdb-py:`, `veupathdb-mcp:`, `assistant-platform:` - as a citation and does not
 resolve it, because that repository is never checked out beside this one. The run

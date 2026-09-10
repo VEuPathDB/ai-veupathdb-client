@@ -3,7 +3,7 @@
 A pushed strategy has one root step, which matches the WDK step tree shape.
 """
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
 
 from veupathdb.domain.strategy.ast import StrategyStepNode
 from veupathdb.domain.strategy.tree import walk
@@ -53,14 +53,3 @@ class StrategyAst(CamelModel):
             )
             raise ValueError(msg)
         return self
-
-
-class PersistedStrategyGraph(CamelModel):
-    """Outer container for a strategy AST snapshot, parsed at the load boundary."""
-
-    model_config = ConfigDict(extra="ignore")
-
-    id: str | None = None
-    name: str | None = None
-    strategy_ast: StrategyAst | None = None
-    wdk_strategy_id: int | None = None

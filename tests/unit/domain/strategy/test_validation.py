@@ -107,3 +107,52 @@ class TestWdkValid001TheBundleIsLevelAndIsValid:
         )
 
         assert step.validation is None
+
+
+_INPUT_REFUSED = (
+    "The step referenced by ID '440085983' is not runnable because: "
+    '{"keyedErrors":{},"validationLevel":"RUNNABLE","validationStatus":"INVALID"}'
+)
+
+
+def _runnable_refusal(key: str = "bq_left_op") -> StepValidation:
+    return StepValidation(
+        level="RUNNABLE",
+        is_valid=False,
+        errors=StepValidationErrors(by_key={key: [_INPUT_REFUSED]}),
+    )
+
+
+class TestWdkValid004TheLevelCarriesTheClaim:
+    """An input's invalidity reaches its consumer only at ``RUNNABLE``: below
+    that level ``AnswerParam.validateValue`` never looks the input up."""
+
+    def test_wdk_valid_004_a_semantic_pass_is_not_a_runnable_pass(self) -> None:
+        semantic = StepValidation(level="SEMANTIC", is_valid=True)
+
+        assert semantic.was_checked()
+        assert not semantic.rejects()
+        assert semantic.level != "RUNNABLE"
+
+    def test_wdk_valid_004_a_runnable_refusal_is_a_rejection(self) -> None:
+        runnable = _runnable_refusal()
+
+        assert runnable.level == "RUNNABLE"
+        assert runnable.rejects()
+
+    def test_wdk_valid_004_a_refusal_is_keyed_under_the_answer_parameter(self) -> None:
+        runnable = _runnable_refusal("bq_left_op_TranscriptRecordClasses")
+
+        # A client reading `general` for structural problems finds nothing.
+        assert runnable.errors is not None
+        assert runnable.errors.general == []
+        assert runnable.messages()[0].startswith("bq_left_op_")
+
+    def test_wdk_valid_004_the_embedded_bundle_is_not_parsed(self) -> None:
+        # The input's own bundle is pretty-printed into the message, under
+        # different field names. Re-read the input step instead.
+        runnable = _runnable_refusal()
+
+        assert "validationStatus" in runnable.messages()[0]
+        assert runnable.errors is not None
+        assert list(runnable.errors.by_key) == ["bq_left_op"]

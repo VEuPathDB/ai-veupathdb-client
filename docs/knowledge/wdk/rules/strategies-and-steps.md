@@ -418,8 +418,8 @@ strategy whose parameters are invalid, which is this rule. The step then read
 
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/request/strategy/StrategyRequest.java#L177-L201
-- anchor: src/veupathdb/domain/strategy/operational_spec.py:build_step_tree
-- status: ENFORCED by tests/unit/domain/strategy/test_operational_spec.py::TestNestedBranchesReachWdk::test_the_union_stays_on_the_secondary_input
+- anchor: src/veupathdb/domain/strategy/ast.py:secondary_input
+- status: ENFORCED by tests/unit/domain/strategy/test_nested_branches_are_a_tree.py::test_the_two_shapes_put_the_union_in_different_slots
 
 `treeToSteps` recurses into `secondaryInput` exactly as it does into `primaryInput`, so a
 branch hanging off the second input is as ordinary to WDK as one hanging off the first.

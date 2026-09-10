@@ -7,7 +7,9 @@ types). This module is the only place that bridges the two.
 
 from veupathdb.domain.parameters.value_codec import from_wire, wire_map
 from veupathdb.domain.parameters.values import ParamKind, ParamValue
-from veupathdb.domain.strategy.types import WireParams
+
+WireParams = dict[str, str]
+"""The WDK wire form of a search configuration's parameters."""
 
 
 def encode_params(decoded: dict[str, ParamValue]) -> WireParams:

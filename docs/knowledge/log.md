@@ -1,5 +1,39 @@
 # Knowledge log
 
+## 2026-09-10 - The authoring model leaves, and an unbound parameter is a parameter
+
+`session`, `operations/`, `spec_diff`, `combination_check`, `build_outcome`,
+`operational_spec`, `constraints`, `SyncStateProtocol` and `PersistedStrategyGraph`
+left `domain/strategy/` for the consuming application. What is left states WDK's own
+shapes: the step tree, the keyed step map, the traversal over both, the combine
+operators, the validation bundle and the organism scope rule.
+
+`StepStatus` and `step_status` left with them. Four states saying whether a step has
+reached WDK yet are a build lifecycle over the keyed map, and WDK states no such
+enum. `StrategyStep` and `is_computable` stay, so the lifecycle reads them across the
+seam and `veupathdb-mcp`, which names neither status symbol, is untouched.
+
+WDK-VALID-004 anchored that lifecycle. It now anchors `StepValidation.rejects` and
+the tests beside it: the half of the rule a client owns is the claim it reads back,
+and that claim is the validation bundle.
+
+`OpenSlot` split on the line its readers already draw. The parameter name, the
+question and the vocabulary are `UnboundParameter` in
+`veupathdb.domain.parameters.unbound`, which is what the MCP server's parameter
+binding builds and reads. The criterion a slot is attached to is the spec's, so it
+left with the spec. There is no forwarding module at the old path: `veupathdb-mcp`
+names the new one at its next release.
+
+The `WireParams` alias moved into `veupathdb.wdk.value_decoding`, so `veupathdb.wdk`
+names two modules of this package and both are WDK shapes.
+
+WDK-STRAT-006 anchors the step node's `secondary_input` and the tree tests beside it.
+The rule is about the shape a client can express, and the shape is what stayed.
+
+The consuming application's card said the cut costs 47 edges out of `veupathdb.wdk`.
+That count was measured before the split. Measured here the edge set was four lines
+into three modules, all of them WDK shapes.
+
 ## 2026-09-09 - The refusal base takes the host's code enum, the strategy prefix leaves, and an absent experiment count reads None
 
 `VEuPathDBError` is generic in its code enum, so a host application puts its own

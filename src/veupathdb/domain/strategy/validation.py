@@ -1,18 +1,7 @@
-"""Domain-native step validation types.
+"""The validity claim WDK states about a step, a search or a strategy.
 
-Defines ``StepValidation`` and ``StepValidationErrors`` — the domain
-representation of WDK step/search/strategy validation state.  These are
-pure data types (frozen, no I/O) that happen to match the shape returned
-by the WDK REST API.
-
-Previously defined in ``integrations.veupathdb.wdk_models`` as
-``WDKValidation`` / ``WDKValidationErrors``, they were stranded in the
-wrong layer.  Validation state ("is this step valid, and what are the
-error messages?") is a domain concept, not an integration concern.
-
-Moving them here lets ``SyncStateProtocol`` declare ``step_validations``
-without importing from the integration layer, eliminating the isinstance
-narrowing that was required at every read site.
+The types are frozen data. WDK returns this shape on a step and inside the
+bundle a refusal carries.
 """
 
 from pydantic import ConfigDict, Field

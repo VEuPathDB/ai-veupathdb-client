@@ -153,8 +153,8 @@ clean - which is exactly the pairing measured above.
 
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/AnswerParam.java#L110-L159
-- anchor: src/veupathdb/domain/strategy/graph_model.py:step_status
-- status: ENFORCED by tests/unit/domain/strategy/test_graph_model_status.py::test_wdk_valid_004_a_runnable_refusal_makes_the_consumer_invalid
+- anchor: src/veupathdb/domain/strategy/validation.py:rejects
+- status: ENFORCED by tests/unit/domain/strategy/test_validation.py::test_wdk_valid_004_a_runnable_refusal_is_a_rejection
 
 `AnswerParam.validateValue` does two different jobs. Below `RUNNABLE` it checks
 that the stable value is an integer or the empty string and returns valid
@@ -205,10 +205,12 @@ The consequence for a client is that "this step is fine" and "this step's
 inputs are fine" are two different questions, and only the second requires
 asking at `RUNNABLE`.
 
-Nothing enforces it. `tests/unit/domain/strategy/test_graph_model_status.py` exercises
-PathFinder's own four-state derivation from a `StepValidation` it constructs by
-hand; it never touches a level and would pass if WDK propagated at every level
-or at none.
+What a client owns of this rule is the claim it reads back, and that is what
+`tests/unit/domain/strategy/test_validation.py` holds: a `SEMANTIC` pass is not
+a `RUNNABLE` pass, a refusal at `RUNNABLE` is a rejection, it arrives keyed
+under the answer parameter with `general` empty, and the input's own bundle
+inside the message stays a string. Whether WDK propagates at other levels is
+the upstream half, carried by the link above.
 
 ### WDK-VALID-005 - `estimatedSize: 0` is a real result of zero; an absent key, a `-1` and an empty list are three other things entirely
 

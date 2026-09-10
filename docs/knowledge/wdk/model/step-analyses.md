@@ -199,7 +199,7 @@ all resolve to `go-enrichment` and are separated by the
 `src/veupathdb/wdk/strategy_api/analyses.py:run_step_analysis` is create, run,
 poll, fetch, preceded by a zero-record standard report to force the step's answer
 to be materialised, and
-`veupathdb-mcp: src/veupathdb_mcp/wdk/enrichment/params.py:extract_default_params`
+`veupathdb-mcp: src/veupathdb_mcp/wdk/params.py:extract_default_params`
 reads the form document and sends its defaults back, which is the behaviour the
 `NO_FILL` rule above requires.
 
