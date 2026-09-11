@@ -25,6 +25,10 @@ PHYLETIC_PARAM_NAMES = frozenset(
 PHYLETIC_MAP_PARAMS = frozenset({"phyletic_term_map", "phyletic_indent_map"})
 """The two structural parameters that carry the tree. They state no criterion."""
 
+PHYLETIC_LIST_PARAMS = frozenset({"included_species", "excluded_species"})
+"""The two visible parameters a caller writes. ``profile_pattern`` is derived
+from them, and the two maps carry the tree they are chosen from."""
+
 TriState = Literal["include", "exclude"]
 """A species left out of both lists has no third state: the pattern omits it."""
 

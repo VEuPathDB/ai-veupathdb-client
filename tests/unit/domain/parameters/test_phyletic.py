@@ -5,6 +5,8 @@ from __future__ import annotations
 import pytest
 
 from veupathdb.domain.parameters.phyletic import (
+    PHYLETIC_LIST_PARAMS,
+    PHYLETIC_MAP_PARAMS,
     PHYLETIC_PARAM_NAMES,
     PhyleticBinding,
     PhyleticTree,
@@ -58,6 +60,20 @@ class TestTheParamNames:
             "phyletic_term_map",
         }
         assert set(PHYLETIC_PARAM_NAMES) == expected
+
+    def test_the_two_visible_lists_a_caller_writes(self) -> None:
+        assert set(PHYLETIC_LIST_PARAMS) == {"included_species", "excluded_species"}
+
+    def test_the_lists_are_the_binding_without_the_derived_pattern(self) -> None:
+        fields = set(PhyleticBinding.model_fields)
+
+        assert fields - PHYLETIC_LIST_PARAMS == {"profile_pattern"}
+
+    def test_the_five_names_are_the_maps_the_lists_and_the_pattern(self) -> None:
+        parts = PHYLETIC_MAP_PARAMS | PHYLETIC_LIST_PARAMS | {"profile_pattern"}
+
+        assert parts == PHYLETIC_PARAM_NAMES
+        assert not PHYLETIC_MAP_PARAMS & PHYLETIC_LIST_PARAMS
 
 
 class TestTheTree:

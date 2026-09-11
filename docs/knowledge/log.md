@@ -42,6 +42,31 @@ the application's name anywhere under `wdk/` or `eda/`. One paragraph was delete
 than moved: it described `StepValidation` defaults the tree has not had since the field
 became `StepValidation | None`.
 
+- The two visible phyletic species lists are `PHYLETIC_LIST_PARAMS` on
+  `veupathdb.domain.parameters`. The five names of a phyletic search are the two
+  structural maps, these two lists and the derived pattern, and the suite asserts that
+  partition. At its next tag `veupathdb-mcp` deletes its own `PHYLETIC_LIST_PARAMS` from
+  `catalog/param_formatting.py`, drops it from its published surface and reads this one
+  at its three call sites; `pathfinder` moves one import line.
+
+- `build_wdk_step_tree` and `MissingWDKStepIdError` join `walk_wdk_step_tree` in
+  `veupathdb.wdk.step_tree`, and `resolve_record_type` is `veupathdb.wdk.record_types`.
+  Both are `veupathdb.wdk` and not `veupathdb.domain.strategy`, because each one names a
+  WDK wire model and no module of the domain package names a module of `veupathdb.wdk`.
+  `veupathdb.wdk` now names four modules of the strategy package, and all four state WDK
+  shapes. At its next tag `veupathdb-mcp` deletes `wdk/step_tree.py` and
+  `wdk/record_types.py`, imports the three names from here and drops them from its
+  surface; `pathfinder` moves one import line in `services/strategies/sync.py`.
+
+- Nine shapes a consumer constructs are published: `InputStepValue`, `PhyleticNode`,
+  `WDKVocabNodeData` and `collect_leaf_terms` on `veupathdb.domain.parameters`, and
+  `AiExpressionReport`, `SiteSearchResponse`, `SiteSearchStreamRecord`, `WDKFilterParam`
+  and `WDKReporter` on `veupathdb.wdk`. Eight of them are the inner shape of a name that
+  was already published, and none of them is a test double.
+  `tests/unit/consumer_imports.json` measures the tool server's suite beside its `src`,
+  so a rename of a shape that suite builds fails here. At its next tag `veupathdb-mcp`
+  rewrites fifteen imports onto the package surface.
+
 ## 2026-09-10 - The authoring model leaves, and an unbound parameter is a parameter
 
 `session`, `operations/`, `spec_diff`, `combination_check`, `build_outcome`,

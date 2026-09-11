@@ -7,6 +7,7 @@ from veupathdb.wdk._failures import (
 )
 from veupathdb.wdk.ai_expression import (
     AI_EXPRESSION_REPORT_PATH,
+    AiExpressionReport,
     AiExpressionStatus,
     AiExpressionSummary,
 )
@@ -33,6 +34,7 @@ from veupathdb.wdk.factory import (
 )
 from veupathdb.wdk.phyletic_tree import phyletic_tree_of
 from veupathdb.wdk.probe import WDKProbe
+from veupathdb.wdk.record_types import resolve_record_type
 from veupathdb.wdk.site_router import (
     SiteInfo,
     get_site_router,
@@ -43,8 +45,14 @@ from veupathdb.wdk.site_search_client import (
     STREAM_MEDIA_TYPE,
     DocumentTypeFilter,
     SiteSearchDocument,
+    SiteSearchResponse,
+    SiteSearchStreamRecord,
 )
-from veupathdb.wdk.step_tree import walk_wdk_step_tree
+from veupathdb.wdk.step_tree import (
+    MissingWDKStepIdError,
+    build_wdk_step_tree,
+    walk_wdk_step_tree,
+)
 from veupathdb.wdk.strategy_api.api import StrategyAPI
 from veupathdb.wdk.strategy_api.helpers import (
     is_internal_wdk_strategy_name,
@@ -92,6 +100,7 @@ from veupathdb.wdk.wdk_models import (
     WDKPathwayEnrichmentRow,
     WDKRecordInstance,
     WDKRecordType,
+    WDKReporter,
     WDKSearch,
     WDKSearchConfig,
     WDKSearchResponse,
@@ -109,6 +118,7 @@ from veupathdb.wdk.wdk_models import (
 from veupathdb.wdk.wdk_parameters import (
     WDKBaseParameter,
     WDKEnumParam,
+    WDKFilterParam,
     WDKNumberParam,
     WDKParameter,
     WDKStringParam,
@@ -119,14 +129,18 @@ __all__ = [
     "GENELIST_PLUGIN_NAME",
     "GENELIST_PLUGIN_VERSION",
     "STREAM_MEDIA_TYPE",
+    "AiExpressionReport",
     "AiExpressionStatus",
     "AiExpressionSummary",
     "CombinedStepSpec",
     "DocumentTypeFilter",
+    "MissingWDKStepIdError",
     "NewStepSpec",
     "PatchStepSpec",
     "SiteInfo",
     "SiteSearchDocument",
+    "SiteSearchResponse",
+    "SiteSearchStreamRecord",
     "StepsMixin",
     "StrategyAPI",
     "TemporaryResultsAPI",
@@ -154,6 +168,7 @@ __all__ = [
     "WDKEnrichmentResponse",
     "WDKEnrichmentRowBase",
     "WDKEnumParam",
+    "WDKFilterParam",
     "WDKFilterValue",
     "WDKGoEnrichmentRow",
     "WDKIdentifier",
@@ -163,6 +178,7 @@ __all__ = [
     "WDKProbe",
     "WDKRecordInstance",
     "WDKRecordType",
+    "WDKReporter",
     "WDKSearch",
     "WDKSearchConfig",
     "WDKSearchResponse",
@@ -176,6 +192,7 @@ __all__ = [
     "WDKStringParam",
     "WDKUserInfo",
     "WDKWordEnrichmentRow",
+    "build_wdk_step_tree",
     "bundle_rows",
     "close_all_clients",
     "decode_params",
@@ -195,6 +212,7 @@ __all__ = [
     "password_logout",
     "phyletic_tree_of",
     "reset_site_router",
+    "resolve_record_type",
     "resolve_registered_email",
     "strip_internal_wdk_strategy_name",
     "tag_internal_wdk_strategy_name",

@@ -89,8 +89,8 @@ def test_the_parameter_that_awaits_a_value_lives_with_the_parameters() -> None:
     assert set(UnboundParameter.model_fields) == {"param_name", "question", "options"}
 
 
-def test_the_wdk_layer_names_two_wdk_shapes_and_nothing_else() -> None:
-    """The operators the boolean search accepts, and the bundle a refusal carries."""
+def test_the_wdk_layer_names_wdk_shapes_and_nothing_else() -> None:
+    """The plan node and its fold, the boolean operators, the refusal bundle."""
     reached = {
         name
         for path in _WDK.rglob("*.py")
@@ -98,4 +98,9 @@ def test_the_wdk_layer_names_two_wdk_shapes_and_nothing_else() -> None:
         if name.startswith(f"{_PACKAGE}.")
     }
 
-    assert reached == {f"{_PACKAGE}.ops", f"{_PACKAGE}.validation"}
+    assert reached == {
+        f"{_PACKAGE}.ast",
+        f"{_PACKAGE}.ops",
+        f"{_PACKAGE}.tree",
+        f"{_PACKAGE}.validation",
+    }
