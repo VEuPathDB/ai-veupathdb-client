@@ -20,6 +20,10 @@ Every claim here is pinned to the upstream that can prove it wrong, and `scripts
 
 - [Decisions](decisions/) - choices with a real alternative
 
+## Backlog
+
+- [Backlog](backlog/) - everything outstanding, ranked by what blocks a second consumer first
+
 ## Conventions
 
 - [Conventions](conventions/) - how this bundle is kept honest
