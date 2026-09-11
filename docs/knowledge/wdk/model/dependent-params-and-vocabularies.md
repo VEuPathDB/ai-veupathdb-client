@@ -57,7 +57,7 @@ leaves](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a37121
 when `countOnlyLeaves` is set. A branch term therefore contributes **zero** to
 the count, so selecting only branches is indistinguishable from selecting
 nothing ([WDK-VOCAB-002](../rules/parameters-and-vocabularies.md)). That is the
-platform-side reason PathFinder expands parent terms to leaves before pushing,
+platform-side reason this client expands parent terms to leaves before pushing,
 and the reason its tree widget had to learn the same rule
 (`pathfinder: docs/knowledge/decisions/parent-term-is-a-selection.md`).
 
@@ -174,15 +174,11 @@ the time and means a different experiment every time
 sending both combinations to the revise endpoint: `20 Hour` is `isValid: true`
 under HB3 and under 3D7 alike, while `47 Hour` under 3D7 is an error.
 
-Two PathFinder failures came out of exactly this. Reading a dependent vocabulary
-with no context returns the search's **defaults**, so a criterion bound to 3D7
-was shown HB3's time points and the model correctly reported hours that did not
-exist in what it had been shown
-(`pathfinder: docs/knowledge/decisions/a-dependent-vocabulary-is-read-under-its-parents.md`).
-And setting `domain_database` to `INTERPRO` alongside a Pfam accession refreshed
-`domain_typeahead` to an IPR-only vocabulary in which the accession genuinely
-did not appear, after which similarity matching supplied a wrong domain
-(`pathfinder: docs/knowledge/decisions/unmatched-accession-stops-the-chain.md`).
+Reading a dependent vocabulary with no context returns the search's
+**defaults** rather than the bound parent's list, so a criterion bound to one
+strain is shown another strain's time points and nothing reports the swap. What
+a consumer does about that is its own
+(`pathfinder: docs/knowledge/wdk/pathfinder/`).
 The `INTERPRO` vocabulary is 5,405 terms on plasmodb.org and 6,592 on
 toxodb.org, against thousands and 2,916 for `PFAM` - re-measured on both sites on
 2026-08-10, and the plasmodb figure matches the one recorded when that bug was

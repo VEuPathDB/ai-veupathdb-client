@@ -16,12 +16,14 @@ from tenacity import (
     wait_exponential,
 )
 
-from veupathdb.auth_context import veupathdb_auth_token_ctx
+from veupathdb.auth_context import (
+    resolve_veupathdb_auth_token,
+    veupathdb_auth_token_ctx,
+)
 from veupathdb.errors import WDKError, WDKLoginRequiredError
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
 from veupathdb.observer import get_observer
-from veupathdb.settings import get_veupathdb_settings
 from veupathdb.wdk._failures import wdk_failure
 from veupathdb.wdk._observability import (
     WdkRequestTelemetry,
@@ -167,12 +169,9 @@ class HTTPClient:
 
         Only the request's own token may reach a WDK account.
         """
-        request_token = veupathdb_auth_token_ctx.get()
-        if request_token:
-            return request_token
-        if _acts_for_a_user(path):
+        if _acts_for_a_user(path) and not veupathdb_auth_token_ctx.get():
             raise WDKLoginRequiredError
-        return self.auth_token or get_veupathdb_settings().veupathdb_auth_token
+        return resolve_veupathdb_auth_token(self.auth_token)
 
     async def close(self) -> None:
         """Close the HTTP client and clear session state.

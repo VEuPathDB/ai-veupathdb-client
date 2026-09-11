@@ -15,8 +15,7 @@ status: stable
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/AnswerService.java#L282-L304
 - anchor: src/veupathdb/wdk/strategy_api/base.py:_standard_report
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/wdk/test_step_results_reports.py::TestTheStepReportEndpointTakesOnlyAReportConfig::test_the_report_config_is_the_whole_body
+- status: ENFORCED by tests/unit/rules/test_search_and_answer_rules.py::test_wdk_ans_001_a_step_report_body_carries_only_the_report_config
 There are two ways to run a reporter and they take different bodies.
 
 `POST /record-types/{rc}/searches/{name}/reports/{reporter}` runs a search that no step
@@ -47,8 +46,7 @@ site. See [the pin-versus-deployment note](../sources.md).
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/config/AnswerDetailsFactory.java#L165-L191
 - anchor: src/veupathdb/wdk/strategy_api/reports.py:get_step_records
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/wdk/test_step_results_reports.py::TestAttributesAreOnlyWhatWeAskFor::test_asking_for_none_sends_no_attributes_key
+- status: ENFORCED by tests/unit/rules/test_search_and_answer_rules.py::test_wdk_ans_002_no_attributes_asked_for_sends_no_attributes_key
 
 `parseAttributeJson` ends with `// if unspecified, do not include any attributes; user could
 just be requesting tables` and returns an empty map. Tables behave the same way. The
@@ -86,8 +84,7 @@ that works because record identity is not an attribute (see
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/config/AnswerDetailsFactory.java#L101-L111
 - anchor: src/veupathdb/wdk/strategy_api/reports.py:get_step_count
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/wdk/test_step_results_reports.py::TestACountAsksForZeroRecords::test_the_count_page_is_exactly_zero_records
+- status: ENFORCED by tests/unit/rules/test_search_and_answer_rules.py::test_wdk_ans_003_a_count_asks_for_zero_records
 
 The factory reads `numRecords` and replaces it with
 [`ALL_RECORDS`, which is `-1`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/config/AnswerDetails.java#L13-L32),
@@ -106,7 +103,7 @@ toxodb.org. So the counts in `meta` are right and the rows are gone, which is ex
 shape that looks like "the search found nothing" to anything reading `records`.
 
 The useful corollary: a zero-record report is the cheap way to ask WDK for a count, because
-`meta.totalCount` is computed regardless. PathFinder's `get_step_count` does this.
+`meta.totalCount` is computed regardless. This client's `get_step_count` does this.
 
 The other half of the rule is the default. `AnswerDetails` starts at `_numRecords =
 ALL_RECORDS`, so a `reportConfig` with no `pagination` key streams the **entire** result -
@@ -147,8 +144,7 @@ attribute. Those are present even when `attributes` is `{}`.
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/reporter/StandardReporter.java#L52-L66
 - anchor: src/veupathdb/wdk/strategy_api/reports.py:get_step_records
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/wdk/test_step_results_reports.py::TestOnlyTheJsonReporterHonoursThePage::test_records_go_through_the_standard_reporter
+- status: ENFORCED by tests/unit/rules/test_search_and_answer_rules.py::test_wdk_ans_005_a_paged_read_goes_through_the_standard_reporter
 
 Two reporter base classes take the same `reportConfig` and treat it differently.
 
@@ -215,8 +211,7 @@ the client too.
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/ApiCommonWebsite/blob/830bb57fe07fc2e4dd37b6ea2e3baae0eaee5bee/Model/src/main/java/org/apidb/apicommon/model/stepanalysis/WordEnrichmentPlugin.java#L169-L182
 - anchor: src/veupathdb/wdk/strategy_api/analyses.py:list_analysis_types
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/wdk/enrichment/test_parser.py::test_word_rows_map_word_to_id_and_pathway_name_to_description
+- status: ENFORCED by tests/unit/rules/test_search_and_answer_rules.py::test_wdk_ans_007_the_word_plugin_serves_its_description_as_pathway_name
 
 **The word plugin's description column is `pathwayName`.** `WordEnrichmentPlugin.ResultRow.toJson`
 writes it literally:
@@ -353,7 +348,7 @@ keeps it out of the UI menu and does not stop WDK running it.
 `primaryKeys` needs **both** primary key columns. The gene record class declares
 `source_id` and a `project_id` that is excluded only on UniDB
 ([`geneRecord.xml:78-82`](https://github.com/VEuPathDB/ApiCommonModel/blob/ef7c5199c0aa6fcf535ffbd2806c39b00d5886b1/Model/lib/wdk/model/records/geneRecord.xml#L78-L82)),
-so every site PathFinder serves needs `"<sourceId>,<projectId>"`. Measured on 2026-09-04:
+so every site needs `"<sourceId>,<projectId>"`. Measured on 2026-09-04:
 `"PF3D7_1133400"` alone returns **422** with
 `RecordClass 'GeneRecordClasses.GeneRecordClass' PK requires exactly 2 values [ source_id, project_id ]`,
 and `"PF3D7_1133400,PlasmoDB"` returns **200**. The same call anonymously returns **401**
@@ -398,8 +393,7 @@ error, because the status also goes stale when upstream changes model or prompt 
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/AbstractWdkService.java#L359-L368
 - anchor: src/veupathdb/wdk/_searches.py:get_search_details
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/catalog/test_discovery.py::test_wdk_search_001_the_catalog_binds_a_search_to_one_record_type
+- status: ENFORCED by tests/unit/rules/test_search_and_answer_rules.py::test_wdk_search_001_the_wrong_record_type_is_a_404_naming_the_record_class
 
 `getQuestionOrNotFound(RecordClass, String)` resolves the search by name and then compares
 `question.getRecordClassName()` against the record class's **full name**. A mismatch throws
@@ -429,8 +423,7 @@ segment** (`transcript`), the same two-vocabulary split that bites in
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/AbstractWdkService.java#L344-L349
 - anchor: src/veupathdb/wdk/wdk_models.py:WDKSearch
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/catalog/test_discovery.py::test_wdk_search_002_the_request_path_carries_the_url_segment
+- status: ENFORCED by tests/unit/rules/test_search_and_answer_rules.py::test_wdk_search_002_the_full_name_is_not_an_address_and_the_url_segment_is
 
 A search carries two names and the response gives you both:
 [`QuestionFormatter`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/formatter/QuestionFormatter.java#L66-L68)
@@ -462,8 +455,7 @@ Two names, two jobs; the mapping between them is data, so keep both.
 - class: CONTRACT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/QuestionService.java#L96-L105
 - anchor: src/veupathdb/wdk/_searches.py:get_searches
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/catalog/test_discovery.py::test_wdk_search_003_two_sites_do_not_share_a_search_set
+- status: ENFORCED by tests/live/test_wdk_rules_live.py::TestWdkSearch003AvailabilityIsPerDeployment::test_wdk_search_003_the_two_sites_publish_different_sets
 
 `getQuestions()` takes `model.getAllQuestions()` and filters it by the requested record
 class's full name, every time. There is no per-site constant anywhere in the service layer:
@@ -488,8 +480,7 @@ that exists on both can differ in what it will take.
 - class: CONTRACT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/Group.java#L6-L16
 - anchor: src/veupathdb/wdk/wdk_models.py:WDKParameterGroup
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/catalog/test_discovery.py::test_wdk_search_004_the_specs_come_from_the_parameter_list
+- status: ENFORCED by tests/unit/rules/test_search_and_answer_rules.py::test_wdk_search_004_the_parameter_list_is_param_names_and_a_group_is_presentation
 
 `Group`'s class comment is unambiguous: a group is `only used to group Params together in
 the question page for display/layout purpose`, and a param with no group is assigned to the

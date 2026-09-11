@@ -480,7 +480,7 @@ complete requested operation","requestId":"..."}`, and a well-formed `POST`
 returned the same 500. A wrong project id gives 404 instead of 500, so the
 route resolves and the failure is behind it. **UNVERIFIED:** the cause. A
 missing user-database table is the obvious candidate but was not confirmed.
-Consequence for PathFinder: only the inline `DerivedVariableSpec[]` path in
+Consequence for a consumer: only the inline `DerivedVariableSpec[]` path in
 merge, compute and data-plugin bodies is usable today, and the inline path
 needs no persistence.
 
@@ -531,7 +531,7 @@ So the persisted model is:
   loads an analysis must fetch each id from the derived-variables store and
   inline the spec into its merge, compute and visualization bodies itself.
 
-For PathFinder this means an EDA integration that never persists an analysis
+For a consumer this means an EDA integration that never persists an analysis
 never needs the derived-variables store at all: it composes
 `DerivedVariableSpec[]` per request. See the integration concept
 (`pathfinder: docs/knowledge/eda/pathfinder-integration-concept.md`).

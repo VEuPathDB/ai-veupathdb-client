@@ -48,3 +48,9 @@ NonFiniteToNoneRounded = Annotated[
     PlainSerializer(_round_4dp_or_none, return_type=float | None),
 ]
 """NonFiniteToNone that also rounds to 4 dp on serialization."""
+
+__all__ = [
+    "CamelModel",
+    "NonFiniteToNone",
+    "NonFiniteToNoneRounded",
+]

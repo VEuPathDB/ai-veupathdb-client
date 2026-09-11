@@ -25,7 +25,7 @@ def validation_bundle(body: str) -> StepValidation | None:
 
 
 def bundle_rows(bundle: StepValidation) -> JSONArray:
-    """One row per refused parameter. The agent tools read this shape."""
+    """One row per refused parameter, keyed by parameter name."""
     return param_message_rows(bundle.errors.by_key if bundle.errors else {})
 
 

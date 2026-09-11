@@ -1,5 +1,47 @@
 # Knowledge log
 
+## 2026-09-11 - One token resolution, a declared surface, and every rule proven here
+
+WDK, EDA and VDI resolve the request's token through one function,
+`veupathdb.auth_context.resolve_veupathdb_auth_token`: the contextvar, then the client's
+own `auth_token`, then settings. `EdaClient` and `VdiClient` take an `auth_token`
+keyword, so a deployment that exports one environment variable reads an EDA study as it
+reads a WDK search list. One WDK rule still stands above the order: a path under
+`/users/` is refused unless the contextvar carries the token.
+
+Sixteen surfaces are published, each declaring `__all__`, all of them checked in at
+`tests/unit/published_surface.json`. `tests/unit/consumer_imports.json` records the
+names the two in-house consumers read under the surface each one reads them from, and
+the gate fails when a name stops being published on that surface.
+`veupathdb.wdk._failures` stays private and `veupathdb.wdk` publishes the three names
+its readers need.
+
+The two schema readers are a `devtools` extra. The wheel already shipped
+`veupathdb.devtools`, and now an installed copy can import it.
+
+Installing a settings source drops the router, the cached sites config and every
+per-site client cache built from the previous one. `reset_site_router` publishes the
+same reset, and this package's own conftest uses it instead of reaching into a private
+signing-key cache.
+
+The login refusal states the condition rather than a feature list, and names no entity
+this package does not model. Three docstrings state what their symbol is rather than
+which layer called it, and `tests/unit/test_package_boundary.py` fails on a caller's
+vocabulary in a docstring.
+
+Every rule status names a test this repository runs. The 36 that named another
+repository are now 29 hermetic cases under `tests/unit/rules/`, two live cases, and
+five `PARTIAL` - four hermetic and one live - where the named case holds the half that
+can be held. The run reports
+78 rules: 73 enforced, 5 partial, 0 unenforced.
+
+The WDK and EDA trees state WDK and EDA, with the client as the actor. The application's
+mapping, its authority ranking and its two verification sites left for
+`pathfinder: docs/knowledge/wdk/pathfinder/`; `tests/unit/test_bundle_subject.py` fails on
+the application's name anywhere under `wdk/` or `eda/`. One paragraph was deleted rather
+than moved: it described `StepValidation` defaults the tree has not had since the field
+became `StepValidation | None`.
+
 ## 2026-09-10 - The authoring model leaves, and an unbound parameter is a parameter
 
 `session`, `operations/`, `spec_diff`, `combination_check`, `build_outcome`,

@@ -890,7 +890,7 @@ wheels = [
 
 [[package]]
 name = "veupathdb-py"
-version = "0.1.0a7"
+version = "0.1.0a8"
 source = { editable = "." }
 dependencies = [
     { name = "httpx" },
@@ -904,6 +904,10 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+devtools = [
+    { name = "jsonschema" },
+    { name = "referencing" },
+]
 otel = [
     { name = "opentelemetry-api" },
 ]
@@ -912,40 +916,40 @@ otel = [
 dev = [
     { name = "cryptography" },
     { name = "hypothesis" },
-    { name = "jsonschema" },
     { name = "mypy" },
     { name = "opentelemetry-sdk" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
-    { name = "referencing" },
     { name = "respx" },
     { name = "ruff" },
+    { name = "veupathdb-py", extra = ["devtools"] },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "json5", specifier = ">=0.14.0" },
+    { name = "jsonschema", marker = "extra == 'devtools'", specifier = ">=4.26.0" },
     { name = "opentelemetry-api", marker = "extra == 'otel'", specifier = ">=1.44.0" },
     { name = "pydantic", specifier = ">=2.13.0" },
     { name = "pydantic-settings", specifier = ">=2.14.2" },
     { name = "pyjwt", specifier = ">=2.13.0" },
     { name = "pyyaml", specifier = ">=6.0.3" },
+    { name = "referencing", marker = "extra == 'devtools'", specifier = ">=0.37.0" },
     { name = "structlog", specifier = ">=25.0.0" },
     { name = "tenacity", specifier = ">=9.1.0" },
 ]
-provides-extras = ["otel"]
+provides-extras = ["otel", "devtools"]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "cryptography", specifier = ">=50.0.1" },
     { name = "hypothesis", specifier = ">=6.167.1" },
-    { name = "jsonschema", specifier = ">=4.26.0" },
     { name = "mypy", specifier = ">=2.3.1" },
     { name = "opentelemetry-sdk", specifier = ">=1.44.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-asyncio", specifier = ">=1.4.0" },
-    { name = "referencing", specifier = ">=0.37.0" },
     { name = "respx", specifier = ">=0.23.1" },
     { name = "ruff", specifier = "==0.16.6" },
+    { name = "veupathdb-py", extras = ["devtools"] },
 ]

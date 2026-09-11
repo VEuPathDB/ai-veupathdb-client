@@ -9,7 +9,7 @@ from typing import Any
 import pytest
 
 from veupathdb.wdk.client import VEuPathDBClient
-from veupathdb.wdk.strategy_api import StrategyAPI
+from veupathdb.wdk.strategy_api.api import StrategyAPI
 
 
 def _api(

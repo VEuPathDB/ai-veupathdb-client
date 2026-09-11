@@ -93,7 +93,7 @@ content. Both maps are needed; either alone still fails.
 
 A client that omits them loses WDK's verdict on every phyletic binding: the read falls
 back to the static `GET`, whose echoed values are the published defaults
-([WDK-PARAM-008](../rules/parameters-and-vocabularies.md)). PathFinder therefore adds the
+([WDK-PARAM-008](../rules/parameters-and-vocabularies.md)). A client therefore adds the
 published `initialDisplayValue` of **every** hidden parameter that allows empty to the
 context of a metadata read, by shape rather than by name
 (`veupathdb-mcp: src/veupathdb_mcp/catalog/search_context.py:context_for_metadata_read`).

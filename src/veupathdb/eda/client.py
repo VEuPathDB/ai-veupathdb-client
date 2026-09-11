@@ -9,7 +9,7 @@ from typing import Literal
 import httpx
 from pydantic import JsonValue, TypeAdapter
 
-from veupathdb.auth_context import veupathdb_auth_token_ctx
+from veupathdb.auth_context import resolve_veupathdb_auth_token
 from veupathdb.eda.errors import eda_failure
 from veupathdb.eda.models import (
     EdaBinSpec,
@@ -46,9 +46,11 @@ class EdaClient:
         base_url: str,
         timeout: float = 60.0,
         transport: httpx.AsyncBaseTransport | None = None,
+        auth_token: str | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
+        self.auth_token = auth_token
         self._client: httpx.AsyncClient | None = None
         self._transport = transport
         self._lock = asyncio.Lock()
@@ -72,7 +74,7 @@ class EdaClient:
             return self._client
 
     def _token(self) -> str:
-        token = veupathdb_auth_token_ctx.get()
+        token = resolve_veupathdb_auth_token(self.auth_token)
         if not token:
             raise WDKLoginRequiredError
         return token

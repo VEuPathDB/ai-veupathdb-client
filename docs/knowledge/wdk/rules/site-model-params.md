@@ -27,8 +27,7 @@ The explainer these rules come from is
 - class: CONTRACT
 - upstream: https://github.com/VEuPathDB/ApiCommonModel/blob/301b2be012af713411e9b0e216ed93c51d04c239/Model/lib/wdk/model/questions/queries/geneQueries.xml#L2239-L2266
 - anchor: src/veupathdb/wdk/strategy_api/base.py:_expand_profile_pattern_groups
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/web/src/features/strategy/editor/widgets/PhyleticProfileParam.test.tsx::encodeProfilePattern::wraps and separates the tokens with the LIKE wildcard
+- status: ENFORCED by tests/unit/rules/test_site_model_parameter_rules.py::test_wdk_site_001_the_pattern_wraps_and_separates_its_tokens_with_the_wildcard
 
 `GenesByOrthologPattern`'s query uses the parameter twice, and the second use is the
 search:
@@ -86,8 +85,7 @@ repositories; none was found in them.
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/ApiCommonModel/blob/301b2be012af713411e9b0e216ed93c51d04c239/Model/lib/wdk/model/questions/queries/geneQueries.xml#L2239-L2266
 - anchor: src/veupathdb/domain/parameters/phyletic.py:encode_profile_pattern
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/web/src/features/strategy/editor/widgets/PhyleticProfileParam.test.tsx::an included species always reaches the matching branch::writes a :Y token for an inclusion
+- status: ENFORCED by tests/unit/rules/test_site_model_parameter_rules.py::test_wdk_site_002_an_included_species_is_written_as_the_matching_state
 There is nothing to parse. The parameter is a `stringParam` with `number="false"`, no
 `regex`, and `length="4000"`, so
 [`StringParam.validateValue`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/StringParam.java#L171-L202)
@@ -95,7 +93,7 @@ has exactly one check to apply to it - the length cap - and any string under 400
 characters passes. The value then goes to `LIKE`, which does not fail on a pattern that
 matches nothing.
 
-PathFinder refuses three shapes before the value leaves the client, all of them read in
+This client refuses three shapes before the value leaves it, all of them read in
 `domain/parameters/phyletic.py`. `read_census` reads the value as a run of
 `code:Y` / `code:N` tokens and returns no states for any other shape, and
 `census_states` answers that with a 422 - which is what prose, OrthoMCL
@@ -109,8 +107,8 @@ carry is a second 422, raised by `validate_phyletic_codes`. All three run at
 pattern the model states is otherwise accepted by the pre-flight and refused one tool call
 later. Guarded by
 `tests/unit/wdk/test_strategy_api_base.py`,
-`veupathdb-mcp/tests/unit/catalog/test_param_validation_phyletic.py`
-and `apps/api/src/pathfinder/tests/unit/test_phyletic_conformance.py`.
+`veupathdb-mcp: tests/unit/catalog/test_param_validation_phyletic.py`
+and `pathfinder: apps/api/src/pathfinder/tests/unit/test_phyletic_conformance.py`.
 
 That narrows the ways in rather than closing them. A pattern built from real codes in the
 right order and the wrong states is well formed, reaches WDK, and comes back as a count;
@@ -234,7 +232,7 @@ and not a claim that no explanation exists.
 The general lesson is
 [WDK-PARAM-010](parameters-and-vocabularies.md): `initialDisplayValue` is what the spec
 holds, the spec was filled from an unvalidated model default, and nothing anywhere promises
-a default returns rows. The anchor is PathFinder's `fill_hidden_required_defaults`, which
+a default returns rows. The anchor is this client's `fill_hidden_required_defaults`, which
 does the reasonable thing for a hidden required parameter and, on this one parameter,
 chooses the science.
 
@@ -243,8 +241,7 @@ chooses the science.
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/web-monorepo/blob/63d1705463d553c0ac19ee577c1b09666597b903/packages/sites/genomics-site/webapp/wdkCustomization/js/client/components/questions/GenesByOrthologPattern.tsx#L154-L178
 - anchor: src/veupathdb/domain/parameters/phyletic.py:sort_profile_pattern
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/web/src/features/strategy/editor/widgets/PhyleticProfileParam.test.tsx::encodeProfilePattern::sorts the tokens into ascending code order
+- status: ENFORCED by tests/unit/rules/test_site_model_parameter_rules.py::test_wdk_site_004_the_tokens_are_written_in_ascending_code_order
 
 `%A%B%` under `LIKE` means "A, then later B". The stored census lists codes in ascending
 order of the code, so two correct tokens in the wrong relative order describe a census that
@@ -283,7 +280,7 @@ rule becomes false and no gate can notice. Re-run: the six patterns above agains
 `GenesByOrthologPattern` with `organism` at *P. falciparum* 3D7, expecting non-zero for the
 ascending form of each pair and 0 for the reverse.
 
-PathFinder sorts in one place. `domain/parameters/phyletic.py:encode_profile_pattern` emits
+This client sorts in one place. `domain/parameters/phyletic.py:encode_profile_pattern` emits
 the tokens sorted, so every pattern the authoring path produces is in census order by
 construction, and `sort_profile_pattern` beside it re-orders only a pattern that reaches
 the wire when the clade tree cannot be read. Re-measured on plasmodb.org on 2026-09-04:
@@ -323,9 +320,9 @@ through `derive_binding`, and the wire guard through `_expand_profile_pattern_gr
 code check is `validate_phyletic_codes`, called before the expansion and again from the
 pre-flight, so a code the tree does not carry is a 422 rather than a token that matches
 nothing (`tests/unit/wdk/test_strategy_api_base.py`,
-`veupathdb-mcp/tests/unit/catalog/test_param_validation_phyletic.py`). The editor widget
-keeps its own copy of the same rule, tested at
-`apps/web/src/features/strategy/editor/widgets/PhyleticProfileParam.test.tsx`.
+`veupathdb-mcp: tests/unit/catalog/test_param_validation_phyletic.py`). The editor
+widget keeps its own copy of the same rule, tested at
+`pathfinder: apps/web/src/features/strategy/editor/widgets/PhyleticProfileParam.test.tsx`.
 
 The other half - that the codes written are the ones the vocabulary carries, whatever case
 the proposal used - is asserted rather than left to construction:
@@ -391,7 +388,7 @@ the lists and not the pattern, and the step reopens correctly and runs on whatev
 was there before. Both must be written together, and they are at different granularities on
 purpose.
 
-PathFinder writes all three together, and the two lists are the input rather than a
+This client writes all three together, and the two lists are the input rather than a
 by-product. The parameter sheet gives `included_species` and `excluded_species` the clade
 tree as their vocabulary, so the model proposes species and clades by code or by label;
 `veupathdb-mcp: src/veupathdb_mcp/catalog/param_phyletic.py:derive_phyletic_overrides`
@@ -432,8 +429,7 @@ its stored value, and the pattern is then regenerated from the reduced set.
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/ApiCommonModel/blob/53de242dfce4e2be81ad28ad8a608c87af3e0b7c/Model/lib/wdk/model/questions/queries/geneQueries.xml#L1807-L1814
 - anchor: src/veupathdb/wdk/wdk_models.py:properties
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/ai/tools/test_frame_proposals.py::test_a_refused_proposal_names_what_is_wrong
+- status: PARTIAL by tests/live/test_wdk_rules_live.py::TestWdkSite007TheRadioPairIsPublished::test_wdk_site_007_the_pair_travels_in_the_properties_live
 
 Some searches offer the same criterion twice: once as a vocabulary the user picks
 from, once as free text with wildcards. ApiCommonModel declares the pair in a

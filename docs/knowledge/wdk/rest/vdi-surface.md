@@ -1,7 +1,7 @@
 ---
 type: Reference
-title: The VDI endpoints PathFinder calls
-description: Method, path, payload and response for every VDI user-dataset endpoint PathFinder's client calls, each pinned to the RAML that defines it, plus the credential forms and the install latency measured live.
+title: The VDI endpoints this client calls
+description: Method, path, payload and response for every VDI user-dataset endpoint this client calls, each pinned to the RAML that defines it, plus the credential forms and the install latency measured live.
 tags: [vdi, user-datasets, rest, veupathdb, wdk-alignment]
 generated: { by: claude-code/opus-5, at: 2026-09-05T00:00:00Z }
 verified: { by: claude-code/opus-5, at: 2026-09-05T00:00:00Z }
@@ -12,8 +12,8 @@ status: stable
 
 VDI is a separate service from WDK. It lives at `{site_origin}/vdi` on every configured
 site, and its contract is RAML, not OpenAPI: `GET /vdi/openapi.json` is 404 and `GET
-/vdi/api` serves rendered HTML. This file records the part of that contract PathFinder
-depends on, pinned to the source that defines it. Why PathFinder uses it this way is recorded in
+/vdi/api` serves rendered HTML. This file records the part of that contract this client
+depends on, pinned to the source that defines it. Why the application uses it this way is recorded in
 `pathfinder: docs/knowledge/decisions/vdi-is-a-publish-target-not-a-store.md`.
 
 Every citation is `VEuPathDB/vdi-service@34eb6f2f331bc5a8cd686d63588102b46d30b4dd`, under
@@ -36,24 +36,24 @@ the header name in `.../utils/RequestKeys.java`):
 | no credential | 401 `{"status":"unauthorized","message":"HTTP 401 Unauthorized"}` |
 
 The token is the same non-guest WDK `Authorization` value `password_login` returns.
-PathFinder sends the bearer header. `/plugins` is the only endpoint below that answers
+This client sends the bearer header. `/plugins` is the only endpoint below that answers
 without a credential.
 
 # Endpoints
 
-| method + path | request | response | RAML | PathFinder |
+| method + path | request | response | RAML | client |
 | --- | --- | --- | --- | --- |
 | `POST /datasets` | `multipart/form-data`: `details` (JSON `DatasetPostMeta`) and `dataFile` (one text file, one gene id per line) | 202 + `Location`, body `{"datasetId": "<VdiId>"}` | `api-schema/resources/dataset-list/method-post.raml`, `api-schema/types/by-path/datasets/post.raml` | `VdiClient.create_genelist` |
 | `GET /datasets/{vdi-id}` | none | 200 `DatasetDetails`; 404 deleted; 410 gone; 425 not yet in the object store | `api-schema/resources/dataset/method-get.raml`, `.../types/by-path/datasets/vdi-id/get.raml` | `VdiClient.get` |
 | `GET /datasets` | none | 200 `DatasetListEntry[]` | `api-schema/resources/dataset-list/method-get.raml`, `.../types/by-path/datasets/get.raml` | not called; the row keeps the one id it published |
 | `DELETE /datasets/{vdi-id}` | none | 204 | `api-schema/resources/dataset/method-delete.raml` | `VdiClient.delete` |
-| `PUT /datasets/{vdi-id}/shares/{recipient-user-id}/offer` | `{"action": "grant" \| "revoke"}` | 204 | `api-schema/resources/dataset-shares/resource.raml`, `.../types/by-path/datasets/vdi-id/shares/put.raml` | not called; PathFinder publishes and reads, it does not share |
+| `PUT /datasets/{vdi-id}/shares/{recipient-user-id}/offer` | `{"action": "grant" \| "revoke"}` | 204 | `api-schema/resources/dataset-shares/resource.raml`, `.../types/by-path/datasets/vdi-id/shares/put.raml` | not called; this client publishes and reads, it does not share |
 | `GET /plugins` | none, no credential | 200 `PluginListItem[]` | `api-schema/resources/plugins/resource.raml` | not called; read once to pin the plugin name and its targets |
 
 `details` carries `type: {name, version}`, `installTargets` (at least one), `name` (3 to
 1024 chars), `summary` (3 to 4000), optional `description`, `origin`, `visibility` and
 `dependencies` - `api-schema/types/common.raml` `DatasetMetaBase`, `DatasetTypeInput`,
-`DatasetVisibility`. PathFinder sends `origin: "direct-upload"` and one install target,
+`DatasetVisibility`. This client sends `origin: "direct-upload"` and one install target,
 the site's own `project_id`, which is what the site's native export does
 (`VEuPathDB/web-monorepo@905ce53ffd0213c9a1da4f6b6f9873768193f2d5`,
 `packages/sites/genomics-site/webapp/wdkCustomization/js/client/components/records/gene-list-export-utils.tsx:366-382`).
@@ -83,7 +83,7 @@ install targets: AmoebaDB, CryptoDB, FungiDB, GiardiaDB, HostDB, MicrosporidiaDB
 PiroplasmaDB, PlasmoDB, ToxoDB, TrichDB, TriTrypDB, VectorBase, UniDB. The plugin's
 importer splits on `[\s,;]+` and writes one id per line
 (`VEuPathDB/vdi-plugin-genelist@cfb31e78a43b91f22037b1e36c7e2e4a9a17713e`,
-`lib/python/eupath/GeneListDatasetImporter.py`), so PathFinder uploads one id per line.
+`lib/python/eupath/GeneListDatasetImporter.py`), so this client uploads one id per line.
 
 # Measured install latency
 

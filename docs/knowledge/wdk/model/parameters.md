@@ -118,7 +118,7 @@ more than the similarities, because three of them 500 rather than reject.
 ([`StringParam.validateValue`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/StringParam.java#L171-L203)).
 The numeric bounds a researcher actually meets are this type, not `number` -
 `min_molecular_weight` is `type: "string"` with `isNumber: true`, live on both
-sites - which is why PathFinder had to learn the distinction
+sites - which is why a client has to hold the distinction
 (`pathfinder: docs/knowledge/decisions/numeric-default-is-not-an-example.md`).
 The trap: `toInternalValue`
 [strips commas](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/StringParamHandler.java#L40-L60)

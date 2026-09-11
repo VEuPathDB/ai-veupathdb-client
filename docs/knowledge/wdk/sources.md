@@ -17,8 +17,8 @@ pinned to a 40-character sha, in rule blocks and in prose alike.
 
 | Repository | Pinned sha | Authoritative for |
 |---|---|---|
-| [VEuPathDB/WDK](https://github.com/VEuPathDB/WDK/tree/e534d2e6a5119165e1742c7a9e07a371217ddda5/) | `e534d2e6a5119165e1742c7a9e07a371217ddda5` | The platform itself. Domain model (`Model/src/main/java`), the REST surface and its status codes (`Service/src/main/java`), validation, the parameter system. Highest authority: when PathFinder and this repository disagree, PathFinder is wrong. |
-| [VEuPathDB/web-monorepo](https://github.com/VEuPathDB/web-monorepo/tree/63d1705463d553c0ac19ee577c1b09666597b903/) | `63d1705463d553c0ac19ee577c1b09666597b903` | The reference client. `packages/libs/wdk-client` carries the TypeScript types PathFinder's own types must match, and the request shapes a working client actually sends. Useful as evidence of intended usage, not of platform behavior: the client can be wrong about WDK in a way WDK's own source cannot. |
+| [VEuPathDB/WDK](https://github.com/VEuPathDB/WDK/tree/e534d2e6a5119165e1742c7a9e07a371217ddda5/) | `e534d2e6a5119165e1742c7a9e07a371217ddda5` | The platform itself. Domain model (`Model/src/main/java`), the REST surface and its status codes (`Service/src/main/java`), validation, the parameter system. Highest authority: a claim in this bundle that WDK's source contradicts is wrong. |
+| [VEuPathDB/web-monorepo](https://github.com/VEuPathDB/web-monorepo/tree/63d1705463d553c0ac19ee577c1b09666597b903/) | `63d1705463d553c0ac19ee577c1b09666597b903` | The reference client. `packages/libs/wdk-client` carries the TypeScript types of every WDK shape, and the request shapes a working client actually sends. Useful as evidence of intended usage, not of platform behavior: the client can be wrong about WDK in a way WDK's own source cannot. |
 | [VEuPathDB/ApiCommonModel](https://github.com/VEuPathDB/ApiCommonModel/tree/301b2be012af713411e9b0e216ed93c51d04c239/) | `301b2be012af713411e9b0e216ed93c51d04c239` | The site model. `Model/lib/wdk/model/questions` and `Model/lib/wdk/model/records` hold the XML that defines which searches exist, their parameters, and their record classes. This is where a search name comes from; WDK only executes what this declares. Cited by [WDK-SITE-001..006](rules/site-model-params.md). |
 | [VEuPathDB/ApiCommonWebsite](https://github.com/VEuPathDB/ApiCommonWebsite/tree/830bb57fe07fc2e4dd37b6ea2e3baae0eaee5bee/) | `830bb57fe07fc2e4dd37b6ea2e3baae0eaee5bee` | The site-specific step-analysis plugins, in `Model/src/main/java/org/apidb/apicommon/model/stepanalysis`. This is where enrichment result shapes are actually defined: WDK runs a plugin and [passes its JSON through untouched](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/user/StepAnalysisInstanceService.java#L272-L284), so no column name in an enrichment result is knowable from the WDK repository. Cited by [WDK-ANS-007](rules/searches-and-answers.md). |
 
@@ -153,15 +153,16 @@ ApiCommonWebsite, and it is not the fix when the artifact is a database table.
 # The live sites
 
 Source says what WDK can do. A deployment says what it does, and per the section above the
-two are not the same build. Two sites are used for live verification, chosen because they
-differ in size and content while running the same platform, so a claim that holds on both is
-unlikely to be an artifact of one site.
+two are not the same build. Two sites are used for live verification, plasmodb.org and toxodb.org, chosen because
+they differ in size and content while running the same platform, so a claim that holds on
+both is unlikely to be an artifact of one site. Which sites a deployment serves is the
+deployment's own business; these two are where the measurements below were taken.
 
 | Site | Service base | Used to confirm |
 |---|---|---|
-| plasmodb.org | `https://plasmodb.org/plasmo/service` | 325 searches on `record-types/transcript/searches`, verified 2026-08-10; **359** on 2026-08-22. Primary site for PathFinder's own work. |
+| plasmodb.org | `https://plasmodb.org/plasmo/service` | 325 searches on `record-types/transcript/searches`, verified 2026-08-10; **359** on 2026-08-22. Every live check in this bundle was run here. |
 | toxodb.org | `https://toxodb.org/toxo/service` | 234 searches on the same path, same date. Confirms that per-site search availability is real, and that platform behavior is not. |
-| orthomcl.org | `https://orthomcl.org/orthomcl/service` | Used once, by [WDK-SITE-003](rules/site-model-params.md), and only as a contrast. It runs the same WDK platform over a different site model, and it is the site whose `GroupsByPhyleticPattern.phyletic_expression` grammar the `profile_pattern` default was written in. It is not a general verification site: nothing else in the bundle should be confirmed there, because a claim that holds on plasmodb.org and toxodb.org and orthomcl.org is not thereby a claim about the two sites PathFinder actually uses. |
+| orthomcl.org | `https://orthomcl.org/orthomcl/service` | Used once, by [WDK-SITE-003](rules/site-model-params.md), and only as a contrast. It runs the same WDK platform over a different site model, and it is the site whose `GroupsByPhyleticPattern.phyletic_expression` grammar the `profile_pattern` default was written in. It is not a general verification site: nothing else in the bundle should be confirmed there, because it runs a site model neither of the two verification sites runs. |
 
 The full list of configured sites and their base paths is in
 `src/veupathdb/sites.yaml`. Each is `<host>/<project

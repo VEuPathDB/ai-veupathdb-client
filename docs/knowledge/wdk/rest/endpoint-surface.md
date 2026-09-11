@@ -1,7 +1,7 @@
 ---
 type: Reference
-title: The WDK REST surface, and which of it PathFinder actually calls
-description: Every endpoint PathFinder touches plus the near-frontier ones it does not, with request and response shapes and the client method behind each.
+title: The WDK REST surface, and which of it this client actually calls
+description: Every endpoint this client touches plus the near-frontier ones it does not, with request and response shapes and the client method behind each.
 tags: [wdk-alignment, rest, api]
 generated: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
 verified: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
@@ -13,44 +13,19 @@ status: stable
 Paths are relative to a site's service base, listed in [sources.md](../sources.md).
 Every path and verb below was read from the JAX-RS annotations in WDK's service classes at
 the pinned sha in [sources.md](../sources.md); no row repeats that permalink. The client
-column names the PathFinder method that issues the call, relative to
+column names the client method that issues the call, relative to
 `src/veupathdb/wdk/`, or says `unused` where WDK offers an
 endpoint we do not call. The unused rows are here on purpose: they are the near frontier,
 and knowing an endpoint exists is what stops the next feature from being built out of
 three that do not fit.
 
-`{userId}` is always a concrete numeric id in PathFinder, never the `current` alias, for
+`{userId}` is always a concrete numeric id, never the `current` alias, for
 the reason in [WDK-HTTP-001](../rules/auth-and-transport.md). The single exception is the
 call that resolves it.
 
-**How the caller column was derived, and how to redo it.** Not by inspection. Every WDK
-path literal under `apps/api/src/pathfinder`, excluding `tests/`, was extracted and mapped
-to its enclosing function, and the column is that mapping. Anything absent from the
-extraction is marked `unused`, so `unused` is a claim about the whole backend rather than
-about one package. Redo it by grepping the backend
-for string literals beginning `/users`, `/record-types`, `/strategy-lists`,
-`/temporary-results`, `/ontologies`, `/login`, `/logout`, and then handling three things
-that will otherwise give a wrong answer. Each of these has already caused a wrong row or a
-false alarm once.
-
-- **Discard PathFinder's own FastAPI route decorators.** `dev.py` and
-  `veupathdb_auth.py` declare `/login` and `/logout` routes of their own, which look
-  identical to the WDK paths in a grep and are not calls to WDK at all.
-- **Discard non-service literals.** The `/service` to `/app` rewrite in
-  `_http.py:_init_wdk_session` and the `removesuffix("/service")` in `site_router.py` both
-  match a naive pattern and neither is an endpoint.
-- **Join implicit string concatenation before matching.** Python adjacent-literal
-  concatenation splits a path across lines, and a line-oriented grep sees only fragments.
-  `records.py:95-96` is the live case: `f"/users/{...}/steps/{step_id}"` on one line and
-  `f"/columns/{column_name}/reports/byValue"` on the next are one path. Matched
-  separately, the first looks like a plain step fetch and the second does not start with
-  any WDK prefix, so the column-reporter row appears uncalled. Join consecutive lines from
-  the same file before deciding.
-- **Grep the whole backend, not one package.** The first version of this column was
-  derived from `src/veupathdb/wdk/strategy_api/` alone and got two rows wrong, both
-  of them outside it: the callers live in `catalog_metadata.py` and
-  `transport/http/routers/`. A narrowed extraction does not just miss rows, it makes the
-  reverse check pass vacuously, so nothing reports the gap.
+**What the client column is.** Each row names the method under `src/veupathdb/wdk/`
+that issues the call. `unused` marks an endpoint this client does not call, which is
+a claim about this package and about nothing a consumer does on top of it.
 
 Two things deliberately absent from the table. The `/app` webapp URL that
 `_init_wdk_session` fetches is a page, not a service endpoint. Site search
@@ -58,7 +33,7 @@ Two things deliberately absent from the table. The `/app` webapp URL that
 and the WDK service base returns 404 for it; its two forms are in
 [the site-search contract](site-search-contract.md).
 
-| Method | Path | Purpose | Request | Response | PathFinder client |
+| Method | Path | Purpose | Request | Response | client method |
 |---|---|---|---|---|---|
 | GET | `/users/current` | Resolve the requesting identity | - | `User` with `id`, `isGuest` | `strategy_api/helpers.py:resolve_wdk_user_id` and `services/wdk_identity.py:fetch_wdk_user` |
 | POST | `/login` | Exchange email and password for an `Authorization` token | `{email, password, redirectUrl}` | `{success, message, redirectUrl}` plus `Set-Cookie: Authorization` | `auth_login.py:password_login` |
@@ -68,7 +43,7 @@ and the WDK service base returns 404 for it; its two forms are in
 | GET, PATCH | `/users/{userId}/preferences` | Read and patch global or project preferences | preference deltas | preferences | unused |
 | GET | `/users/{userId}/strategies` | List the user's strategies | - | `StrategySummary[]` | `strategy_api/strategies.py:list_strategies` |
 | POST | `/users/{userId}/strategies` | Create a strategy | `NewStrategySpec` | `{id}` | `strategy_api/strategies.py:create_strategy` |
-| PATCH | `/users/{userId}/strategies` | Batch delete by id | `DeleteStrategySpec[]` | - | unused; PathFinder deletes one at a time |
+| PATCH | `/users/{userId}/strategies` | Batch delete by id | `DeleteStrategySpec[]` | - | unused; this client deletes one at a time |
 | GET | `/users/{userId}/strategies/{strategyId}` | Full strategy | - | `StrategyDetails` with `stepTree` and `steps` | `strategy_api/strategies.py:get_strategy` |
 | PATCH | `/users/{userId}/strategies/{strategyId}` | Rename, save, or overwrite | `StrategyProperties` subset | `{id}` | `strategy_api/strategies.py:update_strategy`, `set_saved` |
 | DELETE | `/users/{userId}/strategies/{strategyId}` | Delete a strategy | - | - | `strategy_api/strategies.py:delete_strategy` |
@@ -115,7 +90,7 @@ and the WDK service base returns 404 for it; its two forms are in
 | POST | `/temporary-results` | Stash a report request behind an id, for a browser download link | report request | `{id}` | `temporary_results.py:create_temporary_result` |
 | GET | `/temporary-results/{id}` | Redeem that id | - | the stashed report | `unused` by the backend. `temporary_results.py:get_download_url` builds this URL and hands it to the browser, which is the only thing that fetches it. |
 | GET | `/ontologies` | List the ontologies a site publishes | - | ontology names | unused |
-| GET | `/ontologies/{name}` | One ontology as a term tree | - | `{tree}` of ontology nodes | `catalog_metadata.py:load_ontology_categories`, against `Categories`, which is how PathFinder derives each search's category path |
+| GET | `/ontologies/{name}` | One ontology as a term tree | - | `{tree}` of ontology nodes | `catalog_metadata.py:load_ontology_categories`, against `Categories`, which is how a consumer derives each search's category path |
 | POST | `/client-errors` | Report a client-side error to WDK | error payload | - | unused |
 
 # Which of these WDK validates against a published schema
@@ -182,14 +157,14 @@ table above follows the Java, so it is right and the RAML is wrong.
 
 # What the shape of this table says
 
-The surface PathFinder uses is narrow and deep: steps, strategies, searches, reports.
+The surface this client uses is narrow and deep: steps, strategies, searches, reports.
 Almost everything unused is either a browser concern (favorites, baskets, preferences,
 client error reporting) or a capability nobody has needed yet (ontology term summaries,
 dataset readback, analysis properties).
 
 Two absences are deliberate rather than incidental. `POST /users` registers a real
-account, and PathFinder must never call it. `PATCH /users/{userId}/strategies` deletes in
-batches, and PathFinder deletes singly so that a partial failure names the strategy it
+account, and no client may call it. `PATCH /users/{userId}/strategies` deletes in
+batches, and this client deletes singly so that a partial failure names the strategy it
 failed on.
 
 Two rows are the ones that carry the science. `POST .../steps/{stepId}/reports/standard`

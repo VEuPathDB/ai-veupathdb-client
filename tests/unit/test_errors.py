@@ -59,3 +59,17 @@ def test_one_handler_reads_both_hierarchies() -> None:
 
     assert status_of(HostError(HostErrorCode.QUOTA_EXCEEDED, "Quota", 429)) == 429
     assert status_of(WDKError("upstream said no")) == 502
+
+
+# Nouns a consuming application owns and this package does not model. A refusal
+# served to that application's users may not name one.
+CONSUMER_NOUNS = ("gene set", "conversation", "experiment", "workbench")
+
+
+def test_the_login_refusal_states_the_condition_and_names_no_consumer_entity() -> None:
+    refusal = WDKLoginRequiredError()
+    detail = refusal.detail or ""
+    prose = f"{refusal.title} {detail} {WDKLoginRequiredError.__doc__}".lower()
+
+    assert "registered" in detail.lower()
+    assert [noun for noun in CONSUMER_NOUNS if noun in prose] == []

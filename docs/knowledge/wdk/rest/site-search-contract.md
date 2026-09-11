@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: The site-search contract, both forms of it
-description: The paged form stops at fifty records; the streaming form carries the whole match set as tab separated lines. What each one takes, what it answers, and what PathFinder calls where.
+description: The paged form stops at fifty records; the streaming form carries the whole match set as tab separated lines. What each one takes, what it answers, and which client method calls where.
 tags: [wdk-alignment, rest, site-search, gene-lookup]
 generated: { by: claude-code/opus-5, at: 2026-09-04T00:00:00Z }
 verified: { by: claude-code/opus-5, at: 2026-09-04T00:00:00Z }
@@ -75,7 +75,7 @@ tab. Records arrive in `score desc, id asc` order
 which is the same order the paged form serves, so the two agree record for record.
 
 Nothing else is on the line. **A streamed record carries no organism, no product, no gene
-name and no matched fields**, which is why PathFinder describes a streamed identifier from
+name and no matched fields**, which is why a consumer describes a streamed identifier from
 WDK before showing it.
 
 The pinned response is
@@ -92,8 +92,8 @@ counts the result before it writes anything and refuses a set larger than
 `searchText: "kinase"`, `documentType: "gene"`, no organism filter, reports
 `totalCount: 1175519` from the paged form and then streams **1,175,519 lines, 32,886,583
 bytes**, with no error. Whatever build is deployed does not enforce the cap, so **a client
-must bound its own read**; PathFinder's bound is `SITE_SEARCH_STREAM_LIMIT` in
-`veupathdb-mcp/src/veupathdb_mcp/gene_lookup/site_search.py`.
+must bound its own read**; the in-house bound is `SITE_SEARCH_STREAM_LIMIT` in
+`veupathdb-mcp: src/veupathdb_mcp/gene_lookup/site_search.py`.
 
 Reading the stream is cheap up to that bound because the cost is time to first byte, not
 volume. On that same 1,175,519 record query: first byte at 2.4 s, and 5,000 records
@@ -124,7 +124,7 @@ site's own list is the leaves of the `organism` parameter of the site's
 `TAXON_QUESTION_NAME`); plasmodb declares **64**. Sending it turns the same
 kinase query into `totalCount 17516` over Plasmodium genes.
 `veupathdb_mcp.gene_lookup.organisms.list_organisms` reads it and both request
-forms send it; `veupathdb-mcp/tests/live/test_site_scoped_gene_search.py` pins
+forms send it; `veupathdb-mcp: tests/live/test_site_scoped_gene_search.py` pins
 the result.
 
 
@@ -143,7 +143,7 @@ documents.
 The two record sets are identical: same 352 identifiers, in the same order, with the same
 scores to five decimal places.
 
-# What PathFinder calls, and where
+# What calls each form, and where
 
 `src/veupathdb/wdk/site_search_client.py` has one method per form: `search` for the
 paged one and `stream_records` for the streaming one.

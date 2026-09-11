@@ -63,8 +63,7 @@ stronger than omitting the key and is deliberately so: the named test passes a s
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/request/strategy/StepRequestParser.java#L157-L170
 - anchor: src/veupathdb/wdk/_analyses.py:update_step_filters
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/platform/test_wdk_analyses.py::test_wdk_step_003_an_answer_parameter_survives_a_filter_write
+- status: ENFORCED by tests/unit/rules/test_filter_rules.py::test_wdk_step_003_a_search_config_write_keeps_the_answer_parameters
 
 Answer parameters live in the same flat `searchConfig.parameters` map as everything else, so
 a search-config replacement looks like it could rewire a step. It cannot.
@@ -79,7 +78,7 @@ no way around it.
 
 Practically this makes any search-config write a read-modify-write. You must fetch the
 step, keep its answer parameter values byte for byte, change the parameters you meant to
-change, and PUT the whole thing. Dropping an answer parameter is changing it. PathFinder's
+change, and PUT the whole thing. Dropping an answer parameter is changing it. This client's
 filter update does the round trip correctly - it copies `step.search_config.parameters`
 wholesale - though nothing tests that it keeps doing so.
 
@@ -91,8 +90,7 @@ Source-only: read off the pinned sha, not confirmed against a running site. See
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/user/Step.java#L392-L402
 - anchor: src/veupathdb/domain/strategy/graph_model.py:pushable_root_id
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/domain/strategy/test_graph_model.py::TestComputability::test_the_pushable_root_walks_past_a_half_wired_combine
+- status: ENFORCED by tests/unit/rules/test_strategy_and_step_rules.py::test_wdk_step_004_a_half_wired_combine_is_not_a_degraded_combine
 
 `Step`'s constructor asserts the biconditional directly: no strategy implies every answer
 parameter is null, and a strategy implies none of them is. Either violation throws
@@ -109,7 +107,7 @@ error tells you nothing, so the client has to know.
 Source-only: read off the pinned sha, not confirmed against a running site. See
 [the pin-versus-deployment note](../sources.md).
 
-PathFinder never sends one. `pushable_root_id` walks down past a step that is not
+This client never sends one. `pushable_root_id` walks down past a step that is not
 computable and hands WDK the surviving branch instead, which is what keeps a
 mid-rewiring canvas from becoming a 500. The named test cuts an edge and asserts the
 projection roots at the surviving input rather than at the broken combine.
@@ -119,8 +117,7 @@ projection roots at the surviving input rather than at the broken combine.
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/user/StepService.java#L253-L259
 - anchor: src/veupathdb/wdk/strategy_api/reports.py:get_step_count
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/wdk/test_step_results_reports.py::test_wdk_step_005_a_step_count_addresses_a_step_in_a_strategy
+- status: ENFORCED by tests/live/test_wdk_owned_resource_rules.py::TestWdkStep005ACountNeedsAStrategy::test_wdk_step_005_a_step_in_a_strategy_reports_a_count_live
 
 Both report paths check `if (!step.getStrategy().isPresent())` and throw
 `Step <id> is not part of a strategy, so cannot run.` - 422 - and the
@@ -173,8 +170,7 @@ send `MINUS`, not `LEFT_MINUS`. The default is `INTERSECT`.
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/user/StepService.java#L148-L169
 - anchor: src/veupathdb/wdk/strategy_api/steps.py:delete_step
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/services/strategies/test_orphan_delete_after_sync.py::TestTheDeleteFollowsThePush::test_the_strategy_is_pushed_before_any_delete
+- status: ENFORCED by tests/unit/rules/test_strategy_and_step_rules.py::test_wdk_step_007_a_conflict_on_delete_is_not_an_already_gone_step
 `deleteStep` throws `ConflictException` - 409 - with `Steps that are part of strategies
 cannot be deleted. Remove the step from strategy <id> and try again.` The deletion itself is
 a soft one: it sets a deleted flag and updates the row.
@@ -260,9 +256,7 @@ same three-field
 
 The rule is worth stating because the tempting shape is the other one - a tree of whole
 steps - and adopting it means every read has two copies of a step's data and every write
-has to decide which copy won. PathFinder made that mistake once and unmade it; the
-reasoning is in
-the nested-tree decision (`pathfinder: docs/knowledge/decisions/nested-tree-at-the-wire-boundary.md`).
+has to decide which copy won.
 
 What the rule does not say is that the tree is the storage. It is not: WDK reconstructs it
 from each step's answer parameter values on every load, and writes it back into them on
@@ -273,8 +267,7 @@ every PUT. See [strategies-and-step-trees](../model/strategies-and-step-trees.md
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/user/Strategy.java#L202-L208
 - anchor: src/veupathdb/domain/strategy/tree.py:root_ids
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/services/strategies/test_wdk_pushed_step_tree.py::test_wdk_strat_002_the_pushed_tree_has_exactly_one_root
+- status: ENFORCED by tests/unit/rules/test_strategy_and_step_rules.py::test_wdk_strat_002_a_strategy_has_exactly_one_root
 
 `StrategyBuilder.build` throws `Root step ID is required but has not been set.` before
 constructing anything, so a strategy without a root cannot exist. The root is named twice
@@ -309,8 +302,7 @@ and pure invertibility does not reach it.
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/user/Strategy.java#L290-L301
 - anchor: src/veupathdb/domain/strategy/tree.py:subtree_ids
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/services/strategies/test_wdk_pushed_step_tree.py::test_wdk_strat_003_no_step_outside_the_pushed_subtree_appears
+- status: ENFORCED by tests/unit/rules/test_strategy_and_step_rules.py::test_wdk_strat_003_every_step_a_strategy_holds_is_reachable_from_its_root
 
 Reachability is enforced by exhaustion rather than by a traversal check.
 [`buildTree`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/user/Strategy.java#L353-L387)
@@ -336,7 +328,7 @@ projection that consumes it.
 [WDK-STRAT-002](#wdk-strat-002---a-strategy-has-exactly-one-root-step). The test's step
 maps all come from `flatten_tree` on one node, so total reachability holds by
 construction; the assertion pins `subtree_ids` against `flatten_tree` rather than against
-WDK's exhaustion check. The map PathFinder actually holds can contain detached subtrees
+WDK's exhaustion check. The map an authoring client holds can contain detached subtrees
 that are unreachable from the pushed root by design, and what makes the push legal is
 `sync.py` sending only `rebuild_tree(pushable_root_id(...))`. Nothing asserts that the
 tree handed to `PUT .../step-tree` contains no step outside it.
@@ -346,8 +338,7 @@ tree handed to `PUT .../step-tree` contains no step outside it.
 - class: CONTRACT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/user/Strategy.java#L483-L485
 - anchor: src/veupathdb/domain/strategy/graph_model.py:record_class_of
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/services/strategies/test_record_class_comes_from_the_root.py::TestTheStrategysClassIsTheRoots::test_a_class_crossing_transform_makes_the_strategy_its_own_class
+- status: ENFORCED by tests/unit/rules/test_strategy_and_step_rules.py::test_wdk_strat_004_the_strategy_takes_the_record_class_of_its_root
 
 `Strategy.getRecordClass` delegates to `getRootStep().getRecordClass()`, and
 [`StrategyFormatter`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/formatter/StrategyFormatter.java#L29-L37)
@@ -381,8 +372,7 @@ read off its leaf would send both pushes to `transcript`.
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/user/StrategyService.java#L222-L248
 - anchor: src/veupathdb/wdk/strategy_api/strategies.py:update_strategy
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/services/strategies/test_tree_push_is_not_a_checkpoint.py::TestTheReadIsWhatReportsValidity::test_an_accepted_tree_can_still_hold_an_invalid_step
+- status: ENFORCED by tests/unit/rules/test_strategy_and_step_rules.py::test_wdk_strat_005_the_tree_write_is_followed_by_the_read_that_reports_validity
 
 `overwriteStepTreeAndSave` builds the replacement strategy at `ValidationLevel.NONE`. At
 that level nothing about parameter values is examined. What the endpoint does check is

@@ -3,13 +3,15 @@
 import threading
 
 from veupathdb.wdk.client import VEuPathDBClient
-from veupathdb.wdk.site_router import SiteInfo, get_site_router
-from veupathdb.wdk.strategy_api import StrategyAPI
+from veupathdb.wdk.site_router import SiteInfo, get_site_router, on_site_router_reset
+from veupathdb.wdk.strategy_api.api import StrategyAPI
 from veupathdb.wdk.temporary_results import TemporaryResultsAPI
 from veupathdb.wdk.vdi.client import VdiClient
 
 _vdi_clients: dict[str, VdiClient] = {}
 _vdi_lock = threading.Lock()
+
+on_site_router_reset(_vdi_clients.clear)
 
 
 def get_wdk_client(site_id: str) -> VEuPathDBClient:
@@ -30,18 +32,6 @@ def get_site(site_id: str) -> SiteInfo:
     """
     router = get_site_router()
     return router.get_site(site_id)
-
-
-__all__ = [
-    "SiteInfo",
-    "close_all_clients",
-    "get_results_api",
-    "get_site",
-    "get_strategy_api",
-    "get_vdi_client",
-    "get_wdk_client",
-    "list_sites",
-]
 
 
 def list_sites() -> list[SiteInfo]:

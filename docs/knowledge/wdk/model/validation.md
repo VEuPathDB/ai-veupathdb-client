@@ -117,7 +117,7 @@ The first row is the whole point. **A `NONE` bundle reports `isValid: false`
 with an empty error list, because "not validated" is not "valid".** A client
 that reads `isValid` without reading `level` calls a perfectly good step broken,
 and it will do so on exactly the paths that build at `NONE` - which includes
-`PUT .../strategies/{id}/step-tree`, the write PathFinder uses for every
+`PUT .../strategies/{id}/step-tree`, the write this client uses for every
 structural edit ([WDK-STRAT-005](../rules/strategies-and-steps.md)).
 
 The last row is the other trap: an unrecognised level string is not a 400. The
@@ -256,9 +256,7 @@ level.
 Without that parameter, a step becomes invalid because the *model* changed
 underneath it: a search retired, a vocabulary term withdrawn, a record class
 renamed. That is why invalid steps show up on old saved strategies and almost
-never on new ones, and it is why PathFinder treats a WDK rejection as that
-step's problem rather than as a failure of the operation
-(`pathfinder: docs/knowledge/decisions/local-edit-is-the-truth.md`).
+never on new ones.
 
 **The two strategy endpoints then disagree about that step's strategy.**
 Measured on both sites in the same minute, over the strategy holding the step
@@ -267,10 +265,6 @@ just invalidated: `GET .../strategies/{id}` reported `isValid: false`, and
 fills missing or invalid parameters before judging and judges at `SYNTACTIC`;
 the detail judges the stored values at `SEMANTIC`. Neither is lying, and a
 client that reads whichever it happened to fetch gets a coin flip.
-
-PathFinder derives its own four-state step status rather than storing one, for
-the same reason WDK recomputes a bundle on every read
-(`pathfinder: docs/knowledge/decisions/step-status-is-derived.md`).
 
 # The four different things a missing number means
 

@@ -48,8 +48,7 @@ alike, and it did not reproduce on either verification site. See
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/provider/ExceptionMapper.java#L60-L125
 - anchor: src/veupathdb/errors.py:WDKError
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/ai/capabilities/test_wdk_failure_classification.py::test_wdk_http_002_a_422_serves_json_under_text_plain
+- status: ENFORCED by tests/unit/rules/test_auth_and_transport_rules.py::test_wdk_http_002_a_422_serves_json_under_text_plain
 
 One mapper converts the exceptions WDK raises deliberately into responses, so for those
 the status code is the whole diagnosis:
@@ -104,10 +103,10 @@ against
 [the sentinel decoder](https://github.com/VEuPathDB/web-monorepo/blob/63d1705463d553c0ac19ee577c1b09666597b903/packages/libs/wdk-client/src/Service/ServiceBase.ts#L36-L39)
 and throws
 [`DelayedResultError`](https://github.com/VEuPathDB/web-monorepo/blob/63d1705463d553c0ac19ee577c1b09666597b903/packages/libs/wdk-client/src/Service/DelayedResultError.ts)
-when it matches. Matching on 202 alone is narrower than the reference client. PathFinder
+when it matches. Matching on 202 alone is narrower than the reference client. This client
 has neither guard.
 
-### WDK-HTTP-004 - A published WDK schema binds a body only where an endpoint annotates it, and PathFinder's models are the contract everywhere else
+### WDK-HTTP-004 - A published WDK schema binds a body only where an endpoint annotates it, and this client's models are the contract everywhere else
 
 - class: CONTRACT
 - upstream: https://github.com/VEuPathDB/WDK/blob/f0a04136b658617a07c66151a49dd0787688084f/Service/src/main/java/org/gusdb/wdk/service/provider/JsonSchemaProvider.java#L84-L120
@@ -119,7 +118,7 @@ WDK ships 78 JSON Schema files under `Service/doc/schema`. They are not the API 
 on the JAX-RS method, maps the dotted value onto a path with
 [`cleanPath`](https://github.com/VEuPathDB/WDK/blob/f0a04136b658617a07c66151a49dd0787688084f/Service/src/main/java/org/gusdb/wdk/service/provider/JsonSchemaProvider.java#L144-L146),
 and validates. An unannotated method reaches no schema at all, and 95 of WDK's 120
-JAX-RS methods are unannotated. Twelve of the endpoints PathFinder calls are annotated
+JAX-RS methods are unannotated. Twelve of the endpoints this client calls are annotated
 and bind fourteen schema names between them; those fourteen are `ENFORCED_SCHEMAS`, and
 their transitive `$ref` closure - 41 files - is vendored under
 `src/veupathdb/testing/fixtures/wdk/schema/` at the sha in `schema-pin.json`.
@@ -127,7 +126,7 @@ their transitive `$ref` closure - 41 files - is vendored under
 against them offline with draft-04.
 
 Seven of the fourteen are request schemas, and a request is the direction WDK cannot check
-for PathFinder: a body that breaks one is a 400 on the wire. Every body the client sends is
+for a client: a body that breaks one is a 400 on the wire. Every body the client sends is
 therefore built by the model that sends it and validated against its schema in
 `tests/unit/wdk/test_request_bodies_match_wdk_schemas.py`,
 which covers all seven names. Two constraints there bind the serialisation: a search config
@@ -161,7 +160,7 @@ branch rejects. Last touched 2019-08-09.
 
 So the rule has two halves. Where WDK annotates a body and the service holds to it, the
 published schema is authority and drift against it is a gate failure. Everywhere else -
-the parameter union above all - PathFinder's own models in
+the parameter union above all - this client's own models in
 `src/veupathdb/wdk/wdk_models.py` and `wdk_parameters.py` are the contract, falsified
 by a live payload rather than by a schema file. The parameter discriminants come from
 [`JsonKeys.java:146-156`](https://github.com/VEuPathDB/WDK/blob/f0a04136b658617a07c66151a49dd0787688084f/Model/src/main/java/org/gusdb/wdk/core/api/JsonKeys.java#L146-L156),
@@ -198,7 +197,7 @@ a 200, and an empty answer that reads like a scientific negative.
 
 The filter still behaves this way; what changed on 2026-08-19 is what the minted guest
 can then do, which is nothing ([transport-quirks](../rest/transport-quirks.md)). So the
-hazard is no longer a silent wrong answer, it is a 403 on every call. PathFinder mints
+hazard is no longer a silent wrong answer, it is a 403 on every call. This client mints
 no guests and refuses a user-scoped WDK call that carries no registered token before it
 leaves the process, which is what the anchor pins
 (`pathfinder: docs/knowledge/decisions/wdk-requires-registered-login.md`).
@@ -238,7 +237,7 @@ and it carries no credential.
 - anchor: src/veupathdb/wdk/_http.py:_init_wdk_session
 - status: ENFORCED by tests/unit/wdk/test_http.py::test_clears_jsessionid_cookie_on_reinit
 
-PathFinder shares one httpx client per site across every user, so it shares one cookie
+This client keeps one httpx client per site across every user, so it shares one cookie
 jar. A `JSESSIONID` set while acting as user A is still in that jar when the next request
 acts as user B.
 
@@ -250,7 +249,7 @@ not in the container session. A carried-over `JSESSIONID` can therefore only eve
 request to the wrong container session, which is a hazard with no upside.
 
 `_http.py` deletes the cookie and re-initializes whenever the effective token changes.
-Note what the anchor is and is not: it pins PathFinder's conformance. The separate claim
+Note what the anchor is and is not: it pins this client's conformance. The separate claim
 that a *missing* `JSESSIONID` makes a process query return zero remains unverified and is
 deliberately not a rule here - see
 [transport-quirks](../rest/transport-quirks.md).

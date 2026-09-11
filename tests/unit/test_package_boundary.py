@@ -139,3 +139,43 @@ def test_no_module_configures_the_hosts_logging() -> None:
     ]
 
     assert offenders == []
+
+
+# A caller's own vocabulary: its layers, its agents and the models it drives.
+# The shapes here behave the same whoever calls them, so no docstring names one.
+HOST_VOCABULARY = (
+    "pathfinder",
+    "catalog service",
+    "ai tool",
+    "agent tool",
+    "llm",
+    "assistant",
+    "conversation",
+    "workbench",
+)
+
+
+def _docstrings(module: ModuleType) -> list[str]:
+    path = module.__file__
+    assert path is not None
+    tree = ast.parse(Path(path).read_text())
+    holders = (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)
+    return [
+        text
+        for node in ast.walk(tree)
+        if isinstance(node, holders)
+        for text in [ast.get_docstring(node)]
+        if text
+    ]
+
+
+@pytest.mark.parametrize("module", _client_modules(), ids=lambda m: m.__name__)
+def test_no_docstring_names_a_callers_layers_or_its_agents(module: ModuleType) -> None:
+    named = {
+        word
+        for text in _docstrings(module)
+        for word in HOST_VOCABULARY
+        if word in text.lower()
+    }
+
+    assert named == set()

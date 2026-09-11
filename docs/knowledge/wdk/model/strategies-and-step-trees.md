@@ -32,7 +32,7 @@ and the same
 [`StrategyDetails`](https://github.com/VEuPathDB/web-monorepo/blob/63d1705463d553c0ac19ee577c1b09666597b903/packages/libs/wdk-client/src/Utils/WdkUser.ts#L120-L123)
 pairing.
 
-PathFinder's in-memory graph makes the same split for its own reasons, which are recorded
+The application's in-memory graph makes the same split for its own reasons, which are recorded
 in the nested-tree decision (`pathfinder: docs/knowledge/decisions/nested-tree-at-the-wire-boundary.md`) and are
 not repeated here.
 

@@ -155,12 +155,12 @@ _PARAM_VALUE_TYPES = (
 
 
 def param_value_from_raw(raw: object, kind: ParamKind) -> ParamValue:
-    """Build a typed ``ParamValue`` of *kind* from a raw scalar/list/dict the
-    LLM supplied, so callers needn't hand-construct the typed wrapper. An
-    already-typed value (a ``ParamValue`` instance or a dict carrying ``type``)
-    is coerced to *kind*; structural kinds (ranges/filter) are validated from
-    their object form. The system knows *kind* from the WDK spec, so it does
-    the typing."""
+    """Build a typed ``ParamValue`` of *kind* from an untyped scalar, list or dict.
+
+    An already-typed value (a ``ParamValue`` instance or a dict carrying
+    ``type``) is coerced to *kind*; a structural kind (a range or a filter) is
+    validated from its object form. *kind* comes from the WDK parameter spec.
+    """
 
     if isinstance(raw, _PARAM_VALUE_TYPES):
         return coerce_param_value(raw, kind)

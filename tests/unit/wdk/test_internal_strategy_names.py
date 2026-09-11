@@ -12,7 +12,7 @@ from veupathdb.settings import (
     use_veupathdb_settings_source,
     veupathdb_settings_source,
 )
-from veupathdb.wdk.strategy_api import (
+from veupathdb.wdk.strategy_api.helpers import (
     is_internal_wdk_strategy_name,
     strip_internal_wdk_strategy_name,
     tag_internal_wdk_strategy_name,

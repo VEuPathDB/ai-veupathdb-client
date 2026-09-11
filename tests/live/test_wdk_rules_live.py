@@ -1,6 +1,6 @@
 """The half of the WDK rules that only a running site can answer.
 
-Every check here measures WDK, not PathFinder. A failure means the platform
+Every check here measures WDK, not this package. A failure means the platform
 moved, which is what the lane exists to notice.
 """
 
@@ -293,3 +293,31 @@ class TestWdkAns006AnEmptyScopeStillRuns:
             observed=result.status,
         )
         assert result.status == 200
+
+
+class TestWdkSite007TheRadioPairIsPublished:
+    """The pair is a property of the deployment's search, so only a site answers."""
+
+    async def test_wdk_site_007_the_pair_travels_in_the_properties_live(
+        self, probe: Probe, drift_log: DriftLog
+    ) -> None:
+        result = await probe(
+            "plasmodb", "GET", f"{_TRANSCRIPT}/GenesByGoTerm?expandParams=true"
+        )
+        assert result.status == 200
+        body = result.json_body()
+        assert isinstance(body, dict)
+        search = body["searchData"]
+        assert isinstance(search, dict)
+        properties = search["properties"]
+        assert isinstance(properties, dict)
+        pair = properties["radio-params"]
+
+        drift_log.record(
+            site="plasmodb",
+            check="radio-params-pair",
+            subject="GenesByGoTerm",
+            expected=["go_typeahead", "go_term"],
+            observed=pair,
+        )
+        assert pair == ["go_typeahead", "go_term"]

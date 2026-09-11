@@ -1,1 +1,205 @@
-"""VEuPathDB client and API integrations."""
+"""The WDK services: the clients, the site router, the wire models and the login."""
+
+from veupathdb.wdk._failures import (
+    bundle_rows,
+    validation_bundle,
+    wdk_failure,
+)
+from veupathdb.wdk.ai_expression import (
+    AI_EXPRESSION_REPORT_PATH,
+    AiExpressionStatus,
+    AiExpressionSummary,
+)
+from veupathdb.wdk.analysis_result import WDKAnalysisNotReadyError
+from veupathdb.wdk.auth_login import (
+    VEuPathDBClaims,
+    password_login,
+    password_logout,
+    validate_oauth_token,
+)
+from veupathdb.wdk.client import VEuPathDBClient
+from veupathdb.wdk.current_user import (
+    fetch_current_user,
+    resolve_registered_email,
+)
+from veupathdb.wdk.factory import (
+    close_all_clients,
+    get_results_api,
+    get_site,
+    get_strategy_api,
+    get_vdi_client,
+    get_wdk_client,
+    list_sites,
+)
+from veupathdb.wdk.phyletic_tree import phyletic_tree_of
+from veupathdb.wdk.probe import WDKProbe
+from veupathdb.wdk.site_router import (
+    SiteInfo,
+    get_site_router,
+    load_sites_config,
+    reset_site_router,
+)
+from veupathdb.wdk.site_search_client import (
+    STREAM_MEDIA_TYPE,
+    DocumentTypeFilter,
+    SiteSearchDocument,
+)
+from veupathdb.wdk.step_tree import walk_wdk_step_tree
+from veupathdb.wdk.strategy_api.api import StrategyAPI
+from veupathdb.wdk.strategy_api.helpers import (
+    is_internal_wdk_strategy_name,
+    strip_internal_wdk_strategy_name,
+    tag_internal_wdk_strategy_name,
+)
+from veupathdb.wdk.strategy_api.steps import StepsMixin
+from veupathdb.wdk.temporary_results import TemporaryResultsAPI
+from veupathdb.wdk.value_decoding import (
+    decode_params,
+    encode_params,
+)
+from veupathdb.wdk.vdi.client import (
+    VdiClient,
+    VdiDatasetGoneError,
+    VdiServiceError,
+)
+from veupathdb.wdk.vdi.models import (
+    GENELIST_PLUGIN_NAME,
+    GENELIST_PLUGIN_VERSION,
+    VdiDatasetDetails,
+    VdiDatasetPostMeta,
+    VdiDatasetPostResponse,
+    VdiDatasetType,
+    VdiImportStatus,
+    VdiInstallStatus,
+    VdiUploadStatus,
+    VdiVisibility,
+)
+from veupathdb.wdk.wdk_models import (
+    CombinedStepSpec,
+    NewStepSpec,
+    PatchStepSpec,
+    WDKAnswer,
+    WDKAnswerMeta,
+    WDKAttributeField,
+    WDKColumnDistribution,
+    WDKDatasetConfigIdList,
+    WDKDatasetIdListContent,
+    WDKEnrichmentResponse,
+    WDKEnrichmentRowBase,
+    WDKFilterValue,
+    WDKGoEnrichmentRow,
+    WDKIdentifier,
+    WDKPathwayEnrichmentRow,
+    WDKRecordInstance,
+    WDKRecordType,
+    WDKSearch,
+    WDKSearchConfig,
+    WDKSearchResponse,
+    WDKSortSpec,
+    WDKStep,
+    WDKStepAnalysisType,
+    WDKStepAnalysisTypeResponse,
+    WDKStepTree,
+    WDKStrategyDetails,
+    WDKStrategySummary,
+    WDKUserInfo,
+    WDKWordEnrichmentRow,
+    encode_wdk_params,
+)
+from veupathdb.wdk.wdk_parameters import (
+    WDKBaseParameter,
+    WDKEnumParam,
+    WDKNumberParam,
+    WDKParameter,
+    WDKStringParam,
+)
+
+__all__ = [
+    "AI_EXPRESSION_REPORT_PATH",
+    "GENELIST_PLUGIN_NAME",
+    "GENELIST_PLUGIN_VERSION",
+    "STREAM_MEDIA_TYPE",
+    "AiExpressionStatus",
+    "AiExpressionSummary",
+    "CombinedStepSpec",
+    "DocumentTypeFilter",
+    "NewStepSpec",
+    "PatchStepSpec",
+    "SiteInfo",
+    "SiteSearchDocument",
+    "StepsMixin",
+    "StrategyAPI",
+    "TemporaryResultsAPI",
+    "VEuPathDBClaims",
+    "VEuPathDBClient",
+    "VdiClient",
+    "VdiDatasetDetails",
+    "VdiDatasetGoneError",
+    "VdiDatasetPostMeta",
+    "VdiDatasetPostResponse",
+    "VdiDatasetType",
+    "VdiImportStatus",
+    "VdiInstallStatus",
+    "VdiServiceError",
+    "VdiUploadStatus",
+    "VdiVisibility",
+    "WDKAnalysisNotReadyError",
+    "WDKAnswer",
+    "WDKAnswerMeta",
+    "WDKAttributeField",
+    "WDKBaseParameter",
+    "WDKColumnDistribution",
+    "WDKDatasetConfigIdList",
+    "WDKDatasetIdListContent",
+    "WDKEnrichmentResponse",
+    "WDKEnrichmentRowBase",
+    "WDKEnumParam",
+    "WDKFilterValue",
+    "WDKGoEnrichmentRow",
+    "WDKIdentifier",
+    "WDKNumberParam",
+    "WDKParameter",
+    "WDKPathwayEnrichmentRow",
+    "WDKProbe",
+    "WDKRecordInstance",
+    "WDKRecordType",
+    "WDKSearch",
+    "WDKSearchConfig",
+    "WDKSearchResponse",
+    "WDKSortSpec",
+    "WDKStep",
+    "WDKStepAnalysisType",
+    "WDKStepAnalysisTypeResponse",
+    "WDKStepTree",
+    "WDKStrategyDetails",
+    "WDKStrategySummary",
+    "WDKStringParam",
+    "WDKUserInfo",
+    "WDKWordEnrichmentRow",
+    "bundle_rows",
+    "close_all_clients",
+    "decode_params",
+    "encode_params",
+    "encode_wdk_params",
+    "fetch_current_user",
+    "get_results_api",
+    "get_site",
+    "get_site_router",
+    "get_strategy_api",
+    "get_vdi_client",
+    "get_wdk_client",
+    "is_internal_wdk_strategy_name",
+    "list_sites",
+    "load_sites_config",
+    "password_login",
+    "password_logout",
+    "phyletic_tree_of",
+    "reset_site_router",
+    "resolve_registered_email",
+    "strip_internal_wdk_strategy_name",
+    "tag_internal_wdk_strategy_name",
+    "validate_oauth_token",
+    "validation_bundle",
+    "walk_wdk_step_tree",
+    "wdk_failure",
+]

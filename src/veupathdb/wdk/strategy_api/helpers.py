@@ -65,12 +65,3 @@ async def resolve_wdk_user_id(client: VEuPathDBClient) -> str | None:
         return str(user.id)
     except pydantic.ValidationError:
         return None
-
-
-__all__ = [
-    "CURRENT_USER",
-    "is_internal_wdk_strategy_name",
-    "resolve_wdk_user_id",
-    "strip_internal_wdk_strategy_name",
-    "tag_internal_wdk_strategy_name",
-]

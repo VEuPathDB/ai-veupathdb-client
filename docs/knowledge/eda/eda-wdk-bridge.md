@@ -145,7 +145,7 @@ entity `GENE_PHENOTYPE_DATA_ENTITY` with 13 string variables including
   "VAR_035294d0", "type": "stringSet", "stringSet": ["P. berghei"]}` ->
   `totalCount` **5602**
 
-Same transport PathFinder already speaks; nothing about the EDA bridge needs a
+Same transport this client already speaks; nothing about the EDA bridge needs a
 browser.
 
 ## The generic and the per-dataset search count the same genes (2026-08-30)
@@ -182,6 +182,6 @@ beside `default="${presenterId}"` on the hidden dataset id - and the bare
 `GenesByEdaSubset` question adds no overrides. Measured the same day: the
 per-dataset search with an empty spec answered `totalCount` 5810 /
 `displayTotalCount` 5764, and the generic search answered
-`HTTP 422 {"byKey":{"eda_analysis_spec":["Cannot be empty."]}}`. PathFinder
+`HTTP 422 {"byKey":{"eda_analysis_spec":["Cannot be empty."]}}`. A client
 exports through the generic search, so an analysis with no filters and no
 computation has no step to export.

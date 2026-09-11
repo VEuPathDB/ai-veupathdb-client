@@ -64,3 +64,8 @@ class OpenTelemetryObserver:
 
     def on_site_search_retry(self, attrs: MetricAttrs, /) -> None:
         site_search_request_retries.add(1, attrs)
+
+
+__all__ = [
+    "OpenTelemetryObserver",
+]

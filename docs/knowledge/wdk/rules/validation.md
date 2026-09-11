@@ -31,7 +31,7 @@ present `errors` is not "we found errors" either: both members can be empty, and
 on a `NONE` bundle they always are
 ([WDK-VALID-002](#wdk-valid-002---isvalid-false-at-level-none-means-nobody-checked-not-that-something-is-wrong)).
 
-PathFinder's `StepValidation` is the right shape - `level: str`, `is_valid: bool`,
+This client's `StepValidation` is the right shape - `level: str`, `is_valid: bool`,
 `errors: StepValidationErrors | None` - and `StepValidationErrors` splits
 `general` from `by_key` correctly.
 
@@ -81,17 +81,8 @@ as no information rather than as a verdict.
 
 This is not an obscure level. It is what
 [`overwriteStepTreeAndSave`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/user/StrategyService.java#L217-L248)
-builds at, which is the write behind every structural edit PathFinder makes
+builds at, which is the write behind every structural edit this client makes
 ([WDK-STRAT-005](strategies-and-steps.md)).
-
-PathFinder gets this exactly backwards in one place, and it is worth being
-precise about where. `StepValidation`'s defaults are `level="NONE"` and
-`is_valid=True` - the opposite pairing from the one WDK emits - and
-`WDKStrategyDetails.validation` is declared `Field(default_factory=StepValidation)`.
-The strategy detail carries no `validation` object at all
-([WDK-VALID-003](#wdk-valid-003---validity-is-a-claim-about-a-level-and-no-strategy-endpoint-makes-it-at-runnable)),
-so PathFinder manufactures a bundle asserting "valid, unchecked" for a document
-that asserted nothing.
 
 ### WDK-VALID-003 - Validity is a claim about a level, and no strategy endpoint makes it at `RUNNABLE`
 
@@ -305,7 +296,7 @@ scientist should be shown:
   `NONE`.
 - **Is this us?** the strategy list is empty, or a concrete-id read is 403.
 
-PathFinder types `estimated_size` as `int | None`, so an absent key becomes
+This client types `estimated_size` as `int | None`, so an absent key becomes
 `None` correctly - and a `-1` becomes `-1`, a negative record count that will
 propagate into whatever displays it.
 
@@ -349,8 +340,7 @@ captured in - the whole rule is that they look alike.
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/formatter/ValidationFormatter.java#L24-L31
 - anchor: src/veupathdb/errors.py:WDKError
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/ai/capabilities/test_wdk_failure_classification.py::test_wdk_valid_006_by_key_names_the_parameter
+- status: ENFORCED by tests/unit/rules/test_auth_and_transport_rules.py::test_wdk_valid_006_a_keyed_bundle_names_the_parameter
 
 A validation bundle is not only a field on a resource. It is also what the
 write endpoints return in the body of a 422, served as `text/plain` like every
@@ -397,8 +387,7 @@ was pulled with.
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/user/StepAnalysisFormService.java#L108-L130
 - anchor: src/veupathdb/wdk/wdk_models.py:WDKStepAnalysisTypeResponse
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/catalog/test_param_adapters_from_search.py::test_wdk_valid_007_a_displayable_bundle_parses
+- status: ENFORCED by tests/unit/rules/test_validation_rules.py::test_wdk_valid_007_a_displayable_bundle_parses
 
 [The schema include](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/doc/schema/wdk/includes/validation-bundle.json#L5-L47)
 enumerates five levels and `DISPLAYABLE` is not among them.
@@ -456,8 +445,7 @@ way out.
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/user/StepAnalysisInstanceService.java#L258-L285
 - anchor: src/veupathdb/wdk/_analyses.py:get_analysis_result
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/platform/test_wdk_analyses.py::TestTheResultEndpoint::test_no_content_is_not_a_result
+- status: ENFORCED by tests/unit/rules/test_validation_rules.py::test_wdk_valid_008_an_empty_result_body_is_not_a_result
 
 `getStepAnalysisResult` returns `Response.noContent()` when the factory has no
 execution result for the instance. Confirmed on both sites on 2026-08-10:
@@ -506,7 +494,7 @@ So re-running means `POST` the result path on the **same** instance, and the
 platform decides whether that actually re-executes. Creating a second instance
 is unnecessary and loses the first's `analysisId`.
 
-PathFinder retries three of the six - `ERROR`, `OUT_OF_DATE`, `STEP_REVISED` -
+This client retries three of the six - `ERROR`, `OUT_OF_DATE`, `STEP_REVISED` -
 and re-runs all five of the `requiresRerun` statuses it can observe, which is
 what the platform does. `CREATED` is the sixth and needs no branch: an instance
 in that state has not run yet and the poll simply waits.
@@ -539,8 +527,7 @@ claim than the rest of this file makes.
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/formatter/StepAnalysisFormatter.java#L84-L95
 - anchor: src/veupathdb/wdk/_analyses.py:list_step_analyses
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/platform/test_wdk_analyses.py::TestTheLiveShapeParses::test_an_entry_is_returned
+- status: ENFORCED by tests/unit/rules/test_validation_rules.py::test_wdk_valid_010_the_listing_carries_two_fields_per_instance
 `instanceSummaryJson` puts `analysisId` and `displayName` and stops. The service
 [builds the instances at `ValidationLevel.NONE`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/user/StepAnalysisInstanceService.java#L172-L181)
 for that call, consistently: nothing in a two-field summary could carry a
@@ -569,8 +556,7 @@ bad. A model that matches the endpoint is what keeps the two apart.
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/user/StepAnalysisInstanceService.java#L117-L155
 - anchor: src/veupathdb/wdk/strategy_api/analyses.py:get_analysis_type
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/wdk/enrichment/test_analysis_defaults.py::TestAMissingFormStopsTheRun::test_the_analysis_is_not_run_without_its_parameters
+- status: PARTIAL by tests/unit/rules/test_validation_rules.py::test_wdk_valid_011_a_form_default_is_not_applied_by_the_creation_call
 
 `createStepAnalysis` validates the posted form parameters at
 `ValidationLevel.RUNNABLE` with **`FillStrategy.NO_FILL`**, and throws
@@ -587,15 +573,7 @@ naming the two parameters the form had just supplied values for.
 
 The trap is that the defaults look applied. They are rendered, they are
 per-site, they are correct, and they are inert until the client sends them back.
-PathFinder does send them: `extract_default_params` reads the form document and
-copies every `initialDisplayValue` into the create payload. The failure path is
-the one to watch - `EnrichmentService` logs "Could not fetch analysis form
-metadata, using empty params" and proceeds, which is a guaranteed 422 rather
-than a degraded run.
-
-The live end-to-end test at
-`tests/integration/strategies/test_wdk_verification.py::test_go_process_enrichment_returns_real_kinase_terms`
-would fail if `extract_default_params` stopped working, and it is deliberately
-not named in `status` above: it asserts nothing about parameters, it is gated on
-`live_wdk` credentials so it does not run in CI, and it would fail for a hundred
-unrelated reasons. A test that would break is not the same as a test that checks.
+A caller that reads the form and copies every `initialDisplayValue` into the
+create payload gets the analysis it asked for. A caller that proceeds with empty
+parameters after a failed form read gets a guaranteed 422 rather than a degraded
+run.

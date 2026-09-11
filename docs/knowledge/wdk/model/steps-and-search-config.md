@@ -190,7 +190,7 @@ to each - and the class comment states the consequence:
 `GenesBySpanLogic` is the counter-example that proves it is a property of the boolean
 question rather than of two-input steps in general: it accepts five record classes on
 either side, because colocation genuinely relates different things. That asymmetry is why
-PathFinder treats colocation as outside the boolean set, for reasons recorded in
+The application treats colocation as outside the boolean set, for reasons recorded in
 the boolean-operator decision (`pathfinder: docs/knowledge/decisions/boolean-operator-is-a-type.md`).
 
 **The value stored in `bq_operator` is the term, not the display name.**
@@ -247,7 +247,7 @@ works on an orphan:
 fixed order - replace the tree without the step, then delete it - and doing them the other
 way round is the 409 ([WDK-STEP-007](../rules/strategies-and-steps.md)).
 
-Validity is orthogonal to all four and is reported per step in `validation`. PathFinder
+Validity is orthogonal to all four and is reported per step in `validation`. This client
 derives its own step status from wiring, WDK id and validation together rather than storing
 one, for reasons recorded in
 the step-status decision (`pathfinder: docs/knowledge/decisions/step-status-is-derived.md`); a WDK push rejection

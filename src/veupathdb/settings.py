@@ -1,4 +1,4 @@
-"""The settings the client reads, and where it reads them from."""
+"""The settings the client reads, where it reads them from, and what a change drops."""
 
 from collections.abc import Callable
 from functools import lru_cache
@@ -64,11 +64,23 @@ class _SettingsSource:
 
 
 _source = _SettingsSource()
+_invalidators: list[Callable[[], None]] = []
+
+
+def on_settings_source_change(invalidate: Callable[[], None]) -> None:
+    """Register a cache built from settings. Installing a source drops it."""
+    _invalidators.append(invalidate)
 
 
 def use_veupathdb_settings_source(read: Callable[[], VEuPathDBSettings]) -> None:
-    """Read settings from the host application instead of the environment."""
+    """Read settings from the host application instead of the environment.
+
+    Every cache built from the previous source is dropped, so a source may be
+    installed at any point in the process.
+    """
     _source.use(read)
+    for invalidate in _invalidators:
+        invalidate()
 
 
 def veupathdb_settings_source() -> Callable[[], VEuPathDBSettings]:

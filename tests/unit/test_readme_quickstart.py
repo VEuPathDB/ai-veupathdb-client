@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import ast
+import json
 import re
 from pathlib import Path
 from typing import Any
@@ -47,3 +49,19 @@ def test_the_readme_names_every_error_code() -> None:
     text = README.read_text()
 
     assert [code for code in VEuPathDBErrorCode if code.value not in text] == []
+
+
+def test_the_quickstart_reads_only_published_surfaces() -> None:
+    """A consumer copying the quickstart lands on a declared surface."""
+    published = json.loads(
+        (Path(__file__).parent / "published_surface.json").read_text()
+    )
+    reached = {
+        node.module
+        for node in ast.walk(ast.parse(_quickstart()))
+        if isinstance(node, ast.ImportFrom)
+        and node.module
+        and node.module.startswith("veupathdb")
+    }
+
+    assert sorted(reached - set(published)) == []

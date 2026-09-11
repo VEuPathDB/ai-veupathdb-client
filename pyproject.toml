@@ -1,6 +1,6 @@
 [project]
 name = "veupathdb-py"
-version = "0.1.0a7"
+version = "0.1.0a8"
 description = "Python client for the VEuPathDB WDK and EDA services"
 requires-python = ">=3.14"
 dependencies = [
@@ -17,6 +17,9 @@ dependencies = [
 [project.optional-dependencies]
 # The OTEL observer adapter. The API only: a library never installs an SDK.
 otel = ["opentelemetry-api>=1.44.0"]
+# The two schema readers `veupathdb.devtools` imports. The wheel ships those
+# modules, so what they import is an extra and never a dependency group.
+devtools = ["jsonschema>=4.26.0", "referencing>=0.37.0"]
 
 [build-system]
 requires = ["hatchling"]
@@ -29,18 +32,15 @@ packages = ["src/veupathdb"]
 "src/veupathdb/sites.yaml" = "veupathdb/sites.yaml"
 
 [dependency-groups]
-# The two schema readers are the devtools' own: `veupathdb.devtools` verifies the
-# recorded bodies against the vendored WDK and EDA schemas, and nothing the
-# client sends or parses at runtime reads them.
+# This checkout runs the devtools, so the group resolves their extra.
 dev = [
+    "veupathdb-py[devtools]",
     "cryptography>=50.0.1",
     "hypothesis>=6.167.1",
-    "jsonschema>=4.26.0",
     "mypy>=2.3.1",
     "opentelemetry-sdk>=1.44.0",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
-    "referencing>=0.37.0",
     "respx>=0.23.1",
     "ruff==0.16.6",
 ]

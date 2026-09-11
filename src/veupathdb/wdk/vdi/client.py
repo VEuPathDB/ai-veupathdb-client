@@ -9,7 +9,7 @@ from http import HTTPStatus
 import httpx
 from pydantic import ConfigDict
 
-from veupathdb.auth_context import veupathdb_auth_token_ctx
+from veupathdb.auth_context import resolve_veupathdb_auth_token
 from veupathdb.errors import (
     VEuPathDBError,
     VEuPathDBErrorCode,
@@ -74,9 +74,11 @@ class VdiClient:
         base_url: str,
         timeout: float = 60.0,
         transport: httpx.AsyncBaseTransport | None = None,
+        auth_token: str | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
+        self.auth_token = auth_token
         self._client: httpx.AsyncClient | None = None
         self._transport = transport
         self._lock = asyncio.Lock()
@@ -99,8 +101,8 @@ class VdiClient:
             return self._client
 
     def _auth(self) -> dict[str, str]:
-        """The one credential form the service accepts."""
-        token = veupathdb_auth_token_ctx.get()
+        """The bearer header the service accepts, from the token this request carries."""
+        token = resolve_veupathdb_auth_token(self.auth_token)
         if not token:
             raise WDKLoginRequiredError
         return {"Authorization": f"Bearer {token}", "Accept": "application/json"}

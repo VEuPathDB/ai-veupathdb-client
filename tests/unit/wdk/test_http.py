@@ -8,7 +8,6 @@ attempted once because a second attempt is a second object.
 from __future__ import annotations
 
 from collections.abc import Generator
-from typing import Any
 
 import httpx
 import pytest
@@ -24,7 +23,6 @@ from veupathdb.wdk.delayed_result import DELAYED_RESULT_MESSAGE
 
 SERVICE_ACCOUNT = "service.account.token"
 USER_TOKEN = "registered.user.token"
-_TOKEN_CTX = "veupathdb.wdk._http.veupathdb_auth_token_ctx"
 
 
 async def _client(
@@ -47,20 +45,6 @@ def no_request_token() -> Generator[None]:
     reset = veupathdb_auth_token_ctx.set(None)
     yield
     veupathdb_auth_token_ctx.reset(reset)
-
-
-class _ConstCtx:
-    """A read-only stand-in for the auth token context variable."""
-
-    def __init__(self, value: str | None) -> None:
-        self._value = value
-
-    def get(self) -> str | None:
-        return self._value
-
-    def set(self, *_: Any, **__: Any) -> Any:
-        msg = "test-only ctxvar stub; use monkeypatch to swap"
-        raise NotImplementedError(msg)
 
 
 class _CapturingTransport(httpx.AsyncBaseTransport):
@@ -151,21 +135,21 @@ class TestThePerRequestAuthorizationCookieWins:
 
 
 class TestANewTokenStartsANewWdkSession:
+    """Each async test runs in its own context, so a token it sets stays there."""
+
     async def _ping(self, client: HTTPClient) -> None:
         await client._request_attempt("GET", "/ping", client._effective_token("/ping"))
 
-    async def test_reinits_when_token_changes(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    async def test_reinits_when_token_changes(self) -> None:
         """Two tokens on one client produce two session init calls."""
         transport = _CapturingTransport()
         client = await _client(
             transport, base_url="https://plasmodb.org/plasmo/service"
         )
 
-        monkeypatch.setattr(_TOKEN_CTX, _ConstCtx("token-A"))
+        veupathdb_auth_token_ctx.set("token-A")
         await self._ping(client)
-        monkeypatch.setattr(_TOKEN_CTX, _ConstCtx("token-B"))
+        veupathdb_auth_token_ctx.set("token-B")
         await self._ping(client)
 
         init_paths = [r for r in transport.requests if "/app" in str(r.url)]
@@ -174,16 +158,14 @@ class TestANewTokenStartsANewWdkSession:
             f"got {len(init_paths)}: {[str(r.url) for r in transport.requests]}"
         )
 
-    async def test_does_not_reinit_when_token_unchanged(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    async def test_does_not_reinit_when_token_unchanged(self) -> None:
         """One token produces one session init call."""
         transport = _CapturingTransport()
         client = await _client(
             transport, base_url="https://plasmodb.org/plasmo/service"
         )
 
-        monkeypatch.setattr(_TOKEN_CTX, _ConstCtx("token-same"))
+        veupathdb_auth_token_ctx.set("token-same")
         await self._ping(client)
         await self._ping(client)
 
@@ -192,9 +174,7 @@ class TestANewTokenStartsANewWdkSession:
             f"Expected 1 JSESSIONID init call, got {len(init_paths)}"
         )
 
-    async def test_clears_jsessionid_cookie_on_reinit(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    async def test_clears_jsessionid_cookie_on_reinit(self) -> None:
         """A new session removes the session cookie of the previous token."""
         transport = _CapturingTransport()
         client = await _client(
@@ -204,7 +184,7 @@ class TestANewTokenStartsANewWdkSession:
             "JSESSIONID", "stale-session-A", domain="plasmodb.org"
         )
 
-        monkeypatch.setattr(_TOKEN_CTX, _ConstCtx("token-B"))
+        veupathdb_auth_token_ctx.set("token-B")
         await self._ping(client)
 
         assert client._client.cookies.get("JSESSIONID") != "stale-session-A", (

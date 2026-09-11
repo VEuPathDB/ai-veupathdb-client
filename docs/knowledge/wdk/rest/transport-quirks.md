@@ -36,7 +36,7 @@ toxodb.org that day, `GET /record-types/transcript/searches/GenesByTaxon` answer
 only available to registered users, and requires an API key." with a freshly minted
 guest cookie, while a registered user's token answers 200. `POST /users/current/steps`
 behaves the same way. The minting behavior below is unchanged and still describes the
-wire; what changed is that the token it hands back opens nothing. PathFinder therefore
+wire; what changed is that the token it hands back opens nothing. This client therefore
 mints no guests at all, and requires a registered login for every WDK-backed feature
 (`pathfinder: docs/knowledge/decisions/wdk-requires-registered-login.md`).
 
@@ -163,7 +163,7 @@ The likelier explanation for what was originally observed is
 [WDK-AUTH-001](../rules/auth-and-transport.md). A client that loses its `Authorization`
 cookie is a new guest on every request, and a new guest owns nothing: strategies list
 empty, steps 404, and a flow that spans several requests produces exactly the "well-formed
-request, 200 response, empty answer" signature the JSESSIONID note describes. PathFinder's
+request, 200 response, empty answer" signature the JSESSIONID note describes. This client's
 `JSESSIONID` handling and its `Authorization` handling were written together, so a fix
 attributed to one may have been delivered by the other.
 

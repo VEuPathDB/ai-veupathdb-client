@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: EDA REST surface
-description: The EDA service endpoints PathFinder would consume, their shapes, and how authentication works, verified live on PlasmoDB.
+description: The EDA service endpoints this client consumes, their shapes, and how authentication works, verified live on PlasmoDB.
 tags: [eda, rest, endpoints, auth]
 generated: { by: claude-code/fable-5, at: 2026-08-27T00:00:00Z }
 verified: { by: claude-code/fable-5, at: 2026-08-27T00:00:00Z }
@@ -13,12 +13,12 @@ status: stable
 Base URL: `https://{site}/eda` (verified on plasmodb.org and clinepidb.org).
 Source of truth: `VEuPathDB/service-eda` `api.raml` + `schema/library.raml`,
 rendered at https://veupathdb.github.io/service-eda/api.html. Endpoints below
-are the subset PathFinder would consume; the service also carries dataset
+are the subset this client consumes; the service also carries dataset
 access management, staff, metrics, and download endpoints.
 
 ## Authentication
 
-Same WDK bearer token PathFinder already holds
+Same WDK bearer token the WDK client already holds
 (`src/veupathdb/wdk/auth_login.py:password_login`). Verified live:
 
 - No credential -> `401 {"status":"unauthorized"}` even for `/studies`.

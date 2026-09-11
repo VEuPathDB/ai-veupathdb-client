@@ -1,6 +1,7 @@
 """Routes requests to a VEuPathDB portal or component site and owns their clients."""
 
 import threading
+from collections.abc import Callable
 from functools import lru_cache
 from importlib.resources import files
 from pathlib import Path
@@ -12,7 +13,7 @@ from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator
 from veupathdb.errors import SiteNotFoundError
 from veupathdb.logging import get_logger
 from veupathdb.model import CamelModel
-from veupathdb.settings import get_veupathdb_settings
+from veupathdb.settings import get_veupathdb_settings, on_settings_source_change
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.site_search_client import SiteSearchClient
 
@@ -168,7 +169,6 @@ class SiteRouter:
             if site_id not in self._clients:
                 site = self.get_site(site_id)
                 routing = self._config.routing
-                settings = get_veupathdb_settings()
                 timeout = (
                     routing.portal_timeout
                     if site.is_portal
@@ -177,7 +177,6 @@ class SiteRouter:
                 self._clients[site_id] = VEuPathDBClient(
                     base_url=site.service_url,
                     timeout=float(timeout),
-                    auth_token=settings.veupathdb_auth_token,
                 )
             return self._clients[site_id]
 
@@ -209,6 +208,27 @@ class SiteRouter:
 
 _router_holder: dict[str, SiteRouter] = {}
 _router_lock = threading.Lock()
+_per_site_caches: list[Callable[[], None]] = []
+
+
+def on_site_router_reset(drop: Callable[[], None]) -> None:
+    """Register a per-site client cache the reset drops with the router."""
+    _per_site_caches.append(drop)
+
+
+def reset_site_router() -> None:
+    """Drop the router, the cached sites config and every per-site client cache.
+
+    A client already handed out keeps working. Call ``close_all_clients`` and
+    ``close_all_eda_clients`` first to release the sockets they hold.
+    """
+    _router_holder.clear()
+    load_sites_config.cache_clear()
+    for drop in _per_site_caches:
+        drop()
+
+
+on_settings_source_change(reset_site_router)
 
 
 def get_site_router() -> SiteRouter:

@@ -11,5 +11,3 @@ atexit.register(_RESOURCES.close)
 FIXTURE_ROOT: Path = _RESOURCES.enter_context(
     as_file(files("veupathdb.testing") / "fixtures")
 )
-
-__all__ = ["FIXTURE_ROOT"]

@@ -34,7 +34,7 @@ single most important fact on this page.
 
 WDK looks for the token in an
 [`Authorization` header first and an `Authorization` cookie second](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/filter/CheckLoginFilter.java#L208-L218).
-The cookie is the path everything in practice uses, and PathFinder uses it too:
+The cookie is the path everything in practice uses, and this client uses it too:
 `_inject_auth_cookie` in `src/veupathdb/wdk/_http.py` writes exactly one such pair
 onto each outgoing request ([WDK-AUTH-002](../rules/auth-and-transport.md)).
 
@@ -44,7 +44,7 @@ from a real one without asking the server;
 treats anything it cannot decode as a guest, because the failure of an undecodable token
 should be "no privileges" rather than "assume privileges".
 
-**How PathFinder obtains one.** `auth_login.py:password_login` POSTs `{email, password,
+**How this client obtains one.** `auth_login.py:password_login` POSTs `{email, password,
 redirectUrl}` to the site's `/login` and reads the `Authorization` value off the
 `Set-Cookie` headers of the response, returning the first non-guest one. WDK's
 [`SessionService.processDbLogin`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/SessionService.java#L174-L219)
@@ -52,9 +52,9 @@ is what serves that: it exchanges the credentials for a
 bearer token through the OAuth user factory and attaches the cookie with a three-year
 max-age. The endpoint stays enabled on OAuth-configured production sites specifically so
 that programmatic clients can log in, which is a deliberate upstream decision recorded in
-a comment there, not an accident PathFinder is exploiting.
+a comment there, not an accident this client is exploiting.
 
-**PathFinder no longer obtains a guest one at all.** An unauthenticated
+**This client obtains no guest token at all.** An unauthenticated
 `GET /users/current` still makes WDK create a guest and hand back its token, but as of
 2026-08-19 the deployment refuses that identity on the service endpoints
 ([transport-quirks](../rest/transport-quirks.md)), so the token opens nothing. The
@@ -102,7 +102,7 @@ concrete services under `service/user/` were read at the pinned sha:
 `UserUtilityServices` is not user-scoped at all - it hangs off `@Path("/")` - so it has no
 target user and none of this applies to it.
 
-PathFinder reaches both `Access.PUBLIC` paths, so this is not academic.
+This client reaches both `Access.PUBLIC` paths, so this is not academic.
 
 - `GET /users/current`, the call that resolves its own id, is `ProfileService.getById`.
   `Access.PUBLIC` is immaterial there only because the target is `current`, which is the
@@ -120,16 +120,16 @@ PathFinder reaches both `Access.PUBLIC` paths, so this is not academic.
 
   Stage 2 is the share-a-link path: it exists so a third party holding an analysis access
   token can read someone else's analysis, and it 403s when they do not hold one.
-  **PathFinder can only ever hit stage 1.** It addresses a concrete id that is always its
+  **This client can only ever hit stage 1.** It addresses a concrete id that is always its
   own ([WDK-HTTP-001](../rules/auth-and-transport.md)), so the target is the requesting
   user, stage 2's condition is false by construction, and 403 is unreachable for us.
 
   The operational consequence is therefore real but narrower than "this endpoint 404s
-  instead of 403ing": for PathFinder, a 404 from an analysis result endpoint means either
+  instead of 403ing": for this client, a 404 from an analysis result endpoint means either
   "no such analysis" or "wrong owner", and the two are indistinguishable from the status
   code alone. Everywhere else in the user-scoped surface those two cases are 404 and 403.
 
-Every other user-scoped endpoint PathFinder calls is in the first row.
+Every other user-scoped endpoint this client calls is in the first row.
 
 The alias `current` collapses the two: it makes the target the requesting user by
 definition, so the ownership check cannot fail and a mismatch cannot be detected. That is
@@ -148,7 +148,7 @@ there.
 So identity is carried entirely by the bearer token. A `JSESSIONID` binds a request to a
 container session and, at the pinned sha, to nothing that determines who the request is or
 what it can see. That does not make it harmless on a shared client, where a stale one can
-only ever bind a request to the wrong session, which is why PathFinder drops it whenever
+only ever bind a request to the wrong session, which is why this client drops it whenever
 the effective token changes ([WDK-AUTH-003](../rules/auth-and-transport.md)).
 
 The stronger claim, that a missing `JSESSIONID` makes a process query return zero

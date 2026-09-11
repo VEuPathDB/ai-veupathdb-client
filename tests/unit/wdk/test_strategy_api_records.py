@@ -13,7 +13,7 @@ import pytest
 
 from veupathdb.errors import WDKError
 from veupathdb.wdk.client import VEuPathDBClient
-from veupathdb.wdk.strategy_api import StrategyAPI
+from veupathdb.wdk.strategy_api.api import StrategyAPI
 from veupathdb.wdk.wdk_models import WDKColumnDistribution
 
 

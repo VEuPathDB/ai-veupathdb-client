@@ -15,7 +15,7 @@ from veupathdb.settings import (
     use_veupathdb_settings_source,
     veupathdb_settings_source,
 )
-from veupathdb.wdk.site_router import load_sites_config
+from veupathdb.wdk.site_router import load_sites_config, reset_site_router
 
 _ONE_SITE = """
 sites:
@@ -36,7 +36,7 @@ def named_config(tmp_path: Path) -> Generator[Path]:
     path = tmp_path / "sites.yaml"
     path.write_text(_ONE_SITE)
     yield path
-    load_sites_config.cache_clear()
+    reset_site_router()
 
 
 def test_the_host_settings_serve_the_client() -> None:

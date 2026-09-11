@@ -41,7 +41,7 @@ The two axes are independent live. Across plasmodb.org's transcript searches on
 whether to send a list is wrong on that parameter**, which is the whole reason
 this is `CONTRACT` rather than a note.
 
-PathFinder's `ParamKind` is exactly the eleven and is correct.
+This client's `ParamKind` is exactly the eleven and is correct.
 
 ### WDK-PARAM-002 - Every parameter value is a string, including the structured ones
 
@@ -139,7 +139,7 @@ commas are not rare: `GenesByReactionCompounds.chebi_compound_id` is a
 as `C09665 ((E,E)-alpha-farnesene)`. Sent bare, that one term becomes three
 invalid ones.
 
-Send `json.dumps(list_of_terms)`. PathFinder does, and this is one of only two
+Send `json.dumps(list_of_terms)`. This client does, and this is one of only two
 rules here whose test constrains the **encoding** rather than merely its
 invertibility. The named test asserts `json.loads(to_wire()) == ["bant", "bsub"]`
 and, in the same file, `to_wire() == "[]"` for the empty selection - the wire
@@ -182,7 +182,7 @@ clearer error on both types.
 `DateRangeValue` require only one endpoint and `to_wire` omits the absent one,
 so the object would be refused. `domain/parameters/canonicalize.py:close_open_range`
 fills the open end from the parameter's own declared limit, and leaves the value
-alone when the parameter declares none, so WDK names it rather than PathFinder
+alone when the parameter declares none, so WDK names it rather than the client
 inventing a bound. Measured on plasmodb.org on 2026-09-04 against
 `GenesByIntronJunctions.percent_max`: a raw push of `{"min":"20"}` is the 422
 above, and the same input through the canonicalizer becomes
@@ -217,8 +217,7 @@ may simply be a date in the wrong format. `DateParam` is safe here -
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/StringParam.java#L171-L203
 - anchor: src/veupathdb/wdk/wdk_parameters.py:is_number
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/catalog/test__param_binding.py
+- status: PARTIAL by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_007_a_numeric_bound_is_a_string_parameter_flagged_is_number
 
 `StringParam.validateValue` parses the value as a double when `isNumber` is set,
 and `StringParamFormatter`
@@ -239,7 +238,7 @@ number`. The handler that would have stripped the comma
 ([`StringParamHandler.toInternalValue`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/StringParamHandler.java#L40-L60))
 runs only after validation has already passed.
 
-Treating these as free text rather than as numbers is what made PathFinder
+Treating these as free text rather than as numbers is what makes a client
 discard their curated defaults, recorded in
 `pathfinder: docs/knowledge/decisions/numeric-default-is-not-an-example.md`.
 
@@ -255,8 +254,7 @@ the parameter's regex at all.
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/QuestionService.java#L176-L213
 - anchor: src/veupathdb/wdk/_searches.py:get_search_details_with_params
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/catalog/test_wdk_substitution.py::TestWhatWDKFilledIn::test_a_value_wdk_replaced_counts_as_substituted
+- status: PARTIAL by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_008_the_revise_endpoint_answer_is_what_wdk_substituted
 `getQuestionRevise` validates the posted values at `SEMANTIC` with `NO_FILL`,
 **keeps that validation bundle**, and then - if the spec was invalid - builds a
 second spec with `FILL_PARAM_IF_MISSING_OR_INVALID` and renders *that* one. The
@@ -302,7 +300,7 @@ back verbatim, while `FilterValue.to_wire` re-emits only the five keys
 against `GenesByNgsSnps.variation_sample_meta`: a context binding every other
 parameter validates at `SEMANTIC` with `isValid: true` and echoes
 `{"filters": [{"value": ["Thailand", "Cambodia"], "includeUnknown": false, "isRange": false, "type": "string", "field": "VAR_8e68b3e5", "fieldDisplayName": "Country"}]}`
-unchanged, which is not the string PathFinder would have sent for the same
+unchanged, which is not the string this client would have sent for the same
 filter. An `input-step` is excluded from the report entirely: its value is a
 handle WDK issued and the caller wired
 ([WDK-PARAM-009](#wdk-param-009---input-step-and-input-dataset-values-are-bare-ids-wdk-issued-and-a-dataset-is-bound-to-its-owner)),
@@ -424,8 +422,7 @@ the sweep stops at published defaults
 - class: CONTRACT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/ParameterContainer.java#L18-L26
 - anchor: src/veupathdb/domain/parameters/specs.py:fill_hidden_required_defaults
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/catalog/test_param_adapters_from_search.py::test_wdk_param_011_a_hidden_parameter_survives_normalization
+- status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_011_a_hidden_required_parameter_is_filled_from_its_default
 
 `getRequiredParams()` returns `getParamMap()` - every parameter is a required parameter -
 and the
@@ -454,7 +451,7 @@ with `isVisible: false` and `allowEmptyValue: false`, and sending it as `""` is 
 carrying `byKey: {"profile_pattern": ["Cannot be empty."]}`. A parameter no form draws is
 refused for being absent, by name, which is the whole rule in one response.
 
-**So a client must supply hidden required parameters, and this is why PathFinder fills
+**So a client must supply hidden required parameters, and this is why this client fills
 them.** `fill_hidden_required_defaults` supplies any parameter that is not visible, not
 `allowEmptyValue`, absent from the caller's values, and has an `initialDisplayValue`. That
 is the correct shape of the fix and it inherits the hazard of
@@ -475,8 +472,7 @@ defaulted on every later read of the same step.
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/formatter/param/TreeBoxEnumParamFormatter.java#L30-L51
 - anchor: src/veupathdb/domain/parameters/wdk_vocab.py:WDKTreeBoxVocabNode
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/catalog/test_vocab_rendering.py::TestTheSystemRefusesIt::test_a_bare_sentinel_is_rejected
+- status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_vocab_001_the_synthetic_root_is_not_a_selectable_term
 `getVocabularyObject` returns the single real root only when there is exactly
 one and it has children. Otherwise it builds a new `EnumParamTermNode` whose
 term and display are both the constant `@@fake@@`, hangs every real root off it,
@@ -545,12 +541,12 @@ asserts the rejection pins the loud path and leaves the silent one open, which i
 how a `SILENT` rule gets marked enforced by a test that cannot see its hazard.
 
 So "0 selected" from a tree parameter means *the terms you sent matched no
-leaves*, not *you sent nothing*. PathFinder expands parent terms to leaves at
+leaves*, not *you sent nothing*. This client expands parent terms to leaves at
 the WDK boundary for this reason, and its tree widget had to be taught the same
 rule after a correctly-scoped step rendered as an empty required field
 (`pathfinder: docs/knowledge/decisions/parent-term-is-a-selection.md`).
 
-**PathFinder expands in two independent places, and both are now named by a
+**This client expands in two independent places, and both are named by a
 test.** `ParameterCanonicalizer` in `domain/parameters/` serves the validation
 path; `_expand_tree_params_to_leaves` is a separate implementation in
 `integrations/`, reached from `_prepare_search_config` on every `create_step`.
@@ -559,7 +555,7 @@ Delete either and a branch term reaches WDK on that path.
 **Having both is not sufficient, because order decides which one runs first.**
 Parameter validation resolves the search *with the values as they arrived* so it
 can read WDK's verdict, and that verdict is authoritative. A branch term sent to
-that resolve scores zero selected leaves, so WDK refuses values PathFinder was
+that resolve scores zero selected leaves, so WDK refuses values the client was
 about to expand, and the refusal is reported to the model as if the branch term
 were invalid input - while every hint the model was given says a branch term is
 accepted. Canonicalize first, and re-ask only when canonicalizing changed the
@@ -576,8 +572,7 @@ the expansion at the WDK boundary leaves it alone for WDK to reject.
 - class: CONTRACT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/Param.java#L875-L894
 - anchor: src/veupathdb/wdk/wdk_parameters.py:WDKEnumParam
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/catalog/test_param_adapters_from_search.py::test_wdk_vocab_003_the_parents_come_from_inverting_the_map
+- status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_vocab_003_the_order_of_dependent_params_carries_nothing
 
 The model holds the edge from child to parent -
 [`AbstractDependentParam._dependedParamRefs`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/AbstractDependentParam.java#L125-L153)
@@ -608,8 +603,7 @@ readable from that document, and five of the 325 return 500.
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/AbstractEnumParam.java#L401-L455
 - anchor: src/veupathdb/domain/parameters/value_codec.py:coerce_context_values
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/ai/tools/test_catalog_discovery_options.py::TestADependentReadNeedsItsParent::test_an_unbound_parent_does_not_return_a_term_list
+- status: PARTIAL by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_vocab_004_a_dependent_value_travels_with_the_parent_it_was_read_under
 
 Validation of an enum value is set membership against the vocabulary generated
 under the *current* parent values, and nothing more. There is no record of which
@@ -631,12 +625,9 @@ alike. `47 Hour` exists only under HB3 and is rejected under 3D7 - but only two
 terms of forty-six are like that, so a mismatched pair validates cleanly about
 96 percent of the time and silently selects another strain's time course.
 
-Two PathFinder defects came from this. Reading a dependent vocabulary with no
-context returns the search's defaults rather than the bound parent's list
-(`pathfinder: docs/knowledge/decisions/a-dependent-vocabulary-is-read-under-its-parents.md`),
-and an accession absent from the refreshed vocabulary fell through to similarity
-matching and produced the wrong protein domain
-(`pathfinder: docs/knowledge/decisions/unmatched-accession-stops-the-chain.md`).
+A client that reads a dependent vocabulary with no context is handed the
+search's defaults rather than the bound parent's list, and a value absent from a
+refreshed vocabulary is a value the search will refuse.
 `GenesByInterproDomain.domain_typeahead` holds thousands terms under `PFAM` and
 5,405 under `INTERPRO` on plasmodb.org, 2,916 and 6,592 on toxodb.org,
 re-measured on both sites on 2026-08-10.
@@ -650,8 +641,7 @@ both.
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/QuestionService.java#L295-L302
 - anchor: src/veupathdb/wdk/_searches.py:get_refreshed_dependent_params
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/catalog/test_param_validation.py::TestTheRefreshAnswersWithTheStaleDependentsOnly::test_an_empty_array_changes_nothing
+- status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_vocab_005_an_empty_array_names_no_stale_dependent
 
 The response is a JSON array of parameter documents, and the service builds it
 from `changedParam.getStaleDependentParams()` with an explicit instruction to

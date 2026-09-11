@@ -101,10 +101,10 @@ class WDKError(VEuPathDBError[VEuPathDBErrorCode]):
 
 
 class WDKLoginRequiredError(VEuPathDBError[VEuPathDBErrorCode]):
-    """The request names no registered VEuPathDB user.
+    """The request carries no registered VEuPathDB token.
 
-    VEuPathDB serves the WDK service to registered users only, so a guest or
-    anonymous request cannot reach a search, a strategy or a gene set.
+    VEuPathDB serves registered users only, and refuses a guest or anonymous
+    call to WDK, EDA and VDI alike.
     """
 
     def __init__(self) -> None:
@@ -112,7 +112,10 @@ class WDKLoginRequiredError(VEuPathDBError[VEuPathDBErrorCode]):
             code=VEuPathDBErrorCode.WDK_LOGIN_REQUIRED,
             title="VEuPathDB login required",
             status=401,
-            detail="Sign in to VEuPathDB to use searches, strategies and gene sets.",
+            detail=(
+                "VEuPathDB serves registered users only, and this request "
+                "carried no registered VEuPathDB token."
+            ),
         )
 
 
@@ -164,3 +167,18 @@ def validate_response[M: BaseModel](model: type[M], raw: object, context: str) -
     except pydantic.ValidationError as e:
         msg = f"Unexpected {context}: {e}"
         raise DataParsingError(msg) from e
+
+
+__all__ = [
+    "DataParsingError",
+    "ExternalServiceError",
+    "ParamMessages",
+    "SiteNotFoundError",
+    "VEuPathDBError",
+    "VEuPathDBErrorCode",
+    "ValidationError",
+    "WDKError",
+    "WDKLoginRequiredError",
+    "param_message_rows",
+    "validate_response",
+]

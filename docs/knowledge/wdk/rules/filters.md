@@ -15,8 +15,7 @@ status: stable
 - class: CONTRACT
 - upstream: https://github.com/VEuPathDB/web-monorepo/blob/63d1705463d553c0ac19ee577c1b09666597b903/packages/libs/wdk-client/src/Utils/WdkModel.ts#L377-L385
 - anchor: src/veupathdb/wdk/wdk_models.py:WDKSearchConfig
-- status: UNENFORCED
-- reason: enforced in the consuming application, at veupathdb-mcp/tests/unit/catalog/test_param_adapters_from_search.py::test_wdk_filter_001_the_search_config_keeps_them_apart
+- status: ENFORCED by tests/unit/rules/test_filter_rules.py::test_wdk_filter_001_the_search_config_keeps_the_three_mechanisms_apart
 
 A `filter` parameter is an entry in `searchConfig.parameters` whose stable value
 is a JSON object of faceted clauses; its format is
@@ -86,8 +85,7 @@ so the step above reports `isFiltered: false` while carrying the filter.
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/request/answer/AnswerSpecServiceFormat.java#L85-L98
 - anchor: src/veupathdb/wdk/_analyses.py:update_step_filters
-- status: UNENFORCED
-- reason: enforced in the consuming application, at apps/api/src/pathfinder/tests/unit/platform/test_wdk_analyses.py::TestTheFiltersAreReplaced::test_view_filters_are_not_sent
+- status: ENFORCED by tests/unit/rules/test_filter_rules.py::test_wdk_filter_003_a_search_config_write_carries_no_view_filters
 `parseViewFilters` reads `viewFilters` from whatever object it is handed, and it
 is handed the **request body** - by
 [`AnswerService.parseAnswerRequest`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/AnswerService.java#L282-L304)
@@ -116,7 +114,7 @@ that is a JSON object rather than an array is a **400**
 there: [`containerSupports`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/filter/Filter.java#L17-L32)
 lets the view-filter slot take either kind, and only the reverse is an error.
 
-**PathFinder's `FilterMixin` is named for the wrong mechanism.**
+**This client's `FilterMixin` is named for the wrong mechanism.**
 `list_step_filters` and `set_step_filter` say `viewFilters` throughout, and the
 client methods behind them are `get_step_view_filters` and
 `update_step_view_filters`. What they actually read and write is

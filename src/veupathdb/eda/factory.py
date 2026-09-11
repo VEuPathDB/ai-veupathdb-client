@@ -7,9 +7,12 @@ import threading
 from veupathdb.eda.analyses import EdaAnalysesClient
 from veupathdb.eda.client import EdaClient
 from veupathdb.wdk.factory import get_site
+from veupathdb.wdk.site_router import on_site_router_reset
 
 _clients: dict[str, EdaClient] = {}
 _lock = threading.Lock()
+
+on_site_router_reset(_clients.clear)
 
 
 def get_eda_client(site_id: str) -> EdaClient:

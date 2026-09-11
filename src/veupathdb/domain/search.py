@@ -7,8 +7,7 @@ from dataclasses import dataclass
 class SearchContext:
     """Immutable reference to a WDK search at a specific site.
 
-    Bundles the (site_id, record_type, search_name) triplet that is passed
-    throughout the catalog service, transport, and AI tool layers.
+    The (site_id, record_type, search_name) triplet that addresses one search.
     """
 
     site_id: str

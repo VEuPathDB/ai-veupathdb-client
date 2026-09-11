@@ -296,7 +296,7 @@ rejected by the deployed build:
   (for POJO property 'filters')\n"]}}}   HTTP 422
 ```
 
-So the algebra PathFinder can use today is seven types. Treat
+So the algebra a consumer can use today is seven types. Treat
 `stringPrefixSet` as forward-looking: schema-present, source-present,
 wire-absent.
 
