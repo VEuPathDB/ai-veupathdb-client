@@ -1,5 +1,11 @@
 # Knowledge log
 
+## 2026-09-11 - The signing-key reset is published
+
+`forget_signing_keys` is on `veupathdb.wdk`. A consumer's test suite that fakes a WDK
+login drops the OAuth signing-key cache through the surface, so no consumer reads the
+module that holds it. `veupathdb-py` is 0.1.0a10.
+
 ## 2026-09-11 - One token resolution, a declared surface, and every rule proven here
 
 WDK, EDA and VDI resolve the request's token through one function,

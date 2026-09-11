@@ -14,6 +14,7 @@ from veupathdb.wdk.ai_expression import (
 from veupathdb.wdk.analysis_result import WDKAnalysisNotReadyError
 from veupathdb.wdk.auth_login import (
     VEuPathDBClaims,
+    forget_signing_keys,
     password_login,
     password_logout,
     validate_oauth_token,
@@ -199,6 +200,7 @@ __all__ = [
     "encode_params",
     "encode_wdk_params",
     "fetch_current_user",
+    "forget_signing_keys",
     "get_results_api",
     "get_site",
     "get_site_router",

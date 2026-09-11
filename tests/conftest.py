@@ -5,7 +5,7 @@ from collections.abc import Generator
 import pytest
 
 from veupathdb.settings import VEuPathDBSettings, use_veupathdb_settings_source
-from veupathdb.wdk.auth_login import forget_signing_keys
+from veupathdb.wdk import forget_signing_keys
 
 
 @pytest.fixture(autouse=True)

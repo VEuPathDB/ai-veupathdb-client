@@ -367,6 +367,7 @@
     "encode_params",
     "encode_wdk_params",
     "fetch_current_user",
+    "forget_signing_keys",
     "get_results_api",
     "get_site",
     "get_site_router",
