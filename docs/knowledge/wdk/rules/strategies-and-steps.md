@@ -72,8 +72,13 @@ the step's current value and throws `Changes to answer param values are not allo
 any difference. The comment above it says why: the strategy service owns the tree.
 
 A parameter update on an attached step (`update_step_search_config`) therefore reads the
-step back and carries its input-step values; `tests/unit/wdk/test_strategy_api_steps.py::TestAWriteCarriesTheStepsOwnInputs`
-pins it.
+step back and keeps its filters, column filters and weight (the caller's weight replaces
+it only when the caller sets one). The `parameters` map is replaced whole: it is the
+caller's map with every input-step value set to the value the step holds. `tests/unit/wdk/test_strategy_api_steps.py::TestAWriteCarriesTheStepsOwnInputs`
+and `tests/unit/wdk/test_search_config_write.py::TestAWriteStartsFromTheStepsOwnConfig`
+pin it. A write that cannot carry every input value never reaches WDK: a failed catalog
+read of the search's input-step names raises on this path, and so does a step that holds
+no value for one of them (`tests/unit/wdk/test_search_config_write.py::TestAWriteRefusesWhatWDKWouldRefuse`).
 
 Both branches of
 [`putAnswerSpec`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/user/StepService.java#L314-L364)

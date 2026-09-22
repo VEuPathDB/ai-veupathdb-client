@@ -6,6 +6,7 @@ from http import HTTPStatus
 from veupathdb.errors import DataParsingError, VEuPathDBError
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
+from veupathdb.wdk._search_config_body import search_config_write_body
 from veupathdb.wdk.strategy_api.base import StrategyAPIBase
 from veupathdb.wdk.wdk_models import (
     CombinedStepSpec,
@@ -62,24 +63,16 @@ class StepsMixin(StrategyAPIBase):
     ) -> set[str]:
         """Return the ``input-step`` (AnswerParam) names for a search.
 
-        Results are cached per record type and search name.
+        Results are cached per record type and search name. A failed catalog
+        read raises.
         """
         cache_key = f"{record_type}/{search_name}"
         if cache_key in self._answer_param_cache:
             return self._answer_param_cache[cache_key]
 
-        try:
-            response = await self.client.get_search_details(record_type, search_name)
-            params = response.search_data.parameters or []
-            names = {p.name for p in params if p.type == "input-step"}
-        except VEuPathDBError:
-            logger.warning(
-                "Failed to fetch answer param names for %s/%s",
-                record_type,
-                search_name,
-                exc_info=True,
-            )
-            return set()
+        response = await self.client.get_search_details(record_type, search_name)
+        params = response.search_data.parameters or []
+        names = {p.name for p in params if p.type == "input-step"}
         self._answer_param_cache[cache_key] = names
         return names
 
@@ -91,13 +84,23 @@ class StepsMixin(StrategyAPIBase):
     ) -> JSONObject:
         """Force every ``input-step`` (AnswerParam) of the search to ``""``.
 
-        WDK requires an answer param on a new step to be the empty string. The
-        real input is wired through the ``stepTree`` at strategy-creation time.
+        WDK requires an answer param on a new step to be the empty string; the
+        real input is wired through the ``stepTree``. A failed catalog read
+        leaves the params as given, because the create endpoint takes no
+        record type and the caller's one may not hold the search.
         """
-        answer_param_names = await self._get_answer_param_names(
-            record_type, search_name
-        )
         params: JSONObject = dict(raw_params)
+        try:
+            answer_param_names = await self._get_answer_param_names(
+                record_type, search_name
+            )
+        except VEuPathDBError:
+            logger.warning(
+                "No catalog read of the input params for a new step",
+                search_name=search_name,
+                record_type=record_type,
+            )
+            return params
         for ap_name in answer_param_names:
             params[ap_name] = ""
         return params
@@ -109,13 +112,20 @@ class StepsMixin(StrategyAPIBase):
         search_name: str,
         raw_params: JSONObject,
     ) -> JSONObject:
-        """The params with every input-step (AnswerParam) at the step's own value."""
+        """The params with every input-step (AnswerParam) at the step's own value.
+
+        A step that holds no value for one raises: WDK refuses any other value.
+        """
         answer_param_names = await self._get_answer_param_names(
             record_type, search_name
         )
+        held = step.search_config.parameters
         params: JSONObject = dict(raw_params)
-        for ap_name in answer_param_names:
-            params[ap_name] = step.search_config.parameters.get(ap_name, "")
+        for ap_name in sorted(answer_param_names):
+            if ap_name not in held:
+                msg = f"WDK step {step.id} holds no value for input '{ap_name}'"
+                raise DataParsingError(msg)
+            params[ap_name] = held[ap_name]
         return params
 
     async def find_step(self, step_id: int, user_id: str | None = None) -> WDKStep:
@@ -124,15 +134,10 @@ class StepsMixin(StrategyAPIBase):
         raw = await self.client.get(f"/users/{uid}/steps/{step_id}")
         return WDKStep.model_validate(raw)
 
-    async def _prepare_search_config(
-        self,
-        raw_params: JSONObject,
-        record_type: str,
-        search_name: str,
-        *,
-        wdk_weight: int = 0,
-    ) -> tuple[dict[str, str], WDKSearchConfig]:
-        """Normalize and expand raw parameters into a WDK search config."""
+    async def _prepare_parameters(
+        self, raw_params: JSONObject, record_type: str, search_name: str
+    ) -> dict[str, str]:
+        """Normalize and expand raw parameters into WDK wire values."""
         normalized = self._normalize_parameters(raw_params)
 
         if search_name == "GenesByOrthologPattern" and "profile_pattern" in normalized:
@@ -143,12 +148,9 @@ class StepsMixin(StrategyAPIBase):
 
         # A tree param with countOnlyLeaves=true counts only leaf values; a
         # parent node returns 0 rows.
-        normalized = await self._expand_tree_params_to_leaves(
+        return await self._expand_tree_params_to_leaves(
             record_type, search_name, normalized
         )
-
-        search_config = WDKSearchConfig(parameters=normalized, wdk_weight=wdk_weight)
-        return normalized, search_config
 
     async def create_step(
         self,
@@ -160,11 +162,11 @@ class StepsMixin(StrategyAPIBase):
         raw_params = await self._empty_answer_params(
             record_type, spec.search_name, dict(spec.search_config.parameters)
         )
-        _, search_config = await self._prepare_search_config(
-            raw_params=raw_params,
-            record_type=record_type,
-            search_name=spec.search_name,
-            wdk_weight=spec.search_config.wdk_weight,
+        normalized = await self._prepare_parameters(
+            raw_params, record_type, spec.search_name
+        )
+        search_config = WDKSearchConfig(
+            parameters=normalized, wdk_weight=spec.search_config.wdk_weight
         )
 
         payload: JSONObject = {
@@ -251,11 +253,11 @@ class StepsMixin(StrategyAPIBase):
             record_type, spec.search_name, dict(spec.search_config.parameters)
         )
 
-        normalized, search_config = await self._prepare_search_config(
-            raw_params=clean_params,
-            record_type=record_type,
-            search_name=spec.search_name,
-            wdk_weight=spec.search_config.wdk_weight,
+        normalized = await self._prepare_parameters(
+            clean_params, record_type, spec.search_name
+        )
+        search_config = WDKSearchConfig(
+            parameters=normalized, wdk_weight=spec.search_config.wdk_weight
         )
 
         payload: JSONObject = {
@@ -295,26 +297,30 @@ class StepsMixin(StrategyAPIBase):
         *,
         user_id: str | None = None,
     ) -> None:
-        """Update a step's search configuration.
+        """Update a step's parameters, and its weight when the caller sets one.
 
-        Endpoint: ``PUT /users/{uid}/steps/{step_id}/search-config``. Parameters
-        are normalized and expanded as on step creation; the step's input-step
-        params and filters are carried over from the step itself, because the
-        endpoint replaces the whole config and refuses a changed input.
+        Endpoint: ``PUT /users/{uid}/steps/{step_id}/search-config``. The
+        endpoint resets every key the body omits and refuses a changed input,
+        so the write starts from the step's own config: its filters, column
+        filters, weight and input-step params. The caller's parameters are
+        normalized and expanded as on step creation.
         """
         uid = await self._get_user_id(user_id)
         step = await self.find_step(step_id, uid)
 
-        # WDK refuses a write whose input-step params differ from the step's
-        # own, so they are read back and carried, never restated.
         raw_params = await self._current_answer_params(
             step, record_type, search_name, dict(search_config.parameters)
         )
-        _, config_payload = await self._prepare_search_config(
-            raw_params=raw_params,
-            record_type=record_type,
-            search_name=search_name,
-            wdk_weight=search_config.wdk_weight,
+        parameters = await self._prepare_parameters(
+            raw_params, record_type, search_name
+        )
+        weight = (
+            search_config.wdk_weight
+            if "wdk_weight" in search_config.model_fields_set
+            else step.search_config.wdk_weight
+        )
+        written = step.search_config.model_copy(
+            update={"parameters": parameters, "wdk_weight": weight}
         )
 
         logger.info(
@@ -322,14 +328,9 @@ class StepsMixin(StrategyAPIBase):
             step_id=step_id,
             search_name=search_name,
         )
-
-        payload = config_payload.model_dump(by_alias=True, exclude_defaults=True)
-        payload["filters"] = [
-            f.model_dump(by_alias=True) for f in step.search_config.filters
-        ]
         await self.client.put(
             f"/users/{uid}/steps/{step_id}/search-config",
-            json=payload,
+            json=search_config_write_body(written),
         )
 
     async def delete_step(

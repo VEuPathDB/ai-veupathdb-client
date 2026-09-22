@@ -1,4 +1,5 @@
 import json
+from collections.abc import Sequence
 
 from veupathdb.domain.parameters.phyletic import (
     census_states,
@@ -23,7 +24,7 @@ from veupathdb.wdk.strategy_api.helpers import (
     CURRENT_USER,
     resolve_wdk_user_id,
 )
-from veupathdb.wdk.wdk_models import WDKAnswer
+from veupathdb.wdk.wdk_models import WDKAnswer, WDKFilterValue
 from veupathdb.wdk.wdk_parameters import WDKParameter
 
 logger = get_logger(__name__)
@@ -208,11 +209,16 @@ class StrategyAPIBase:
         step_id: int,
         report_config: dict[str, object],
         user_id: str | None = None,
+        *,
+        view_filters: Sequence[WDKFilterValue] | None = None,
     ) -> WDKAnswer:
+        """Run the standard report. ``viewFilters`` is read beside ``reportConfig``."""
         uid = await self._get_user_id(user_id)
+        body: dict[str, object] = {"reportConfig": report_config}
+        if view_filters is not None:
+            body["viewFilters"] = [f.model_dump(by_alias=True) for f in view_filters]
         result = await self.client.post(
-            f"/users/{uid}/steps/{step_id}/reports/standard",
-            json={"reportConfig": report_config},
+            f"/users/{uid}/steps/{step_id}/reports/standard", json=body
         )
         return validate_response(
             WDKAnswer, result, f"WDK answer response for step {step_id}"

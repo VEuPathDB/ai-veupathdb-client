@@ -12,11 +12,14 @@ from types import SimpleNamespace
 from typing import Any
 
 import pytest
+from tests.unit.wdk._step_writes import Recorder, no_expansion
 
+from veupathdb.errors import WDKError
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.strategy_api.api import StrategyAPI
 from veupathdb.wdk.wdk_models import (
+    NewStepSpec,
     WDKSearch,
     WDKSearchConfig,
     WDKSearchResponse,
@@ -44,42 +47,23 @@ _STEP: dict[str, Any] = {
 }
 
 
-class _Recorder:
-    """Captures a request body instead of reaching WDK."""
-
-    def __init__(self) -> None:
-        self.bodies: list[dict[str, Any]] = []
-
-    async def __call__(
-        self, path: str, json: dict[str, Any] | None = None, **_: object
-    ) -> Any:
-        del path
-        self.bodies.append(json or {})
-        return None
-
-    @property
-    def body(self) -> dict[str, Any]:
-        return self.bodies[-1]
-
-
 async def _read_step(path: str, **_: object) -> Any:
     del path
     return _STEP
 
 
-async def _no_expansion(
-    record_type: str, search_name: str, params: dict[str, str]
-) -> dict[str, str]:
+async def _no_input_params(record_type: str, search_name: str, **_: object) -> Any:
     del record_type, search_name
-    return params
+    return SimpleNamespace(search_data=SimpleNamespace(parameters=[]))
 
 
-def _api(monkeypatch: pytest.MonkeyPatch) -> tuple[StrategyAPI, _Recorder]:
+def _api(monkeypatch: pytest.MonkeyPatch) -> tuple[StrategyAPI, Recorder]:
     api = StrategyAPI(VEuPathDBClient("https://example.invalid/service"), "1")
-    put = _Recorder()
+    put = Recorder()
     monkeypatch.setattr(api.client, "get", _read_step)
+    monkeypatch.setattr(api.client, "get_search_details", _no_input_params)
     monkeypatch.setattr(api.client, "put", put)
-    monkeypatch.setattr(api, "_expand_tree_params_to_leaves", _no_expansion)
+    monkeypatch.setattr(api, "_expand_tree_params_to_leaves", no_expansion)
     return api, put
 
 
@@ -212,6 +196,33 @@ class TestANewStepSendsItsAnswerParamsEmpty:
 
         assert out == {"x": "kinase"}
 
+    async def test_a_failed_catalog_read_still_creates_the_step(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The create endpoint takes no record type, so a catalog miss under
+        the caller's record type does not stop the step."""
+        api = StrategyAPI(VEuPathDBClient("https://example.invalid/service"), "1")
+        post = Recorder(reply={"id": 41})
+
+        async def missing(record_type: str, search_name: str, **_: object) -> Any:
+            msg = f"GET /record-types/{record_type}/searches/{search_name} -> HTTP 404"
+            raise WDKError(msg, status=404)
+
+        monkeypatch.setattr(api.client, "get_search_details", missing)
+        monkeypatch.setattr(api.client, "post", post)
+        monkeypatch.setattr(api, "_expand_tree_params_to_leaves", no_expansion)
+
+        await api.create_step(
+            NewStepSpec(
+                search_name="SequencesByTaxon",
+                search_config=WDKSearchConfig(parameters={"organism": '["Pf3D7"]'}),
+            ),
+            record_type="transcript",
+        )
+
+        assert post.body["searchName"] == "SequencesByTaxon"
+        assert post.body["searchConfig"]["parameters"] == {"organism": '["Pf3D7"]'}
+
 
 async def test_wdk_step_006_the_names_are_read_from_the_search(
     monkeypatch: pytest.MonkeyPatch,
@@ -247,7 +258,7 @@ class TestAWriteCarriesTheStepsOwnInputs:
     @staticmethod
     def _transform_api(
         monkeypatch: pytest.MonkeyPatch, held_input: str, reads: list[str] | None = None
-    ) -> tuple[StrategyAPI, _Recorder]:
+    ) -> tuple[StrategyAPI, Recorder]:
         api, put = _api(monkeypatch)
         read_paths = [] if reads is None else reads
 

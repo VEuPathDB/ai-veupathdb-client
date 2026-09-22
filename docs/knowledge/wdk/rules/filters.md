@@ -114,6 +114,12 @@ that is a JSON object rather than an array is a **400**
 there: [`containerSupports`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/filter/Filter.java#L17-L32)
 lets the view-filter slot take either kind, and only the reverse is an error.
 
+This client sends them there. `get_step_records` and `get_step_answer` take
+`view_filters` and put the array beside `reportConfig`; with none given the body carries
+no `viewFilters` key (`tests/unit/wdk/test_strategy_api_reports.py`). On a transcript
+step, `representativeTranscriptOnly` makes the rows one per gene, the unit the count
+reports.
+
 **This client's `FilterMixin` is named for the wrong mechanism.**
 `list_step_filters` and `set_step_filter` say `viewFilters` throughout, and the
 client methods behind them are `get_step_view_filters` and

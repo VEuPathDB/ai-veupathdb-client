@@ -1,5 +1,25 @@
 # Knowledge log
 
+## 2026-09-23 - A search-config update starts from the step's own config
+
+`update_step_search_config` keeps the step's own filters, column filters and weight,
+and replaces its `parameters` map whole with the caller's map, every input-step value set
+to the value the step holds. The caller's weight replaces the step's only when the caller
+sets one. The body always carries `parameters`, empty for a search without any (WDK
+resets every key the body omits). On the update path a failed catalog read of the
+input-step names raises, and a step that holds no value for an input refuses the write
+before it reaches WDK (WDK-STEP-003). Step creation still proceeds on a failed catalog
+read, because the create endpoint takes no record type. `update_step_filters` builds its
+body the same way.
+
+`get_step_records` and `get_step_answer` take `view_filters`, sent as `viewFilters` at the
+top level of the step report body beside `reportConfig` (WDK-FILTER-003). A transcript
+step reports one row per transcript while its count is of genes, so a caller that pages
+genes sends `representativeTranscriptOnly`. With no view filters the body is unchanged.
+The two methods no longer take `user_id`: no consumer passed one, and they read as the
+session's user.
+`veupathdb-py` is 0.1.0a13.
+
 ## 2026-09-22 - One step read serves a search-config update
 
 `update_step_search_config` reads the step once and takes both its filters and its

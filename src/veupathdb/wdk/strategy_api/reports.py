@@ -4,11 +4,13 @@ Provides :class:`ReportsMixin` with methods to run reports, fetch step
 answers and records, and get step counts.
 """
 
+from collections.abc import Sequence
+
 from pydantic import JsonValue
 
 from veupathdb.json_types import JSONObject
 from veupathdb.wdk.strategy_api.base import StrategyAPIBase
-from veupathdb.wdk.wdk_models import WDKAnswer, WDKSortSpec
+from veupathdb.wdk.wdk_models import WDKAnswer, WDKFilterValue, WDKSortSpec
 
 
 class ReportsMixin(StrategyAPIBase):
@@ -33,19 +35,24 @@ class ReportsMixin(StrategyAPIBase):
         step_id: int,
         attributes: list[str] | None = None,
         pagination: dict[str, int] | None = None,
-        user_id: str | None = None,
+        *,
+        view_filters: Sequence[WDKFilterValue] | None = None,
     ) -> WDKAnswer:
-        """Get answer records for a step via the standard report endpoint.
+        """Get answer records for a step, as the session's user.
 
         Convenience wrapper around :meth:`get_step_records`.
 
         :param step_id: Step ID.
         :param attributes: Attributes to include in response.
         :param pagination: Offset and numRecords.
+        :param view_filters: View filters, sent beside ``reportConfig``.
         :returns: Validated WDK answer with records.
         """
         return await self.get_step_records(
-            step_id, attributes=attributes, pagination=pagination, user_id=user_id
+            step_id,
+            attributes=attributes,
+            pagination=pagination,
+            view_filters=view_filters,
         )
 
     async def get_step_records(
@@ -55,15 +62,18 @@ class ReportsMixin(StrategyAPIBase):
         tables: list[str] | None = None,
         pagination: dict[str, int] | None = None,
         sorting: list[WDKSortSpec] | None = None,
-        user_id: str | None = None,
+        *,
+        view_filters: Sequence[WDKFilterValue] | None = None,
     ) -> WDKAnswer:
-        """Get paginated records for a step with configurable attributes and sorting.
+        """Get paginated records for a step, as the session's user.
 
         :param step_id: WDK step ID (must be part of a strategy).
         :param attributes: Attribute names to include.
         :param tables: Table names to include.
         :param pagination: ``{offset, numRecords}`` for server-side paging.
         :param sorting: Typed sort specs (attributeName + direction).
+        :param view_filters: View filters, sent beside ``reportConfig``. On a
+            transcript step, ``representativeTranscriptOnly`` pages one row per gene.
         :returns: Validated WDK answer with ``records`` and ``meta``.
         """
         report_config: dict[str, object] = {}
@@ -76,8 +86,9 @@ class ReportsMixin(StrategyAPIBase):
         if sorting:
             report_config["sorting"] = [s.model_dump(by_alias=True) for s in sorting]
 
-        uid = await self._get_user_id(user_id)
-        return await self._standard_report(step_id, report_config, user_id=uid)
+        return await self._standard_report(
+            step_id, report_config, view_filters=view_filters
+        )
 
     async def get_step_count(self, step_id: int, user_id: str | None = None) -> int:
         """Get result count for a step."""

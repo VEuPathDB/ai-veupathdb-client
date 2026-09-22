@@ -6,6 +6,7 @@ from veupathdb.errors import validate_response
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
 from veupathdb.wdk._helpers import _validate_list
+from veupathdb.wdk._search_config_body import search_config_write_body
 from veupathdb.wdk.analysis_result import WDKAnalysisNotReadyError
 from veupathdb.wdk.wdk_models import (
     WDKAnalysisStatus,
@@ -80,12 +81,10 @@ class AnalysisEndpoints:
         """
         raw = await self.get(f"/users/{user_id}/steps/{step_id}")
         step = WDKStep.model_validate(raw)
-        config = step.search_config.model_dump(by_alias=True, exclude_none=True)
-        # viewFilters is not part of a search config; WDK's schema rejects it.
-        config.pop("viewFilters", None)
-        config["filters"] = [f.model_dump(by_alias=True) for f in filters]
+        config = step.search_config.model_copy(update={"filters": filters})
         return await self.put(
-            f"/users/{user_id}/steps/{step_id}/search-config", json=config
+            f"/users/{user_id}/steps/{step_id}/search-config",
+            json=search_config_write_body(config),
         )
 
     # --- Analysis types ---
@@ -139,7 +138,7 @@ class AnalysisEndpoints:
     ) -> None:
         """Kick off execution of a step analysis instance.
 
-        Return value is unused — callers poll status separately.
+        The return value is unused. Callers poll the status separately.
         """
         await self.post(
             f"/users/{user_id}/steps/{step_id}/analyses/{analysis_id}/result"

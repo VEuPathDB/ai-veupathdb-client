@@ -15,6 +15,7 @@ from veupathdb.devtools.fixtures import ENFORCED_SCHEMAS, verify_body
 from veupathdb.domain.strategy.ops import CombineOp
 from veupathdb.json_types import JSONObject
 from veupathdb.testing.wdk_fixtures import fixture_request, load_recorded
+from veupathdb.wdk._search_config_body import search_config_write_body
 from veupathdb.wdk.wdk_models import (
     CombinedStepSpec,
     NewStepSpec,
@@ -104,21 +105,9 @@ def _combined_step_body(spec: CombinedStepSpec) -> JSONObject:
     return payload
 
 
-def _search_config_write(
-    config: WDKSearchConfig, filters: list[WDKFilterValue]
-) -> JSONObject:
-    """``StepsMixin.update_step_search_config``."""
-    payload: JSONObject = config.model_dump(by_alias=True, exclude_defaults=True)
-    payload["filters"] = [f.model_dump(by_alias=True) for f in filters]
-    return payload
-
-
-def _filter_write(config: WDKSearchConfig, filters: list[WDKFilterValue]) -> JSONObject:
-    """``AnalysisEndpoints.update_step_filters``, which writes the whole config back."""
-    payload: JSONObject = config.model_dump(by_alias=True, exclude_none=True)
-    payload.pop("viewFilters", None)
-    payload["filters"] = [f.model_dump(by_alias=True) for f in filters]
-    return payload
+def _config_write(config: WDKSearchConfig, filters: list[WDKFilterValue]) -> JSONObject:
+    """``update_step_search_config`` and ``update_step_filters`` both send this."""
+    return search_config_write_body(config.model_copy(update={"filters": filters}))
 
 
 def _mw_config() -> WDKSearchConfig:
@@ -184,8 +173,33 @@ def test_a_step_properties_patch_passes_the_schema_wdk_binds(
 def test_a_search_config_write_passes_the_schema_wdk_binds() -> None:
     filters = [WDKFilterValue(name="matched_transcript_filter_array", value=None)]
 
-    body = _search_config_write(_mw_config(), filters)
+    body = _config_write(_mw_config(), filters)
 
+    assert verify_body("wdk.answer.answer-spec-request", body) == ()
+
+
+def test_a_paramless_write_with_its_weight_passes_the_schema_wdk_binds() -> None:
+    config = WDKSearchConfig(parameters={}, wdk_weight=0)
+
+    body = search_config_write_body(config)
+
+    assert body["parameters"] == {}
+    assert body["wdkWeight"] == 0
+    assert verify_body("wdk.answer.answer-spec-request", body) == ()
+
+
+def test_a_write_carrying_column_filters_passes_the_schema_wdk_binds() -> None:
+    config = WDKSearchConfig.model_validate(
+        {
+            "parameters": _mw_config().parameters,
+            "columnFilters": {"gene_product": {"byValue": {"pattern": "kinase"}}},
+            "wdkWeight": 5,
+        }
+    )
+
+    body = search_config_write_body(config)
+
+    assert body["columnFilters"] == {"gene_product": {"byValue": {"pattern": "kinase"}}}
     assert verify_body("wdk.answer.answer-spec-request", body) == ()
 
 
@@ -198,7 +212,7 @@ def test_a_filter_write_passes_the_schema_wdk_binds() -> None:
         )
     ]
 
-    body = _filter_write(_mw_config(), filters)
+    body = _config_write(_mw_config(), filters)
 
     assert verify_body("wdk.answer.answer-spec-request", body) == ()
 
