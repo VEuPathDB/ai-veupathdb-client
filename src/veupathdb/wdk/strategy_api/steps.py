@@ -102,6 +102,26 @@ class StepsMixin(StrategyAPIBase):
             params[ap_name] = ""
         return params
 
+    async def _current_answer_params(
+        self,
+        uid: str,
+        step_id: int,
+        record_type: str,
+        search_name: str,
+        raw_params: JSONObject,
+    ) -> JSONObject:
+        """The params with every input-step (AnswerParam) at the step's own value."""
+        answer_param_names = await self._get_answer_param_names(
+            record_type, search_name
+        )
+        if not answer_param_names:
+            return dict(raw_params)
+        step = await self.find_step(step_id, uid)
+        params: JSONObject = dict(raw_params)
+        for ap_name in answer_param_names:
+            params[ap_name] = step.search_config.parameters.get(ap_name, "")
+        return params
+
     async def find_step(self, step_id: int, user_id: str | None = None) -> WDKStep:
         """Fetch a single step by id. Mirrors the monorepo ``findStep``."""
         uid = await self._get_user_id(user_id)
@@ -282,15 +302,20 @@ class StepsMixin(StrategyAPIBase):
         """Update a step's search configuration.
 
         Endpoint: ``PUT /users/{uid}/steps/{step_id}/search-config``. Parameters
-        are normalized and expanded exactly as they are on step creation. The
-        step's filters are carried over, because an omitted filters array lets
-        WDK re-apply the filters it applies by itself.
+        are normalized and expanded as on step creation; the step's input-step
+        params and filters are carried over from the step itself, because the
+        endpoint replaces the whole config and refuses a changed input.
         """
         uid = await self._get_user_id(user_id)
         current = await self.client.get_step_filters(uid, step_id)
 
+        # WDK refuses a write whose input-step params differ from the step's
+        # own, so they are read back and carried, never restated.
+        raw_params = await self._current_answer_params(
+            uid, step_id, record_type, search_name, dict(search_config.parameters)
+        )
         _, config_payload = await self._prepare_search_config(
-            raw_params=dict(search_config.parameters),
+            raw_params=raw_params,
             record_type=record_type,
             search_name=search_name,
             wdk_weight=search_config.wdk_weight,

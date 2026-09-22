@@ -238,3 +238,71 @@ async def test_wdk_step_006_the_names_are_read_from_the_search(
     assert left == "bq_left_op_TranscriptRecordClasses_TranscriptRecordClass"
     assert right == "bq_right_op_TranscriptRecordClasses_TranscriptRecordClass"
     assert operator == "bq_operator"
+
+
+class TestAWriteCarriesTheStepsOwnInputs:
+    """WDK-STEP-003: a search-config write keeps every input-step param at the
+    value the step holds, whatever the caller states for it."""
+
+    @staticmethod
+    def _transform_api(
+        monkeypatch: pytest.MonkeyPatch, held_input: str
+    ) -> tuple[StrategyAPI, _Recorder]:
+        api, put = _api(monkeypatch)
+
+        async def details(record_type: str, search_name: str, **_: object) -> Any:
+            del record_type, search_name
+            return SimpleNamespace(
+                search_data=SimpleNamespace(
+                    parameters=[
+                        WDKAnswerParam(name="gene_result"),
+                        WDKStringParam(name="isSyntenic"),
+                    ]
+                )
+            )
+
+        async def read_step(path: str, **_: object) -> Any:
+            del path
+            return {
+                "id": 9,
+                "searchName": "GenesByOrthologs",
+                "searchConfig": {
+                    "parameters": {"gene_result": held_input, "isSyntenic": "no"},
+                    "filters": [],
+                },
+            }
+
+        monkeypatch.setattr(api.client, "get_search_details", details)
+        monkeypatch.setattr(api.client, "get", read_step)
+        return api, put
+
+    async def test_the_input_step_param_is_the_steps_own_value(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        api, put = self._transform_api(monkeypatch, held_input="440533233")
+
+        await api.update_step_search_config(
+            9,
+            WDKSearchConfig(parameters={"isSyntenic": "yes"}),
+            record_type="transcript",
+            search_name="GenesByOrthologs",
+            user_id="1",
+        )
+
+        assert put.body["parameters"]["gene_result"] == "440533233"
+        assert put.body["parameters"]["isSyntenic"] == "yes"
+
+    async def test_a_stated_input_never_overrides_the_steps_own(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        api, put = self._transform_api(monkeypatch, held_input="440533233")
+
+        await api.update_step_search_config(
+            9,
+            WDKSearchConfig(parameters={"isSyntenic": "yes", "gene_result": ""}),
+            record_type="transcript",
+            search_name="GenesByOrthologs",
+            user_id="1",
+        )
+
+        assert put.body["parameters"]["gene_result"] == "440533233"

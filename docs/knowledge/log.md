@@ -1,5 +1,13 @@
 # Knowledge log
 
+## 2026-09-22 - A search-config update carries the step's own inputs
+
+`update_step_search_config` reads the step back and sends every input-step
+(AnswerParam) value at the value the step holds, whatever the caller states for it
+(WDK-STEP-003: the endpoint refuses a changed input, and the client sent none).
+Before this, a change to a transform's own parameter could not be pushed.
+`veupathdb-py` is 0.1.0a11.
+
 ## 2026-09-11 - The signing-key reset is published
 
 `forget_signing_keys` is on `veupathdb.wdk`. A consumer's test suite that fakes a WDK

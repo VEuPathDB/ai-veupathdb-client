@@ -71,6 +71,10 @@ a search-config replacement looks like it could rewire a step. It cannot.
 the step's current value and throws `Changes to answer param values are not allowed.` on
 any difference. The comment above it says why: the strategy service owns the tree.
 
+A parameter update on an attached step (`update_step_search_config`) therefore reads the
+step back and carries its input-step values; `tests/unit/wdk/test_strategy_api_steps.py::TestAWriteCarriesTheStepsOwnInputs`
+pins it.
+
 Both branches of
 [`putAnswerSpec`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/user/StepService.java#L314-L364)
 run the check, including the undocumented `allowInvalid=true` developer path, so there is
