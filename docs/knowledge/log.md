@@ -1,5 +1,10 @@
 # Knowledge log
 
+## 2026-09-22 - One step read serves a search-config update
+
+`update_step_search_config` reads the step once and takes both its filters and its
+input-step values from that read. `veupathdb-py` is 0.1.0a12.
+
 ## 2026-09-22 - A search-config update carries the step's own inputs
 
 `update_step_search_config` reads the step back and sends every input-step

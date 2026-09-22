@@ -104,8 +104,7 @@ class StepsMixin(StrategyAPIBase):
 
     async def _current_answer_params(
         self,
-        uid: str,
-        step_id: int,
+        step: WDKStep,
         record_type: str,
         search_name: str,
         raw_params: JSONObject,
@@ -114,9 +113,6 @@ class StepsMixin(StrategyAPIBase):
         answer_param_names = await self._get_answer_param_names(
             record_type, search_name
         )
-        if not answer_param_names:
-            return dict(raw_params)
-        step = await self.find_step(step_id, uid)
         params: JSONObject = dict(raw_params)
         for ap_name in answer_param_names:
             params[ap_name] = step.search_config.parameters.get(ap_name, "")
@@ -307,12 +303,12 @@ class StepsMixin(StrategyAPIBase):
         endpoint replaces the whole config and refuses a changed input.
         """
         uid = await self._get_user_id(user_id)
-        current = await self.client.get_step_filters(uid, step_id)
+        step = await self.find_step(step_id, uid)
 
         # WDK refuses a write whose input-step params differ from the step's
         # own, so they are read back and carried, never restated.
         raw_params = await self._current_answer_params(
-            uid, step_id, record_type, search_name, dict(search_config.parameters)
+            step, record_type, search_name, dict(search_config.parameters)
         )
         _, config_payload = await self._prepare_search_config(
             raw_params=raw_params,
@@ -328,7 +324,9 @@ class StepsMixin(StrategyAPIBase):
         )
 
         payload = config_payload.model_dump(by_alias=True, exclude_defaults=True)
-        payload["filters"] = [f.model_dump(by_alias=True) for f in current]
+        payload["filters"] = [
+            f.model_dump(by_alias=True) for f in step.search_config.filters
+        ]
         await self.client.put(
             f"/users/{uid}/steps/{step_id}/search-config",
             json=payload,

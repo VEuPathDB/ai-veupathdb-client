@@ -246,9 +246,10 @@ class TestAWriteCarriesTheStepsOwnInputs:
 
     @staticmethod
     def _transform_api(
-        monkeypatch: pytest.MonkeyPatch, held_input: str
+        monkeypatch: pytest.MonkeyPatch, held_input: str, reads: list[str] | None = None
     ) -> tuple[StrategyAPI, _Recorder]:
         api, put = _api(monkeypatch)
+        read_paths = [] if reads is None else reads
 
         async def details(record_type: str, search_name: str, **_: object) -> Any:
             del record_type, search_name
@@ -262,7 +263,7 @@ class TestAWriteCarriesTheStepsOwnInputs:
             )
 
         async def read_step(path: str, **_: object) -> Any:
-            del path
+            read_paths.append(path)
             return {
                 "id": 9,
                 "searchName": "GenesByOrthologs",
@@ -306,3 +307,19 @@ class TestAWriteCarriesTheStepsOwnInputs:
         )
 
         assert put.body["parameters"]["gene_result"] == "440533233"
+
+    async def test_the_step_is_read_once_for_its_inputs_and_its_filters(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        reads: list[str] = []
+        api, _ = self._transform_api(monkeypatch, held_input="440533233", reads=reads)
+
+        await api.update_step_search_config(
+            9,
+            WDKSearchConfig(parameters={"isSyntenic": "yes"}),
+            record_type="transcript",
+            search_name="GenesByOrthologs",
+            user_id="1",
+        )
+
+        assert reads == ["/users/1/steps/9"]
