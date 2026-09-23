@@ -11,6 +11,7 @@ from veupathdb.eda.models import (
     EdaAnalysisSummary,
     EdaCreateAnalysisResponse,
     EdaNewAnalysis,
+    analysis_descriptor_patch,
 )
 from veupathdb.errors import WDKLoginRequiredError
 from veupathdb.wdk.client import VEuPathDBClient
@@ -37,7 +38,8 @@ class EdaAnalysesClient:
             raise WDKLoginRequiredError
         return user_id
 
-    def _root(self, user_id: str) -> str:
+    def collection_path(self, user_id: str) -> str:
+        """The path that holds every analysis of *user_id* in this project."""
         return f"/users/{user_id}/analyses/{self._project_id}"
 
     @property
@@ -45,7 +47,7 @@ class EdaAnalysesClient:
         return self._project_id
 
     async def list_all(self, *, user_id: str) -> list[EdaAnalysisSummary]:
-        raw = await self._client.request_json("GET", self._root(user_id))
+        raw = await self._client.request_json("GET", self.collection_path(user_id))
         return ANALYSIS_SUMMARIES.validate_python(raw)
 
     async def create(
@@ -56,14 +58,14 @@ class EdaAnalysesClient:
     ) -> EdaCreateAnalysisResponse:
         raw = await self._client.request_json(
             "POST",
-            self._root(user_id),
+            self.collection_path(user_id),
             json=analysis.model_dump(by_alias=True, mode="json", exclude_none=True),
         )
         return EdaCreateAnalysisResponse.model_validate(raw)
 
     async def get(self, *, user_id: str, analysis_id: str) -> EdaAnalysisDetail:
         raw = await self._client.request_json(
-            "GET", f"{self._root(user_id)}/{analysis_id}"
+            "GET", f"{self.collection_path(user_id)}/{analysis_id}"
         )
         return EdaAnalysisDetail.model_validate(raw)
 
@@ -76,15 +78,11 @@ class EdaAnalysesClient:
     ) -> None:
         await self._client.request_json(
             "PATCH",
-            f"{self._root(user_id)}/{analysis_id}",
-            json={
-                "descriptor": descriptor.model_dump(
-                    by_alias=True, mode="json", exclude_none=True
-                )
-            },
+            f"{self.collection_path(user_id)}/{analysis_id}",
+            json={"descriptor": analysis_descriptor_patch(descriptor)},
         )
 
     async def delete(self, *, user_id: str, analysis_id: str) -> None:
         await self._client.request_json(
-            "DELETE", f"{self._root(user_id)}/{analysis_id}"
+            "DELETE", f"{self.collection_path(user_id)}/{analysis_id}"
         )

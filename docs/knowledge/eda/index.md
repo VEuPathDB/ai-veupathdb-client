@@ -34,4 +34,4 @@ Start with [What EDA is](what-eda-is.md), then read by subject.
 
 ## The API
 
-- [REST surface](rest-surface.md) - the endpoints this client consumes, authentication, and the ten measured divergences from the pinned `service-eda` RAML that the recorded fixtures are gated against
+- [REST surface](rest-surface.md) - the endpoints this client consumes, authentication, the analysis document every compute plugin writes into, and the eleven measured divergences from the pinned `service-eda` RAML that the recorded fixtures are gated against

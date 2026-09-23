@@ -55,6 +55,16 @@ class EdaModel(CamelModel):
     )
 
 
+class EdaStoredModel(EdaModel):
+    """A node of a stored analysis document. It keeps every key the site stored.
+
+    A node read from the site dumps with ``exclude_unset=True`` exactly as stored;
+    a node built here dumps with its defaults. ``analysis_descriptor_patch`` applies both.
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+
 class EdaVariableSpec(EdaModel):
     entity_id: str
     variable_id: str
@@ -345,7 +355,7 @@ type EdaFilter = Annotated[
 ]
 
 
-class EdaLabeledRange(EdaModel):
+class EdaLabeledRange(EdaStoredModel):
     """A comparator bin. ``min``/``max`` are declared required and are optional."""
 
     label: str
@@ -353,13 +363,13 @@ class EdaLabeledRange(EdaModel):
     max: str | None = None
 
 
-class EdaComparator(EdaModel):
+class EdaComparator(EdaStoredModel):
     variable: EdaVariableSpec
     group_a: list[EdaLabeledRange] = Field(min_length=1)
     group_b: list[EdaLabeledRange] = Field(min_length=1)
 
 
-class EdaDifferentialExpressionConfig(EdaModel):
+class EdaDifferentialExpressionConfig(EdaStoredModel):
     """The compute's own configuration. There is no collectionVariable here."""
 
     identifier_variable: EdaVariableSpec
@@ -369,44 +379,100 @@ class EdaDifferentialExpressionConfig(EdaModel):
     p_value_floor: str = "1e-200"
 
 
-class EdaComputationDescriptor(EdaModel):
+class EdaDifferentialExpressionDescriptor(EdaStoredModel):
+    """A differential-expression compute whose configuration is complete."""
+
     type: Literal["differentialexpression"] = "differentialexpression"
     configuration: EdaDifferentialExpressionConfig
 
 
-class EdaVolcanoConfiguration(EdaModel):
-    """The thresholds the WDK bridge plugin requires on the visualization."""
+class EdaPassDescriptor(EdaStoredModel):
+    """The pass-through compute every plain visualization hangs off. It has no configuration."""
+
+    type: Literal["pass"] = "pass"
+
+
+class EdaOtherComputeDescriptor(EdaStoredModel):
+    """Any other compute plugin, or a DE compute the UI has not finished configuring."""
+
+    type: str
+    configuration: JsonValue = None
+
+
+# Left to right: a descriptor that fails the typed members is kept as it stands.
+type EdaComputeDescriptor = Annotated[
+    EdaDifferentialExpressionDescriptor | EdaPassDescriptor | EdaOtherComputeDescriptor,
+    Field(union_mode="left_to_right"),
+]
+
+
+class EdaNumberRange(EdaStoredModel):
+    min: float
+    max: float
+
+
+class EdaVolcanoConfiguration(EdaStoredModel):
+    """The thresholds the WDK bridge plugin requires, and the plot settings the UI stores."""
 
     effect_size_threshold: float
     significance_threshold: float
     effect_direction: Literal["upOnly", "downOnly", "upAndDown"] = "upAndDown"
+    marker_body_opacity: float | None = None
+    independent_axis_range: EdaNumberRange | None = None
+    dependent_axis_range: EdaNumberRange | None = None
+    effect_size_label: str | None = None
 
 
-class EdaVolcanoDescriptor(EdaModel):
+class EdaVolcanoDescriptor(EdaStoredModel):
     type: Literal["volcanoplot"] = "volcanoplot"
     configuration: EdaVolcanoConfiguration
     current_plot_filters: list[EdaFilter] = Field(default_factory=list)
+    thumbnail: str | None = None
+    application_context: str | None = None
 
 
-class EdaVisualization(EdaModel):
+class EdaOtherVisualizationDescriptor(EdaStoredModel):
+    """Any other visualization, or a volcano plot without its thresholds."""
+
+    type: str
+    configuration: JsonValue = None
+    current_plot_filters: list[JsonValue] | None = None
+    thumbnail: str | None = None
+    application_context: str | None = None
+
+
+type EdaVisualizationDescriptor = Annotated[
+    EdaVolcanoDescriptor | EdaOtherVisualizationDescriptor,
+    Field(union_mode="left_to_right"),
+]
+
+
+class EdaVisualization(EdaStoredModel):
     visualization_id: str
-    display_name: str = ""
-    descriptor: EdaVolcanoDescriptor
+    display_name: str | None = None
+    descriptor: EdaVisualizationDescriptor
 
 
-class EdaComputation(EdaModel):
+class EdaComputation(EdaStoredModel):
     computation_id: str
-    display_name: str = ""
-    descriptor: EdaComputationDescriptor
+    display_name: str | None = None
+    descriptor: EdaComputeDescriptor
     visualizations: list[EdaVisualization] = Field(default_factory=list)
 
 
-class EdaSubsetDescriptor(EdaModel):
+class EdaDifferentialExpressionComputation(EdaModel):
+    """One computation of an analysis, beside its descriptor narrowed to the DE member."""
+
+    computation: EdaComputation
+    descriptor: EdaDifferentialExpressionDescriptor
+
+
+class EdaSubsetDescriptor(EdaStoredModel):
     descriptor: list[EdaFilter] = Field(default_factory=list)
     ui_settings: JSONObject = Field(default_factory=dict)
 
 
-class EdaAnalysisDescriptor(EdaModel):
+class EdaAnalysisDescriptor(EdaStoredModel):
     """The whole semantic state. ``derivedVariables`` holds ids, not specs."""
 
     subset: EdaSubsetDescriptor = Field(default_factory=EdaSubsetDescriptor)
@@ -414,6 +480,66 @@ class EdaAnalysisDescriptor(EdaModel):
     starred_variables: list[EdaVariableSpec] = Field(default_factory=list)
     data_table_config: JSONObject = Field(default_factory=dict)
     derived_variables: list[str] = Field(default_factory=list)
+
+
+def differential_expression_computations(
+    descriptor: EdaAnalysisDescriptor,
+) -> list[EdaDifferentialExpressionComputation]:
+    """The complete differential-expression computations of *descriptor*, in order."""
+    return [
+        EdaDifferentialExpressionComputation(
+            computation=computation, descriptor=computation.descriptor
+        )
+        for computation in descriptor.computations
+        if isinstance(computation.descriptor, EdaDifferentialExpressionDescriptor)
+    ]
+
+
+def _written(
+    node: EdaStoredModel, *, built: bool, exclude: set[str] | None = None
+) -> JSONObject:
+    """A built node carries its defaults; a read node carries what the site stored."""
+    return node.model_dump(
+        by_alias=True,
+        mode="json",
+        exclude=exclude,
+        exclude_none=built,
+        exclude_unset=not built,
+    )
+
+
+def _built(descriptor: EdaComputeDescriptor | EdaVisualizationDescriptor) -> bool:
+    """The wire always carries ``type``, so a descriptor without it set was built here."""
+    return "type" not in descriptor.model_fields_set
+
+
+def _visualization_body(visualization: EdaVisualization) -> JSONObject:
+    return _written(visualization, built=_built(visualization.descriptor))
+
+
+def _computation_body(computation: EdaComputation) -> JSONObject:
+    written = _written(
+        computation, built=_built(computation.descriptor), exclude={"visualizations"}
+    )
+    written["visualizations"] = [
+        _visualization_body(visualization)
+        for visualization in computation.visualizations
+    ]
+    return written
+
+
+def analysis_descriptor_patch(descriptor: EdaAnalysisDescriptor) -> JSONObject:
+    """The body of a descriptor PATCH: read nodes as stored, built nodes with defaults.
+
+    The document level is written in full, as the site stores every member of it.
+    """
+    return descriptor.model_dump(
+        by_alias=True, mode="json", exclude={"computations"}, exclude_none=True
+    ) | {
+        "computations": [
+            _computation_body(computation) for computation in descriptor.computations
+        ]
+    }
 
 
 class EdaNewAnalysis(EdaModel):

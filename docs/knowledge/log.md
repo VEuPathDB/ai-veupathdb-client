@@ -1,5 +1,29 @@
 # Knowledge log
 
+## 2026-09-23 - An analysis document holds every compute the site offers
+
+`EdaComputation.descriptor` is a left-to-right union: `EdaDifferentialExpressionDescriptor`
+(the old `EdaComputationDescriptor`, renamed), `EdaPassDescriptor` for the pass-through
+compute every plain visualization hangs off, and `EdaOtherComputeDescriptor` for every
+other plugin and for a DE compute the EDA app has not finished configuring. The alias is
+`EdaComputeDescriptor`. `EdaVisualization.descriptor` is `EdaVolcanoDescriptor` or
+`EdaOtherVisualizationDescriptor`, and both keep `thumbnail` and `applicationContext`; the
+volcano configuration keeps the plot settings the app stores. A computation's and a
+visualization's `display_name` is `None` when the site stores none.
+`differential_expression_computations` returns the complete DE computations of a
+descriptor in order, each an `EdaDifferentialExpressionComputation` that holds the
+`computation` as stored beside its narrowed `descriptor`. Every node of the stored
+document keeps the keys it does not model (`extra="allow"` on `EdaStoredModel`; the
+other EDA models still drop them, as they are responses or request bodies). A node
+read from the site dumps with `exclude_unset=True` exactly as stored; a node built here
+dumps with its defaults. `analysis_descriptor_patch` writes a PATCH body that way,
+deciding per computation and per visualization by whether the descriptor's `type` is
+in `model_fields_set`, and `patch_descriptor` sends it. The anchor is the recorded
+`analysis_detail_pass_and_de` fixture, which `python -m veupathdb.devtools.eda_capture
+record` writes (create, PATCH, GET, DELETE); `Computation.displayName` joins the RAML
+spec defects. See [rest-surface](eda/rest-surface.md). `EdaAnalysesClient.collection_path`
+is public. `veupathdb-py` is 0.1.0a15.
+
 ## 2026-09-23 - The identity read answers fast or raises
 
 `fetch_current_user` makes one attempt under a 10 s deadline, where every other read keeps

@@ -6,6 +6,7 @@ import pytest
 from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from veupathdb.eda.models import (
+    EdaAnalysisDetail,
     EdaCategoryVariable,
     EdaCollection,
     EdaComputeJob,
@@ -33,6 +34,7 @@ FILTERS = TypeAdapter(list[EdaFilter])
 VARIABLE = TypeAdapter(EdaVariable)
 
 READERS: dict[str, type[BaseModel]] = {
+    "analysis_detail_pass_and_de.json": EdaAnalysisDetail,
     "studies_list.json": EdaStudiesResponse,
     "study_detail_de.json": EdaStudyDetailResponse,
     "study_detail_phenotype.json": EdaStudyDetailResponse,

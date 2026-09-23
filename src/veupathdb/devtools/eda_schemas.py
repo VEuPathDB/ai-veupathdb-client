@@ -523,11 +523,18 @@ SPEC_DEFECTS: tuple[SpecDefect, ...] = (
         measured="sent on every response, declared nowhere, 2026-09-04",
         records="docs/knowledge/eda/rest-surface.md",
     ),
+    SpecDefect(
+        raml_type="Computation",
+        member="displayName",
+        kind="required-but-absent",
+        measured="absent on the pass computation of the recorded analysis, 2026-09-23",
+        records="docs/knowledge/eda/rest-surface.md",
+    ),
 )
 """Where the pinned RAML describes a service that does not exist.
 
 Every entry is a defect in the specification: this client's own models already
-match the wire at each of these ten members. The gate applies them so that
+match the wire at each of these eleven members. The gate applies them so that
 whatever it still reports is drift.
 """
 
@@ -623,6 +630,11 @@ BINDINGS: tuple[FixtureBinding, ...] = (
         fixture="permissions",
         raml_type="PermissionsGetResponse",
         endpoint="GET /permissions",
+    ),
+    FixtureBinding(
+        fixture="analysis_detail_pass_and_de",
+        raml_type="AnalysisDetail",
+        endpoint="GET /users/{user-id}/analyses/{project-id}/{analysis-id}",
     ),
 )
 """Which RAML type each recorded body answers to, read from ``api.raml``.
@@ -752,7 +764,7 @@ def _refs(node: JsonValue) -> Iterator[str]:
 def _list_types() -> None:
     library = pinned().library
     for binding in BINDINGS:
-        print(f"{binding.fixture:26} {binding.raml_type:36} {binding.endpoint}")
+        print(f"{binding.fixture:28} {binding.raml_type:36} {binding.endpoint}")
     for defect in SPEC_DEFECTS:
         member = f"{defect.raml_type}.{defect.member}"
         print(f"{member:52} {defect.kind:22} {defect.measured}")
@@ -770,7 +782,7 @@ def _verify() -> int:
     failed = [check for check in checks if check.errors]
     for check in checks:
         state = "FAIL" if check.errors else "PASS"
-        print(f"{check.fixture:26} {state:5} {check.raml_type}")
+        print(f"{check.fixture:28} {state:5} {check.raml_type}")
         for error in check.errors:
             print(f"    {error}")
 

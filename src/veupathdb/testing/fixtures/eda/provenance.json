@@ -1,4 +1,15 @@
 {
+  "analysis_detail_pass_and_de": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "GET",
+    "url": "https://plasmodb.org/eda/users/{user-id}/analyses/PlasmoDB/uoZgkI9",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "analysisId,apiVersion,creationTime,description,descriptor,displayName,isPublic,modificationTime,numComputations,numFilters,numVisualizations,studyId,studyVersion",
+    "recorded_at": "2026-09-23",
+    "trim": ""
+  },
   "compute_job_lookup": {
     "site": "plasmodb",
     "deployment": "https://plasmodb.org/eda",

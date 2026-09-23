@@ -1,0 +1,103 @@
+{
+  "displayName": "veupathdb-py fixture analysis_detail_pass_and_de",
+  "description": "",
+  "studyId": "DS_e973eadd57",
+  "studyVersion": "",
+  "apiVersion": "",
+  "isPublic": false,
+  "analysisId": "uoZgkI9",
+  "creationTime": "2026-09-23T11:59:49",
+  "modificationTime": "2026-09-23T11:59:49",
+  "numFilters": 0,
+  "numComputations": 2,
+  "numVisualizations": 2,
+  "descriptor": {
+    "subset": {
+      "descriptor": [],
+      "uiSettings": {}
+    },
+    "computations": [
+      {
+        "computationId": "k3x9q",
+        "descriptor": {
+          "type": "pass"
+        },
+        "visualizations": [
+          {
+            "visualizationId": "0b6f1c2e-5a3d-4e8f-9c71-2d4a6b8e0f13",
+            "displayName": "Unnamed visualization",
+            "descriptor": {
+              "type": "histogram",
+              "configuration": {
+                "dependentAxisLogScale": false,
+                "valueSpec": "count",
+                "independentAxisValueSpec": "Full",
+                "dependentAxisValueSpec": "Full",
+                "xAxisVariable": {
+                  "entityId": "ENT_8151325d",
+                  "variableId": "VAR_7033e90f"
+                }
+              },
+              "currentPlotFilters": [],
+              "thumbnail": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+            }
+          }
+        ]
+      },
+      {
+        "computationId": "m7p2d",
+        "displayName": "Unnamed computation",
+        "descriptor": {
+          "type": "differentialexpression",
+          "configuration": {
+            "identifierVariable": {
+              "entityId": "ENT_fd574cd6",
+              "variableId": "VEUPATHDB_GENE_ID"
+            },
+            "valueVariable": {
+              "entityId": "ENT_fd574cd6",
+              "variableId": "SEQUENCE_READ_COUNT_ANTISENSE"
+            },
+            "comparator": {
+              "variable": {
+                "entityId": "ENT_8151325d",
+                "variableId": "VAR_081ab087"
+              },
+              "groupA": [
+                {
+                  "label": "normal"
+                }
+              ],
+              "groupB": [
+                {
+                  "label": "febrile"
+                }
+              ]
+            },
+            "differentialExpressionMethod": "DESeq",
+            "pValueFloor": "1e-200"
+          }
+        },
+        "visualizations": [
+          {
+            "visualizationId": "7e2c4a91-3b5d-4f60-8a1e-9c0d2b4f6a85",
+            "displayName": "Unnamed visualization",
+            "descriptor": {
+              "type": "volcanoplot",
+              "configuration": {
+                "effectSizeThreshold": 1,
+                "significanceThreshold": 0.05,
+                "markerBodyOpacity": 0.5,
+                "effectDirection": "upAndDown"
+              },
+              "currentPlotFilters": []
+            }
+          }
+        ]
+      }
+    ],
+    "starredVariables": [],
+    "dataTableConfig": {},
+    "derivedVariables": []
+  }
+}

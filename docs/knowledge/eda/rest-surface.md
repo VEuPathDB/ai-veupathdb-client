@@ -146,6 +146,41 @@ Same WDK bearer token the WDK client already holds
   document it replaced on the service.
 - `GET|PUT /users/{uid}/preferences/{project}` -> workspace preferences.
 
+### An analysis holds every compute the site offers
+
+The site's own EDA app writes into the same document. A plain visualization
+hangs off a `pass` computation, whose descriptor is `{"type": "pass"}` with no
+`configuration`; a histogram, a scatterplot or a map sits under it. Every other
+compute plugin (`alphadiv`, `correlation`, ...) writes its own `type`, and the
+app stores a differential-expression configuration with every member optional
+until the researcher sets it. A reader therefore models three computation
+descriptors, tried left to right: a complete `differentialexpression`
+(`EdaDifferentialExpressionDescriptor`), `pass` (`EdaPassDescriptor`), and any
+other `type` with its configuration kept as JSON (`EdaOtherComputeDescriptor`).
+Visualizations are the same: a volcano plot with both thresholds
+(`EdaVolcanoDescriptor`), and any other with its configuration, filters,
+thumbnail and application context kept (`EdaOtherVisualizationDescriptor`).
+
+A reader keeps what it does not drive. Every node of the stored document
+(`EdaStoredModel`: the descriptor, the subset, each computation and visualization,
+the union members and their configurations) keeps the keys it does not model, and
+a node read from the site dumps with `exclude_unset=True` exactly as stored: no
+default the site did not store is written. A node built here dumps with its
+defaults, as it always did. `analysis_descriptor_patch` writes a PATCH body that
+way: the document level in full, each computation and each visualization as read
+when its descriptor's `type` is in `model_fields_set` (the wire always carries
+it), and with defaults when the builder left `type` at its default.
+`EdaAnalysesClient.patch_descriptor` sends that body, so a PATCH after a read
+never drops the researcher's own computations or their settings.
+`differential_expression_computations` selects the complete DE computations in
+document order; no caller indexes `computations[0]`.
+
+Anchor: `src/veupathdb/testing/fixtures/eda/analysis_detail_pass_and_de.json`,
+recorded by `python -m veupathdb.devtools.eda_capture record` (create, PATCH,
+GET, DELETE on the `DS_e973eadd57` RNA-Seq study) and bound to `AnalysisDetail`
+in `eda_schemas`; enforced by `tests/unit/eda/test_analysis_computations.py` and
+`tests/unit/eda/test_analysis_round_trip.py`.
+
 ## Divergences from the pinned RAML
 
 `VEuPathDB/service-eda` publishes one merged RAML 1.0 type library,
@@ -157,7 +192,7 @@ generators emit Java and Kotlin from this same file. It is pinned at
 the one file it includes (`lib-hash-id` v1.1.0 `hash-id.raml`) and a sha256 per
 file in `schema-pin.json`.
 
-It describes the wire, with ten exceptions. Each is a defect in the
+It describes the wire, with eleven exceptions. Each is a defect in the
 specification, not in `integrations/eda/models.py`: our models already match
 the service at every one of them. Counts marked live were measured against
 `https://plasmodb.org/eda` on 2026-09-04; counts marked recorded are what the
@@ -175,6 +210,7 @@ trimmed fixtures on disk hold.
 | `DifferentialExpressionPoint` | `adjustedPValue` | required `string` | omitted on the same row | absent on 1 of 5511 rows (live) |
 | `DifferentialExpressionStatsResponse` | `pValueFloor` | not declared | sent on every response | present on every response (live) |
 | `DifferentialExpressionStatsResponse` | `adjustedPValueFloor` | not declared | sent on every response | present on every response (live) |
+| `Computation` | `displayName` | required `string` | stored and served without it | absent on the `pass` computation of `analysis_detail_pass_and_de`, the shape the EDA app writes (live, 2026-09-23) |
 
 `isCategory` is also recorded in [data-model.md](data-model.md), which carries
 the 66664-variable scan behind it and the rule that follows: the category test
@@ -192,12 +228,12 @@ not know they exist.
 to JSON Schema draft-07 and validates every recorded body under
 `src/veupathdb/testing/fixtures/eda/` against the
 type its endpoint returns. It is offline, needs no credential, and fails when a
-vendored file no longer matches its sha256. The nine recorded bodies bind seven
-types, whose transitive closure is 40 of the library's 414. `vendor`
+vendored file no longer matches its sha256. The ten recorded bodies bind eight
+types, whose transitive closure is 51 of the library's 414. `vendor`
 re-downloads the library at the commit the pin names and rewrites the pin only
 when a byte changed; bump `sha` first, then run it.
 
-The ten rows above are the converter's only allowance, declared as
+The eleven rows above are the converter's only allowance, declared as
 `SPEC_DEFECTS` in `src/veupathdb/devtools/eda_schemas.py`. An
 eleventh error means either the service changed or a fixture is stale, and a
 row the pinned library stops contradicting is a failure too, so a spec fix
@@ -205,7 +241,7 @@ upstream forces this table to shrink. The converter reads the constructs this
 library uses and refuses the rest, so a facet the service adds fails the parse
 rather than passing unchecked.
 
-Anchor: `src/veupathdb/devtools/eda_schemas.py` (the converter and the ten rows),
+Anchor: `src/veupathdb/devtools/eda_schemas.py` (the converter and the eleven rows),
 with `tests/unit/devtools/test_eda_raml_converter.py` for the RAML-to-draft-07
 rules and `tests/unit/devtools/test_eda_schema_vendor.py` for what the vendor
 command writes. The recorded bodies are gated in the consuming application, at

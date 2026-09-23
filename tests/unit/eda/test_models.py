@@ -11,10 +11,10 @@ from veupathdb.eda.models import (
     EdaAnalysisDescriptor,
     EdaComparator,
     EdaComputation,
-    EdaComputationDescriptor,
     EdaComputeJob,
     EdaCountResponse,
     EdaDifferentialExpressionConfig,
+    EdaDifferentialExpressionDescriptor,
     EdaDistributionResponse,
     EdaLabeledRange,
     EdaNewAnalysis,
@@ -135,7 +135,9 @@ def test_the_bridge_spec_round_trips_byte_for_byte() -> None:
             computations=[
                 EdaComputation(
                     computation_id="de2",
-                    descriptor=EdaComputationDescriptor(configuration=_config()),
+                    descriptor=EdaDifferentialExpressionDescriptor(
+                        configuration=_config()
+                    ),
                     visualizations=[
                         EdaVisualization(
                             visualization_id="v2",
