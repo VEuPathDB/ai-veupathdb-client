@@ -96,8 +96,10 @@ The plugin authenticates to EDA with the requesting user's bearer token
 
 ## What the compute plugin adds
 
-`GeneEdaVizWithComputePlugin` reads the spec's first computation and its first
-visualization. It then:
+`GeneEdaVizWithComputePlugin` scans the spec's computations in order and takes
+the first one that holds a volcano plot with both thresholds, then that
+computation's first visualization (`findVolcanoComputation`, quoted in
+[notebook-presets](notebook-presets.md)). It then:
 
 1. `POST {eda}/computes/{computeName}?autostart=true` with {studyId, filters,
    config, derivedVariables}. Status `complete` proceeds; `queued` or
