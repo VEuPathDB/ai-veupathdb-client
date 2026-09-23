@@ -1,5 +1,17 @@
 # Knowledge log
 
+## 2026-09-23 - The identity read answers fast or raises
+
+`fetch_current_user` makes one attempt under a 10 s deadline, where every other read keeps
+three attempts under the site's timeout. `HTTPClient.get` takes an `attempts` keyword,
+three by default. The read returns `None` only when the request carries no token or the
+site answers 401 or 403; a site that does not answer raises `WDKError` (502 past the
+deadline, on a transport timeout or a refused connection, the site's own status for a
+5xx), so a consumer can tell an outage from a signed-out user. An unknown site raises
+`SiteNotFoundError` and an unreadable profile raises, where both were `None` before.
+See [transport-quirks](wdk/rest/transport-quirks.md).
+`veupathdb-py` is 0.1.0a14.
+
 ## 2026-09-23 - A search-config update starts from the step's own config
 
 `update_step_search_config` keeps the step's own filters, column filters and weight,

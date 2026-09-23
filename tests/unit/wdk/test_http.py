@@ -16,10 +16,13 @@ from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.errors import (
     VEuPathDBError,
     VEuPathDBErrorCode,
+    WDKError,
     WDKLoginRequiredError,
 )
 from veupathdb.wdk._http import HTTPClient, _inject_auth_cookie
+from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.delayed_result import DELAYED_RESULT_MESSAGE
+from veupathdb.wdk.strategy_api.api import StrategyAPI
 
 SERVICE_ACCOUNT = "service.account.token"
 USER_TOKEN = "registered.user.token"
@@ -30,12 +33,15 @@ async def _client(
     *,
     auth_token: str | None = None,
     base_url: str = "https://example.invalid/service",
-) -> HTTPClient:
+) -> VEuPathDBClient:
     """A client whose transport answers without reaching WDK."""
-    client = HTTPClient(base_url=base_url, auth_token=auth_token)
+    client = VEuPathDBClient(base_url=base_url, auth_token=auth_token)
     async with client._client_lock:
         client._client = httpx.AsyncClient(
-            base_url=client.base_url, transport=transport, follow_redirects=True
+            base_url=client.base_url,
+            transport=transport,
+            follow_redirects=True,
+            timeout=httpx.Timeout(client.timeout),
         )
     return client
 
@@ -91,6 +97,20 @@ class _FlakyTransport(httpx.AsyncBaseTransport):
         return httpx.Response(
             200, json=self._body, headers={"content-type": "application/json"}
         )
+
+
+class _TimingOutTransport(httpx.AsyncBaseTransport):
+    """Times out every request and records the read timeout each one carried."""
+
+    def __init__(self) -> None:
+        self.read_timeouts: list[float] = []
+
+    async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+        if request.url.path.startswith("/app"):
+            return httpx.Response(200, text="ok")
+        self.read_timeouts.append(request.extensions["timeout"]["read"])
+        msg = "slow"
+        raise httpx.ReadTimeout(msg, request=request)
 
 
 def _cookie_pairs(request: httpx.Request) -> list[str]:
@@ -325,3 +345,27 @@ class TestTheDelayedResultGuardStillRetries:
             "id": 1
         }
         assert transport.attempts == 2
+
+
+@pytest.mark.usefixtures("wdk_request_token")
+class TestAReadCanCarryItsOwnPolicy:
+    async def test_a_read_can_ask_for_one_attempt(self) -> None:
+        transport = _TimingOutTransport()
+        client = await _client(transport)
+
+        with pytest.raises(WDKError) as raised:
+            await client.get("/users/current", attempts=1)
+
+        assert raised.value.status == 502
+        assert transport.read_timeouts == [30.0]
+
+    async def test_a_strategy_read_keeps_three_attempts_and_the_site_timeout(
+        self,
+    ) -> None:
+        transport = _TimingOutTransport()
+        client = await _client(transport)
+
+        with pytest.raises(WDKError):
+            await StrategyAPI(client, user_id="1").get_strategy(5)
+
+        assert transport.read_timeouts == [30.0, 30.0, 30.0]

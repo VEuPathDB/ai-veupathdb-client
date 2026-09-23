@@ -136,6 +136,33 @@ remains correct, for the identity reason in
 [WDK-HTTP-001](../rules/auth-and-transport.md) rather than for this one; the docstring is
 the weaker argument and should not be the one anyone relies on.
 
+# The identity read gets one attempt and ten seconds
+
+Every other read goes through the transport's retry policy: three attempts, with waits of
+1 s and 2 s between them, each attempt bounded by the site's timeout from `sites.yaml`
+(30 s on a component site, 120 s on the portal). `fetch_current_user` does not. An
+identity check answers a person who waits on a page, so it answers fast or not at all: one
+attempt, under a deadline of `IDENTITY_READ_TIMEOUT_SECONDS` (10 s). The deadline covers
+the whole read, including the WDK session the first request of a new token opens
+([WDK-AUTH-003](../rules/auth-and-transport.md)).
+
+Measured on 2026-09-23 against a live deployment: eighty direct `GET /users/current` calls
+answered in 0.07-2.04 s. The read is fast when it answers. Under the retry policy an
+attempt that timed out made one sign-in status check take 30-95 s, and when every attempt
+failed the consumer read the failure as "signed out".
+
+The contract keeps those two answers apart:
+
+- **`None`** - the request carries no token, or the site answered 401 or 403 to it. A guest
+  answer is the guest profile (`isGuest: true`), and `resolve_registered_email` reads it
+  as `None`.
+- **`WDKError`** - the site did not answer. A read past the deadline, a transport timeout
+  or a refused connection is status 502; a 5xx the site answered keeps its own status. A
+  consumer maps it to "site unavailable", never to "signed out".
+
+`resolve_wdk_user_id`, which resolves the numeric id before strategy and analysis calls,
+keeps the retry policy: it runs ahead of work, not ahead of a page.
+
 # The JSESSIONID silent-zero, which is unverified
 
 The belief, stated in `CLAUDE.md`, in two docstrings in

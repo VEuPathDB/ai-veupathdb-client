@@ -38,6 +38,7 @@ from veupathdb.wdk.probe import WDKProbe
 logger = get_logger(__name__)
 
 _HTTP_SERVER_ERROR = 500
+_ATTEMPTS = 3
 
 # Steps, strategies, datasets, baskets, favorites and preferences all hang off
 # a user, and ``/users/current`` resolves which user that is.
@@ -294,7 +295,7 @@ class HTTPClient:
         params: JSONObject | None = None,
         json: object = None,
         *,
-        idempotent: bool = True,
+        attempts: int = _ATTEMPTS,
     ) -> JsonValue:
         """Make an HTTP request with retries, and record telemetry."""
         start = time.monotonic()
@@ -307,7 +308,7 @@ class HTTPClient:
         )
         try:
             result: JsonValue = await self._retrying(
-                attempts=3 if idempotent else 1,
+                attempts=attempts,
                 telemetry=telemetry,
             )(
                 self._request_attempt,
@@ -383,9 +384,15 @@ class HTTPClient:
             text=response.text,
         )
 
-    async def get(self, path: str, params: JSONObject | None = None) -> JsonValue:
-        """GET request."""
-        return await self._request("GET", path, params=params)
+    async def get(
+        self,
+        path: str,
+        params: JSONObject | None = None,
+        *,
+        attempts: int = _ATTEMPTS,
+    ) -> JsonValue:
+        """GET request. ``attempts`` bounds the retries of this one read."""
+        return await self._request("GET", path, params=params, attempts=attempts)
 
     async def post(
         self,
@@ -401,7 +408,11 @@ class HTTPClient:
         into a second object.
         """
         return await self._request(
-            "POST", path, params=params, json=json, idempotent=idempotent
+            "POST",
+            path,
+            params=params,
+            json=json,
+            attempts=_ATTEMPTS if idempotent else 1,
         )
 
     async def patch(self, path: str, json: object = None) -> JsonValue:
