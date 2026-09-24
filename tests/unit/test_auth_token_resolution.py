@@ -1,4 +1,7 @@
-"""One token resolution serves WDK, EDA and VDI."""
+"""How WDK, EDA and VDI resolve the token a request travels with.
+
+A call on a researcher's own data never travels as the deployment.
+"""
 
 from __future__ import annotations
 
@@ -6,11 +9,13 @@ from collections.abc import Iterator
 
 import httpx
 import pytest
+from tests.unit.wdk.vdi._wire import no_request_transport
 
 from veupathdb.auth_context import (
     resolve_veupathdb_auth_token,
     veupathdb_auth_token_ctx,
 )
+from veupathdb.eda.analyses import EdaAnalysesClient
 from veupathdb.eda.client import EdaClient
 from veupathdb.errors import WDKLoginRequiredError
 from veupathdb.settings import VEuPathDBSettings, use_veupathdb_settings_source
@@ -24,6 +29,8 @@ REQUEST_TOKEN = "token-from-contextvar"
 EDA_BASE_URL = "https://plasmodb.org/eda"
 VDI_BASE_URL = "https://plasmodb.org/vdi"
 DATASET_ID = "soV5JEQEcF00p"
+PROJECT_ID = "PlasmoDB"
+WDK_USER_ID = "1216062453"
 
 
 @pytest.fixture
@@ -112,7 +119,7 @@ def test_no_form_carries_a_token(empty_context: None) -> None:
     assert resolve_veupathdb_auth_token(None) is None
 
 
-async def test_eda_reads_the_settings_token_with_an_empty_contextvar(
+async def test_eda_keeps_the_settings_token_for_a_study_read(
     settings_token: None, empty_context: None
 ) -> None:
     del settings_token, empty_context
@@ -124,6 +131,56 @@ async def test_eda_reads_the_settings_token_with_an_empty_contextvar(
         await client.close()
 
     assert f"Authorization={SETTINGS_TOKEN}" in recorder.requests[0].headers["cookie"]
+
+
+async def test_eda_refuses_the_settings_token_on_a_user_path(
+    settings_token: None, empty_context: None
+) -> None:
+    """An analysis is the researcher's own, so the deployment token never reads it."""
+    del settings_token, empty_context
+    client = EdaClient(base_url=EDA_BASE_URL, transport=no_request_transport())
+    analyses = EdaAnalysesClient(client=client, project_id=PROJECT_ID)
+    try:
+        with pytest.raises(WDKLoginRequiredError):
+            await analyses.list_all(user_id=WDK_USER_ID)
+    finally:
+        await client.close()
+
+
+async def test_eda_sends_the_request_token_on_a_user_path(
+    settings_token: None, request_token: None
+) -> None:
+    del settings_token, request_token
+    recorder = _Recorder(body=[])
+    client = EdaClient(base_url=EDA_BASE_URL, transport=recorder.transport())
+    analyses = EdaAnalysesClient(client=client, project_id=PROJECT_ID)
+    try:
+        await analyses.list_all(user_id=WDK_USER_ID)
+    finally:
+        await client.close()
+
+    assert f"Authorization={REQUEST_TOKEN}" in recorder.requests[0].headers["cookie"]
+
+
+async def test_eda_sends_the_constructor_token_on_a_user_path(
+    settings_token: None, empty_context: None
+) -> None:
+    del settings_token, empty_context
+    recorder = _Recorder(body=[])
+    client = EdaClient(
+        base_url=EDA_BASE_URL,
+        transport=recorder.transport(),
+        auth_token=CONSTRUCTOR_TOKEN,
+    )
+    analyses = EdaAnalysesClient(client=client, project_id=PROJECT_ID)
+    try:
+        await analyses.list_all(user_id=WDK_USER_ID)
+    finally:
+        await client.close()
+
+    assert (
+        f"Authorization={CONSTRUCTOR_TOKEN}" in recorder.requests[0].headers["cookie"]
+    )
 
 
 async def test_eda_reads_the_constructor_token_with_an_empty_contextvar(
@@ -177,24 +234,23 @@ async def test_eda_refuses_when_no_form_carries_a_token(empty_context: None) -> 
     assert recorder.requests == []
 
 
-async def test_vdi_reads_the_settings_token_with_an_empty_contextvar(
+async def test_vdi_refuses_the_settings_token_with_an_empty_contextvar(
     settings_token: None, empty_context: None
 ) -> None:
+    """A dataset is the researcher's own, so the deployment token never reads it."""
     del settings_token, empty_context
-    recorder = _Recorder(status=204)
-    client = VdiClient(base_url=VDI_BASE_URL, transport=recorder.transport())
+    client = VdiClient(base_url=VDI_BASE_URL, transport=no_request_transport())
     try:
-        await client.delete(DATASET_ID)
+        with pytest.raises(WDKLoginRequiredError):
+            await client.get(DATASET_ID)
     finally:
         await client.close()
 
-    assert recorder.requests[0].headers["Authorization"] == f"Bearer {SETTINGS_TOKEN}"
-
 
 async def test_vdi_reads_the_constructor_token_with_an_empty_contextvar(
-    empty_context: None,
+    settings_token: None, empty_context: None
 ) -> None:
-    del empty_context
+    del settings_token, empty_context
     recorder = _Recorder(status=204)
     client = VdiClient(
         base_url=VDI_BASE_URL,

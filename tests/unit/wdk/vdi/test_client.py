@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import inspect
 import json
 import re
-from pathlib import Path
 
 import httpx
 import pytest
@@ -13,6 +11,8 @@ from tests.unit.wdk.vdi._wire import (
     BASE_URL,
     PROBE_ID,
     TOKEN,
+    deployment_token,
+    no_request_transport,
     recorded,
     registered_token,
     vdi_client,
@@ -20,7 +20,6 @@ from tests.unit.wdk.vdi._wire import (
 
 from veupathdb.errors import WDKLoginRequiredError
 from veupathdb.wdk.vdi.client import (
-    VdiClient,
     VdiDatasetGoneError,
     VdiServiceError,
 )
@@ -30,7 +29,7 @@ from veupathdb.wdk.vdi.models import (
     VdiVisibility,
 )
 
-__all__ = ["registered_token"]
+__all__ = ["deployment_token", "registered_token"]
 
 GENELIST = VdiDatasetType(name="genelist", version="1.0")
 
@@ -186,10 +185,21 @@ class TestTheClientNeverActsWithoutTheUsersOwnLogin:
 
         assert recorder.requests == []
 
-    def test_the_client_module_never_reads_the_deployment_settings(self) -> None:
-        source = Path(inspect.getfile(VdiClient)).read_text()
+    @pytest.mark.usefixtures("deployment_token")
+    async def test_a_publish_never_travels_as_the_deployment(self) -> None:
+        client = vdi_client(no_request_transport())
 
-        assert "settings" not in source
+        with pytest.raises(WDKLoginRequiredError):
+            await client.create_genelist(details=_meta(), gene_ids=["PF3D7_1133400"])
+        await client.close()
+
+    @pytest.mark.usefixtures("deployment_token")
+    async def test_a_delete_never_travels_as_the_deployment(self) -> None:
+        client = vdi_client(no_request_transport())
+
+        with pytest.raises(WDKLoginRequiredError):
+            await client.delete(PROBE_ID)
+        await client.close()
 
 
 @pytest.mark.usefixtures("registered_token")

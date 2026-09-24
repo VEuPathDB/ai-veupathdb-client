@@ -7,13 +7,15 @@ Wire models mirror the WDK REST API field for field (`searchName`, not
 trees keep primary and secondary inputs.
 
 **VEuPathDB refuses guest and anonymous service calls.** Every user-scoped call
-needs a registered VEuPathDB token. WDK, EDA and VDI resolve it the same way,
-through `veupathdb.auth_context.resolve_veupathdb_auth_token`: the contextvar
+needs a registered VEuPathDB token. A user-independent read resolves it through
+`veupathdb.auth_context.resolve_veupathdb_auth_token`: the contextvar
 `veupathdb_auth_token_ctx` first, then the client's own `auth_token=`, then
-`VEUPATHDB_AUTH_TOKEN`. One WDK rule stands above the order: a path under
-`/users/` is refused unless the contextvar carries the token, so the
-deployment's service account reads record types, searches and parameter
-metadata and never a WDK account.
+`VEUPATHDB_AUTH_TOKEN`. The deployment's token never reaches a researcher's own
+data. A WDK path under `/users/` is refused unless the contextvar carries the
+token; every VDI call and every EDA path under `/users/` is refused unless the
+contextvar or the client's own `auth_token=` carries it. So the deployment's
+service account reads record types, searches, parameter metadata and EDA
+studies, and never a WDK account, a user dataset or an EDA analysis.
 
 ## The published surface
 

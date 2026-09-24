@@ -4,7 +4,7 @@ title: Auth and transport rules
 description: How a WDK request is identified, how WDK signals failure, and the two ways a 2xx response is not a result.
 tags: [wdk-alignment, rules, auth, http]
 generated: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
-verified: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
+verified: { by: claude-code/opus-5, at: 2026-09-24T00:00:00Z }
 status: stable
 ---
 
@@ -293,3 +293,33 @@ Two consequences, and the second is the one to carry:
 The same token was checked on toxodb.org and the portal after logout and answered
 `isGuest: false` with the same user id on both, so this is not per-site.
 
+
+### WDK-AUTH-005 - A user dataset and an EDA analysis travel only with the researcher's own token; the deployment's token never stands in
+
+- class: SILENT
+- upstream: https://github.com/VEuPathDB/vdi-service/blob/34eb6f2f331bc5a8cd686d63588102b46d30b4dd/project/core/module/rest-service/src/main/kotlin/vdi/service/rest/server/controllers/DatasetListController.kt#L25-L65
+- anchor: src/veupathdb/auth_context.py:resolve_user_auth_token
+- status: ENFORCED by tests/unit/test_auth_token_resolution.py::test_vdi_refuses_the_settings_token_with_an_empty_contextvar
+
+VDI keys every dataset call to the user the token names.
+[`ControllerBase.userID`](https://github.com/VEuPathDB/vdi-service/blob/34eb6f2f331bc5a8cd686d63588102b46d30b4dd/project/core/module/rest-service/src/main/kotlin/vdi/service/rest/server/controllers/ControllerBase.kt#L49-L61)
+is read from the authenticated request, `GET /datasets` lists that user's datasets and
+`POST /datasets` creates the new one under that user. A registered service account is a
+user like any other, so a publish sent as the deployment answers 202 and the gene list
+lands in the service account's workspace, where the researcher never sees it; a poll or a
+delete reads or removes the service account's copy.
+
+EDA addresses an analysis by the user id in its path, and
+[`UserService`](https://github.com/VEuPathDB/service-eda/blob/b3bb8bac06de4340b4b2c21d9aa4a94d9b3de61f/src/main/java/org/veupathdb/service/eda/user/service/UserService.java#L44-L59)
+checks that id against the token's user through `Utils.getAuthorizedUser`. Under the
+deployment's token that is a 403 at best, and a write into the service account's own
+analyses when the id is the service account's.
+
+So both clients resolve the token for these calls from the request's contextvar or the
+client's own `auth_token=` and nothing else. With neither, `resolve_user_auth_token`
+raises `WDKLoginRequiredError` before a request is built: every `VdiClient` call, and
+every `EdaClient` path under `/users/`. A worker task that carries no token is refused,
+not served as the deployment. EDA study, subsetting and compute reads are
+user-independent and keep the settings token as the last fallback. The WDK side is
+stricter: a WDK path under `/users/` accepts the contextvar only
+([WDK-AUTH-001](#wdk-auth-001---a-request-with-no-credential-is-not-rejected-wdk-mints-a-new-guest-user-for-it)).

@@ -9,11 +9,10 @@ from http import HTTPStatus
 import httpx
 from pydantic import ConfigDict
 
-from veupathdb.auth_context import resolve_veupathdb_auth_token
+from veupathdb.auth_context import resolve_user_auth_token
 from veupathdb.errors import (
     VEuPathDBError,
     VEuPathDBErrorCode,
-    WDKLoginRequiredError,
     validate_response,
 )
 from veupathdb.model import CamelModel
@@ -102,9 +101,7 @@ class VdiClient:
 
     def _auth(self) -> dict[str, str]:
         """The bearer header the service accepts, from the token this request carries."""
-        token = resolve_veupathdb_auth_token(self.auth_token)
-        if not token:
-            raise WDKLoginRequiredError
+        token = resolve_user_auth_token(self.auth_token)
         return {"Authorization": f"Bearer {token}", "Accept": "application/json"}
 
     async def _send(self, request: httpx.Request) -> httpx.Response:

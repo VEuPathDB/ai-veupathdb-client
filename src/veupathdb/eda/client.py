@@ -9,7 +9,10 @@ from typing import Literal
 import httpx
 from pydantic import JsonValue, TypeAdapter
 
-from veupathdb.auth_context import resolve_veupathdb_auth_token
+from veupathdb.auth_context import (
+    resolve_user_auth_token,
+    resolve_veupathdb_auth_token,
+)
 from veupathdb.eda.errors import eda_failure
 from veupathdb.eda.models import (
     EdaBinSpec,
@@ -36,9 +39,15 @@ _JSON_ONLY = "application/json"
 
 _FIRST_ERROR_STATUS = 400
 
+# Analyses, derived variables and preferences hang off a user.
+_USER_PATH_PREFIX = "/users/"
+
 
 class EdaClient:
-    """One site's EDA service. The request's own registered token authenticates it."""
+    """One site's EDA service.
+
+    A study read may travel as the deployment; a path under ``/users/`` never does.
+    """
 
     def __init__(
         self,
@@ -73,7 +82,10 @@ class EdaClient:
                 )
             return self._client
 
-    def _token(self) -> str:
+    def _token(self, path: str) -> str:
+        """Only the researcher's own token reaches a path under ``/users/``."""
+        if path.startswith(_USER_PATH_PREFIX):
+            return resolve_user_auth_token(self.auth_token)
         token = resolve_veupathdb_auth_token(self.auth_token)
         if not token:
             raise WDKLoginRequiredError
@@ -93,7 +105,10 @@ class EdaClient:
             path,
             json=json,
             params=params,
-            headers={"Accept": _JSON_ONLY, "Cookie": f"Authorization={self._token()}"},
+            headers={
+                "Accept": _JSON_ONLY,
+                "Cookie": f"Authorization={self._token(path)}",
+            },
         )
         response = await client.send(request)
         if response.status_code >= _FIRST_ERROR_STATUS:

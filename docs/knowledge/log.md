@@ -1,5 +1,16 @@
 # Knowledge log
 
+## 2026-09-24 - A user dataset and an EDA analysis never travel as the deployment
+
+Every `VdiClient` call, and every `EdaClient` path under `/users/`, takes its token from
+`veupathdb_auth_token_ctx` or the client's own `auth_token=` through the new
+`resolve_user_auth_token` in `veupathdb.auth_context`, and raises `WDKLoginRequiredError`
+before a request is built when neither carries one. Before this, both fell back to
+`VEUPATHDB_AUTH_TOKEN`, so a VDI publish, poll or delete made with no request token ran as
+the deployment's service account. EDA study, subsetting and compute paths keep the
+settings fallback. The rule is [WDK-AUTH-005](wdk/rules/auth-and-transport.md); the name
+is not on the published surface. `veupathdb-py` is 0.1.0a16.
+
 ## 2026-09-23 - An analysis document holds every compute the site offers
 
 `EdaComputation.descriptor` is a left-to-right union: `EdaDifferentialExpressionDescriptor`

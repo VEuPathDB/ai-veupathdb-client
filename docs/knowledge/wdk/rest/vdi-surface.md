@@ -4,7 +4,7 @@ title: The VDI endpoints this client calls
 description: Method, path, payload and response for every VDI user-dataset endpoint this client calls, each pinned to the RAML that defines it, plus the credential forms and the install latency measured live.
 tags: [vdi, user-datasets, rest, veupathdb, wdk-alignment]
 generated: { by: claude-code/opus-5, at: 2026-09-05T00:00:00Z }
-verified: { by: claude-code/opus-5, at: 2026-09-05T00:00:00Z }
+verified: { by: claude-code/opus-5, at: 2026-09-24T00:00:00Z }
 status: stable
 ---
 
@@ -38,6 +38,11 @@ the header name in `.../utils/RequestKeys.java`):
 The token is the same non-guest WDK `Authorization` value `password_login` returns.
 This client sends the bearer header. `/plugins` is the only endpoint below that answers
 without a credential.
+
+VDI keys every dataset to the user the token names, so every `VdiClient` call takes the
+token from the request's contextvar or the client's own `auth_token=` and never from
+the deployment's settings; with neither it raises `WDKLoginRequiredError` and sends
+nothing ([WDK-AUTH-005](../rules/auth-and-transport.md)).
 
 # Endpoints
 

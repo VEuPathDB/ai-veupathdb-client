@@ -27,6 +27,12 @@ Same WDK bearer token the WDK client already holds
 - `Cookie: Authorization={token}` -> 200, and `Authorization: Bearer {token}`
   -> 200 (both live-verified; the bearer form is what the WSF plugins send).
   The `Auth-Key: {token}` header form returns 401.
+- A path under `/users/` names an account, and the service checks that id
+  against the token's user. `EdaClient` sends such a path only with the
+  request's contextvar token or its own `auth_token=`, never the deployment's
+  settings token, and raises `WDKLoginRequiredError` before the request with
+  neither (`WDK-AUTH-005`). Study, subsetting and compute paths keep the
+  settings token as the last fallback.
 
 ## Metadata
 
