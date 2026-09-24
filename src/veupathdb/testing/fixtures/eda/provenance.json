@@ -54,6 +54,50 @@
     "recorded_at": "2026-09-04",
     "trim": ""
   },
+  "gene_id_distribution_de_filtered": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/studies/STUDY_e973eadd57/entities/ENT_fd574cd6/variables/VEUPATHDB_GENE_ID/distribution",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "histogram,statistics",
+    "recorded_at": "2026-09-24",
+    "trim": "the first 20 histogram bins; the statistics are whole"
+  },
+  "gene_id_distribution_de_unfiltered": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/studies/STUDY_e973eadd57/entities/ENT_fd574cd6/variables/VEUPATHDB_GENE_ID/distribution",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "histogram,statistics",
+    "recorded_at": "2026-09-24",
+    "trim": "the first 20 histogram bins; the statistics are whole"
+  },
+  "gene_id_distribution_phenotype_filtered": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/studies/STUDY_53f554ec6a/entities/GENE_PHENOTYPE_DATA_ENTITY/variables/VEUPATHDB_GENE_ID/distribution",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "histogram,statistics",
+    "recorded_at": "2026-09-24",
+    "trim": "the first 20 histogram bins; the statistics are whole"
+  },
+  "gene_id_distribution_phenotype_unfiltered": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/studies/STUDY_53f554ec6a/entities/GENE_PHENOTYPE_DATA_ENTITY/variables/VEUPATHDB_GENE_ID/distribution",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "histogram,statistics",
+    "recorded_at": "2026-09-24",
+    "trim": "the first 20 histogram bins; the statistics are whole"
+  },
   "permissions": {
     "site": "plasmodb",
     "deployment": "https://plasmodb.org/eda",

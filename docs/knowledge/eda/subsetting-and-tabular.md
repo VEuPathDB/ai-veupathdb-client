@@ -551,6 +551,20 @@ The distribution is subset-sensitive in the normal way: `filters` on any entity
 of the study change both the bins and the statistics, per the propagation rule
 above.
 
+On the `VEUPATHDB_GENE_ID` variable of a gene entity, one bin is one gene id and
+`numDistinctValues` is the number of genes, while `subsetSize` counts the entity's
+rows. They differ wherever a row is one gene in one sample. On plasmodb, 2026-09-24:
+the RNA-Seq counts entity `ENT_fd574cd6` of `STUDY_e973eadd57` holds 68640 rows and
+5720 genes, and 5114 rows and 842 genes under `SEQUENCE_READ_COUNT_SENSE` in
+[1000, 61892]; `GENE_PHENOTYPE_DATA_ENTITY` of `STUDY_53f554ec6a` holds 4279 rows and
+5803 genes, and 4011 rows and 5595 genes under the `P. berghei` species filter.
+
+Anchor: the four `gene_id_distribution_*` fixtures, declared in
+`DISTRIBUTION_CAPTURES` in `src/veupathdb/devtools/eda_capture.py`, recorded by
+`python -m veupathdb.devtools.eda_capture record` and read through
+`veupathdb.testing.eda_fixtures.recorded_distribution`; enforced by
+`tests/unit/eda/test_recorded_gene_id_distributions.py`.
+
 ## `POST .../variables/{variableId}/root-vocab`
 
 ```

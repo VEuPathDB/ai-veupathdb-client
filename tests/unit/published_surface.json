@@ -287,7 +287,8 @@
   "veupathdb.testing.eda_fixtures": [
     "FIXTURE_DIR",
     "SCHEMA_PIN_FILE",
-    "UPSTREAM_DIR"
+    "UPSTREAM_DIR",
+    "recorded_distribution"
   ],
   "veupathdb.testing.wdk_fixtures": [
     "FIXTURES",

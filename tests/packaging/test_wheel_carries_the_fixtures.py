@@ -78,7 +78,7 @@ def test_the_wheel_holds_every_recorded_file(built_wheel: Path) -> None:
 
 @pytest.mark.wheel
 def test_an_installed_copy_reads_both_stores(installed_env: Path) -> None:
-    """An interpreter that holds only the wheel reads a WDK and an EDA fixture."""
+    """An interpreter that holds only the wheel reads a WDK and two EDA fixtures."""
     finished = subprocess.run(
         [
             "/usr/bin/env",
@@ -89,13 +89,15 @@ import json
 import sys
 
 import veupathdb
-from veupathdb.testing.eda_fixtures import FIXTURE_DIR
+from veupathdb.testing.eda_fixtures import FIXTURE_DIR, recorded_distribution
 from veupathdb.testing.wdk_fixtures import load_recorded
 
 print(sys.prefix)
 print(veupathdb.__file__)
 print(load_recorded("record_types").json_body()[0])
 print(json.loads((FIXTURE_DIR / "studies_list.json").read_text())["studies"][0]["id"])
+de_genes = recorded_distribution("gene_id_distribution_de_filtered").statistics
+print(de_genes.num_distinct_values)
 """,
         ],
         cwd=installed_env.parent,
@@ -103,8 +105,9 @@ print(json.loads((FIXTURE_DIR / "studies_list.json").read_text())["studies"][0][
         text=True,
         check=True,
     )
-    prefix, module, record_type, study_id = finished.stdout.split()
+    prefix, module, record_type, study_id, de_genes = finished.stdout.split()
     assert Path(prefix) == installed_env
     assert module.startswith(f"{installed_env}/")
     assert record_type == "transcript"
     assert study_id == "STUDY_ccab256dfb"
+    assert de_genes == "842"

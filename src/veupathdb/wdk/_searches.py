@@ -1,6 +1,7 @@
 """Search and record-type endpoint methods for VEuPathDBClient."""
 
 import contextlib
+from collections.abc import Sequence
 
 import pydantic
 from pydantic import JsonValue, TypeAdapter
@@ -16,6 +17,7 @@ from veupathdb.wdk.ai_expression import (
 )
 from veupathdb.wdk.wdk_models import (
     WDKAnswer,
+    WDKFilterValue,
     WDKRecordType,
     WDKSearch,
     WDKSearchConfig,
@@ -139,15 +141,24 @@ class SearchEndpoints:
         search_name: str,
         search_config: WDKSearchConfig,
         report_config: JSONObject | None = None,
+        *,
+        view_filters: Sequence[WDKFilterValue] | None = None,
     ) -> WDKAnswer:
         """Runs a report on a search and creates no step or strategy. The endpoint
-        needs no user session, so several calls can run in parallel."""
+        needs no user session, so several calls can run in parallel.
+
+        :param view_filters: View filters, sent beside ``reportConfig``.
+        """
         payload: JSONObject = {
             "searchConfig": search_config.model_dump(
                 by_alias=True, exclude_defaults=True
             ),
             "reportConfig": report_config or {},
         }
+        if view_filters is not None:
+            payload["viewFilters"] = [
+                f.model_dump(by_alias=True, mode="json") for f in view_filters
+            ]
         result = await self.post(
             f"/record-types/{record_type}/searches/{search_name}/reports/standard",
             json=payload,

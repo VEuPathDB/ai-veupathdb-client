@@ -42,6 +42,10 @@ READERS: dict[str, type[BaseModel]] = {
     "count_unfiltered.json": EdaCountResponse,
     "count_filtered.json": EdaCountResponse,
     "distribution_categorical.json": EdaDistributionResponse,
+    "gene_id_distribution_phenotype_filtered.json": EdaDistributionResponse,
+    "gene_id_distribution_phenotype_unfiltered.json": EdaDistributionResponse,
+    "gene_id_distribution_de_filtered.json": EdaDistributionResponse,
+    "gene_id_distribution_de_unfiltered.json": EdaDistributionResponse,
     "compute_job_lookup.json": EdaComputeJob,
     "volcano_statistics.json": VolcanoStatsResponse,
 }

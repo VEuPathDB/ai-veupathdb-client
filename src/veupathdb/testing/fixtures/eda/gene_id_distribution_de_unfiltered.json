@@ -1,0 +1,131 @@
+{
+  "histogram": [
+    {
+      "value": 12,
+      "binStart": "PF3D7_0100100",
+      "binEnd": "PF3D7_0100100",
+      "binLabel": "PF3D7_0100100"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0100200",
+      "binEnd": "PF3D7_0100200",
+      "binLabel": "PF3D7_0100200"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0100300",
+      "binEnd": "PF3D7_0100300",
+      "binLabel": "PF3D7_0100300"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0100400",
+      "binEnd": "PF3D7_0100400",
+      "binLabel": "PF3D7_0100400"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0100500",
+      "binEnd": "PF3D7_0100500",
+      "binLabel": "PF3D7_0100500"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0100600",
+      "binEnd": "PF3D7_0100600",
+      "binLabel": "PF3D7_0100600"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0100700",
+      "binEnd": "PF3D7_0100700",
+      "binLabel": "PF3D7_0100700"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0100800",
+      "binEnd": "PF3D7_0100800",
+      "binLabel": "PF3D7_0100800"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0100900",
+      "binEnd": "PF3D7_0100900",
+      "binLabel": "PF3D7_0100900"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0101000",
+      "binEnd": "PF3D7_0101000",
+      "binLabel": "PF3D7_0101000"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0101100",
+      "binEnd": "PF3D7_0101100",
+      "binLabel": "PF3D7_0101100"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0101200",
+      "binEnd": "PF3D7_0101200",
+      "binLabel": "PF3D7_0101200"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0101300",
+      "binEnd": "PF3D7_0101300",
+      "binLabel": "PF3D7_0101300"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0101400",
+      "binEnd": "PF3D7_0101400",
+      "binLabel": "PF3D7_0101400"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0101500",
+      "binEnd": "PF3D7_0101500",
+      "binLabel": "PF3D7_0101500"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0101600",
+      "binEnd": "PF3D7_0101600",
+      "binLabel": "PF3D7_0101600"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0101700",
+      "binEnd": "PF3D7_0101700",
+      "binLabel": "PF3D7_0101700"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0101800",
+      "binEnd": "PF3D7_0101800",
+      "binLabel": "PF3D7_0101800"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0101900",
+      "binEnd": "PF3D7_0101900",
+      "binLabel": "PF3D7_0101900"
+    },
+    {
+      "value": 12,
+      "binStart": "PF3D7_0102000",
+      "binEnd": "PF3D7_0102000",
+      "binLabel": "PF3D7_0102000"
+    }
+  ],
+  "statistics": {
+    "subsetSize": 68640,
+    "numVarValues": 68640,
+    "numDistinctValues": 5720,
+    "numDistinctEntityRecords": 68640,
+    "numMissingCases": 0
+  }
+}

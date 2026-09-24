@@ -221,16 +221,18 @@ installed copy reads them.
 `veupathdb.testing.wdk_fixtures.FIXTURE_DIR` and
 `veupathdb.testing.eda_fixtures.FIXTURE_DIR` resolve that directory through
 `importlib.resources`, and every reader goes through them rather than spelling a
-path of its own.
+path of its own. `veupathdb.testing.eda_fixtures.recorded_distribution(name)` reads
+one recorded `/distribution` body as an `EdaDistributionResponse`.
 
 Recorded bodies and vendored schemas are refreshed, never hand-edited. The two
-schema readers ride the `devtools` extra, so an installed copy runs the five
+schema readers ride the `devtools` extra, so an installed copy runs the six
 commands after `pip install "veupathdb-py[devtools]"`:
 
 ```
 uv run python -m veupathdb.devtools.fixtures record     # needs VEUPATHDB_AUTH_TOKEN
 uv run python -m veupathdb.devtools.fixtures vendor
 uv run python -m veupathdb.devtools.fixtures verify
+uv run python -m veupathdb.devtools.eda_capture record   # analyses need WDK_TEST_*
 uv run python -m veupathdb.devtools.eda_schemas vendor
 uv run python -m veupathdb.devtools.eda_schemas verify
 ```

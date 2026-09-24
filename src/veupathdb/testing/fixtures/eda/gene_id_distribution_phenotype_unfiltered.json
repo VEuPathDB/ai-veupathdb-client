@@ -1,0 +1,131 @@
+{
+  "histogram": [
+    {
+      "value": 1,
+      "binStart": "PBANKA_0100100",
+      "binEnd": "PBANKA_0100100",
+      "binLabel": "PBANKA_0100100"
+    },
+    {
+      "value": 1,
+      "binStart": "PBANKA_0100200",
+      "binEnd": "PBANKA_0100200",
+      "binLabel": "PBANKA_0100200"
+    },
+    {
+      "value": 5,
+      "binStart": "PBANKA_0100600",
+      "binEnd": "PBANKA_0100600",
+      "binLabel": "PBANKA_0100600"
+    },
+    {
+      "value": 2,
+      "binStart": "PBANKA_0100800",
+      "binEnd": "PBANKA_0100800",
+      "binLabel": "PBANKA_0100800"
+    },
+    {
+      "value": 1,
+      "binStart": "PBANKA_0100900",
+      "binEnd": "PBANKA_0100900",
+      "binLabel": "PBANKA_0100900"
+    },
+    {
+      "value": 4,
+      "binStart": "PBANKA_0101100",
+      "binEnd": "PBANKA_0101100",
+      "binLabel": "PBANKA_0101100"
+    },
+    {
+      "value": 1,
+      "binStart": "PBANKA_0101200",
+      "binEnd": "PBANKA_0101200",
+      "binLabel": "PBANKA_0101200"
+    },
+    {
+      "value": 1,
+      "binStart": "PBANKA_0101300",
+      "binEnd": "PBANKA_0101300",
+      "binLabel": "PBANKA_0101300"
+    },
+    {
+      "value": 1,
+      "binStart": "PBANKA_0101500",
+      "binEnd": "PBANKA_0101500",
+      "binLabel": "PBANKA_0101500"
+    },
+    {
+      "value": 1,
+      "binStart": "PBANKA_0101600",
+      "binEnd": "PBANKA_0101600",
+      "binLabel": "PBANKA_0101600"
+    },
+    {
+      "value": 1,
+      "binStart": "PBANKA_0102000",
+      "binEnd": "PBANKA_0102000",
+      "binLabel": "PBANKA_0102000"
+    },
+    {
+      "value": 2,
+      "binStart": "PBANKA_0102100",
+      "binEnd": "PBANKA_0102100",
+      "binLabel": "PBANKA_0102100"
+    },
+    {
+      "value": 1,
+      "binStart": "PBANKA_0102200",
+      "binEnd": "PBANKA_0102200",
+      "binLabel": "PBANKA_0102200"
+    },
+    {
+      "value": 2,
+      "binStart": "PBANKA_0102300",
+      "binEnd": "PBANKA_0102300",
+      "binLabel": "PBANKA_0102300"
+    },
+    {
+      "value": 5,
+      "binStart": "PBANKA_0102400",
+      "binEnd": "PBANKA_0102400",
+      "binLabel": "PBANKA_0102400"
+    },
+    {
+      "value": 1,
+      "binStart": "PBANKA_0102600",
+      "binEnd": "PBANKA_0102600",
+      "binLabel": "PBANKA_0102600"
+    },
+    {
+      "value": 1,
+      "binStart": "PbANKA_0102900",
+      "binEnd": "PbANKA_0102900",
+      "binLabel": "PbANKA_0102900"
+    },
+    {
+      "value": 1,
+      "binStart": "PBANKA_0102900",
+      "binEnd": "PBANKA_0102900",
+      "binLabel": "PBANKA_0102900"
+    },
+    {
+      "value": 1,
+      "binStart": "PBANKA_0103300",
+      "binEnd": "PBANKA_0103300",
+      "binLabel": "PBANKA_0103300"
+    },
+    {
+      "value": 1,
+      "binStart": "PBANKA_0103700",
+      "binEnd": "PBANKA_0103700",
+      "binLabel": "PBANKA_0103700"
+    }
+  ],
+  "statistics": {
+    "subsetSize": 4279,
+    "numVarValues": 8565,
+    "numDistinctValues": 5803,
+    "numDistinctEntityRecords": 4279,
+    "numMissingCases": 0
+  }
+}

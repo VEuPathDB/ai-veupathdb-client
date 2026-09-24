@@ -1,5 +1,24 @@
 # Knowledge log
 
+## 2026-09-24 - A search report takes view filters, and a gene-id distribution is recorded
+
+`run_search_report` takes `view_filters`, sent as `viewFilters` at the top level of the
+search report body beside `searchConfig` and `reportConfig` (WDK-FILTER-003), the way
+`get_step_answer` does. With none given the body carries no `viewFilters` key. Live on
+plasmodb, `GenesByMolecularWeight` on P. falciparum 3D7 between 50000 and 52000 Da
+returned 85 transcript rows for 84 genes, and 84 rows under
+`representativeTranscriptOnly`.
+
+`eda_capture` records `/distribution` reads beside the analysis documents:
+`DISTRIBUTION_CAPTURES` declares each request, and `record` writes the body with the
+first 20 histogram bins and whole statistics, and a provenance entry that states the
+cut. The four `gene_id_distribution_*` fixtures hold the `VEUPATHDB_GENE_ID`
+distribution of the RNA-Seq and the phenotype study, under one example subset and
+under none, bound to `VariableDistributionPostResponse` in `eda_schemas`.
+`veupathdb.testing.eda_fixtures.recorded_distribution` reads one as an
+`EdaDistributionResponse`. `EdaClient.distribution` builds its body through the new
+`distribution_body`, which the capture sends too.
+
 ## 2026-09-24 - A user dataset and an EDA analysis never travel as the deployment
 
 Every `VdiClient` call, and every `EdaClient` path under `/users/`, takes its token from

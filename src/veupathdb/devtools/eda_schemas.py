@@ -617,6 +617,38 @@ BINDINGS: tuple[FixtureBinding, ...] = (
         ),
     ),
     FixtureBinding(
+        fixture="gene_id_distribution_phenotype_filtered",
+        raml_type="VariableDistributionPostResponse",
+        endpoint=(
+            "POST /studies/{study-id}/entities/{entity-id}"
+            "/variables/{variable-id}/distribution"
+        ),
+    ),
+    FixtureBinding(
+        fixture="gene_id_distribution_phenotype_unfiltered",
+        raml_type="VariableDistributionPostResponse",
+        endpoint=(
+            "POST /studies/{study-id}/entities/{entity-id}"
+            "/variables/{variable-id}/distribution"
+        ),
+    ),
+    FixtureBinding(
+        fixture="gene_id_distribution_de_filtered",
+        raml_type="VariableDistributionPostResponse",
+        endpoint=(
+            "POST /studies/{study-id}/entities/{entity-id}"
+            "/variables/{variable-id}/distribution"
+        ),
+    ),
+    FixtureBinding(
+        fixture="gene_id_distribution_de_unfiltered",
+        raml_type="VariableDistributionPostResponse",
+        endpoint=(
+            "POST /studies/{study-id}/entities/{entity-id}"
+            "/variables/{variable-id}/distribution"
+        ),
+    ),
+    FixtureBinding(
         fixture="compute_job_lookup",
         raml_type="JobResponse",
         endpoint="POST /computes/differentialexpression",
@@ -764,7 +796,7 @@ def _refs(node: JsonValue) -> Iterator[str]:
 def _list_types() -> None:
     library = pinned().library
     for binding in BINDINGS:
-        print(f"{binding.fixture:28} {binding.raml_type:36} {binding.endpoint}")
+        print(f"{binding.fixture:42} {binding.raml_type:36} {binding.endpoint}")
     for defect in SPEC_DEFECTS:
         member = f"{defect.raml_type}.{defect.member}"
         print(f"{member:52} {defect.kind:22} {defect.measured}")
@@ -782,7 +814,7 @@ def _verify() -> int:
     failed = [check for check in checks if check.errors]
     for check in checks:
         state = "FAIL" if check.errors else "PASS"
-        print(f"{check.fixture:28} {state:5} {check.raml_type}")
+        print(f"{check.fixture:42} {state:5} {check.raml_type}")
         for error in check.errors:
             print(f"    {error}")
 

@@ -234,7 +234,7 @@ not know they exist.
 to JSON Schema draft-07 and validates every recorded body under
 `src/veupathdb/testing/fixtures/eda/` against the
 type its endpoint returns. It is offline, needs no credential, and fails when a
-vendored file no longer matches its sha256. The ten recorded bodies bind eight
+vendored file no longer matches its sha256. The fourteen recorded bodies bind eight
 types, whose transitive closure is 51 of the library's 414. `vendor`
 re-downloads the library at the commit the pin names and rewrites the pin only
 when a byte changed; bump `sha` first, then run it.

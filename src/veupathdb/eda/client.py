@@ -152,20 +152,11 @@ class EdaClient:
         filters: Sequence[EdaFilter],
         bin_spec: EdaBinSpec | None = None,
     ) -> EdaDistributionResponse:
-        body: dict[str, JsonValue] = {
-            "filters": _filters(filters),
-            "valueSpec": "count",
-        }
-        # A binSpec is required for a continuous variable and refused otherwise.
-        if bin_spec is not None:
-            body["binSpec"] = bin_spec.model_dump(
-                by_alias=True, mode="json", exclude_none=True
-            )
         raw = await self.request_json(
             "POST",
             f"/studies/{study_id}/entities/{entity_id}"
             f"/variables/{variable_id}/distribution",
-            json=body,
+            json=distribution_body(filters, bin_spec),
         )
         return EdaDistributionResponse.model_validate(raw)
 
@@ -204,6 +195,19 @@ class EdaClient:
             json=_compute_body(study_id, config, filters),
         )
         return VolcanoStatsResponse.model_validate(raw)
+
+
+def distribution_body(
+    filters: Sequence[EdaFilter], bin_spec: EdaBinSpec | None = None
+) -> dict[str, JsonValue]:
+    """The ``VariableDistributionPostRequest`` of a count distribution."""
+    body: dict[str, JsonValue] = {"filters": _filters(filters), "valueSpec": "count"}
+    # A binSpec is required for a continuous variable and refused otherwise.
+    if bin_spec is not None:
+        body["binSpec"] = bin_spec.model_dump(
+            by_alias=True, mode="json", exclude_none=True
+        )
+    return body
 
 
 def _filters(filters: Sequence[EdaFilter]) -> JsonValue:
