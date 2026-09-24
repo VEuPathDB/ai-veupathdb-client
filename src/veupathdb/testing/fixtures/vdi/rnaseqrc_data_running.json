@@ -1,0 +1,121 @@
+{
+  "installTargets": [
+    "PlasmoDB"
+  ],
+  "name": "veupathdb-py fixture rnaseqrc",
+  "summary": "Recorded by vdi_capture and deleted after the capture.",
+  "origin": "direct-upload",
+  "dependencies": [
+    {
+      "resourceIdentifier": "PlasmoDB-71_Pfalciparum3D7_Genome",
+      "resourceDisplayName": "Plasmodium falciparum 3D7",
+      "resourceVersion": "71"
+    }
+  ],
+  "publications": [],
+  "contacts": [],
+  "linkedDatasets": [],
+  "funding": [],
+  "daysForApproval": -1,
+  "datasetSources": [],
+  "datasetId": "x4Z5JRpM9F0M8",
+  "type": {
+    "name": "rnaseqrc",
+    "version": "1.0",
+    "category": "RNA-Seq raw counts"
+  },
+  "visibility": "private",
+  "owner": {
+    "userId": 1000000001,
+    "firstName": "Recorded",
+    "lastName": "Owner",
+    "email": "recorded.owner@example.invalid",
+    "affiliation": "Example University"
+  },
+  "created": "2026-09-24T12:38:16.568540757Z",
+  "shortName": "veupathdb-py fixture rnaseqrc",
+  "relatedDatasets": [],
+  "status": {
+    "upload": {
+      "status": "success"
+    },
+    "import": {
+      "status": "complete"
+    },
+    "install": [
+      {
+        "installTarget": "PlasmoDB",
+        "meta": {
+          "status": "complete"
+        },
+        "data": {
+          "status": "running"
+        }
+      }
+    ]
+  },
+  "files": {
+    "upload": {
+      "zipSize": 179940,
+      "contents": [
+        {
+          "fileName": "HS_counts_sense.tsv",
+          "fileSize": 305693
+        },
+        {
+          "fileName": "HS_counts_antisense.tsv",
+          "fileSize": 239511
+        },
+        {
+          "fileName": "sample-info.txt",
+          "fileSize": 579
+        },
+        {
+          "fileName": "manifest.tsv",
+          "fileSize": 88
+        }
+      ]
+    },
+    "install": {
+      "zipSize": 937033,
+      "contents": [
+        {
+          "fileName": "attributegraph_s5557f1d242_HTSeqcnts.cache",
+          "fileSize": 92079
+        },
+        {
+          "fileName": "attributevalue_s5557f1d242_HTSeqcnts.cache",
+          "fileSize": 12401730
+        },
+        {
+          "fileName": "entitytypegraph.cache",
+          "fileSize": 151
+        },
+        {
+          "fileName": "attributevalue_s5557f1d242_sample.cache",
+          "fileSize": 1764
+        },
+        {
+          "fileName": "ancestors_s5557f1d242_HTSeqcnts.cache",
+          "fileSize": 2746908
+        },
+        {
+          "fileName": "ancestors_s5557f1d242_sample.cache",
+          "fileSize": 156
+        },
+        {
+          "fileName": "study.cache",
+          "fileSize": 67
+        },
+        {
+          "fileName": "attributegraph_s5557f1d242_sample.cache",
+          "fileSize": 758
+        },
+        {
+          "fileName": "install.json",
+          "fileSize": 19701
+        }
+      ]
+    }
+  }
+}

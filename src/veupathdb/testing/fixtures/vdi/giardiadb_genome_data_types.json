@@ -1,0 +1,343 @@
+{
+  "records": [
+    {
+      "tables": {},
+      "displayName": "<i>Giardia Assemblage A</i> isolate WB",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia Assemblage A isolate WB",
+        "name_for_filenames": "GintestinalisAssemblageAWB"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_184922"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Giardia Assemblage B</i> isolate GS",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia Assemblage B isolate GS",
+        "name_for_filenames": "GintestinalisAssemblageBGS"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_598745"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Giardia Assemblage E</i> isolate P15",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia Assemblage E isolate P15",
+        "name_for_filenames": "GintestinalisAssemblageEP15"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_658858"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Giardia Assemblage A</i> 2 isolate DH",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia Assemblage A2 isolate DH",
+        "name_for_filenames": "GintestinalisAssemblageADH"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_gassA2DH"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Giardia Assemblage A</i> AS175",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia assemblage A isolate AS175",
+        "name_for_filenames": "GintestinalisAssemblageAAS175"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_gassAAS175"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Giardia Assemblage A</i> isolate CIA",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia Assemblage A isolate CIA",
+        "name_for_filenames": "GintestinalisAssemblageACIA"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_gassACIA"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Giardia Assemblage A</i> isolate WB 2019",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia Assemblage A isolate WB 2019",
+        "name_for_filenames": "GintestinalisAssemblageAWB2019"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_gassAWB2019"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Giardia Assemblage A</i> isolate WB Calgary",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia Assemblage A isolate WB Calgary",
+        "name_for_filenames": "GintestinalisAssemblageAWBCalgary"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_gassAWBCalgary"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Giardia Assemblage B</i> isolate BAH15c1",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia Assemblage B isolate BAH15c1",
+        "name_for_filenames": "GintestinalisAssemblageBBAH15c1"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_gassBBAH15c1"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Giardia Assemblage B</i> isolate GS_B",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia Assemblage B isolate GS_B",
+        "name_for_filenames": "GintestinalisAssemblageBGS_B"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_gassBGS_B"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Giardia Assemblage B</i> isolate GS Calgary",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia Assemblage B isolate GS Calgary",
+        "name_for_filenames": "GintestinalisAssemblageBGSCalgary"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_gassBGSCalgary"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Giardia Assemblage D</i> isolate DID",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia Assemblage D isolate DID",
+        "name_for_filenames": "GintestinalisAssemblageDDID"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_gassDDID"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Giardia Assemblage A</i> Beaver",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia intestinalis Beaver",
+        "name_for_filenames": "GintestinalisBeaver"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_gintBeaver"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Giardia muris</i> strain Roberts-Thomson",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Giardia muris strain Roberts-Thomson",
+        "name_for_filenames": "GmurisRobertsThomson"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_gmurRobertsThomson"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Monocercomonoides exilis</i> PA203",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Monocercomonoides exilis PA203",
+        "name_for_filenames": "MexilisPA203"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_mexiPA203"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Spironucleus salmonicida</i> ATCC50377",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Spironucleus salmonicida ATCC50377",
+        "name_for_filenames": "SsalmonicidaATCC50377"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_ssalATCC50377"
+        },
+        {
+          "name": "project_id",
+          "value": "GiardiaDB"
+        }
+      ],
+      "tableErrors": []
+    }
+  ],
+  "meta": {
+    "displayViewTotalCount": 16,
+    "tables": [],
+    "pagination": {
+      "offset": 0,
+      "numRecords": -1
+    },
+    "cachePreviouslyExisted": true,
+    "viewTotalCount": 16,
+    "sorting": [],
+    "recordClassName": "organism",
+    "responseCount": 16,
+    "attributes": [
+      "organism_full",
+      "name_for_filenames"
+    ],
+    "totalCount": 16,
+    "displayTotalCount": 16
+  }
+}

@@ -11,7 +11,11 @@ from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk._failures import wdk_failure
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.strategy_api.api import StrategyAPI
-from veupathdb.wdk.wdk_models import WDKSearch, WDKWordEnrichmentRow
+from veupathdb.wdk.wdk_models import (
+    WDKSearch,
+    WDKSearchConfig,
+    WDKWordEnrichmentRow,
+)
 
 
 class _Report:
@@ -145,3 +149,19 @@ def test_wdk_search_004_the_parameter_list_is_param_names_and_a_group_is_present
     ]
     assert grouped <= set(search.param_names)
     assert [param.name for param in search.parameters or []] == search.param_names
+
+
+async def test_wdk_ans_010_an_empty_search_config_still_sends_its_parameters(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """WDK reads `parameters` unconditionally, so no dump option may drop it."""
+    client = VEuPathDBClient("https://example.invalid/service")
+    report = _Report(load_recorded("answer_report_by_molecular_weight").json_body())
+    monkeypatch.setattr(client, "post", report)
+
+    await client.run_search_report("organism", "GenomeDataTypes", WDKSearchConfig())
+
+    assert report.bodies[0]["searchConfig"] == {"parameters": {}}
+    assert WDKSearchConfig().model_dump(by_alias=True, exclude_defaults=True) == {
+        "parameters": {}
+    }

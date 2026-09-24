@@ -8,12 +8,17 @@ parameters must go out as ``""``.
 
 from __future__ import annotations
 
+import json
+from collections.abc import Iterator
 from types import SimpleNamespace
 from typing import Any
 
+import httpx
 import pytest
+import respx
 from tests.unit.wdk._step_writes import Recorder, no_expansion
 
+from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.errors import WDKError
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.client import VEuPathDBClient
@@ -334,3 +339,63 @@ class TestAWriteCarriesTheStepsOwnInputs:
         )
 
         assert reads == ["/users/1/steps/9"]
+
+
+class TestAStepForASearchWithNoParametersSendsAnEmptyMap:
+    """WDK-ANS-010: WDK reads ``parameters`` on every new step's search config."""
+
+    @pytest.fixture(autouse=True)
+    def _registered_token(self) -> Iterator[None]:
+        reset = veupathdb_auth_token_ctx.set("registered.token")
+        yield
+        veupathdb_auth_token_ctx.reset(reset)
+
+    @staticmethod
+    def _wire_api(monkeypatch: pytest.MonkeyPatch) -> StrategyAPI:
+        api = _api_with_params(monkeypatch, [])
+        monkeypatch.setattr(api, "_expand_tree_params_to_leaves", no_expansion)
+        return api
+
+    @respx.mock
+    async def test_a_leaf_step_sends_parameters_on_the_wire(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        respx.get("https://example.invalid/app").mock(return_value=httpx.Response(200))
+        route = respx.post("https://example.invalid/service/users/1/steps").mock(
+            return_value=httpx.Response(200, json={"id": 41})
+        )
+
+        created = await self._wire_api(monkeypatch).create_step(
+            NewStepSpec(search_name="AllGenes", search_config=WDKSearchConfig()),
+            record_type="transcript",
+            user_id="1",
+        )
+
+        assert created.id == 41
+        assert json.loads(route.calls.last.request.content) == {
+            "searchName": "AllGenes",
+            "searchConfig": {"parameters": {}},
+        }
+
+    @respx.mock
+    async def test_a_transform_step_sends_parameters_on_the_wire(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        respx.get("https://example.invalid/app").mock(return_value=httpx.Response(200))
+        route = respx.post("https://example.invalid/service/users/1/steps").mock(
+            return_value=httpx.Response(200, json={"id": 42})
+        )
+
+        await self._wire_api(monkeypatch).create_transform_step(
+            NewStepSpec(
+                search_name="GenesByProteinStructure",
+                search_config=WDKSearchConfig(),
+            ),
+            input_step_id=41,
+            user_id="1",
+        )
+
+        assert json.loads(route.calls.last.request.content) == {
+            "searchName": "GenesByProteinStructure",
+            "searchConfig": {"parameters": {}},
+        }

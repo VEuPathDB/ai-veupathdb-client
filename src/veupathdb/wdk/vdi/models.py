@@ -12,6 +12,8 @@ from veupathdb.model import CamelModel
 GENELIST_PLUGIN_NAME = "genelist"
 GENELIST_PLUGIN_VERSION = "1.0"
 DIRECT_UPLOAD_ORIGIN = "direct-upload"
+EDA_USER_DATASET_PREFIX = "EDAUD_"
+DEPENDENCY_IDENTIFIER_MAX = 50
 
 _NAME_MIN = 3
 _NAME_MAX = 1024
@@ -59,9 +61,35 @@ class VdiInstallStatus(StrEnum):
     MISSING_DEPENDENCY = "missing-dependency"
 
 
-TERMINAL_INSTALL_STATUSES = frozenset(
+class VdiInstallDisposition(StrEnum):
+    """What a poller does next for one project: keep going, slow down, or stop."""
+
+    CONTINUE = "continue"
+    CONTINUE_SLOW = "continue-slow"
+    INSTALLED = "installed"
+    FAILED = "failed"
+
+
+# The site's own poller: fast while a user watches, then slow over a long import.
+_POLL_TIERS = ((5, 2.0), (11, 5.0))
+_POLL_STEADY_SECONDS = 15.0
+_POLL_REINSTALL_SECONDS = 60.0
+
+
+def poll_interval_seconds(poll_count: int, disposition: VdiInstallDisposition) -> float:
+    """Seconds to wait before poll number ``poll_count + 1``."""
+    if disposition is VdiInstallDisposition.CONTINUE_SLOW:
+        return _POLL_REINSTALL_SECONDS
+    return next(
+        (seconds for through, seconds in _POLL_TIERS if poll_count < through),
+        _POLL_STEADY_SECONDS,
+    )
+
+
+_FAILED_UPLOAD = frozenset({VdiUploadStatus.REJECTED, VdiUploadStatus.FAILED})
+_FAILED_IMPORT = frozenset({VdiImportStatus.INVALID, VdiImportStatus.FAILED})
+_FAILED_INSTALL = frozenset(
     {
-        VdiInstallStatus.COMPLETE,
         VdiInstallStatus.FAILED_VALIDATION,
         VdiInstallStatus.FAILED_INSTALLATION,
         VdiInstallStatus.MISSING_DEPENDENCY,
@@ -88,27 +116,54 @@ class VdiDatasetTypeDetail(VdiDatasetType):
     category: str = ""
 
 
+RNASEQRC = VdiDatasetType(name="rnaseqrc", version="1.0")
+
+
+class VdiDatasetDependency(VdiModel):
+    """A resource the dataset needs on the target site, such as a reference genome."""
+
+    resource_identifier: str = Field(min_length=3, max_length=DEPENDENCY_IDENTIFIER_MAX)
+    resource_display_name: str = Field(min_length=3, max_length=100)
+    resource_version: str = Field(min_length=1, max_length=50)
+
+
+# A status VDI adds later parses as text, so a poll keeps going instead of failing.
 class VdiUploadStatusInfo(VdiModel):
-    status: VdiUploadStatus
+    status: VdiUploadStatus | str = Field(union_mode="left_to_right")
     message: str | None = None
 
 
 class VdiImportStatusInfo(VdiModel):
-    status: VdiImportStatus
+    status: VdiImportStatus | str = Field(union_mode="left_to_right")
     messages: list[str] = Field(default_factory=list)
 
 
 class VdiInstallStatusDetails(VdiModel):
-    status: VdiInstallStatus
+    status: VdiInstallStatus | str = Field(union_mode="left_to_right")
     messages: list[str] = Field(default_factory=list)
 
 
 class VdiInstallStatusEntry(VdiModel):
-    """One target site's installation of a dataset."""
+    """One target site's installation of a dataset: its metadata and its data."""
 
     install_target: str
     meta: VdiInstallStatusDetails
     data: VdiInstallStatusDetails | None = None
+
+    def axes(self) -> list[VdiInstallStatusDetails]:
+        """The axes the service has reported, meta first."""
+        return [self.meta] if self.data is None else [self.meta, self.data]
+
+    def disposition(self) -> VdiInstallDisposition:
+        """A failure on either axis fails the install; both must be complete."""
+        statuses = [axis.status for axis in self.axes()]
+        if any(status in _FAILED_INSTALL for status in statuses):
+            return VdiInstallDisposition.FAILED
+        if VdiInstallStatus.READY_FOR_REINSTALL in statuses:
+            return VdiInstallDisposition.CONTINUE_SLOW
+        if statuses == [VdiInstallStatus.COMPLETE, VdiInstallStatus.COMPLETE]:
+            return VdiInstallDisposition.INSTALLED
+        return VdiInstallDisposition.CONTINUE
 
 
 class VdiDatasetStatus(VdiModel):
@@ -118,17 +173,45 @@ class VdiDatasetStatus(VdiModel):
     import_: VdiImportStatusInfo | None = Field(default=None, validation_alias="import")
     install: list[VdiInstallStatusEntry] = Field(default_factory=list)
 
-    def is_terminal(self) -> bool:
-        """Report whether no axis can still change without a new request."""
-        if self.upload.status in {VdiUploadStatus.REJECTED, VdiUploadStatus.FAILED}:
-            return True
-        if self.import_ is None:
-            return False
-        if self.import_.status in {VdiImportStatus.INVALID, VdiImportStatus.FAILED}:
-            return True
-        return bool(self.install) and all(
-            entry.meta.status in TERMINAL_INSTALL_STATUSES for entry in self.install
+    def _entry(self, project_id: str) -> VdiInstallStatusEntry | None:
+        return next(
+            (entry for entry in self.install if entry.install_target == project_id),
+            None,
         )
+
+    def disposition(self, project_id: str) -> VdiInstallDisposition:
+        """Where one project's install stands; only that project's entry decides.
+
+        Installed means the import is complete and both install axes are complete.
+        A status this client does not know keeps the poll going.
+        """
+        if self.upload.status in _FAILED_UPLOAD or (
+            self.import_ is not None and self.import_.status in _FAILED_IMPORT
+        ):
+            return VdiInstallDisposition.FAILED
+        entry = self._entry(project_id)
+        if (
+            self.upload.status != VdiUploadStatus.SUCCESS
+            or self.import_ is None
+            or self.import_.status != VdiImportStatus.COMPLETE
+            or entry is None
+        ):
+            return VdiInstallDisposition.CONTINUE
+        return entry.disposition()
+
+    def failure_messages(self, project_id: str) -> list[str]:
+        """The service's own text for each axis that failed, upload first."""
+        messages: list[str] = []
+        if self.upload.status in _FAILED_UPLOAD and self.upload.message:
+            messages.append(self.upload.message)
+        if self.import_ is not None and self.import_.status in _FAILED_IMPORT:
+            messages.extend(self.import_.messages)
+        entry = self._entry(project_id)
+        if entry is not None:
+            for axis in entry.axes():
+                if axis.status in _FAILED_INSTALL:
+                    messages.extend(axis.messages)
+        return messages
 
 
 class VdiDatasetOwner(VdiModel):
@@ -149,7 +232,7 @@ class VdiDatasetPostMeta(VdiModel):
     description: str | None = None
     origin: str = DIRECT_UPLOAD_ORIGIN
     visibility: VdiVisibility = VdiVisibility.PRIVATE
-    dependencies: list[str] = Field(default_factory=list)
+    dependencies: list[VdiDatasetDependency] = Field(default_factory=list)
 
 
 class VdiDatasetPostResponse(VdiModel):
@@ -173,9 +256,59 @@ class VdiDatasetDetails(VdiModel):
     status: VdiDatasetStatus
 
     def installed_targets(self) -> list[str]:
-        """The sites whose databases already hold this dataset."""
+        """The sites whose databases hold both this dataset's metadata and its data."""
         return [
             entry.install_target
             for entry in self.status.install
-            if entry.meta.status is VdiInstallStatus.COMPLETE
+            if self.status.disposition(entry.install_target)
+            is VdiInstallDisposition.INSTALLED
         ]
+
+
+class VdiDatasetListEntry(VdiModel):
+    """One row of ``GET /datasets``. A failed import lists its status without messages."""
+
+    dataset_id: str
+    owner: VdiDatasetOwner
+    type: VdiDatasetTypeDetail
+    visibility: VdiVisibility
+    name: str
+    install_targets: list[str] = Field(default_factory=list)
+    status: VdiDatasetStatus
+    created: datetime
+    summary: str = ""
+
+
+class VdiPluginDataType(VdiDatasetTypeDetail):
+    """One dataset type a plugin serves, with the checks a multi-file upload skips."""
+
+    max_file_size: int
+    allowed_file_extensions: list[str] = Field(default_factory=list)
+
+
+class VdiPlugin(VdiModel):
+    """One plugin ``GET /plugins`` lists. No install target means any site."""
+
+    plugin_name: str
+    data_types: list[VdiPluginDataType] = Field(default_factory=list)
+    install_targets: list[str] = Field(default_factory=list)
+
+    def data_type(self, dataset_type: VdiDatasetType) -> VdiPluginDataType | None:
+        """The served type with this name and version, if this plugin serves it."""
+        return next(
+            (
+                served
+                for served in self.data_types
+                if served.name == dataset_type.name
+                and served.version == dataset_type.version
+            ),
+            None,
+        )
+
+    def installs_into(self, project_id: str) -> bool:
+        return not self.install_targets or project_id in self.install_targets
+
+
+def eda_dataset_id(vdi_id: str) -> str:
+    """The EDA dataset id the WDK vocabulary gives an installed user dataset."""
+    return f"{EDA_USER_DATASET_PREFIX}{vdi_id}"

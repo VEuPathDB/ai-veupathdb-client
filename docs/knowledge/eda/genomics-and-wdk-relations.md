@@ -4,7 +4,7 @@ title: EDA's genomics and WDK relations
 description: How dataset presenters stamp per-dataset EDA searches, how VDI user datasets become EDA studies a WDK search can bind, how /eda/permissions gates both, and every place EDA reaches a genomics site beyond the analysis-spec parameter.
 tags: [eda, wdk, apicommonmodel, vdi, permissions, dataset-presenters, dst-templates, genomics]
 generated: { by: claude-code/opus-5, at: 2026-08-27T00:00:00Z }
-verified: { by: claude-code/opus-5, at: 2026-08-27T00:00:00Z }
+verified: { by: claude-code/opus-5, at: 2026-09-24T00:00:00Z }
 status: stable
 ---
 
@@ -462,6 +462,88 @@ None of the 12 appears in PlasmoDB's WDK user-dataset vocabularies, because
 those filter on VDI `type` and `project_id` and these are ToxoDB-scoped
 `isasimple` datasets. **A study being visible in `/eda` does not imply a WDK
 search can bind it.**
+
+### The study listing is per account
+
+`GET /eda/studies` is filtered by the requesting user.
+[`StudiesService.getStudies`](https://github.com/VEuPathDB/service-eda/blob/b3bb8bac06de4340b4b2c21d9aa4a94d9b3de61f/src/main/java/org/veupathdb/service/eda/subset/service/StudiesService.java#L70-L88)
+reads `DatasetAccessClient.getStudyDatasetInfoMapForUser(user.getUserId())` and keeps only
+the overviews whose study id is in that map. User studies enter the map through the
+owner and shared-with tables, so a private upload is listed for its owner and for no one
+else.
+
+Measured on plasmodb.org on 2026-09-24, with four private `rnaseqrc` uploads installed
+under one registered account:
+
+| caller | `curated` | `user_submitted` | the four uploads |
+| --- | ---: | ---: | --- |
+| the owner's token | 747 | 14 | all four listed |
+| a guest token WDK minted for the call | 747 | 10 | none |
+| no credential | 747 | 10 | none |
+
+`/eda/permissions` gave the same split: 14 `isUserStudy` entries for the owner, 10 for the
+guest and for no credential. The 10 are user studies every caller sees. Each upload's
+permission entry for its owner is `isUserStudy: true`, `sha1Hash: ""`, `type: provider`,
+`isManager: true`, and every `actionAuthorization` flag true. A cache of `/eda/studies`
+shared across accounts therefore holds whichever account filled it, and one filled under
+a service account never lists a researcher's own upload.
+
+The entry appears 1.1 to 1.2 s after VDI reports the install's `data` axis `complete`, and
+was gone at the first read after a `DELETE`, within 5.1 s
+(`veupathdb-py: docs/knowledge/wdk/rest/vdi-surface.md`).
+
+### What an `rnaseqrc` upload becomes
+
+`GET /eda/studies/{studyId}` for an installed stranded upload of 12 samples by 5,720 genes
+returned two entities, the shape the plugin writes
+([`wrangle-rnaseqrc.R:32-60`](https://github.com/VEuPathDB/vdi-plugin-wrangler/blob/2a5e1714f8c7661979b0205dd342b8735ab6d0b4/lib/R/wrangle-rnaseqrc.R#L32-L60)):
+
+| entity | id | variables |
+| --- | --- | --- |
+| `Sample` (root) | `ENT_8151325d` | the annotator's categorical and continuous sample attributes |
+| `HTSeq counts` (child) | `ENT_c4144811` | `VEUPATHDB_GENE_ID` "Gene" (string), `SEQUENCE_READ_COUNT_SENSE` "Sense Count" and `SEQUENCE_READ_COUNT_ANTISENSE` "Antisense Count" (integer, continuous) |
+
+An unstranded upload has one `SEQUENCE_READ_COUNT` "Count" in place of the pair. The
+sample entity is not a copy of the uploaded table. The sample details had the columns
+`temperature_condition`, `strain`, `genotype` and `temperature_celsius`, and the
+annotator produced `strain`, `genotype` (categorical, with the uploaded values),
+`temperature` (integer, continuous) and its own `label` (`wildtype - 37°C` and so on); it
+dropped `temperature_condition`. Variable ids are derived from the names, so
+`genotype` is `VAR_84f17484` in the upload and in the curated study the matrix came from.
+A comparator therefore names a variable the annotator wrote, read from the study, never
+one the researcher's file named.
+
+### An upload exports through the generic compute search
+
+One volcano cut, measured on plasmodb.org on 2026-09-24: DESeq2 on the sense counts,
+`genotype` `wildtype` against `delta-DHC mutant`, `effectSizeThreshold` 1,
+`significanceThreshold` 0.05, the same spec shape as the curated export in
+[notebook-presets](notebook-presets.md).
+
+| export | search | `eda_dataset_id` | answer `totalCount` / `displayTotalCount` | step `estimatedSize` |
+| --- | --- | --- | --- | ---: |
+| (a) the upload | `GenesByEdaVizWithCompute` | `EDAUD_<vdiId>` | 202 / 201 | 201 |
+| (b) the upload | `GenesByDESeqUserDataset` | `EDAUD_<vdiId>` | 202 / 201 | 201 |
+| (c) the curated study the counts came from | `GenesByEdaVizWithCompute` | `DS_e973eadd57` | 202 / 201 | 201 |
+
+The three gene sets are identical, and both DESeq2 computes retained the same 201 points
+with `|effectSize| >= 1` and `pValue <= 0.05`. So the generic search
+binds an `EDAUD_` id through `/eda/permissions` exactly as it binds a curated one, and the
+same counts give the same genes. Both computes went `queued`, `in-progress`, `complete` in
+16.4 to 16.8 s. The upload made without a genome dependency exported the same 202 / 201.
+
+`GenesByDESeqUserDataset`'s `eda_dataset_id` vocabulary, read by the owner, listed the
+owner's four installed `rnaseqrc` uploads and not the `EDAUD_slI5M0RwIg0Zw` placeholder,
+with the newest as `initialDisplayValue`.
+
+**An id the site does not know is dropped without a word.** A copy of the matrix with 3 of
+the 201 retained genes renamed to ids PlasmoDB does not have (`PF3D7_9901100`,
+`PF3D7_9902100`, `PF3D7_9903100`) installed normally. Its volcano still retained 201
+points, and its step answered 199 / 198 with `estimatedSize` 198: the three renamed ids,
+exactly. The plugin joins the gene column to `apidbtuning.transcriptattributes`
+([eda-wdk-bridge](eda-wdk-bridge.md), step 6), and nothing between the upload and the step
+checks gene ids against the genome, so the difference between the volcano and the step is
+the only trace.
 
 ## Permissions and dataset access
 

@@ -388,6 +388,27 @@ fixtures `ai_expression_summary_present` and `ai_expression_experiments_incomple
 A reader must treat every non-`present` status as "no summary to quote" rather than as an
 error, because the status also goes stale when upstream changes model or prompt version.
 
+### WDK-ANS-010 - A search config always carries `parameters`, even an empty map; the schema calls it optional and the service refuses a body without it
+
+- class: HARD
+- upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/request/answer/AnswerSpecServiceFormat.java#L50-L56
+- anchor: src/veupathdb/wdk/wdk_models.py:WDKSearchConfig
+- status: ENFORCED by tests/unit/rules/test_search_and_answer_rules.py::test_wdk_ans_010_an_empty_search_config_still_sends_its_parameters
+
+`AnswerSpecServiceFormat.parse` reads `json.getJSONObject(JsonKeys.PARAMETERS)`, which
+throws when the key is absent. The vendored `wdk/answer/answer-spec-request.json` lists
+`parameters` under `properties` with no `required`, so a body without it passes the schema
+and fails in the parser. A search that takes no parameters, such as `GenomeDataTypes`,
+still has to send `"parameters": {}`.
+
+Measured live on plasmodb.org on 2026-09-24: `POST
+/record-types/organism/searches/GenomeDataTypes/reports/standard` with `"searchConfig": {}`
+answered **400** `Required value is missing or incorrect type JSONObject["parameters"] not
+found.`, and the same body with `"searchConfig": {"parameters": {}}` answered 200 with 64
+rows. `WDKSearchConfig` serializes `parameters` on every dump, so a caller that dumps with
+`exclude_defaults=True` (the search report, step creation, the AI expression report) cannot
+drop it.
+
 ### WDK-SEARCH-001 - A search belongs to exactly one record class, and asking for it under another is a 404
 
 - class: HARD

@@ -1,0 +1,81 @@
+{
+  "installTargets": [
+    "PlasmoDB"
+  ],
+  "name": "PathFinder live check L2 heat shock counts",
+  "summary": "PathFinder live check L2_rnaseqrc_install; deleted after the check.",
+  "origin": "direct-upload",
+  "dependencies": [
+    {
+      "resourceIdentifier": "PlasmoDB-71_Pfalciparum3D7_Genome",
+      "resourceDisplayName": "Plasmodium falciparum 3D7",
+      "resourceVersion": "71"
+    }
+  ],
+  "publications": [],
+  "contacts": [],
+  "linkedDatasets": [],
+  "funding": [],
+  "daysForApproval": -1,
+  "datasetSources": [],
+  "datasetId": "lIZ5ZVpEVE0FE",
+  "type": {
+    "name": "rnaseqrc",
+    "version": "1.0",
+    "category": "RNA-Seq raw counts"
+  },
+  "visibility": "private",
+  "owner": {
+    "userId": 1000000001,
+    "firstName": "Recorded",
+    "lastName": "Owner",
+    "email": "recorded.owner@example.invalid",
+    "affiliation": "Example University"
+  },
+  "created": "2026-09-24T11:59:48.606257487Z",
+  "shortName": "PathFinder live check L2 heat shock coun",
+  "relatedDatasets": [],
+  "status": {
+    "upload": {
+      "status": "success"
+    },
+    "import": {
+      "status": "failed",
+      "messages": [
+        "import exited with unexpected status 255",
+        "process error: error while making a(n) import request to plugin wrangler for dataset 1000000001/lIZ5ZVpEVE0FE targeting project N/A: import failed for dataset 1000000001/lIZ5ZVpEVE0FE in plugin wrangler targeting N/A: import exited with unexpected status 255"
+      ]
+    },
+    "install": [
+      {
+        "installTarget": "PlasmoDB",
+        "meta": {
+          "status": "complete"
+        }
+      }
+    ]
+  },
+  "files": {
+    "upload": {
+      "zipSize": 179969,
+      "contents": [
+        {
+          "fileName": "HS_counts_sense.tsv",
+          "fileSize": 305693
+        },
+        {
+          "fileName": "HS_counts_antisense.tsv",
+          "fileSize": 239511
+        },
+        {
+          "fileName": "sample-info.txt",
+          "fileSize": 729
+        },
+        {
+          "fileName": "manifest.tsv",
+          "fileSize": 88
+        }
+      ]
+    }
+  }
+}

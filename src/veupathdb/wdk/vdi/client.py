@@ -5,9 +5,10 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Sequence
 from http import HTTPStatus
+from typing import Literal
 
 import httpx
-from pydantic import ConfigDict
+from pydantic import ConfigDict, Field, RootModel
 
 from veupathdb.auth_context import resolve_user_auth_token
 from veupathdb.errors import (
@@ -17,16 +18,23 @@ from veupathdb.errors import (
 )
 from veupathdb.model import CamelModel
 from veupathdb.wdk.vdi.models import (
+    RNASEQRC,
     VdiDatasetDetails,
+    VdiDatasetListEntry,
     VdiDatasetPostMeta,
     VdiDatasetPostResponse,
+    VdiPlugin,
+    VdiPluginDataType,
 )
+from veupathdb.wdk.vdi.rnaseqrc import RnaSeqRcUpload
 
 _SERVICE = "VEuPathDB user datasets"
 _UPLOAD_FILE_NAME = "gene-list.txt"
 _EMPTY_GENE_LIST = "A gene list with no genes cannot be published."
 _FIRST_ERROR_STATUS = 400
 _GONE_STATUSES = frozenset({HTTPStatus.NOT_FOUND, HTTPStatus.GONE})
+_UPLOAD_PART_TYPE = "text/plain"
+type VdiOwnership = Literal["any", "owned", "shared"]
 
 
 class VdiServiceError(VEuPathDBError[VEuPathDBErrorCode]):
@@ -51,6 +59,40 @@ class VdiDatasetGoneError(VdiServiceError):
         )
 
 
+def _details_part(details: VdiDatasetPostMeta) -> tuple[str, tuple[None, str, str]]:
+    return (
+        "details",
+        (
+            None,
+            details.model_dump_json(by_alias=True, exclude_none=True),
+            "application/json",
+        ),
+    )
+
+
+class _Listing(RootModel[list[VdiDatasetListEntry]]):
+    pass
+
+
+class _Plugins(RootModel[list[VdiPlugin]]):
+    pass
+
+
+class _VdiInputErrors(CamelModel):
+    model_config = ConfigDict(extra="ignore")
+
+    general: list[str] = Field(default_factory=list)
+    by_key: dict[str, list[str]] = Field(default_factory=dict)
+
+    def text(self) -> str:
+        keyed = (
+            f"{key}: {reason}"
+            for key, reasons in self.by_key.items()
+            for reason in reasons
+        )
+        return "; ".join([*self.general, *keyed])
+
+
 class _VdiProblem(CamelModel):
     """The refusal body the service returns for every non-2xx status."""
 
@@ -58,6 +100,7 @@ class _VdiProblem(CamelModel):
 
     status: str = ""
     message: str = ""
+    errors: _VdiInputErrors = Field(default_factory=_VdiInputErrors)
 
 
 class VdiClient:
@@ -121,7 +164,7 @@ class VdiClient:
         problem = self._problem(response.text)
         detail = (
             f"{request.method} {request.url.path}: "
-            f"{problem.message or problem.status or response.text[:500]}"
+            f"{problem.message or problem.errors.text() or problem.status or response.text[:500]}"
         )
         return VdiServiceError(detail, response.status_code)
 
@@ -143,19 +186,77 @@ class VdiClient:
             "POST",
             "/datasets",
             headers=self._auth(),
-            files={
-                "details": (
-                    None,
-                    details.model_dump_json(by_alias=True, exclude_none=True),
-                    "application/json",
-                ),
-                "dataFile": (_UPLOAD_FILE_NAME, body.encode(), "text/plain"),
-            },
+            files=[
+                _details_part(details),
+                ("dataFile", (_UPLOAD_FILE_NAME, body.encode(), _UPLOAD_PART_TYPE)),
+            ],
         )
         response = await self._send(request)
         return validate_response(
             VdiDatasetPostResponse, response.json(), "VDI create response"
         )
+
+    async def create_rnaseqrc(
+        self, *, details: VdiDatasetPostMeta, upload: RnaSeqRcUpload
+    ) -> VdiDatasetPostResponse:
+        """Upload RNA-Seq raw counts: one part per file, streamed, with the manifest.
+
+        The file extensions are checked against the plugin's own list first.
+        """
+        if details.type != RNASEQRC:
+            msg = f"create_rnaseqrc sends rnaseqrc details, not {details.type.name}."
+            raise ValueError(msg)
+        headers = self._auth()
+        data_type = await self._served(details)
+        files = upload.files(data_type.allowed_file_extensions)
+        client = await self._http()
+        request = client.build_request(
+            "POST",
+            "/datasets",
+            headers=headers,
+            files=[
+                _details_part(details),
+                *(
+                    ("dataFile", (name, content, _UPLOAD_PART_TYPE))
+                    for name, content in files
+                ),
+            ],
+        )
+        response = await self._send(request)
+        return validate_response(
+            VdiDatasetPostResponse, response.json(), "VDI create response"
+        )
+
+    async def _served(self, details: VdiDatasetPostMeta) -> VdiPluginDataType:
+        for plugin in await self.plugins():
+            data_type = plugin.data_type(details.type)
+            if data_type is not None:
+                return data_type
+        msg = f"No VDI plugin serves {details.type.name} {details.type.version}."
+        raise VdiServiceError(msg, HTTPStatus.UNPROCESSABLE_ENTITY)
+
+    async def list_datasets(
+        self, install_target: str, ownership: VdiOwnership = "owned"
+    ) -> list[VdiDatasetListEntry]:
+        """The datasets this account owns, or that are shared with it, on one site."""
+        client = await self._http()
+        request = client.build_request(
+            "GET",
+            "/datasets",
+            headers=self._auth(),
+            params={"install_target": install_target, "ownership": ownership},
+        )
+        response = await self._send(request)
+        return validate_response(_Listing, response.json(), "VDI dataset listing").root
+
+    async def plugins(self) -> list[VdiPlugin]:
+        """The plugins and the types they serve. The service needs no credential."""
+        client = await self._http()
+        request = client.build_request(
+            "GET", "/plugins", headers={"Accept": "application/json"}
+        )
+        response = await self._send(request)
+        return validate_response(_Plugins, response.json(), "VDI plugin listing").root
 
     async def get(self, vdi_id: str) -> VdiDatasetDetails:
         """Read one dataset and its three status axes."""

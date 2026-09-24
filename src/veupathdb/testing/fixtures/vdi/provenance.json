@@ -1,0 +1,155 @@
+{
+  "dataset_import_queued": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/vdi/datasets/soV5JEQEcF00p",
+    "status": 200,
+    "elapsed_s": 1.7,
+    "recorded_at": "2026-09-04",
+    "reads": "a genelist whose import is queued"
+  },
+  "dataset_installed": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/vdi/datasets/soV5JEQEcF00p",
+    "status": 200,
+    "elapsed_s": 7.6,
+    "recorded_at": "2026-09-04",
+    "reads": "a genelist installed on PlasmoDB"
+  },
+  "dataset_post_response": {
+    "site": "plasmodb",
+    "method": "POST",
+    "url": "https://plasmodb.org/vdi/datasets",
+    "status": 202,
+    "elapsed_s": 0.0,
+    "recorded_at": "2026-09-04",
+    "reads": "POST /datasets for a five-gene genelist"
+  },
+  "datasets_owned": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/vdi/datasets?install_target=PlasmoDB&ownership=owned",
+    "status": 200,
+    "elapsed_s": 0.4,
+    "recorded_at": "2026-09-24",
+    "reads": "GET /datasets?install_target=PlasmoDB&ownership=owned"
+  },
+  "genome_data_types": {
+    "site": "plasmodb",
+    "method": "POST",
+    "url": "https://plasmodb.org/plasmo/service/record-types/organism/searches/GenomeDataTypes/reports/standard",
+    "status": 200,
+    "elapsed_s": 0.9,
+    "recorded_at": "2026-09-24",
+    "reads": "the GenomeDataTypes standard report, organism_full and name_for_filenames, all rows"
+  },
+  "giardiadb_genome_data_types": {
+    "site": "giardiadb",
+    "method": "POST",
+    "url": "https://giardiadb.org/giardiadb/service/record-types/organism/searches/GenomeDataTypes/reports/standard",
+    "status": 200,
+    "elapsed_s": 0.2,
+    "recorded_at": "2026-09-24",
+    "reads": "the GiardiaDB GenomeDataTypes report; three identifiers exceed 50 characters"
+  },
+  "giardiadb_service_root": {
+    "site": "giardiadb",
+    "method": "GET",
+    "url": "https://giardiadb.org/giardiadb/service/",
+    "status": 200,
+    "elapsed_s": 0.6,
+    "recorded_at": "2026-09-24",
+    "reads": "GET the GiardiaDB WDK service root with no credential"
+  },
+  "plugins": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/vdi/plugins",
+    "status": 200,
+    "elapsed_s": 0.5,
+    "recorded_at": "2026-09-24",
+    "reads": "GET /vdi/plugins with no credential"
+  },
+  "rnaseqrc_data_running": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/vdi/datasets/x4Z5JRpM9F0M8",
+    "status": 200,
+    "elapsed_s": 51.9,
+    "recorded_at": "2026-09-24",
+    "reads": "rnaseqrc: data running"
+  },
+  "rnaseqrc_import_complete_data_absent": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/vdi/datasets/4xZ5Q5pV1s4IM",
+    "status": 200,
+    "elapsed_s": 46.9,
+    "recorded_at": "2026-09-24",
+    "reads": "import complete, meta complete, data not yet reported"
+  },
+  "rnaseqrc_import_failed": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/vdi/datasets/lIZ5ZVpEVE0FE",
+    "status": 200,
+    "elapsed_s": 40.2,
+    "recorded_at": "2026-09-24",
+    "reads": "import failed: a sample-details column named label stops the wrangler with status 255"
+  },
+  "rnaseqrc_import_in_progress": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/vdi/datasets/x4Z5JRpM9F0M8",
+    "status": 200,
+    "elapsed_s": 4.5,
+    "recorded_at": "2026-09-24",
+    "reads": "rnaseqrc: import in progress"
+  },
+  "rnaseqrc_import_invalid": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/vdi/datasets/MoZ5BBpM8U0IM",
+    "status": 200,
+    "elapsed_s": 8.9,
+    "recorded_at": "2026-09-24",
+    "reads": "import invalid: the wrangler's 19-negative-counts-BAD files"
+  },
+  "rnaseqrc_installed": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/vdi/datasets/x4Z5JRpM9F0M8",
+    "status": 200,
+    "elapsed_s": 67.9,
+    "recorded_at": "2026-09-24",
+    "reads": "rnaseqrc: installed"
+  },
+  "rnaseqrc_post_long_dependency": {
+    "site": "giardiadb",
+    "method": "POST",
+    "url": "https://giardiadb.org/vdi/datasets",
+    "status": 422,
+    "elapsed_s": 0.6,
+    "recorded_at": "2026-09-24",
+    "reads": "POST /datasets refused: a genome identifier of 53 characters"
+  },
+  "rnaseqrc_post_response": {
+    "site": "plasmodb",
+    "method": "POST",
+    "url": "https://plasmodb.org/vdi/datasets",
+    "status": 202,
+    "elapsed_s": 1.7,
+    "recorded_at": "2026-09-24",
+    "reads": "rnaseqrc: post response"
+  },
+  "service_root": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://plasmodb.org/plasmo/service/",
+    "status": 200,
+    "elapsed_s": 0.8,
+    "recorded_at": "2026-09-24",
+    "reads": "GET the WDK service root with no credential"
+  }
+}

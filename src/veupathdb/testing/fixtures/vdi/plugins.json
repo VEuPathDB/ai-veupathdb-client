@@ -1,0 +1,190 @@
+[
+  {
+    "pluginName": "noop",
+    "dataTypes": [
+      {
+        "name": "lightweight",
+        "version": "1.0",
+        "category": "Lightweight",
+        "maxFileSize": 1073741824,
+        "usesDataProperties": false,
+        "allowedFileExtensions": []
+      }
+    ],
+    "installTargets": []
+  },
+  {
+    "pluginName": "genelist",
+    "dataTypes": [
+      {
+        "name": "genelist",
+        "version": "1.0",
+        "category": "Gene List",
+        "maxFileSize": 1073741824,
+        "usesDataProperties": false,
+        "allowedFileExtensions": [
+          ".txt",
+          ".csv",
+          ".tsv"
+        ]
+      }
+    ],
+    "installTargets": [
+      "AmoebaDB",
+      "CryptoDB",
+      "FungiDB",
+      "GiardiaDB",
+      "HostDB",
+      "MicrosporidiaDB",
+      "PiroplasmaDB",
+      "PlasmoDB",
+      "ToxoDB",
+      "TrichDB",
+      "TriTrypDB",
+      "VectorBase",
+      "UniDB"
+    ]
+  },
+  {
+    "pluginName": "bigwig",
+    "dataTypes": [
+      {
+        "name": "bigwigfiles",
+        "version": "1.0",
+        "category": "bigWig",
+        "maxFileSize": 524288000,
+        "usesDataProperties": false,
+        "allowedFileExtensions": [
+          ".bw",
+          ".bigwig"
+        ]
+      }
+    ],
+    "installTargets": [
+      "AmoebaDB",
+      "CryptoDB",
+      "FungiDB",
+      "GiardiaDB",
+      "HostDB",
+      "MicrosporidiaDB",
+      "PiroplasmaDB",
+      "PlasmoDB",
+      "ToxoDB",
+      "TrichDB",
+      "TriTrypDB",
+      "VectorBase",
+      "UniDB"
+    ]
+  },
+  {
+    "pluginName": "biom",
+    "dataTypes": [
+      {
+        "name": "biom",
+        "version": "1.0",
+        "category": "BIOM",
+        "maxFileSize": 104857600,
+        "usesDataProperties": false,
+        "allowedFileExtensions": [
+          ".biom"
+        ]
+      }
+    ],
+    "installTargets": [
+      "MicrobiomeDB"
+    ]
+  },
+  {
+    "pluginName": "wrangler",
+    "dataTypes": [
+      {
+        "name": "rnaseqrc",
+        "version": "1.0",
+        "category": "RNA-Seq raw counts",
+        "maxFileSize": 1073741824,
+        "usesDataProperties": false,
+        "allowedFileExtensions": [
+          ".txt",
+          ".tsv",
+          ".csv",
+          ".tab"
+        ]
+      },
+      {
+        "name": "phenotype",
+        "version": "1.0",
+        "category": "Phenotype",
+        "maxFileSize": 1073741824,
+        "usesDataProperties": true,
+        "allowedFileExtensions": [
+          ".txt",
+          ".tsv",
+          ".csv"
+        ]
+      },
+      {
+        "name": "isasimple",
+        "version": "1.0",
+        "category": "Data Table",
+        "maxFileSize": 1073741824,
+        "usesDataProperties": true,
+        "allowedFileExtensions": [
+          ".txt",
+          ".tsv",
+          ".csv"
+        ]
+      },
+      {
+        "name": "stf",
+        "version": "1.0",
+        "category": "Simple Dataset",
+        "maxFileSize": 1073741824,
+        "usesDataProperties": false,
+        "allowedFileExtensions": []
+      }
+    ],
+    "installTargets": [
+      "AmoebaDB",
+      "CryptoDB",
+      "FungiDB",
+      "GiardiaDB",
+      "HostDB",
+      "MicrosporidiaDB",
+      "PiroplasmaDB",
+      "PlasmoDB",
+      "ToxoDB",
+      "TrichDB",
+      "TriTrypDB",
+      "VectorBase",
+      "UniDB"
+    ]
+  },
+  {
+    "pluginName": "rnaseq",
+    "dataTypes": [
+      {
+        "name": "rnaseq",
+        "version": "1.0",
+        "category": "RNA-Seq normalized counts",
+        "maxFileSize": 1073741824,
+        "usesDataProperties": false,
+        "allowedFileExtensions": []
+      }
+    ],
+    "installTargets": [
+      "AmoebaDB",
+      "CryptoDB",
+      "FungiDB",
+      "GiardiaDB",
+      "HostDB",
+      "MicrosporidiaDB",
+      "PiroplasmaDB",
+      "PlasmoDB",
+      "ToxoDB",
+      "TrichDB",
+      "TriTrypDB",
+      "VectorBase",
+      "UniDB"
+    ]
+  }
+]

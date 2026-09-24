@@ -1,0 +1,76 @@
+{
+  "installTargets": [
+    "PlasmoDB"
+  ],
+  "name": "PathFinder live check L8 negative counts",
+  "summary": "PathFinder live check L8_negative_counts; deleted after the check.",
+  "origin": "direct-upload",
+  "dependencies": [
+    {
+      "resourceIdentifier": "PlasmoDB-71_Pfalciparum3D7_Genome",
+      "resourceDisplayName": "Plasmodium falciparum 3D7",
+      "resourceVersion": "71"
+    }
+  ],
+  "publications": [],
+  "contacts": [],
+  "linkedDatasets": [],
+  "funding": [],
+  "daysForApproval": -1,
+  "datasetSources": [],
+  "datasetId": "MoZ5BBpM8U0IM",
+  "type": {
+    "name": "rnaseqrc",
+    "version": "1.0",
+    "category": "RNA-Seq raw counts"
+  },
+  "visibility": "private",
+  "owner": {
+    "userId": 1000000001,
+    "firstName": "Recorded",
+    "lastName": "Owner",
+    "email": "recorded.owner@example.invalid",
+    "affiliation": "Example University"
+  },
+  "created": "2026-09-24T12:03:36.114157718Z",
+  "shortName": "PathFinder live check L8 negative counts",
+  "relatedDatasets": [],
+  "status": {
+    "upload": {
+      "status": "success"
+    },
+    "import": {
+      "status": "invalid",
+      "messages": [
+        "Your counts file contains a non-count value ('-5' in sample 'S2', gene 'PF3D7_0500'). Every count must be a whole, non-negative number with no thousands separators."
+      ]
+    },
+    "install": [
+      {
+        "installTarget": "PlasmoDB",
+        "meta": {
+          "status": "complete"
+        }
+      }
+    ]
+  },
+  "files": {
+    "upload": {
+      "zipSize": 632,
+      "contents": [
+        {
+          "fileName": "lab_counts_2023.tsv",
+          "fileSize": 241
+        },
+        {
+          "fileName": "sample-info.txt",
+          "fileSize": 85
+        },
+        {
+          "fileName": "manifest.tsv",
+          "fileSize": 59
+        }
+      ]
+    }
+  }
+}

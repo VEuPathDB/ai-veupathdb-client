@@ -1,0 +1,111 @@
+{
+  "changePasswordUrl": "https://auth.veupathdb.org/assets/eupathdb-changePassword.html?returnUrl={{returnUrl}}&suggestedUsername={{suggestedUsername}}",
+  "releaseDate": "20 August 2026 00:00",
+  "displayName": "PlasmoDB",
+  "projectUrls": {
+    "UniDB": "https://veupathdb.org/veupathdb/"
+  },
+  "categoriesOntologyName": "Categories",
+  "description": "Welcome to the WDK 3.0 Web Service",
+  "startupTime": 1789671915945,
+  "projectId": "PlasmoDB",
+  "buildNumber": "71",
+  "userProfileProperties": [
+    {
+      "help": "You are able to log in with this value or your email.",
+      "isRequired": false,
+      "displayName": "Username",
+      "name": "username",
+      "isPublic": false,
+      "inputType": "text"
+    },
+    {
+      "isRequired": true,
+      "displayName": "First name",
+      "name": "firstName",
+      "isPublic": true,
+      "inputType": "text"
+    },
+    {
+      "isRequired": false,
+      "displayName": "Middle name",
+      "name": "middleName",
+      "isPublic": true,
+      "inputType": "text"
+    },
+    {
+      "isRequired": true,
+      "displayName": "Last name",
+      "name": "lastName",
+      "isPublic": true,
+      "inputType": "text"
+    },
+    {
+      "help": "Please use the full name of your academic institution, company, or foundation.",
+      "isRequired": true,
+      "displayName": "Organization name",
+      "name": "organization",
+      "isPublic": true,
+      "suggestText": "e.g. University of Pennsylvania",
+      "inputType": "text"
+    },
+    {
+      "isRequired": true,
+      "displayName": "Organization type",
+      "name": "organizationType",
+      "isPublic": true,
+      "inputType": "select"
+    },
+    {
+      "isRequired": true,
+      "displayName": "Organization location",
+      "name": "country",
+      "isPublic": true,
+      "inputType": "select"
+    },
+    {
+      "isRequired": true,
+      "displayName": "Primary position",
+      "name": "position",
+      "isPublic": true,
+      "inputType": "select"
+    },
+    {
+      "help": "Please use the official name of your group or lab or the full name of your primary investigator.",
+      "isRequired": true,
+      "displayName": "Group name",
+      "name": "groupName",
+      "isPublic": true,
+      "suggestText": "e.g. Jane Doe Lab OR Professor Jones Bioinformatics 101",
+      "inputType": "text"
+    },
+    {
+      "isRequired": false,
+      "displayName": "Group type",
+      "name": "groupType",
+      "isPublic": true,
+      "inputType": "select"
+    },
+    {
+      "help": "Enter your group's subscription token to become a subscribing user.",
+      "isRequired": false,
+      "displayName": "Subscription token",
+      "name": "subscriptionToken",
+      "isPublic": false,
+      "inputType": "text"
+    },
+    {
+      "isRequired": false,
+      "displayName": "Interests",
+      "name": "interests",
+      "isPublic": false,
+      "inputType": "textbox"
+    }
+  ],
+  "authentication": {
+    "oauthUrl": "https://auth.veupathdb.org",
+    "method": "OAUTH2",
+    "oauthClientId": "apiComponentSite",
+    "oauthClientUrl": "https://plasmodb.org/plasmo/service"
+  }
+}

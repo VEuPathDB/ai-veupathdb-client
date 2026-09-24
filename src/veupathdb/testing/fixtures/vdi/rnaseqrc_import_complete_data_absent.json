@@ -1,0 +1,118 @@
+{
+  "installTargets": [
+    "PlasmoDB"
+  ],
+  "name": "PathFinder live check stranded no label",
+  "summary": "PathFinder live check L2probe_stranded_nolabel; deleted after the check.",
+  "origin": "direct-upload",
+  "dependencies": [
+    {
+      "resourceIdentifier": "PlasmoDB-71_Pfalciparum3D7_Genome",
+      "resourceDisplayName": "Plasmodium falciparum 3D7",
+      "resourceVersion": "71"
+    }
+  ],
+  "publications": [],
+  "contacts": [],
+  "linkedDatasets": [],
+  "funding": [],
+  "daysForApproval": -1,
+  "datasetSources": [],
+  "datasetId": "4xZ5Q5pV1s4IM",
+  "type": {
+    "name": "rnaseqrc",
+    "version": "1.0",
+    "category": "RNA-Seq raw counts"
+  },
+  "visibility": "private",
+  "owner": {
+    "userId": 1000000001,
+    "firstName": "Recorded",
+    "lastName": "Owner",
+    "email": "recorded.owner@example.invalid",
+    "affiliation": "Example University"
+  },
+  "created": "2026-09-24T12:02:05.971405964Z",
+  "shortName": "PathFinder live check stranded no label",
+  "relatedDatasets": [],
+  "status": {
+    "upload": {
+      "status": "success"
+    },
+    "import": {
+      "status": "complete"
+    },
+    "install": [
+      {
+        "installTarget": "PlasmoDB",
+        "meta": {
+          "status": "complete"
+        }
+      }
+    ]
+  },
+  "files": {
+    "upload": {
+      "zipSize": 179940,
+      "contents": [
+        {
+          "fileName": "HS_counts_sense.tsv",
+          "fileSize": 305693
+        },
+        {
+          "fileName": "HS_counts_antisense.tsv",
+          "fileSize": 239511
+        },
+        {
+          "fileName": "sample-info.txt",
+          "fileSize": 579
+        },
+        {
+          "fileName": "manifest.tsv",
+          "fileSize": 88
+        }
+      ]
+    },
+    "install": {
+      "zipSize": 937073,
+      "contents": [
+        {
+          "fileName": "attributevalue_sab8a2fce33_sample.cache",
+          "fileSize": 1884
+        },
+        {
+          "fileName": "entitytypegraph.cache",
+          "fileSize": 151
+        },
+        {
+          "fileName": "ancestors_sab8a2fce33_HTSeqcnts.cache",
+          "fileSize": 2746908
+        },
+        {
+          "fileName": "attributegraph_sab8a2fce33_HTSeqcnts.cache",
+          "fileSize": 92079
+        },
+        {
+          "fileName": "attributegraph_sab8a2fce33_sample.cache",
+          "fileSize": 861
+        },
+        {
+          "fileName": "ancestors_sab8a2fce33_sample.cache",
+          "fileSize": 156
+        },
+        {
+          "fileName": "study.cache",
+          "fileSize": 67
+        },
+        {
+          "fileName": "install.json",
+          "fileSize": 19702
+        },
+        {
+          "fileName": "attributevalue_sab8a2fce33_HTSeqcnts.cache",
+          "fileSize": 12401730
+        }
+      ]
+    }
+  }
+}

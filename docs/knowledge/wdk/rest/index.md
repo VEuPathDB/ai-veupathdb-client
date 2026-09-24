@@ -5,5 +5,5 @@ These explain; they do not assert. Assertions live in [the rules](../rules/).
 
 - [Endpoint surface](endpoint-surface.md) - every endpoint, its shapes, the client method behind it, and which of them WDK validates against a published schema
 - [Transport quirks](transport-quirks.md) - what a live site does, including two beliefs that did not reproduce
-- [VDI surface](vdi-surface.md) - the user-dataset service at `{site_origin}/vdi`: the endpoints this client calls, the credential forms, the three status axes, and one measured install
+- [VDI surface](vdi-surface.md) - the user-dataset service at `{site_origin}/vdi`: the endpoints this client calls, the credential forms, the rnaseqrc upload contract, the two-axis install predicate, and the measured install latencies
 - [Site-search contract](site-search-contract.md) - the separate service at the site origin, its paged form and its streaming form, and what each one costs

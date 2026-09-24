@@ -8,7 +8,15 @@ from __future__ import annotations
 
 from typing import Annotated, Literal
 
-from pydantic import ConfigDict, Discriminator, Field, JsonValue, field_validator
+from pydantic import (
+    ConfigDict,
+    Discriminator,
+    Field,
+    JsonValue,
+    SerializerFunctionWrapHandler,
+    field_validator,
+    model_serializer,
+)
 from pydantic.alias_generators import to_camel
 
 from veupathdb.domain.parameters.values import ParamValue
@@ -59,6 +67,15 @@ class WDKSearchConfig(WDKModel):
     view_filters: list[WDKFilterValue] = Field(default_factory=list)
     column_filters: JSONObject | None = None
     wdk_weight: int = 0
+
+    @model_serializer(mode="wrap")
+    def _parameters_always_sent(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, JsonValue]:
+        """WDK reads ``parameters`` on every search config, even an empty one."""
+        body: dict[str, JsonValue] = handler(self)
+        body.setdefault("parameters", dict(self.parameters))
+        return body
 
 
 class WDKStepTree(WDKModel):

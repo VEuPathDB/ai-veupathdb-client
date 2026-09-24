@@ -1,0 +1,1303 @@
+{
+  "records": [
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium cynomolgi</i> strain B",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium cynomolgi strain B",
+        "name_for_filenames": "PcynomolgiB"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_1120755"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium inui</i> San Antonio 1",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium inui San Antonio 1",
+        "name_for_filenames": "PinuiSanAntonio1"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_1237626"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium vivax</i> Sal-1",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium vivax Sal-1",
+        "name_for_filenames": "PvivaxSal1"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_126793"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium cynomolgi</i> strain M",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium cynomolgi strain M",
+        "name_for_filenames": "PcynomolgiM"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_1274352"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> HB3",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum HB3",
+        "name_for_filenames": "PfalciparumHB3"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_137071"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium chabaudi</i> chabaudi",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium chabaudi chabaudi",
+        "name_for_filenames": "Pchabaudichabaudi"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_31271"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium yoelii</i> yoelii 17XNL",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium yoelii yoelii 17XNL",
+        "name_for_filenames": "Pyoeliiyoelii17XNL"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_352914"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> 3D7",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum 3D7",
+        "name_for_filenames": "Pfalciparum3D7"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_36329"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> 7G8",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum 7G8",
+        "name_for_filenames": "Pfalciparum7G8"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_57266"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> Dd2",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum Dd2",
+        "name_for_filenames": "PfalciparumDd2"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_57267"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium berghei</i> ANKA",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium berghei ANKA",
+        "name_for_filenames": "PbergheiANKA"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_5823"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> NF54",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum NF54",
+        "name_for_filenames": "PfalciparumNF54"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_5843"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium knowlesi</i> strain H",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium knowlesi strain H",
+        "name_for_filenames": "PknowlesiH"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "NCBITAXON_5851"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Hepatocystis sp. ex Piliocolobus tephrosceles</i> 2019",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Hepatocystis sp. ex Piliocolobus tephrosceles 2019",
+        "name_for_filenames": "Hpiliocolobus2019"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_hpil2019"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Haemoproteus tartakovskyi</i> strain SISKIN1",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Haemoproteus tartakovskyi strain SISKIN1",
+        "name_for_filenames": "HtartakovskyiSISKIN1"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_htarSISKIN1"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium adleri</i> G01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium adleri G01",
+        "name_for_filenames": "PadleriG01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_padlG01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium billcollinsi</i> G01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium billcollinsi G01",
+        "name_for_filenames": "PbillcollinsiG01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pbilG01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium blacklocki</i> G01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium blacklocki G01",
+        "name_for_filenames": "PblacklockiG01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pblaG01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium brasilianum</i> strain Bolivian I",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium brasilianum strain Bolivian I",
+        "name_for_filenames": "PbrasilianumBolivianI"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pbraBolivianI"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium chabaudi</i> chabaudi CB",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium chabaudi chabaudi CB",
+        "name_for_filenames": "PchabaudichabaudiCB"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pchachabaudiCB"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium coatneyi</i> Hackeri",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium coatneyi Hackeri",
+        "name_for_filenames": "PcoatneyiHackeri"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pcoaHackeri"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> 7G8 2019",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum 7G8 2019",
+        "name_for_filenames": "Pfalciparum7G8-2019"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfal7G8-2019"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> CD01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum CD01",
+        "name_for_filenames": "PfalciparumCD01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalCD01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> GA01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum GA01",
+        "name_for_filenames": "PfalciparumGA01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalGA01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> GB4",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum GB4",
+        "name_for_filenames": "PfalciparumGB4"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalGB4"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> GN01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum GN01",
+        "name_for_filenames": "PfalciparumGN01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalGN01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> IT",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum IT",
+        "name_for_filenames": "PfalciparumIT"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalIT"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> KE01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum KE01",
+        "name_for_filenames": "PfalciparumKE01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalKE01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> KH01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum KH01",
+        "name_for_filenames": "PfalciparumKH01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalKH01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> KH02",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum KH02",
+        "name_for_filenames": "PfalciparumKH02"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalKH02"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> ML01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum ML01",
+        "name_for_filenames": "PfalciparumML01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalML01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> NF135.C10",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum NF135.C10",
+        "name_for_filenames": "PfalciparumNF135C10"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalNF135C10"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> NF166",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum NF166",
+        "name_for_filenames": "PfalciparumNF166"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalNF166"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> SD01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum SD01",
+        "name_for_filenames": "PfalciparumSD01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalSD01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> SN01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum SN01",
+        "name_for_filenames": "PfalciparumSN01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalSN01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium falciparum</i> TG01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium falciparum TG01",
+        "name_for_filenames": "PfalciparumTG01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfalTG01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium fragile</i> strain nilgiri",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium fragile strain nilgiri",
+        "name_for_filenames": "PfragileNilgiri"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pfraNilgiri"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium gaboni</i> strain G01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium gaboni strain G01",
+        "name_for_filenames": "PgaboniG01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pgabG01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium gaboni</i> strain SY75",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium gaboni strain SY75",
+        "name_for_filenames": "PgaboniSY75"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pgabSY75"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium gallinaceum</i> 8A",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium gallinaceum 8A",
+        "name_for_filenames": "Pgallinaceum8A"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pgal8A"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium knowlesi</i> strain A1H1",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium knowlesi strain A1H1",
+        "name_for_filenames": "PknowlesiA1H1"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pknoA1H1"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium knowlesi</i> strain Malayan Strain Pk1 A",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium knowlesi strain Malayan Strain Pk1 A",
+        "name_for_filenames": "PknowlesiMalayanPk1A"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pknoMalayanPk1A"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium malariae</i> UG01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium malariae UG01",
+        "name_for_filenames": "PmalariaeUG01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pmalUG01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium ovale</i> curtisi GH01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium ovale curtisi GH01",
+        "name_for_filenames": "PovalecurtisiGH01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_povacurtisiGH01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium ovale</i> wallikeri PowCR01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium ovale wallikeri PowCR01",
+        "name_for_filenames": "PovalewallikeriPowCR01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_povawallikeriCR01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium praefalciparum</i> strain G01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium praefalciparum strain G01",
+        "name_for_filenames": "PpraefalciparumG01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_ppraG01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium reichenowi</i> CDC",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium reichenowi CDC",
+        "name_for_filenames": "PreichenowiCDC"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_preiCDC"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium reichenowi</i> G01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium reichenowi G01",
+        "name_for_filenames": "PreichenowiG01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_preiG01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium relictum</i> SGS1-like",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium relictum SGS1-like",
+        "name_for_filenames": "PrelictumSGS1-like"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_prelSGS1-like"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium vinckei</i> brucechwatti DA",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium vinckei brucechwatti DA",
+        "name_for_filenames": "PvinckeibrucechwattiDA"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pvinbrucechwattiDA"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium vinckei</i> Cameroon EL",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium vinckei Cameroon EL",
+        "name_for_filenames": "PvinckeiCameroonEL"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pvinCameroonEL"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium vinckei</i> lentum DE",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium vinckei lentum DE",
+        "name_for_filenames": "PvinckeilentumDE"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pvinlentumDE"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium vinckei</i> petteri strain CR",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium vinckei petteri strain CR",
+        "name_for_filenames": "PvinckeipetteriCR"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pvinpetteriCR"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium vinckei</i> petteri CR 2020",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium vinckei petteri CR 2020",
+        "name_for_filenames": "PvinckeipetteriCR2020"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pvinpetteriCR2020"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium vinckei</i> vinckei CY",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium vinckei vinckei CY",
+        "name_for_filenames": "PvinckeivinckeiCY"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pvinvinckeiCY"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium vinckei</i> vinckei strain vinckei",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium vinckei vinckei strain vinckei",
+        "name_for_filenames": "Pvinckeivinckeivinckei"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pvinvinckeivinckei"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium vivax</i> P01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium vivax P01",
+        "name_for_filenames": "PvivaxP01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pvivP01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium vivax</i> PAM",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium vivax PAM",
+        "name_for_filenames": "PvivaxPAM"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pvivPAM"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium vivax-like sp.</i> Pvl01",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium vivax-like Pvl01",
+        "name_for_filenames": "Pvivax-likePvl01"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pvivPvl01"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium vivax</i> PvSY56",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium vivax PvSY56",
+        "name_for_filenames": "PvivaxPvSY56"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pvivPvSY56"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium vivax</i> PvW1",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium vivax PvW1",
+        "name_for_filenames": "PvivaxPvW1"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pvivPvW1"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium yoelii</i> yoelii 17X",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium yoelii yoelii 17X",
+        "name_for_filenames": "Pyoeliiyoelii17X"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pyoeyoelii17X"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium yoelii</i> yoelii 17XNL 2023",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium yoelii yoelii 17XNL 2023",
+        "name_for_filenames": "Pyoeliiyoelii17XNL2023"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pyoeyoelii17XNL2023"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    },
+    {
+      "tables": {},
+      "displayName": "<i>Plasmodium yoelii</i> yoelii YM",
+      "recordClassName": "OrganismRecordClasses.OrganismRecordClass",
+      "attributes": {
+        "organism_full": "Plasmodium yoelii yoelii YM",
+        "name_for_filenames": "PyoeliiyoeliiYM"
+      },
+      "id": [
+        {
+          "name": "source_id",
+          "value": "TMPTX_pyoeyoeliiYM"
+        },
+        {
+          "name": "project_id",
+          "value": "PlasmoDB"
+        }
+      ],
+      "tableErrors": []
+    }
+  ],
+  "meta": {
+    "displayViewTotalCount": 64,
+    "tables": [],
+    "pagination": {
+      "offset": 0,
+      "numRecords": -1
+    },
+    "cachePreviouslyExisted": true,
+    "viewTotalCount": 64,
+    "sorting": [],
+    "recordClassName": "organism",
+    "responseCount": 64,
+    "attributes": [
+      "organism_full",
+      "name_for_filenames"
+    ],
+    "totalCount": 64,
+    "displayTotalCount": 64
+  }
+}

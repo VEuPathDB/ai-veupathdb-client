@@ -1,0 +1,11 @@
+{
+  "status": "invalid-input",
+  "errors": {
+    "general": [],
+    "byKey": {
+      "$.details.dependencies[0]": [
+        "exceeds the max allowed length of 50 bytes"
+      ]
+    }
+  }
+}

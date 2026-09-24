@@ -1,0 +1,365 @@
+[
+  {
+    "datasetId": "ctZ5MhpEs50I5",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "rnaseqrc",
+      "version": "1.0",
+      "category": "RNA-Seq raw counts"
+    },
+    "visibility": "private",
+    "name": "PathFinder live check L7b renamed genes",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "complete"
+      },
+      "install": [
+        {
+          "installTarget": "PlasmoDB",
+          "meta": {
+            "status": "complete"
+          },
+          "data": {
+            "status": "complete"
+          }
+        }
+      ]
+    },
+    "fileCount": 4,
+    "fileSizeTotal": 545871,
+    "created": "2026-09-24T08:08:52.463818-04:00",
+    "summary": "PathFinder live check L7b_renamed_genes; deleted after the check."
+  },
+  {
+    "datasetId": "wtZ5dUpN8J0IE",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "rnaseqrc",
+      "version": "1.0",
+      "category": "RNA-Seq raw counts"
+    },
+    "visibility": "private",
+    "name": "PathFinder live check L3 no genome",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "complete"
+      },
+      "install": [
+        {
+          "installTarget": "PlasmoDB",
+          "meta": {
+            "status": "complete"
+          },
+          "data": {
+            "status": "complete"
+          }
+        }
+      ]
+    },
+    "fileCount": 4,
+    "fileSizeTotal": 545871,
+    "created": "2026-09-24T08:03:37.03958-04:00",
+    "summary": "PathFinder live check L3_no_dependency; deleted after the check."
+  },
+  {
+    "datasetId": "MoZ5BBpM8U0IM",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "rnaseqrc",
+      "version": "1.0",
+      "category": "RNA-Seq raw counts"
+    },
+    "visibility": "private",
+    "name": "PathFinder live check L8 negative counts",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "invalid"
+      }
+    },
+    "fileCount": 3,
+    "fileSizeTotal": 385,
+    "created": "2026-09-24T08:03:36.114158-04:00",
+    "summary": "PathFinder live check L8_negative_counts; deleted after the check."
+  },
+  {
+    "datasetId": "4xZ5Q5pV1s4IM",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "rnaseqrc",
+      "version": "1.0",
+      "category": "RNA-Seq raw counts"
+    },
+    "visibility": "private",
+    "name": "PathFinder live check stranded no label",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "complete"
+      },
+      "install": [
+        {
+          "installTarget": "PlasmoDB",
+          "meta": {
+            "status": "complete"
+          },
+          "data": {
+            "status": "complete"
+          }
+        }
+      ]
+    },
+    "fileCount": 4,
+    "fileSizeTotal": 545871,
+    "created": "2026-09-24T08:02:05.971406-04:00",
+    "summary": "PathFinder live check L2probe_stranded_nolabel; deleted after the check."
+  },
+  {
+    "datasetId": "I5Z5dBpV1c1I5",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "rnaseqrc",
+      "version": "1.0",
+      "category": "RNA-Seq raw counts"
+    },
+    "visibility": "private",
+    "name": "PathFinder live check sense only",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "failed"
+      }
+    },
+    "fileCount": 3,
+    "fileSizeTotal": 306481,
+    "created": "2026-09-24T08:02:05.697975-04:00",
+    "summary": "PathFinder live check L2probe_sense_only; deleted after the check."
+  },
+  {
+    "datasetId": "IVZ5NgpV1N0Ik",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "rnaseqrc",
+      "version": "1.0",
+      "category": "RNA-Seq raw counts"
+    },
+    "visibility": "private",
+    "name": "PathFinder live check wrangler stranded fixture",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "complete"
+      },
+      "install": [
+        {
+          "installTarget": "PlasmoDB",
+          "meta": {
+            "status": "complete"
+          },
+          "data": {
+            "status": "complete"
+          }
+        }
+      ]
+    },
+    "fileCount": 4,
+    "fileSizeTotal": 605,
+    "created": "2026-09-24T08:02:05.002505-04:00",
+    "summary": "PathFinder live check L2probe_wrangler_ok02; deleted after the check."
+  },
+  {
+    "datasetId": "lNZ5Btp8080Ic",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "rnaseqrc",
+      "version": "1.0",
+      "category": "RNA-Seq raw counts"
+    },
+    "visibility": "private",
+    "name": "PathFinder live check wrangler OK fixture",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "complete"
+      },
+      "install": [
+        {
+          "installTarget": "PlasmoDB",
+          "meta": {
+            "status": "complete"
+          },
+          "data": {
+            "status": "complete"
+          }
+        }
+      ]
+    },
+    "fileCount": 3,
+    "fileSizeTotal": 379,
+    "created": "2026-09-24T08:01:08.200749-04:00",
+    "summary": "PathFinder live check L2probe_wrangler_ok01; deleted after the check."
+  },
+  {
+    "datasetId": "lIZ5ZVpEVE0FE",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "rnaseqrc",
+      "version": "1.0",
+      "category": "RNA-Seq raw counts"
+    },
+    "visibility": "private",
+    "name": "PathFinder live check L2 heat shock counts",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "failed"
+      }
+    },
+    "fileCount": 4,
+    "fileSizeTotal": 546021,
+    "created": "2026-09-24T07:59:48.606257-04:00",
+    "summary": "PathFinder live check L2_rnaseqrc_install; deleted after the check."
+  },
+  {
+    "datasetId": "dMY5sYJRNl11F",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "genelist",
+      "version": "1.0",
+      "category": "Gene List"
+    },
+    "visibility": "private",
+    "name": "csv uploaded msps",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "complete"
+      },
+      "install": [
+        {
+          "installTarget": "PlasmoDB",
+          "meta": {
+            "status": "complete"
+          },
+          "data": {
+            "status": "complete"
+          }
+        }
+      ]
+    },
+    "fileCount": 1,
+    "fileSizeTotal": 70,
+    "created": "2026-09-15T18:01:31.221543-04:00",
+    "summary": "5 genes published from the PathFinder gene set 'csv uploaded msps'."
+  }
+]
