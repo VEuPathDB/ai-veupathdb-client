@@ -9,7 +9,7 @@ us aligned. `SILENT` is why this exists.
 - [Auth and transport](auth-and-transport.md) - `WDK-HTTP-001..004` and `WDK-AUTH-001..005`
 - [Strategies and steps](strategies-and-steps.md) - `WDK-STRAT-001..007` and `WDK-STEP-001..008`
 - [Searches and answers](searches-and-answers.md) - `WDK-SEARCH-001..004` and `WDK-ANS-001..010`
-- [Parameters and vocabularies](parameters-and-vocabularies.md) - `WDK-PARAM-001..011` and `WDK-VOCAB-001..007`
+- [Parameters and vocabularies](parameters-and-vocabularies.md) - `WDK-PARAM-001..012` and `WDK-VOCAB-001..007`
 - [Site-model parameters](site-model-params.md) - `WDK-SITE-001..007`
 - [Filters](filters.md) - `WDK-FILTER-001..006`
 - [Validation](validation.md) - `WDK-VALID-001..011`

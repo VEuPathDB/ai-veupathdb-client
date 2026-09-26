@@ -1,5 +1,16 @@
 # Knowledge log
 
+## 2026-09-26 - A filter clause's value takes the shape its facet parses
+
+[WDK-PARAM-012](wdk/rules/parameters-and-vocabularies.md) records that
+`FilterParamNewStableValue` reads a `date` clause and a `number` clause with
+`isRange: true` as an object of `min` and `max`, and a `string` clause and a `number`
+clause with `isRange: false` as a list. On plasmodb.org a member list on the range facet
+`variants_per_kb` of `GenesByVariantCharacteristics` is refused with
+`JSONObject["value"] is not a JSONObject`. The rule is anchored in `veupathdb-mcp`, where
+a clause is bound to its facet; this client needs no change, because
+`FilterTermClause.value` is `JsonValue`.
+
 ## 2026-09-24 - A search report takes view filters, and a gene-id distribution is recorded
 
 `run_search_report` takes `view_filters`, sent as `viewFilters` at the top level of the

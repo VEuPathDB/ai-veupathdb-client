@@ -1,7 +1,7 @@
 ---
 type: Rules
 title: Parameter and vocabulary rules
-description: The eleven types and the exact string each takes, the two encodings a vocabulary value can have and which one is silently wrong, and why a dependent value is only meaningful under the parent it was read with.
+description: The eleven types and the exact string each takes, the shape a filter clause value takes per facet, the two encodings a vocabulary value can have and which one is silently wrong, and why a dependent value is only meaningful under the parent it was read with.
 tags: [wdk-alignment, rules, parameters, vocabularies, dependent-params, wire-format]
 generated: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
 verified: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
@@ -464,6 +464,38 @@ loads steps out of the database with `FILL_PARAM_IF_MISSING`, while
 [`AnswerSpecBuilder.build`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/answer/spec/AnswerSpecBuilder.java#L72-L94)
 defaults to `NO_FILL`. A parameter omitted at creation time is refused then, and silently
 defaulted on every later read of the same step.
+
+### WDK-PARAM-012 - A filter clause's `value` is an object of bounds for a range facet and a list for a member facet, chosen by the facet's `type`
+
+- class: HARD
+- upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNewStableValue.java#L224-L248
+- anchor: veupathdb-mcp: src/veupathdb_mcp/catalog/_param_filters.py:_clause
+- status: ENFORCED by veupathdb-mcp: tests/unit/catalog/test_a_range_facet_takes_min_and_max.py::test_a_range_facet_is_written_as_min_and_max
+
+`FilterParamNewStableValue` builds one filter per clause and reads `value` with the
+accessor its facet kind needs. A `date` clause is a `DateRangeFilter` read with
+`getJSONObject`, whatever its `isRange` says. A `number` clause is a
+`NumberRangeFilter` read with `getJSONObject` when `isRange` is true, and a
+`NumberMembersFilter` read with `getJSONArray` when it is false. A `string` clause is
+a `StringMembersFilter` read with `getJSONArray`. The bounds are `min` and `max`;
+[`NumberRangeFilter`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNewStableValue.java#L429-L445)
+reads each with `getDouble` and leaves a null bound unbounded. `wdk-client` states the
+same split as
+[`RangeValue<T> = { min?: T; max?: T }` and `MemberValue<T> = Array<T | null>`](https://github.com/VEuPathDB/web-monorepo/blob/63d1705463d553c0ac19ee577c1b09666597b903/packages/libs/wdk-client/src/Components/AttributeFilter/Types.ts#L60-L75).
+The source is unchanged on WDK `master` at `736013d6baf757d8d44709db962952ef512d400f`.
+
+So the facet decides the shape, and the two shapes do not substitute for each other.
+Measured on plasmodb.org on 2026-09-26, `GenesByVariantCharacteristics` with
+`gene_variant_stats` =
+`{"filters":[{"includeUnknown":false,"field":"variants_per_kb","type":"number","value":["0"],"isRange":true}]}`
+is refused with `Invalid stable value. Can't parse JSON. JSONObject["value"] is not a
+JSONObject (class org.json.JSONArray).` Fifteen of that parameter's sixteen facets are
+`type: number, isRange: true`, so a client that writes every clause as a member list
+cannot bind any of them.
+
+`FilterTermClause.value` is `JsonValue`, so this client carries both shapes. The shape
+is chosen where a clause is bound to its ontology term, which is the tool server's
+`_clause`.
 
 # WDK-VOCAB - vocabularies, trees, and the parents they were read under
 
