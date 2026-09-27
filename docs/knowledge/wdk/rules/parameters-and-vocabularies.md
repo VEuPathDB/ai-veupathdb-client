@@ -1,7 +1,7 @@
 ---
 type: Rules
 title: Parameter and vocabulary rules
-description: The eleven types and the exact string each takes, the shape a filter clause value takes per facet, the two encodings a vocabulary value can have and which one is silently wrong, and why a dependent value is only meaningful under the parent it was read with.
+description: The eleven types and the exact string each takes, the mark that names a search's organism parameter, the shape a filter clause value takes per facet, the two encodings a vocabulary value can have and which one is silently wrong, and why a dependent value is only meaningful under the parent it was read with.
 tags: [wdk-alignment, rules, parameters, vocabularies, dependent-params, wire-format]
 generated: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
 verified: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
@@ -496,6 +496,35 @@ cannot bind any of them.
 `FilterTermClause.value` is `JsonValue`, so this client carries both shapes. The shape
 is chosen where a clause is bound to its ontology term, which is the tool server's
 `_clause`.
+
+### WDK-PARAM-013 - The organism parameter of a search is the one WDK marks with `organismProperties`; a name is not the mark
+
+- class: CONTRACT
+- upstream: https://github.com/VEuPathDB/WDK/blob/736013d6baf757d8d44709db962952ef512d400f/Service/src/main/java/org/gusdb/wdk/service/formatter/param/ParamFormatter.java#L59
+- anchor: src/veupathdb/wdk/wdk_parameters.py:is_organism
+- status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_013_the_organism_parameter_is_the_one_wdk_marks
+
+`ParamFormatter.getBaseJson` writes every `<propertyList>` of the model parameter into
+`properties`. ApiCommonModel gives the organism parameters a list named
+`organismProperties`: `organism`, `organism_select_none`, `organismSinglePick` and
+`text_search_organism` among them
+([organismParams.xml](https://github.com/VEuPathDB/ApiCommonModel/blob/be0a8c67c73ddfb929e079f9e9a54e8a9de9cc7a/Model/lib/wdk/model/questions/params/organismParams.xml#L65-L90)).
+`wdk-client` finds the organism parameter the same way:
+[`isOrganismParam`](https://github.com/VEuPathDB/web-monorepo/blob/4733d56cf7fca324be1973778ff095576877cbef/packages/libs/preferred-organisms/src/lib/components/OrganismParam.tsx#L672-L677)
+tests `properties.organismProperties != null` on an enum parameter. The key is the mark;
+the `organisms` list that every parameter of a search can carry is not.
+
+In the recorded bodies the mark is at `body.searchData.parameters[0].properties.organismProperties`
+on `organism` (plasmodb `GenesByMolecularWeight`), `organismSinglePick` (plasmodb
+`GenesByNgsSnps`) and `organism_select_none` (vectorbase `GenesByGeneModelChars`).
+Measured on 2026-09-27 over every transcript search: on plasmodb 42 of 359 carry one
+marked parameter and 313 carry none; on vectorbase 33 of 876 carry one and 842 carry
+none; the rest answered 500. No search carries two. The marked names are ten on
+plasmodb, so a list of names misses searches.
+
+The mark means the vocabulary is an organism tree, not that a selected value is an
+organism name. `ms_assay` (`GenesByMassSpec`) and `ptm_assay` (`GenesByPTM`) are marked,
+and their leaves are experiments and samples under organism branches.
 
 # WDK-VOCAB - vocabularies, trees, and the parents they were read under
 

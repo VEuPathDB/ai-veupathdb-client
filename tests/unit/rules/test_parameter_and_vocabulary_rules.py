@@ -20,6 +20,7 @@ from veupathdb.domain.parameters.wdk_vocab import (
 from veupathdb.json_types import JSONObject
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.client import VEuPathDBClient
+from veupathdb.wdk.wdk_models import WDKSearchResponse
 
 
 def _recorded_parameters(name: str) -> dict[str, JSONObject]:
@@ -170,3 +171,33 @@ async def test_wdk_vocab_005_an_empty_array_names_no_stale_dependent(
     )
 
     assert refreshed == []
+
+
+@pytest.mark.parametrize(
+    ("fixture", "marked"),
+    [
+        ("search_genes_by_molecular_weight", "organism"),
+        ("search_genes_by_ngs_snps", "organismSinglePick"),
+        ("search_genes_by_gene_model_chars", "organism_select_none"),
+    ],
+)
+def test_wdk_param_013_the_organism_parameter_is_the_one_wdk_marks(
+    fixture: str, marked: str
+) -> None:
+    """Exactly one parameter carries `organismProperties`, whatever its name."""
+    search = WDKSearchResponse.model_validate(
+        load_recorded(fixture).json_body()
+    ).search_data
+
+    assert [p.name for p in search.parameters or [] if p.is_organism] == [marked]
+
+
+def test_wdk_param_013_an_organisms_property_is_not_the_mark() -> None:
+    """Every GenesByLocation parameter lists `organisms`; only one is marked."""
+    search = WDKSearchResponse.model_validate(
+        load_recorded("search_genes_by_location").json_body()
+    ).search_data
+    parameters = search.parameters or []
+
+    assert all("organisms" in p.properties for p in parameters)
+    assert [p.name for p in parameters if p.is_organism] == ["organismSinglePick"]

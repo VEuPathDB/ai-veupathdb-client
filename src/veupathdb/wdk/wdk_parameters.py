@@ -55,6 +55,11 @@ class WDKBaseParameter(WDKModel):
     record_class_name: str | None = None
     parsers: list[WDKDatasetParser] = Field(default_factory=list)
 
+    @property
+    def is_organism(self) -> bool:
+        """True when WDK marks this parameter as the search's organism parameter."""
+        return "organismProperties" in self.properties
+
     @field_validator("max_selected_count", mode="before")
     @classmethod
     def _normalize_unlimited(cls, v: object) -> object:

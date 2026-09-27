@@ -205,9 +205,10 @@ def _redacted(body: JSONObject) -> JSONObject:
         return body
     owner = VdiDatasetOwner.model_validate(body["owner"])
     text = json.dumps(body).replace(f"{owner.user_id}/", f"{_RECORDED_OWNER.user_id}/")
-    return _BODY.validate_json(text) | {
-        "owner": _RECORDED_OWNER.model_dump(by_alias=True, mode="json")
-    }
+    return _BODY.validate_python(
+        _BODY.validate_json(text)
+        | {"owner": _RECORDED_OWNER.model_dump(by_alias=True, mode="json")}
+    )
 
 
 def load_provenance(directory: Path) -> dict[str, VdiFixtureProvenance]:

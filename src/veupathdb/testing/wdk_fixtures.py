@@ -164,7 +164,20 @@ FIXTURES: tuple[FixtureRequest, ...] = (
         name="search_genes_by_molecular_weight",
         path=f"{_TRANSCRIPT}/GenesByMolecularWeight",
         params={"expandParams": "true"},
-        reads="WDK-SEARCH-002, WDK-SEARCH-004, WDK-PARAM-002",
+        reads="WDK-SEARCH-002, WDK-SEARCH-004, WDK-PARAM-002, WDK-PARAM-013",
+    ),
+    FixtureRequest(
+        name="search_genes_by_ngs_snps",
+        path=f"{_TRANSCRIPT}/GenesByNgsSnps",
+        params={"expandParams": "true"},
+        reads="WDK-PARAM-013",
+    ),
+    FixtureRequest(
+        name="search_genes_by_gene_model_chars",
+        path=f"{_TRANSCRIPT}/GenesByGeneModelChars",
+        site="vectorbase",
+        params={"expandParams": "true"},
+        reads="WDK-PARAM-013",
     ),
     FixtureRequest(
         name="search_boolean_transcript",

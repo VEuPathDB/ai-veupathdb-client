@@ -1,5 +1,18 @@
 # Knowledge log
 
+## 2026-09-27 - The organism parameter is the one WDK marks
+
+[WDK-PARAM-013](wdk/rules/parameters-and-vocabularies.md) records that WDK publishes a
+parameter's `<propertyList>`s under `properties`, and that ApiCommonModel marks an
+organism parameter with `organismProperties`. `WDKBaseParameter.is_organism` reads the
+mark. `extract_output_organisms` takes a map from a search name to its marked parameter
+and no longer recognizes `organism` and `text_search_organism` by name, which missed
+`organismSinglePick` and `organism_select_none`. An ortholog step with no target value
+now answers unknown instead of its input's organism. Two fixtures are recorded,
+plasmodb `GenesByNgsSnps` and vectorbase `GenesByGeneModelChars`; over every transcript
+search on both sites, no search carries two marked parameters. `ms_assay` and
+`ptm_assay` are marked too, and their values are experiments under organism branches.
+
 ## 2026-09-26 - A filter clause's value takes the shape its facet parses
 
 [WDK-PARAM-012](wdk/rules/parameters-and-vocabularies.md) records that
