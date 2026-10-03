@@ -1,7 +1,7 @@
 ---
 type: Rules
 title: Parameter and vocabulary rules
-description: The eleven types and the exact string each takes, the mark that names a search's organism parameter, the shape a filter clause value takes per facet, the two encodings a vocabulary value can have and which one is silently wrong, and why a dependent value is only meaningful under the parent it was read with.
+description: The eleven types and the exact string each takes, the mark that names a search's organism parameter, the shape a filter clause value takes per facet, what a filter term's summary counts and where its labels come from, the two encodings a vocabulary value can have and which one is silently wrong, and why a dependent value is only meaningful under the parent it was read with.
 tags: [wdk-alignment, rules, parameters, vocabularies, dependent-params, wire-format]
 generated: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
 verified: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
@@ -525,6 +525,30 @@ plasmodb, so a list of names misses searches.
 The mark means the vocabulary is an organism tree, not that a selected value is an
 organism name. `ms_assay` (`GenesByMassSpec`) and `ptm_assay` (`GenesByPTM`) are marked,
 and their leaves are experiments and samples under organism branches.
+
+### WDK-PARAM-014 - A filter parameter's term summary counts the values of one ontology term; the value is its own label, and the term's label is the ontology's `display`
+
+- class: CONTRACT
+- upstream: https://github.com/VEuPathDB/WDK/blob/736013d6baf757d8d44709db962952ef512d400f/Service/src/main/java/org/gusdb/wdk/service/formatter/param/ParamContainerFormatter.java#L68-L90
+- anchor: src/veupathdb/wdk/_searches.py:get_ontology_term_summary
+- status: ENFORCED by tests/unit/wdk/test_ontology_term_summary.py::test_each_value_of_the_term_is_read_with_its_two_counts
+
+[`QuestionService.getFilterParamOntologyTermSummary`](https://github.com/VEuPathDB/WDK/blob/736013d6baf757d8d44709db962952ef512d400f/Service/src/main/java/org/gusdb/wdk/service/service/QuestionService.java#L304-L359)
+reads `ontologyId`, `filters` and `contextParamValues` from the body, and refuses a term
+the parameter's ontology does not hold. `getOntologyTermSummaryJson` writes
+`valueCounts`, one `{value, count, filteredCount}` per distinct value of that term, and
+`internalsCount` and `internalsFilteredCount`, the distinct filter items. `count` is over
+the background query and `filteredCount` under the body's `filters`. The values come
+from a `HashMap`, so their order carries no meaning.
+[`OntologyTermSummary`](https://github.com/VEuPathDB/web-monorepo/blob/50c00301ea0cac997af6669f2f77243d63fff77d/packages/libs/wdk-client/src/Components/AttributeFilter/Types.ts#L143-L153)
+in `wdk-client` states the same shape.
+
+The response holds no display name. A value is the string, number or date WDK stores
+for it, and the filter form shows it as it is. The label of the term itself is the
+`display` of its node in the parameter's `ontology`, which the search detail already
+carries. Measured on plasmodb.org on 2026-09-28, `GenesByNgsSnps.variation_sample_meta`
+term `VAR_68bb04bd` (ontology `display` `sex`) under P. falciparum 3D7 answered `female`
+6 and `male` 6 of 12 samples.
 
 # WDK-VOCAB - vocabularies, trees, and the parents they were read under
 

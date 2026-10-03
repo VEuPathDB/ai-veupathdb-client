@@ -10,6 +10,28 @@
     "recorded_at": "2026-09-23",
     "trim": ""
   },
+  "boxplot_sense_reads_by_genotype": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/apps/pass/visualizations/boxplot",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "boxplot,completeCasesTable,sampleSizeTable",
+    "recorded_at": "2026-10-03",
+    "trim": ""
+  },
+  "compute_job_dimensionalityreduction": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/computes/dimensionalityreduction?autostart=true",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "jobID,status",
+    "recorded_at": "2026-10-03",
+    "trim": ""
+  },
   "compute_job_lookup": {
     "site": "plasmodb",
     "deployment": "https://plasmodb.org/eda",
@@ -19,6 +41,28 @@
     "content_type": "application/json",
     "body_shape": "jobID,status",
     "recorded_at": "2026-09-04",
+    "trim": ""
+  },
+  "computed_variables_dimensionalityreduction": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/computes/dimensionalityreduction/meta",
+    "status": 200,
+    "content_type": "text/plain",
+    "body_shape": "variables",
+    "recorded_at": "2026-10-03",
+    "trim": ""
+  },
+  "conttable_genotype_by_temperature": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/apps/pass/visualizations/conttable",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "completeCasesTable,mosaic,sampleSizeTable,statsTable",
+    "recorded_at": "2026-10-03",
     "trim": ""
   },
   "count_filtered": {
@@ -108,6 +152,28 @@
     "body_shape": "perDataset",
     "recorded_at": "2026-09-04",
     "trim": "the first 40 perDataset entries, plus every entry that omits shortDisplayName or description, plus DS_53f554ec6a"
+  },
+  "scatterplot_best_fit_sense_antisense": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/apps/pass/visualizations/scatterplot",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "completeCasesTable,sampleSizeTable,scatterplot",
+    "recorded_at": "2026-10-03",
+    "trim": ""
+  },
+  "scatterplot_dimensionalityreduction": {
+    "site": "plasmodb",
+    "deployment": "https://plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://plasmodb.org/eda/apps/dimensionalityreduction/visualizations/scatterplot",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "completeCasesTable,sampleSizeTable,scatterplot",
+    "recorded_at": "2026-10-03",
+    "trim": ""
   },
   "studies_list": {
     "site": "plasmodb",

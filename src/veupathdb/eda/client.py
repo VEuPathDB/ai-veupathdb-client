@@ -16,17 +16,27 @@ from veupathdb.auth_context import (
 from veupathdb.eda.errors import eda_failure
 from veupathdb.eda.models import (
     EdaBinSpec,
+    EdaBoxplotConfig,
+    EdaBoxplotResponse,
+    EdaComputeConfig,
+    EdaComputedVariableMetadata,
     EdaComputeJob,
+    EdaContTableResponse,
     EdaCountResponse,
-    EdaDifferentialExpressionConfig,
     EdaDistributionResponse,
     EdaFilter,
+    EdaModel,
+    EdaMosaicConfig,
     EdaPermissionEntry,
     EdaPermissionsResponse,
+    EdaScatterplotConfig,
+    EdaScatterplotResponse,
     EdaStudiesResponse,
     EdaStudyDetail,
     EdaStudyDetailResponse,
     EdaStudyOverview,
+    EdaTwoByTwoConfig,
+    EdaTwoByTwoResponse,
     VolcanoStatsResponse,
 )
 from veupathdb.errors import WDKLoginRequiredError
@@ -36,6 +46,10 @@ JSON_BODY: TypeAdapter[JsonValue] = TypeAdapter(JsonValue)
 
 # Content negotiation is one exact string comparison; any other value is TSV.
 _JSON_ONLY = "application/json"
+_TEXT_ONLY = "text/plain"
+
+# The app whose visualizations read the subset alone, with no compute.
+_NO_COMPUTE_APP = "pass"
 
 _FIRST_ERROR_STATUS = 400
 
@@ -91,14 +105,16 @@ class EdaClient:
             raise WDKLoginRequiredError
         return token
 
-    async def request_json(
+    async def send(
         self,
         method: Literal["GET", "POST", "PATCH", "DELETE"],
         path: str,
         *,
         json: JsonValue | None = None,
         params: dict[str, str] | None = None,
-    ) -> JsonValue:
+        accept: str = _JSON_ONLY,
+    ) -> httpx.Response:
+        """One call, raised as an EDA error on any status from 400 up."""
         client = await self._http()
         request = client.build_request(
             method,
@@ -106,13 +122,28 @@ class EdaClient:
             json=json,
             params=params,
             headers={
-                "Accept": _JSON_ONLY,
+                "Accept": accept,
                 "Cookie": f"Authorization={self._token(path)}",
             },
         )
         response = await client.send(request)
         if response.status_code >= _FIRST_ERROR_STATUS:
             raise eda_failure(method, path, response.status_code, response.text)
+        return response
+
+    async def request_json(
+        self,
+        method: Literal["GET", "POST", "PATCH", "DELETE"],
+        path: str,
+        *,
+        json: JsonValue | None = None,
+        params: dict[str, str] | None = None,
+        accept: str = _JSON_ONLY,
+    ) -> JsonValue:
+        """The body read as JSON whatever content type it was sent with."""
+        response = await self.send(
+            method, path, json=json, params=params, accept=accept
+        )
         if not response.content or not response.text.strip():
             return None
         return JSON_BODY.validate_json(response.content)
@@ -165,14 +196,14 @@ class EdaClient:
         *,
         compute_name: str,
         study_id: str,
-        config: EdaDifferentialExpressionConfig,
+        config: EdaComputeConfig,
         filters: Sequence[EdaFilter],
         autostart: bool = True,
     ) -> EdaComputeJob:
         raw = await self.request_json(
             "POST",
             f"/computes/{compute_name}",
-            json=_compute_body(study_id, config, filters),
+            json=compute_body(study_id, config, filters),
             params={"autostart": "true" if autostart else "false"},
         )
         return EdaComputeJob.model_validate(raw)
@@ -186,15 +217,92 @@ class EdaClient:
         *,
         compute_name: str,
         study_id: str,
-        config: EdaDifferentialExpressionConfig,
+        config: EdaComputeConfig,
         filters: Sequence[EdaFilter],
     ) -> VolcanoStatsResponse:
         raw = await self.request_json(
             "POST",
             f"/computes/{compute_name}/statistics",
-            json=_compute_body(study_id, config, filters),
+            json=compute_body(study_id, config, filters),
         )
         return VolcanoStatsResponse.model_validate(raw)
+
+    async def compute_meta(
+        self,
+        *,
+        compute_name: str,
+        study_id: str,
+        config: EdaComputeConfig,
+        filters: Sequence[EdaFilter],
+    ) -> EdaComputedVariableMetadata:
+        """The variables a completed job generated. The route answers only text."""
+        raw = await self.request_json(
+            "POST",
+            f"/computes/{compute_name}/meta",
+            json=compute_body(study_id, config, filters),
+            accept=_TEXT_ONLY,
+        )
+        return EdaComputedVariableMetadata.model_validate(raw)
+
+    async def scatterplot(
+        self,
+        *,
+        app: str,
+        study_id: str,
+        filters: Sequence[EdaFilter],
+        config: EdaScatterplotConfig,
+        compute_config: EdaComputeConfig | None = None,
+    ) -> EdaScatterplotResponse:
+        raw = await self.request_json(
+            "POST",
+            f"/apps/{app}/visualizations/scatterplot",
+            json=visualization_body(study_id, filters, config, compute_config),
+        )
+        return EdaScatterplotResponse.model_validate(raw)
+
+    async def two_by_two(
+        self,
+        *,
+        study_id: str,
+        filters: Sequence[EdaFilter],
+        config: EdaTwoByTwoConfig,
+    ) -> EdaTwoByTwoResponse:
+        raw = await self.request_json(
+            "POST",
+            f"/apps/{_NO_COMPUTE_APP}/visualizations/twobytwo",
+            json=visualization_body(study_id, filters, config),
+        )
+        return EdaTwoByTwoResponse.model_validate(raw)
+
+    async def contingency_table(
+        self,
+        *,
+        study_id: str,
+        filters: Sequence[EdaFilter],
+        config: EdaMosaicConfig,
+    ) -> EdaContTableResponse:
+        raw = await self.request_json(
+            "POST",
+            f"/apps/{_NO_COMPUTE_APP}/visualizations/conttable",
+            json=visualization_body(study_id, filters, config),
+        )
+        return EdaContTableResponse.model_validate(raw)
+
+    async def boxplot(
+        self,
+        *,
+        study_id: str,
+        filters: Sequence[EdaFilter],
+        config: EdaBoxplotConfig,
+        app: str = _NO_COMPUTE_APP,
+        compute_config: EdaComputeConfig | None = None,
+    ) -> EdaBoxplotResponse:
+        raw = await self.request_json(
+            "POST",
+            f"/apps/{app}/visualizations/boxplot",
+            json=visualization_body(study_id, filters, config, compute_config),
+        )
+        return EdaBoxplotResponse.model_validate(raw)
 
 
 def distribution_body(
@@ -215,9 +323,9 @@ def _filters(filters: Sequence[EdaFilter]) -> JsonValue:
     return dumped
 
 
-def _compute_body(
+def compute_body(
     study_id: str,
-    config: EdaDifferentialExpressionConfig,
+    config: EdaComputeConfig,
     filters: Sequence[EdaFilter],
 ) -> dict[str, JsonValue]:
     """The submit body addresses the job, so a reader sends the same one."""
@@ -225,5 +333,27 @@ def _compute_body(
         "studyId": study_id,
         "filters": _filters(filters),
         "derivedVariables": [],
-        "config": config.model_dump(by_alias=True, mode="json", exclude_none=True),
+        "config": _config(config),
     }
+
+
+def visualization_body(
+    study_id: str,
+    filters: Sequence[EdaFilter],
+    config: EdaModel,
+    compute_config: EdaComputeConfig | None = None,
+) -> dict[str, JsonValue]:
+    """A visualization request. Only a compute-backed app takes ``computeConfig``."""
+    body: dict[str, JsonValue] = {
+        "studyId": study_id,
+        "filters": _filters(filters),
+        "config": _config(config),
+    }
+    if compute_config is not None:
+        body["computeConfig"] = _config(compute_config)
+    return body
+
+
+def _config(config: EdaModel) -> JsonValue:
+    dumped: JsonValue = config.model_dump(by_alias=True, mode="json", exclude_none=True)
+    return dumped

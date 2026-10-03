@@ -220,6 +220,21 @@ FIXTURES: tuple[FixtureRequest, ...] = (
         reads="WDK-SEARCH-002",
     ),
     FixtureRequest(
+        name="ontology_term_summary_ngs_snps_sex",
+        path=f"{_TRANSCRIPT}/GenesByNgsSnps/variation_sample_meta/ontology-term-summary",
+        method="POST",
+        body={
+            "ontologyId": "VAR_68bb04bd",
+            "filters": [],
+            "contextParamValues": {
+                "organismSinglePick": '["Plasmodium falciparum 3D7"]',
+                "eda_sample_table_suffix": "s3be28bbe14_sample",
+                "variation_sample_meta": '{"filters":[]}',
+            },
+        },
+        reads="WDK-PARAM-014",
+    ),
+    FixtureRequest(
         name="refresh_without_changed_param",
         path=f"{_TRANSCRIPT}/GenesByLocation/refreshed-dependent-params",
         method="POST",

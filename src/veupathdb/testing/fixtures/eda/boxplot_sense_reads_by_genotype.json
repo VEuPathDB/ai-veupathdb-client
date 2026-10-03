@@ -1,0 +1,139 @@
+{
+  "boxplot": {
+    "data": [
+      {
+        "label": [
+          "delta-DHC mutant",
+          "delta-LRR5 mutant",
+          "wildtype"
+        ],
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "q1": [
+          0,
+          0,
+          1
+        ],
+        "median": [
+          1,
+          1,
+          13.5
+        ],
+        "q3": [
+          4.5,
+          5.25,
+          45.5
+        ],
+        "max": [
+          437,
+          401,
+          525
+        ],
+        "lowerfence": [
+          0,
+          0,
+          0
+        ],
+        "upperfence": [
+          6,
+          8,
+          49
+        ],
+        "outliers": [
+          [
+            376,
+            343,
+            288,
+            437
+          ],
+          [
+            401,
+            195,
+            392,
+            238
+          ],
+          [
+            472,
+            525,
+            205,
+            328
+          ]
+        ],
+        "mean": [
+          61.1667,
+          52.4583,
+          76.7083
+        ]
+      }
+    ],
+    "config": {
+      "variables": [
+        {
+          "variableClass": "native",
+          "variableSpec": {
+            "variableId": "SEQUENCE_READ_COUNT_SENSE",
+            "entityId": "ENT_fd574cd6"
+          },
+          "plotReference": "yAxis",
+          "dataType": "integer",
+          "dataShape": "continuous",
+          "isCollection": false,
+          "imputeZero": false,
+          "hasStudyDependentVocabulary": false
+        },
+        {
+          "variableClass": "native",
+          "variableSpec": {
+            "variableId": "VAR_84f17484",
+            "entityId": "ENT_8151325d"
+          },
+          "plotReference": "xAxis",
+          "dataType": "string",
+          "dataShape": "categorical",
+          "isCollection": false,
+          "imputeZero": false,
+          "hasStudyDependentVocabulary": false
+        }
+      ],
+      "completeCasesAllVars": 72,
+      "completeCasesAxesVars": 72
+    }
+  },
+  "sampleSizeTable": [
+    {
+      "xVariableDetails": {
+        "variableId": "VAR_84f17484",
+        "entityId": "ENT_8151325d",
+        "value": [
+          "delta-DHC mutant",
+          "delta-LRR5 mutant",
+          "wildtype"
+        ]
+      },
+      "size": [
+        24,
+        24,
+        24
+      ]
+    }
+  ],
+  "completeCasesTable": [
+    {
+      "variableDetails": {
+        "variableId": "VAR_84f17484",
+        "entityId": "ENT_8151325d"
+      },
+      "completeCases": 72
+    },
+    {
+      "variableDetails": {
+        "variableId": "SEQUENCE_READ_COUNT_SENSE",
+        "entityId": "ENT_fd574cd6"
+      },
+      "completeCases": 72
+    }
+  ]
+}

@@ -6,6 +6,7 @@ from collections.abc import Sequence
 import pydantic
 from pydantic import JsonValue, TypeAdapter
 
+from veupathdb.domain.parameters.values import FilterTermClause
 from veupathdb.errors import validate_response
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
@@ -18,6 +19,7 @@ from veupathdb.wdk.ai_expression import (
 from veupathdb.wdk.wdk_models import (
     WDKAnswer,
     WDKFilterValue,
+    WDKOntologyTermSummary,
     WDKRecordType,
     WDKSearch,
     WDKSearchConfig,
@@ -134,6 +136,38 @@ class SearchEndpoints:
             },
         )
         return _validate_list(raw, _PARAMETER_ADAPTER)
+
+    async def get_ontology_term_summary(
+        self,
+        record_type: str,
+        search_name: str,
+        param_name: str,
+        ontology_id: str,
+        context: dict[str, str],
+        *,
+        filters: Sequence[FilterTermClause] = (),
+    ) -> WDKOntologyTermSummary:
+        """Returns the count of each value of one ontology term of a filter parameter.
+
+        Matches WDK's ``QuestionService.getFilterParamOntologyTermSummary``. Every
+        context value must already be a WDK-encoded string. ``filters`` are the
+        clauses the filtered counts are taken under.
+        """
+        raw = await self.post(
+            f"/record-types/{record_type}/searches/{search_name}/{param_name}/ontology-term-summary",
+            json={
+                "ontologyId": ontology_id,
+                "filters": [
+                    clause.model_dump(by_alias=True, mode="json") for clause in filters
+                ],
+                "contextParamValues": context,
+            },
+        )
+        return validate_response(
+            WDKOntologyTermSummary,
+            raw,
+            f"WDK ontology term summary for {search_name}/{param_name}/{ontology_id}",
+        )
 
     async def run_search_report(
         self,

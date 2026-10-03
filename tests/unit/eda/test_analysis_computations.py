@@ -12,6 +12,7 @@ from veupathdb.eda import (
     EdaAnalysisDetail,
     EdaComputeDescriptor,
     EdaDifferentialExpressionDescriptor,
+    EdaDimensionalityReductionDescriptor,
     EdaOtherComputeDescriptor,
     EdaOtherVisualizationDescriptor,
     EdaPassDescriptor,
@@ -131,6 +132,42 @@ def test_an_unknown_compute_is_the_permissive_member(
     assert isinstance(parsed, EdaOtherComputeDescriptor)
     assert parsed.type == raw["type"]
     assert parsed.configuration == configuration
+
+
+def test_a_pca_computation_is_the_pca_member() -> None:
+    raw: JSONObject = {
+        "type": "dimensionalityreduction",
+        "configuration": {
+            "identifierVariable": _DE_CONFIGURATION["identifierVariable"],
+            "valueVariable": {
+                "entityId": "ENT_fd574cd6",
+                "variableId": "SEQUENCE_READ_COUNT_SENSE",
+            },
+            "dataFormat": "rawCounts",
+        },
+    }
+
+    parsed = COMPUTE.validate_python(raw)
+
+    assert isinstance(parsed, EdaDimensionalityReductionDescriptor)
+    assert parsed.configuration.value_variable.variable_id == (
+        "SEQUENCE_READ_COUNT_SENSE"
+    )
+    assert parsed.configuration.data_format == "rawCounts"
+    assert COMPUTE.dump_python(parsed, by_alias=True, exclude_unset=True) == raw
+
+
+def test_a_pca_computation_the_ui_has_not_configured_is_the_permissive_member() -> None:
+    """The UI stores only the data format until the researcher picks the variables."""
+    raw: JSONObject = {
+        "type": "dimensionalityreduction",
+        "configuration": {"dataFormat": "normalizedValues"},
+    }
+
+    parsed = COMPUTE.validate_python(raw)
+
+    assert isinstance(parsed, EdaOtherComputeDescriptor)
+    assert parsed.configuration == {"dataFormat": "normalizedValues"}
 
 
 def test_a_de_computation_the_ui_has_not_configured_is_the_permissive_member() -> None:

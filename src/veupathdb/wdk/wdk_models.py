@@ -424,6 +424,27 @@ class WDKColumnDistribution(WDKModel):
     statistics: WDKHistogramStatistics = Field(default_factory=WDKHistogramStatistics)
 
 
+class WDKOntologyTermValueCount(WDKModel):
+    """One value of a filter parameter's ontology term. The value is what the
+    researcher picks and sees: WDK stores no separate label for it."""
+
+    value: str | int | float | None
+    count: int
+    filtered_count: int
+
+
+class WDKOntologyTermSummary(WDKModel):
+    """Response from POST .../{paramName}/ontology-term-summary.
+
+    ``count`` is over the unfiltered background, ``filtered_count`` under the
+    request's filters; the two internals counts are distinct filter items.
+    """
+
+    value_counts: list[WDKOntologyTermValueCount] = Field(default_factory=list)
+    internals_count: int
+    internals_filtered_count: int
+
+
 class WDKTemporaryResult(WDKModel):
     """Response from POST /temporary-results."""
 

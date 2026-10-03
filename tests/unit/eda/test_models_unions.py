@@ -7,9 +7,12 @@ from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from veupathdb.eda.models import (
     EdaAnalysisDetail,
+    EdaBoxplotResponse,
     EdaCategoryVariable,
     EdaCollection,
+    EdaComputedVariableMetadata,
     EdaComputeJob,
+    EdaContTableResponse,
     EdaCountResponse,
     EdaDistributionResponse,
     EdaEntity,
@@ -19,6 +22,7 @@ from veupathdb.eda.models import (
     EdaMultiFilter,
     EdaNumberVariable,
     EdaPermissionsResponse,
+    EdaScatterplotResponse,
     EdaStringSetFilter,
     EdaStringVariable,
     EdaStudiesResponse,
@@ -48,6 +52,12 @@ READERS: dict[str, type[BaseModel]] = {
     "gene_id_distribution_de_unfiltered.json": EdaDistributionResponse,
     "compute_job_lookup.json": EdaComputeJob,
     "volcano_statistics.json": VolcanoStatsResponse,
+    "compute_job_dimensionalityreduction.json": EdaComputeJob,
+    "computed_variables_dimensionalityreduction.json": EdaComputedVariableMetadata,
+    "scatterplot_dimensionalityreduction.json": EdaScatterplotResponse,
+    "scatterplot_best_fit_sense_antisense.json": EdaScatterplotResponse,
+    "conttable_genotype_by_temperature.json": EdaContTableResponse,
+    "boxplot_sense_reads_by_genotype.json": EdaBoxplotResponse,
 }
 
 

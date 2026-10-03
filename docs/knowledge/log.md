@@ -1,5 +1,39 @@
 # Knowledge log
 
+## 2026-10-03 - The PCA compute and four statistical plots are read
+
+`EdaClient` runs `dimensionalityreduction` through the existing submit and poll, reads its
+computed variables with `compute_meta` (`POST /computes/{name}/meta`, which answers only
+`text/plain`), and reads `scatterplot`, `two_by_two`, `contingency_table` and `boxplot`
+into typed models that refuse misaligned parallel arrays. Six bodies are recorded on
+`STUDY_e973eadd57` and bound in `eda_schemas`, with ten new specification defects and the
+`retyped-on-the-wire` kind ([rest-surface](eda/rest-surface.md)). The deployment answers
+every twobytwo request with a 400 R evaluation failure, so the 2x2 shape follows the R
+producer ([visualizations](eda/visualizations.md)).
+
+## 2026-09-30 - A failed rnaseqrc import is the plugin's fault, not a `label` column
+
+[vdi-surface](wdk/rest/vdi-surface.md) no longer says a sample-details column named `label`
+stops an rnaseqrc import. Byte-identical uploads with no such column failed with
+`import: failed` and exit 255 twice and installed twice on plasmodb. The wrangler exits
+255 only through `stop_unexpected_error`, which the rnaseqrc path reaches when a Claude API
+call of its annotation step fails. A `failed` import takes a new upload of the same files;
+an `invalid` import names what is wrong with the data.
+
+## 2026-09-28 - A filter parameter's term summary is read
+
+`get_ontology_term_summary` calls
+`POST /record-types/{recordType}/searches/{searchName}/{paramName}/ontology-term-summary`
+with `ontologyId`, `filters` (each a `FilterTermClause` in its wire form) and
+`contextParamValues`, and reads `WDKOntologyTermSummary`: `valueCounts` of
+`WDKOntologyTermValueCount` (`value`, `count`, `filteredCount`), `internalsCount` and
+`internalsFilteredCount`. [WDK-PARAM-014](wdk/rules/parameters-and-vocabularies.md)
+records that the response carries no display name: a value is its own label, and a
+term's label is the `display` of its node in the parameter's `ontology`. The fixture
+`ontology_term_summary_ngs_snps_sex` holds plasmodb `GenesByNgsSnps.variation_sample_meta`
+term `VAR_68bb04bd` (`sex`) under P. falciparum 3D7: `female` 6, `male` 6, 12 samples.
+`veupathdb-py` is 0.1.0a20.
+
 ## 2026-09-27 - The organism parameter is the one WDK marks
 
 [WDK-PARAM-013](wdk/rules/parameters-and-vocabularies.md) records that WDK publishes a

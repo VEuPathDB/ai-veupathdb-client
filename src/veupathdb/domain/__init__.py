@@ -1,6 +1,7 @@
 """The WDK and EDA shapes this package reasons over, with no I/O."""
 
 from veupathdb.domain.eda_compute_validation import (
+    GENE_EXPRESSION_VALUE_IDS,
     ComputeConfigFacts,
     validate_compute_config,
 )
@@ -39,6 +40,7 @@ from veupathdb.domain.wdk_values import (
 )
 
 __all__ = [
+    "GENE_EXPRESSION_VALUE_IDS",
     "VEUPATHDB_GENE_ID",
     "ComputeConfigFacts",
     "DateSetFacts",

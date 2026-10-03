@@ -24,7 +24,7 @@ Start with [What EDA is](what-eda-is.md), then read by subject.
 ## Computation
 
 - [Computes and jobs](computes-and-jobs.md) - every compute plugin's config schema, the derivable job identity, the six-state lifecycle live-observed, job control and output files
-- [Apps and visualization data](visualizations.md) - the app catalog with per-project availability, and the request/response shapes of the plot-data endpoints
+- [Apps and visualization data](visualizations.md) - the app catalog with per-project availability, and the request/response shapes of the plot-data endpoints, including the PCA scatterplot and the boxplot, scatterplot, contingency-table and 2x2 statistics
 
 ## The WDK side
 
@@ -34,4 +34,4 @@ Start with [What EDA is](what-eda-is.md), then read by subject.
 
 ## The API
 
-- [REST surface](rest-surface.md) - the endpoints this client consumes, authentication, the analysis document every compute plugin writes into, and the eleven measured divergences from the pinned `service-eda` RAML that the recorded fixtures are gated against
+- [REST surface](rest-surface.md) - the endpoints this client consumes, authentication, the analysis document every compute plugin writes into, and the twenty-one measured divergences from the pinned `service-eda` RAML that the recorded fixtures are gated against

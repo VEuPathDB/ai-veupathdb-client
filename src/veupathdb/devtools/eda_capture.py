@@ -3,7 +3,8 @@
 An analysis capture creates an analysis on a live site under a registered
 account, writes the descriptor the site's own EDA app would write, reads the
 stored document back, and deletes the analysis. A distribution capture posts
-one declared request. The read body is the fixture.
+one declared request. A POST capture first drives the compute job it reads to
+complete, then posts one declared request. The read body is the fixture.
 
 Usage::
 
@@ -11,8 +12,8 @@ Usage::
     python -m veupathdb.devtools.eda_capture record [--only NAME ...]
 
 An analysis needs WDK_TEST_TOKEN, or WDK_TEST_EMAIL/WDK_TEST_PASSWORD: the
-analysis routes are keyed by a registered user. A distribution needs
-VEUPATHDB_AUTH_TOKEN, the deployment's token.
+analysis routes are keyed by a registered user. A distribution, a compute and a
+visualization need VEUPATHDB_AUTH_TOKEN, the deployment's token.
 """
 
 from __future__ import annotations
@@ -23,19 +24,31 @@ import datetime
 import json
 import sys
 from pathlib import Path
+from urllib.parse import urlencode
 
-from pydantic import BaseModel, ConfigDict, JsonValue, TypeAdapter
+from pydantic import BaseModel, ConfigDict, Field, JsonValue, TypeAdapter
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.domain import VEUPATHDB_GENE_ID
 from veupathdb.eda.analyses import EdaAnalysesClient
-from veupathdb.eda.client import EdaClient, distribution_body
+from veupathdb.eda.client import (
+    EdaClient,
+    compute_body,
+    distribution_body,
+    visualization_body,
+)
 from veupathdb.eda.factory import get_eda_analyses_client, get_eda_client
 from veupathdb.eda.models import (
+    EdaBoxplotConfig,
+    EdaComputeConfig,
+    EdaDimensionalityReductionConfig,
     EdaFilter,
+    EdaMosaicConfig,
     EdaNewAnalysis,
     EdaNumberRangeFilter,
+    EdaScatterplotConfig,
     EdaStringSetFilter,
+    EdaVariableSpec,
 )
 from veupathdb.json_types import JSONObject
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
@@ -260,6 +273,204 @@ DISTRIBUTION_CAPTURES: tuple[DistributionCapture, ...] = (
 )
 
 
+class ComputeRun(BaseModel):
+    """A compute job a capture reads. The recorder drives it to complete first."""
+
+    model_config = ConfigDict(frozen=True)
+
+    compute_name: str
+    study_id: str
+    config: EdaComputeConfig
+
+
+class PostCapture(BaseModel):
+    """One POST to record whole, and the compute job it reads, if any."""
+
+    model_config = ConfigDict(frozen=True)
+
+    name: str
+    site: str
+    path: str
+    body: JSONObject
+    params: dict[str, str] = Field(default_factory=dict)
+    accept: str = "application/json"
+    awaits: ComputeRun | None = None
+
+    @property
+    def url_path(self) -> str:
+        """The path with its query, as the provenance names it."""
+        return f"{self.path}?{urlencode(self.params)}" if self.params else self.path
+
+
+class CapturedPost(BaseModel):
+    """The body a POST capture read, and the content type it was sent as."""
+
+    model_config = ConfigDict(frozen=True)
+
+    content_type: str
+    body: JSONObject
+
+
+_DE_STUDY = "STUDY_e973eadd57"
+_SAMPLE = "ENT_8151325d"
+_COUNTS = "ENT_fd574cd6"
+_GENOTYPE = EdaVariableSpec(entity_id=_SAMPLE, variable_id="VAR_84f17484")
+_TEMPERATURE_CONDITION = EdaVariableSpec(entity_id=_SAMPLE, variable_id="VAR_081ab087")
+_SENSE_READS = EdaVariableSpec(
+    entity_id=_COUNTS, variable_id="SEQUENCE_READ_COUNT_SENSE"
+)
+_ANTISENSE_READS = EdaVariableSpec(
+    entity_id=_COUNTS, variable_id="SEQUENCE_READ_COUNT_ANTISENSE"
+)
+_SIX_GENES = EdaStringSetFilter(
+    entity_id=_COUNTS,
+    variable_id=VEUPATHDB_GENE_ID,
+    string_set=[f"PF3D7_0100{n}00" for n in range(1, 7)],
+)
+_PCA = ComputeRun(
+    compute_name="dimensionalityreduction",
+    study_id=_DE_STUDY,
+    config=EdaDimensionalityReductionConfig(
+        identifier_variable=EdaVariableSpec(
+            entity_id=_COUNTS, variable_id=VEUPATHDB_GENE_ID
+        ),
+        value_variable=_SENSE_READS,
+        data_format="rawCounts",
+    ),
+)
+_PCA_BODY = compute_body(_PCA.study_id, _PCA.config, [])
+
+
+def _principal_component(number: int) -> EdaVariableSpec:
+    return EdaVariableSpec(entity_id=_SAMPLE, variable_id=f"PC{number}")
+
+
+POST_CAPTURES: tuple[PostCapture, ...] = (
+    PostCapture(
+        name="compute_job_dimensionalityreduction",
+        site="plasmodb",
+        path="/computes/dimensionalityreduction",
+        body=_PCA_BODY,
+        params={"autostart": "true"},
+        awaits=_PCA,
+    ),
+    PostCapture(
+        name="computed_variables_dimensionalityreduction",
+        site="plasmodb",
+        path="/computes/dimensionalityreduction/meta",
+        body=_PCA_BODY,
+        accept="text/plain",
+        awaits=_PCA,
+    ),
+    PostCapture(
+        name="scatterplot_dimensionalityreduction",
+        site="plasmodb",
+        path="/apps/dimensionalityreduction/visualizations/scatterplot",
+        body=visualization_body(
+            _DE_STUDY,
+            [],
+            EdaScatterplotConfig(
+                output_entity_id=_SAMPLE,
+                value_spec="raw",
+                x_axis_variable=_principal_component(1),
+                y_axis_variable=_principal_component(2),
+                overlay_variable=_GENOTYPE,
+            ),
+            _PCA.config,
+        ),
+        awaits=_PCA,
+    ),
+    PostCapture(
+        name="conttable_genotype_by_temperature",
+        site="plasmodb",
+        path="/apps/pass/visualizations/conttable",
+        body=visualization_body(
+            _DE_STUDY,
+            [],
+            EdaMosaicConfig(
+                output_entity_id=_SAMPLE,
+                x_axis_variable=_GENOTYPE,
+                y_axis_variable=_TEMPERATURE_CONDITION,
+            ),
+        ),
+    ),
+    PostCapture(
+        name="boxplot_sense_reads_by_genotype",
+        site="plasmodb",
+        path="/apps/pass/visualizations/boxplot",
+        body=visualization_body(
+            _DE_STUDY,
+            [_SIX_GENES],
+            EdaBoxplotConfig(
+                output_entity_id=_COUNTS,
+                x_axis_variable=_GENOTYPE,
+                y_axis_variable=_SENSE_READS,
+            ),
+        ),
+    ),
+    PostCapture(
+        name="scatterplot_best_fit_sense_antisense",
+        site="plasmodb",
+        path="/apps/pass/visualizations/scatterplot",
+        body=visualization_body(
+            _DE_STUDY,
+            [_SIX_GENES],
+            EdaScatterplotConfig(
+                output_entity_id=_COUNTS,
+                value_spec="bestFitLineWithRaw",
+                x_axis_variable=_SENSE_READS,
+                y_axis_variable=_ANTISENSE_READS,
+                overlay_variable=_TEMPERATURE_CONDITION,
+            ),
+        ),
+    ),
+)
+
+_JOB_POLLS = 60
+_JOB_POLL_SECONDS = 5.0
+
+
+async def complete_job(
+    run: ComputeRun, *, client: EdaClient, poll_seconds: float = _JOB_POLL_SECONDS
+) -> None:
+    """Start the job and poll it until it completes. Any other end raises."""
+    job = await client.submit_compute(
+        compute_name=run.compute_name,
+        study_id=run.study_id,
+        config=run.config,
+        filters=[],
+    )
+    for _ in range(_JOB_POLLS):
+        if job.status == "complete":
+            return
+        if job.status not in {"queued", "in-progress"}:
+            msg = f"{run.compute_name} job {job.job_id} ended {job.status}"
+            raise RuntimeError(msg)
+        await asyncio.sleep(poll_seconds)
+        job = await client.get_job(job.job_id)
+    msg = f"{run.compute_name} job {job.job_id} did not complete"
+    raise TimeoutError(msg)
+
+
+async def capture_post(
+    capture: PostCapture, *, client: EdaClient, poll_seconds: float = _JOB_POLL_SECONDS
+) -> CapturedPost:
+    """Complete the job the capture reads, then post the declared request."""
+    if capture.awaits is not None:
+        await complete_job(capture.awaits, client=client, poll_seconds=poll_seconds)
+    response = await client.send(
+        "POST",
+        capture.path,
+        json=capture.body,
+        params=capture.params,
+        accept=capture.accept,
+    )
+    content_type, _, _ = response.headers["content-type"].partition(";")
+    return CapturedPost(
+        content_type=content_type, body=_BODY.validate_json(response.content)
+    )
+
+
 def load_provenance(directory: Path) -> dict[str, EdaFixtureProvenance]:
     """Every provenance entry the store in *directory* holds."""
     return _PROVENANCE.validate_json((directory / PROVENANCE_FILE).read_text())
@@ -374,6 +585,32 @@ def write_distribution(
     )
 
 
+def write_post(
+    capture: PostCapture,
+    captured: CapturedPost,
+    *,
+    base_url: str,
+    recorded_at: str,
+    into: Path,
+) -> None:
+    """Write the whole body and its provenance, with the content type it came as."""
+    _write_fixture(
+        capture.name,
+        captured.body,
+        EdaFixtureProvenance(
+            site=capture.site,
+            deployment=base_url,
+            method="POST",
+            url=f"{base_url}{capture.url_path}",
+            status=200,
+            content_type=captured.content_type,
+            body_shape=",".join(sorted(captured.body)),
+            recorded_at=recorded_at,
+        ),
+        into=into,
+    )
+
+
 async def record_analyses(wanted: list[AnalysisCapture]) -> int:
     """Record each analysis capture under the registered test account."""
     if not wanted:
@@ -420,11 +657,29 @@ async def record_distributions(wanted: list[DistributionCapture]) -> int:
     return len(wanted)
 
 
+async def record_posts(wanted: list[PostCapture]) -> int:
+    """Record each POST capture under the deployment's token."""
+    today = datetime.datetime.now(tz=datetime.UTC).date().isoformat()
+    for capture in wanted:
+        captured = await capture_post(capture, client=get_eda_client(capture.site))
+        write_post(
+            capture,
+            captured,
+            base_url=get_site(capture.site).eda_base_url.rstrip("/"),
+            recorded_at=today,
+            into=FIXTURE_DIR,
+        )
+        print(f"{capture.name}: {capture.url_path} recorded")
+    return len(wanted)
+
+
 def _declared() -> list[tuple[str, str]]:
-    """The name and the site of every capture of both kinds."""
-    return [(c.name, c.site) for c in ANALYSIS_CAPTURES] + [
-        (c.name, c.site) for c in DISTRIBUTION_CAPTURES
-    ]
+    """The name and the site of every capture of every kind."""
+    return (
+        [(c.name, c.site) for c in ANALYSIS_CAPTURES]
+        + [(c.name, c.site) for c in DISTRIBUTION_CAPTURES]
+        + [(c.name, c.site) for c in POST_CAPTURES]
+    )
 
 
 async def record(names: list[str]) -> int:
@@ -435,7 +690,12 @@ async def record(names: list[str]) -> int:
         raise KeyError(msg)
     analyses = [c for c in ANALYSIS_CAPTURES if not names or c.name in names]
     distributions = [c for c in DISTRIBUTION_CAPTURES if not names or c.name in names]
-    return await record_analyses(analyses) + await record_distributions(distributions)
+    posts = [c for c in POST_CAPTURES if not names or c.name in names]
+    return (
+        await record_analyses(analyses)
+        + await record_distributions(distributions)
+        + await record_posts(posts)
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -463,18 +723,26 @@ if __name__ == "__main__":
 __all__ = [
     "ANALYSIS_CAPTURES",
     "DISTRIBUTION_CAPTURES",
+    "POST_CAPTURES",
     "PROVENANCE_FILE",
     "AnalysisCapture",
     "CapturedAnalysis",
+    "CapturedPost",
+    "ComputeRun",
     "DistributionCapture",
     "EdaFixtureProvenance",
+    "PostCapture",
     "capture_analysis",
     "capture_distribution",
+    "capture_post",
+    "complete_job",
     "load_provenance",
     "main",
     "record",
     "record_analyses",
     "record_distributions",
+    "record_posts",
     "write_capture",
     "write_distribution",
+    "write_post",
 ]

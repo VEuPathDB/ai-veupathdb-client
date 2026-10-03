@@ -1,0 +1,114 @@
+{
+  "mosaic": {
+    "data": [
+      {
+        "xLabel": [
+          "delta-DHC mutant",
+          "delta-LRR5 mutant",
+          "wildtype"
+        ],
+        "yLabel": [
+          [
+            "febrile",
+            "normal"
+          ],
+          [
+            "febrile",
+            "normal"
+          ],
+          [
+            "febrile",
+            "normal"
+          ]
+        ],
+        "value": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            2
+          ]
+        ]
+      }
+    ],
+    "config": {
+      "variables": [
+        {
+          "variableClass": "native",
+          "variableSpec": {
+            "variableId": "VAR_081ab087",
+            "entityId": "ENT_8151325d"
+          },
+          "plotReference": "yAxis",
+          "dataType": "string",
+          "dataShape": "categorical",
+          "isCollection": false,
+          "imputeZero": false,
+          "hasStudyDependentVocabulary": false
+        },
+        {
+          "variableClass": "native",
+          "variableSpec": {
+            "variableId": "VAR_84f17484",
+            "entityId": "ENT_8151325d"
+          },
+          "plotReference": "xAxis",
+          "dataType": "string",
+          "dataShape": "categorical",
+          "isCollection": false,
+          "imputeZero": false,
+          "hasStudyDependentVocabulary": false
+        }
+      ],
+      "completeCasesAllVars": 12,
+      "completeCasesAxesVars": 12
+    }
+  },
+  "sampleSizeTable": [
+    {
+      "xVariableDetails": {
+        "variableId": "VAR_84f17484",
+        "entityId": "ENT_8151325d",
+        "value": [
+          "delta-DHC mutant",
+          "delta-LRR5 mutant",
+          "wildtype"
+        ]
+      },
+      "size": [
+        4,
+        4,
+        4
+      ]
+    }
+  ],
+  "statsTable": [
+    {
+      "chisq": 0,
+      "pvalue": 1,
+      "degreesFreedom": 2
+    }
+  ],
+  "completeCasesTable": [
+    {
+      "variableDetails": {
+        "variableId": "VAR_84f17484",
+        "entityId": "ENT_8151325d"
+      },
+      "completeCases": 12
+    },
+    {
+      "variableDetails": {
+        "variableId": "VAR_081ab087",
+        "entityId": "ENT_8151325d"
+      },
+      "completeCases": 12
+    }
+  ]
+}

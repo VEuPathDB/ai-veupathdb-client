@@ -2,9 +2,9 @@
 type: Reference
 title: EDA apps and visualization data
 description: The app and visualization catalog with per-project availability, and the request and response shapes of the visualization data endpoints, live-verified on PlasmoDB.
-tags: [eda, apps, visualizations, volcanoplot, scatterplot, bipartitenetwork, histogram, barplot]
+tags: [eda, apps, visualizations, volcanoplot, scatterplot, bipartitenetwork, histogram, barplot, boxplot, conttable, twobytwo]
 generated: { by: claude-code/opus-5, at: 2026-08-27T00:00:00Z }
-verified: { by: claude-code/opus-5, at: 2026-08-27T00:00:00Z }
+verified: { by: claude-code/opus-5, at: 2026-10-03T00:00:00Z }
 status: stable
 ---
 
@@ -19,7 +19,8 @@ Sources. Schema is `VEuPathDB/service-eda` at commit
 `api.raml`, `schema/url/data/apps.raml`, `schema/url/data/visualizations.raml`,
 `schema/url/data/plots.raml`, and one file per plugin under
 `schema/url/data/{app}/`. Live calls ran against `https://plasmodb.org/eda` on
-2026-08-27. Each shape below is marked live-verified or schema-derived.
+2026-08-27, and the boxplot, scatterplot, conttable and twobytwo calls on
+2026-10-03. Each shape below is marked live-verified or schema-derived.
 
 ## The catalog
 
@@ -74,6 +75,11 @@ Three things a reader should not assume:
   It is not MicrobiomeDB-only. `selfcorrelation` is MicrobiomeDB-only.
 - **`correlation` is not on VectorBase**, while `differentialexpression` and
   `dimensionalityreduction` are.
+- **A `projects` array gates the EDA app's menus, not the route.**
+  `POST /apps/pass/visualizations/{conttable,boxplot,scatterplot}` on a PlasmoDB
+  study answers 200 through `https://plasmodb.org/eda`, with the same body the
+  `countsandproportions`, `distributions` and `xyrelationships` routes take.
+  `EdaClient` reads its statistical plots through `pass`.
 
 ## Pass-through apps
 
@@ -224,6 +230,13 @@ The axes are the compute's **computed variables**. Read `PC1` and `PC2` from
 }
 ```
 
+The EDA app sends neither `nPCs` nor `correlationMethod`, and the service
+accepts the body without them. The recorded call
+(`scatterplot_dimensionalityreduction`) has `computeConfig`
+`{identifierVariable, valueVariable, dataFormat: "rawCounts"}` and colors by
+`genotype` (`VAR_84f17484`): three series of four samples, point ids the sample
+ids (`WT_37C_Rep1`), coordinates as strings.
+
 Omitting `yAxisVariable` returned `500 {"status":"server-error","message":"No
 value present","requestId":"..."}`. A missing required field in a visualization
 `config` is a **500, not a 422**; the compute endpoints validate better than the
@@ -373,32 +386,128 @@ POST /eda/apps/countsandproportions/visualizations/barplot
 `BarplotData` is `{label: string[], value: number[]}` plus optional strata
 details. One `data` entry per overlay/facet combination.
 
-### boxplot (schema-derived)
+### boxplot (live-verified)
 
-`BoxplotSpec` requires `outputEntityId`, `xAxisVariable`, `yAxisVariable`,
-`points` (`outliers | all`), `mean` and `computeStats` (both the string enum
-`'TRUE' | 'FALSE'`, not booleans); optional `overlayVariable`,
-`facetVariable`, `maxAllowedDataPoints`, `showMissingness`.
-`BoxplotPostResponse` is `{boxplot: {data: BoxplotData[], config: PlotConfig},
-sampleSizeTable[], completeCasesTable[], statsTable?: BoxplotStatsTable[]}`.
-`BoxplotData` carries parallel `lowerfence`, `upperfence`, `q1`, `q3` number
-arrays plus strata details.
+`BoxplotSpec` declares `outputEntityId`, `xAxisVariable`, `yAxisVariable`,
+`points` (`outliers | all`), `mean` and `computeStats` required (`mean` and
+`computeStats` are the string enum `'TRUE' | 'FALSE'`, not booleans); optional
+`overlayVariable`, `facetVariable`, `maxAllowedDataPoints`, `showMissingness`.
+**`computeStats` is not required**: a body without it answers 200 and carries
+no `statsTable`. The x variable may sit on an ancestor of the output entity.
+
+```
+POST /eda/apps/pass/visualizations/boxplot
+{"studyId":"STUDY_e973eadd57",
+ "filters":[{"entityId":"ENT_fd574cd6","variableId":"VEUPATHDB_GENE_ID","type":"stringSet",
+             "stringSet":["PF3D7_0100100", ... ,"PF3D7_0100600"]}],
+ "config":{"outputEntityId":"ENT_fd574cd6","points":"outliers","mean":"TRUE",
+   "xAxisVariable":{"entityId":"ENT_8151325d","variableId":"VAR_84f17484"},
+   "yAxisVariable":{"entityId":"ENT_fd574cd6","variableId":"SEQUENCE_READ_COUNT_SENSE"}}}
+
+-> 200
+{"boxplot":{"data":[{"label":["delta-DHC mutant","delta-LRR5 mutant","wildtype"],
+   "min":[0,0,0],"q1":[0,0,1],"median":[1,1,13.5],"q3":[4.5,5.25,45.5],"max":[437,401,525],
+   "lowerfence":[0,0,0],"upperfence":[6,8,49],
+   "outliers":[[376,343,288,437],[401,195,392,238],[472,525,205,328]],
+   "mean":[61.1667,52.4583,76.7083]}],
+  "config":{...,"completeCasesAllVars":72,"completeCasesAxesVars":72}},
+ "sampleSizeTable":[{"xVariableDetails":{"variableId":"VAR_84f17484","entityId":"ENT_8151325d",
+    "value":["delta-DHC mutant","delta-LRR5 mutant","wildtype"]},"size":[24,24,24]}],
+ "completeCasesTable":[...]}
+```
+
+One series per overlay value; each series is parallel arrays with one entry per
+x label. **`min` and `max` are on the wire and in no declaration**, and
+`BoxplotData` closes itself. `EdaBoxplotSeries` unzips the arrays into one
+`EdaBoxplotGroup` per label and refuses a series whose arrays differ in length,
+so a quartile can never be read against the wrong label. Recorded as
+`boxplot_sense_reads_by_genotype` (6 genes x 12 samples = 72 rows).
 
 The compute-backed boxplots (`alphadiv`, `abundance`) use the narrowed
 `BoxplotWith1ComputeSpec` instead: no `yAxisVariable`, because the y axis is
 always the computed variable, and `xAxisVariable` becomes optional.
 
-### scatterplot, pass-through (schema-derived)
+### scatterplot, pass-through (live-verified)
 
-`ScatterplotSpec` requires `outputEntityId`, `valueSpec`
+`ScatterplotSpec` declares `outputEntityId`, `valueSpec`
 (`raw | smoothedMeanWithRaw | bestFitLineWithRaw`), `xAxisVariable`,
-`yAxisVariable` and `correlationMethod`
-(`none | spearman | pearson | sparcc`); optional `overlayVariable`,
-`facetVariable`, `maxAllowedDataPoints`, `returnPointIds`. `ScatterplotData`
-carries `seriesX`/`seriesY` as `string[]` plus optional `smoothedMeanX`,
-`smoothedMeanY`, `smoothedMeanSE`, `smoothedMeanError` and `pointIds`.
-`betadiv`'s scatterplot uses a further narrowed `BetaDivScatterplotSpec` with no
-axes and no faceting at all.
+`yAxisVariable` and `correlationMethod` (`none | spearman | pearson | sparcc`)
+required; optional `overlayVariable`, `facetVariable`, `maxAllowedDataPoints`,
+`returnPointIds`. **`correlationMethod` is not required**: the EDA app never
+sends it and a body without it answers 200.
+
+With `valueSpec: "bestFitLineWithRaw"` each series carries the raw points and
+the fitted line. Recorded as `scatterplot_best_fit_sense_antisense`: sense
+against antisense read counts of six genes, colored by `temperature_condition`:
+
+```
+{"scatterplot":{"data":[
+  {"overlayVariableDetails":{"variableId":"VAR_081ab087","entityId":"ENT_8151325d","value":"febrile"},
+   "seriesX":["392","8","2", ...36],"seriesY":["9","3","1", ...36],
+   "pointIds":["PB31_41C_Rep1.PF3D7_0100100", ...36],
+   "bestFitLineX":["0","1","2", ...20],"bestFitLineY":[5.5487,5.5713,5.5939, ...20],
+   "r2":0.106},
+  {... "value":"normal" ..., "r2":0.3168}], "config":{...}},
+ "sampleSizeTable":[{"overlayVariableDetails":{... "value":"febrile"},"size":[36]}, ...],
+ "completeCasesTable":[...]}
+```
+
+`seriesX`, `seriesY` and `bestFitLineX` are strings, `bestFitLineY` and `r2` are
+numbers, and `bestFitLineX` holds the distinct x values, so its length differs
+from the point count. A point id on a child entity is
+`{sampleId}.{geneId}`. `EdaScatterplotSeries` refuses a series whose x, y and
+point-id arrays differ in length. `betadiv`'s scatterplot uses a further narrowed
+`BetaDivScatterplotSpec` with no axes and no faceting at all.
+
+### conttable (live-verified)
+
+`MosaicSpec` is `{outputEntityId, xAxisVariable, yAxisVariable, facetVariable?,
+showMissingness?}` and closes itself: a reference value sent here is
+`422 Unrecognized field "xAxisReferenceValue"`. Recorded as
+`conttable_genotype_by_temperature`, genotype against `temperature_condition`
+over the 12 samples:
+
+```
+{"mosaic":{"data":[{"xLabel":["delta-DHC mutant","delta-LRR5 mutant","wildtype"],
+   "yLabel":[["febrile","normal"],["febrile","normal"],["febrile","normal"]],
+   "value":[[2,2],[2,2],[2,2]]}], "config":{...,"completeCasesAllVars":12}},
+ "sampleSizeTable":[{"xVariableDetails":{..., "value":["delta-DHC mutant","delta-LRR5 mutant","wildtype"]},
+   "size":[4,4,4]}],
+ "statsTable":[{"chisq":0,"pvalue":1,"degreesFreedom":2}],
+ "completeCasesTable":[...]}
+```
+
+`value[i][j]` counts x label `i` against y label `yLabel[i][j]`. **The three
+statistics are single numbers**; `ContTableStatsTable` declares each a
+`number[]`. The web client types `pvalue` as `number | string | null`.
+`EdaMosaicConfig` sends no facet, so `EdaContTableResponse` lifts the one table
+into `counts` and the one statistics row beside it, and refuses a body with two
+tables or two rows.
+
+### twobytwo (not recordable on PlasmoDB)
+
+`TwoByTwoSpec` is `MosaicSpec` plus `xAxisReferenceValue` and
+`yAxisReferenceValue`; the plugin (`TwoByTwoPlugin.java`) requires exactly two
+values on each axis and runs `plot.data::mosaic(..., statistic='all', ...)`.
+**Every twobytwo request tried through `https://plasmodb.org/eda` answered
+`400 {"status":"bad-request","message":"eval failed, request status: error code: 127"}`**:
+binary sample variables on `STUDY_4d3aadae16`, `STUDY_a03298576e`,
+`STUDY_b15b7077f9` and `STUDY_aeed24b566`, and `temperature_condition` against a
+genotype filtered to two values on `STUDY_e973eadd57`, with and without
+reference values and `showMissingness`, through both `pass` and
+`countsandproportions`. A `conttable` over the same variables answers 200, so
+the failure is in the R evaluation of the 2x2 statistics.
+
+No response is recorded, so the response shape is schema- and producer-derived.
+The statistic names disagree between sources: the RAML `TwoByTwoStatsTable`
+declares `chisq`, `oddsratio` and `relativerisk`, while the R producer
+(`VEuPathDB/plot.data`, `tests/testthat/test-mosaic.R`) and the web client's
+`TwoByTwoResponse` both name `chiSq`, `fisher`, `oddsRatio`, `relativeRisk`,
+`prevalence`, `sensitivity`, `specificity`, `posPredictiveValue`,
+`negPredictiveValue`. `EdaTwoByTwoResponse` follows the producer. Each is a
+`Statistic` `{value, pvalue, confidenceInterval?, confidenceLevel?}`, with
+`pvalue` and `confidenceInterval` strings. `EdaClient.two_by_two` raises
+`EdaBadRequestError` on the 400.
 
 ## Shared response types
 
@@ -407,9 +516,12 @@ From `schema/url/data/plots.raml`:
 - `PlotConfig` = `{completeCasesAllVars: number, completeCasesAxesVars: number,
   variables: VariableMapping[]}`.
 - `SampleSizeTable` = `{xVariableDetails?: StrataVariableDetails[],
-  overlayVariableDetails?, facetVariableDetails?, size: number[]}`.
+  overlayVariableDetails?, facetVariableDetails?, size: number[]}`. On the wire
+  `xVariableDetails` is one object whose `value` lists every x label, one per
+  entry of `size` (`EdaSampleSizeAxis`).
 - `VariableCompleteCases` = `{variableDetails: VariableSpec, completeCases:
-  number}`.
+  number}`. A computed variable's row adds `displayLabel` inside
+  `variableDetails`, which `VariableSpec` does not admit.
 - `StrataVariableDetails` = `VariableSpec` plus `value: string`.
 - `VariableMapping` (in `schema/url/common/compute.raml`) =
   `{variableClass, variableSpec, plotReference, dataType, dataShape,

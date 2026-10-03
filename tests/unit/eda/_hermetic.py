@@ -13,6 +13,7 @@ from veupathdb.eda.client import EdaClient
 from veupathdb.eda.models import (
     EdaComparator,
     EdaDifferentialExpressionConfig,
+    EdaDimensionalityReductionConfig,
     EdaLabeledRange,
     EdaStringSetFilter,
     EdaVariableSpec,
@@ -61,4 +62,16 @@ def de_config() -> EdaDifferentialExpressionConfig:
             group_a=[EdaLabeledRange(label="normal")],
             group_b=[EdaLabeledRange(label="febrile")],
         ),
+    )
+
+
+def pca_config() -> EdaDimensionalityReductionConfig:
+    return EdaDimensionalityReductionConfig(
+        identifier_variable=EdaVariableSpec(
+            entity_id="ENT_fd574cd6", variable_id="VEUPATHDB_GENE_ID"
+        ),
+        value_variable=EdaVariableSpec(
+            entity_id="ENT_fd574cd6", variable_id="SEQUENCE_READ_COUNT_SENSE"
+        ),
+        data_format="rawCounts",
     )

@@ -84,7 +84,7 @@ and the WDK service base returns 404 for it; its two forms are in
 | POST | `/record-types/{recordType}/searches/{searchName}/refreshed-dependent-params` | Recompute dependent parameter vocabularies after one value changes | `{changedParam, contextParamValues}` | refreshed parameters | `_searches.py:get_refreshed_dependent_params` |
 | POST | `/record-types/{recordType}/searches/{searchName}/reports/standard` | Run a search without creating a step | `{searchConfig, reportConfig, viewFilters}` | `Answer` | `_searches.py:run_search_report`, and `catalog_metadata.py:load_dataset_metadata` against `dataset/searches/AllDatasets`; `viewFilters` is sent only when `run_search_report` is given `view_filters` |
 | POST | `/record-types/{recordType}/searches/{searchName}/reports/{reportName}` | The same through a named reporter | `{searchConfig, reportConfig}` | reporter-defined, and bound to no `@InSchema` or `@OutSchema` | `_searches.py:get_ai_expression_report`, against `gene/searches/single_record_question_GeneRecordClasses_GeneRecordClass/reports/aiExpression` ([WDK-ANS-009](../rules/searches-and-answers.md)) |
-| POST | `/record-types/{recordType}/searches/{searchName}/{paramName}/ontology-term-summary` | Filter-parameter ontology term summary | parameter context | term summary | unused |
+| POST | `/record-types/{recordType}/searches/{searchName}/{paramName}/ontology-term-summary` | Filter-parameter ontology term summary: the count of each value of one term ([WDK-PARAM-014](../rules/parameters-and-vocabularies.md)) | `{ontologyId, filters, contextParamValues}` | `{valueCounts, internalsCount, internalsFilteredCount}` | `_searches.py:get_ontology_term_summary` |
 | POST | `/record-types/{recordType}/searches/{searchName}/{paramName}/summary-counts` | Filter-parameter counts | parameter context | counts | unused |
 | GET | `/record-types/{recordType}/searches/{searchName}/columns` | Columns available to column tools | - | column list | unused |
 | POST | `/temporary-results` | Stash a report request behind an id, for a browser download link | report request | `{id}` | `temporary_results.py:create_temporary_result` |
@@ -159,8 +159,8 @@ table above follows the Java, so it is right and the RAML is wrong.
 
 The surface this client uses is narrow and deep: steps, strategies, searches, reports.
 Almost everything unused is either a browser concern (favorites, baskets, preferences,
-client error reporting) or a capability nobody has needed yet (ontology term summaries,
-dataset readback, analysis properties).
+client error reporting) or a capability nobody has needed yet (filter-parameter summary
+counts, dataset readback, analysis properties).
 
 Two absences are deliberate rather than incidental. `POST /users` registers a real
 account, and no client may call it. `PATCH /users/{userId}/strategies` deletes in

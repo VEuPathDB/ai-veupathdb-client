@@ -189,11 +189,16 @@ The count layout, the DESeq suitability rule and the AI sample annotation are th
 (`VEuPathDB/vdi-plugin-wrangler@2a5e1714f8c7661979b0205dd342b8735ab6d0b4`, `doc/rnaseq-rc.md`).
 Two measured behaviours that document does not state:
 
-- **A sample-details column named `label` stops the import.** The same 12-sample matrix
-  failed twice with it, stranded and unstranded, and installed four times without it.
+- **The same file set can fail once and install the next time.** The plugin's exit 255
+  comes only from `stop_unexpected_error`, which the rnaseqrc path reaches when a Claude
+  API call of the annotation step fails (`lib/R/sample_annotation.R`, `lib/R/llm_client.R`).
   The terminal body is `import: failed` with `"import exited with unexpected status 255"`,
-  not `invalid`, so the researcher gets no usable reason. The annotator writes its own
-  `label` variable on the sample entity. The cause inside the plugin was not traced.
+  not `invalid`, and carries no reason. Byte-identical uploads of the stranded 5,720-gene,
+  12-sample matrix with no `label` column failed twice and installed twice; six variants
+  (unstranded, 200 genes, a two-column sample file, the 6-sample reference) installed.
+  An earlier two-failures-in-six run was read as a `label` column fault; the failure
+  without that column does not support it. A `failed` import is the plugin's fault and a
+  new upload of the same files is the remedy; an `invalid` one is the data's.
 - **The reference genome is optional to VDI.** The same upload with `dependencies: []` was
   accepted and installed in 67.8 s, and its export matched the one with the genome
   ([genomics-and-wdk-relations](../../eda/genomics-and-wdk-relations.md)). Only the site's
@@ -241,7 +246,7 @@ the first poll that saw the state, so a state shorter than the poll gap can go u
 The EDA permission entry `EDAUD_<vdiId>` appeared 1.1 to 1.2 s after `data: complete` in
 every run that read it. The plugin's own four-sample fixture installed in 20.4 s
 (unstranded) and 20.7 s (stranded). Failures ended sooner: `import: invalid` at 8.9 s for
-negative counts, and `import: failed` at 40.2 s and 46.2 s for a `label` column.
+negative counts, and `import: failed` (exit 255) at 40.2 s and 46.2 s.
 
 `DELETE` returned 204 for eight datasets, and `GET /datasets/{id}` then returned 404
 `{"status":"not-found"}`. Every `EDAUD_` permission entry was already gone at the first

@@ -7,7 +7,7 @@ its aliases explicitly.
 
 from __future__ import annotations
 
-from typing import Annotated, Literal
+from typing import Annotated, Any, ClassVar, Literal, Self
 
 from pydantic import (
     AfterValidator,
@@ -16,6 +16,7 @@ from pydantic import (
     Discriminator,
     Field,
     JsonValue,
+    model_validator,
 )
 from pydantic.alias_generators import to_camel
 
@@ -386,6 +387,28 @@ class EdaDifferentialExpressionDescriptor(EdaStoredModel):
     configuration: EdaDifferentialExpressionConfig
 
 
+class EdaDimensionalityReductionConfig(EdaStoredModel):
+    """The PCA compute's configuration. Both variables are on one entity."""
+
+    identifier_variable: EdaVariableSpec
+    value_variable: EdaVariableSpec
+    data_format: Literal["rawCounts", "normalizedValues"] = "normalizedValues"
+
+
+class EdaDimensionalityReductionDescriptor(EdaStoredModel):
+    """A dimensionality-reduction compute whose configuration is complete."""
+
+    type: Literal["dimensionalityreduction"] = "dimensionalityreduction"
+    configuration: EdaDimensionalityReductionConfig
+
+
+# Left to right: a DE configuration carries a comparator, a PCA one does not.
+type EdaComputeConfig = Annotated[
+    EdaDifferentialExpressionConfig | EdaDimensionalityReductionConfig,
+    Field(union_mode="left_to_right"),
+]
+
+
 class EdaPassDescriptor(EdaStoredModel):
     """The pass-through compute every plain visualization hangs off. It has no configuration."""
 
@@ -393,7 +416,7 @@ class EdaPassDescriptor(EdaStoredModel):
 
 
 class EdaOtherComputeDescriptor(EdaStoredModel):
-    """Any other compute plugin, or a DE compute the UI has not finished configuring."""
+    """Any other compute plugin, or a typed compute the UI has not finished configuring."""
 
     type: str
     configuration: JsonValue = None
@@ -401,7 +424,10 @@ class EdaOtherComputeDescriptor(EdaStoredModel):
 
 # Left to right: a descriptor that fails the typed members is kept as it stands.
 type EdaComputeDescriptor = Annotated[
-    EdaDifferentialExpressionDescriptor | EdaPassDescriptor | EdaOtherComputeDescriptor,
+    EdaDifferentialExpressionDescriptor
+    | EdaDimensionalityReductionDescriptor
+    | EdaPassDescriptor
+    | EdaOtherComputeDescriptor,
     Field(union_mode="left_to_right"),
 ]
 
@@ -650,3 +676,319 @@ class EdaDistributionResponse(EdaModel):
     statistics: EdaDistributionStatistics = Field(
         default_factory=EdaDistributionStatistics,
     )
+
+
+EdaVariableClass = Literal["native", "derived", "computed"]
+EdaPlotReference = Literal[
+    "xAxis",
+    "yAxis",
+    "zAxis",
+    "overlay",
+    "facet1",
+    "facet2",
+    "geo",
+    "latitude",
+    "longitude",
+    "undefined",
+]
+EdaStringBoolean = Literal["TRUE", "FALSE"]
+
+
+class EdaVariableMapping(EdaModel):
+    """One variable a plot or a compute names, with the role it plays there."""
+
+    variable_class: EdaVariableClass
+    variable_spec: EdaVariableSpec
+    plot_reference: EdaPlotReference | None = None
+    data_type: Literal["category", "string", "number", "date", "longitude", "integer"]
+    data_shape: EdaVariableDataShape
+    display_name: str | None = None
+    display_range_min: str | float | None = None
+    display_range_max: str | float | None = None
+    vocabulary: list[str] | None = None
+    impute_zero: bool = False
+    has_study_dependent_vocabulary: bool | None = None
+    is_collection: bool = False
+    members: list[EdaVariableSpec] | None = None
+
+
+class EdaComputedVariableMetadata(EdaModel):
+    """``POST /computes/{name}/meta``: the variables a completed job generated."""
+
+    variables: list[EdaVariableMapping]
+
+
+class EdaPlotConfig(EdaModel):
+    variables: list[EdaVariableMapping]
+    complete_cases_all_vars: int | None = None
+    complete_cases_axes_vars: int | None = None
+
+
+class EdaStrataValue(EdaVariableSpec):
+    """One value of an overlay or facet variable."""
+
+    value: str
+
+
+class EdaSampleSizeAxis(EdaVariableSpec):
+    """The x-axis values a sample-size row counts, one per entry of ``size``."""
+
+    value: list[str]
+
+
+class EdaSampleSize(EdaModel):
+    x_variable_details: EdaSampleSizeAxis | None = None
+    overlay_variable_details: EdaStrataValue | None = None
+    size: list[int]
+
+
+class EdaCompleteCases(EdaModel):
+    variable_details: EdaVariableSpec
+    complete_cases: int
+
+
+def _out_of_envelope(value: Any, envelope: str) -> Any:
+    """The plot's ``data`` and ``config`` beside the tables that follow its key."""
+    match value:
+        case {**body}:
+            match body.pop(envelope, None):
+                case {**plot}:
+                    return body | plot
+                case _:
+                    return value
+        case _:
+            return value
+
+
+class _EdaPlotResponse(EdaModel):
+    """A visualization answer: one plot under its own key, then the count tables."""
+
+    envelope: ClassVar[str]
+
+    config: EdaPlotConfig
+    sample_size_table: list[EdaSampleSize] = Field(default_factory=list)
+    complete_cases_table: list[EdaCompleteCases] = Field(default_factory=list)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _lift_the_plot(cls, value: Any) -> Any:
+        return _out_of_envelope(value, cls.envelope)
+
+
+class EdaScatterplotConfig(EdaModel):
+    """``ScatterplotSpec``. A compute's generated variables may stand on either axis."""
+
+    output_entity_id: str
+    value_spec: Literal[
+        "raw", "smoothedMean", "smoothedMeanWithRaw", "bestFitLineWithRaw"
+    ]
+    x_axis_variable: EdaVariableSpec
+    y_axis_variable: EdaVariableSpec
+    overlay_variable: EdaVariableSpec | None = None
+    return_point_ids: bool = True
+    max_allowed_data_points: int | None = None
+    show_missingness: EdaStringBoolean | None = None
+
+
+class EdaScatterplotSeries(EdaModel):
+    """One overlay value's points. Coordinates are strings, as a date axis needs."""
+
+    overlay_variable_details: EdaStrataValue | None = None
+    series_x: list[str] = Field(default_factory=list)
+    series_y: list[str] = Field(default_factory=list)
+    point_ids: list[str] = Field(default_factory=list)
+    smoothed_mean_x: list[str] = Field(default_factory=list)
+    smoothed_mean_y: list[float] = Field(default_factory=list)
+    smoothed_mean_se: list[float] = Field(
+        default_factory=list,
+        validation_alias=AliasChoices("smoothedMeanSE", "smoothed_mean_se"),
+        serialization_alias="smoothedMeanSE",
+    )
+    best_fit_line_x: list[str] = Field(default_factory=list)
+    best_fit_line_y: list[float] = Field(default_factory=list)
+    r2: float | None = None
+
+    @model_validator(mode="after")
+    def _one_point_per_index(self) -> Self:
+        if len(self.series_x) != len(self.series_y):
+            msg = "seriesX and seriesY do not have one value per point"
+            raise ValueError(msg)
+        if self.point_ids and len(self.point_ids) != len(self.series_x):
+            msg = "pointIds does not have one id per point"
+            raise ValueError(msg)
+        if len(self.best_fit_line_x) != len(self.best_fit_line_y):
+            msg = "bestFitLineX and bestFitLineY do not have one value per point"
+            raise ValueError(msg)
+        smoothed = {len(self.smoothed_mean_y), len(self.smoothed_mean_se)}
+        if smoothed - {len(self.smoothed_mean_x)}:
+            msg = "the smoothed mean arrays do not have one value per point"
+            raise ValueError(msg)
+        return self
+
+
+class EdaScatterplotResponse(_EdaPlotResponse):
+    envelope: ClassVar[str] = "scatterplot"
+
+    data: list[EdaScatterplotSeries]
+
+
+class EdaMosaicConfig(EdaModel):
+    """``MosaicSpec`` without a facet, so the answer is one table."""
+
+    output_entity_id: str
+    x_axis_variable: EdaVariableSpec
+    y_axis_variable: EdaVariableSpec
+    show_missingness: EdaStringBoolean | None = None
+
+
+class EdaTwoByTwoConfig(EdaMosaicConfig):
+    """The reference values name the exposed column and the positive row."""
+
+    x_axis_reference_value: str
+    y_axis_reference_value: str
+
+
+class EdaMosaicCounts(EdaModel):
+    """``value[i][j]`` counts the records with x label ``i`` and y label ``y_label[i][j]``."""
+
+    x_label: list[str]
+    y_label: list[list[str]]
+    value: list[list[int]]
+
+    @model_validator(mode="after")
+    def _one_count_per_cell(self) -> Self:
+        rows = [len(labels) for labels in self.y_label]
+        if len(self.x_label) != len(rows) or [len(r) for r in self.value] != rows:
+            msg = "the mosaic counts do not have one value per x and y label"
+            raise ValueError(msg)
+        return self
+
+
+class _EdaMosaicResponse(_EdaPlotResponse):
+    """One unfaceted table, and its one statistics row lifted beside it."""
+
+    envelope: ClassVar[str] = "mosaic"
+
+    counts: EdaMosaicCounts
+
+    @model_validator(mode="before")
+    @classmethod
+    def _one_table_and_one_row(cls, value: Any) -> Any:
+        match _out_of_envelope(value, cls.envelope):
+            case {"data": [table], **rest}:
+                match rest.pop("statsTable", []):
+                    case []:
+                        return rest | {"counts": table}
+                    case [{**row}]:
+                        return rest | row | {"counts": table}
+                    case _:
+                        msg = "an unfaceted mosaic carries at most one statistics row"
+                        raise ValueError(msg)
+            case {"data": _}:
+                msg = "an unfaceted mosaic carries exactly one table"
+                raise ValueError(msg)
+            case lifted:
+                return lifted
+
+
+class EdaContTableResponse(_EdaMosaicResponse):
+    """Pearson's chi-squared test of independence on the table."""
+
+    pvalue: float | str | None = None
+    degrees_freedom: float | None = None
+    chisq: float | None = None
+
+
+class EdaTwoByTwoStatistic(EdaModel):
+    value: float | None = None
+    pvalue: str | None = None
+    confidence_interval: str | None = None
+    confidence_level: float | None = None
+
+
+class EdaTwoByTwoResponse(_EdaMosaicResponse):
+    """The 2x2 statistics, under the names the service's R package writes."""
+
+    chi_sq: EdaTwoByTwoStatistic | None = None
+    fisher: EdaTwoByTwoStatistic | None = None
+    prevalence: EdaTwoByTwoStatistic | None = None
+    odds_ratio: EdaTwoByTwoStatistic | None = None
+    relative_risk: EdaTwoByTwoStatistic | None = None
+    sensitivity: EdaTwoByTwoStatistic | None = None
+    specificity: EdaTwoByTwoStatistic | None = None
+    pos_predictive_value: EdaTwoByTwoStatistic | None = None
+    neg_predictive_value: EdaTwoByTwoStatistic | None = None
+
+
+class EdaBoxplotConfig(EdaModel):
+    """``BoxplotSpec``. ``points`` and ``mean`` are string enums, not booleans."""
+
+    output_entity_id: str
+    points: Literal["outliers", "all"] = "outliers"
+    mean: EdaStringBoolean = "TRUE"
+    x_axis_variable: EdaVariableSpec
+    y_axis_variable: EdaVariableSpec
+    overlay_variable: EdaVariableSpec | None = None
+    show_missingness: EdaStringBoolean | None = None
+
+
+class EdaBoxplotGroup(EdaModel):
+    """The box of one x-axis label."""
+
+    label: str
+    min: float | None = None
+    lowerfence: float
+    q1: float
+    median: float
+    q3: float
+    upperfence: float
+    max: float | None = None
+    mean: float | None = None
+    outliers: list[float] = Field(default_factory=list)
+    raw_data: list[float] = Field(default_factory=list)
+
+
+_BOXPLOT_COLUMNS = (
+    "min",
+    "lowerfence",
+    "q1",
+    "median",
+    "q3",
+    "upperfence",
+    "max",
+    "mean",
+    "outliers",
+    "rawData",
+)
+
+
+class EdaBoxplotSeries(EdaModel):
+    """One overlay value's boxes, one group per label of the wire's parallel arrays."""
+
+    overlay_variable_details: EdaStrataValue | None = None
+    groups: list[EdaBoxplotGroup]
+
+    @model_validator(mode="before")
+    @classmethod
+    def _one_group_per_label(cls, value: Any) -> Any:
+        match value:
+            case {"label": [*labels], **rest}:
+                columns: dict[str, Any] = {
+                    k: rest.pop(k) for k in _BOXPLOT_COLUMNS if k in rest
+                }
+                if {len(column) for column in columns.values()} - {len(labels)}:
+                    msg = "a boxplot column does not have one value per label"
+                    raise ValueError(msg)
+                groups = [
+                    {"label": label} | {k: c[i] for k, c in columns.items()}
+                    for i, label in enumerate(labels)
+                ]
+                return rest | {"groups": groups}
+            case _:
+                return value
+
+
+class EdaBoxplotResponse(_EdaPlotResponse):
+    envelope: ClassVar[str] = "boxplot"
+
+    data: list[EdaBoxplotSeries]

@@ -4,7 +4,7 @@ title: EDA REST surface
 description: The EDA service endpoints this client consumes, their shapes, and how authentication works, verified live on PlasmoDB.
 tags: [eda, rest, endpoints, auth]
 generated: { by: claude-code/fable-5, at: 2026-08-27T00:00:00Z }
-verified: { by: claude-code/fable-5, at: 2026-08-27T00:00:00Z }
+verified: { by: claude-code/opus-5, at: 2026-10-03T00:00:00Z }
 status: stable
 ---
 
@@ -126,6 +126,16 @@ Same WDK bearer token the WDK client already holds
   compute-backed viz whose job has not completed is
   `400 "Compute results are not available for the requested job."` - the viz
   endpoint never starts a compute.
+- `POST /computes/{name}/meta` with the submit body -> the computed variables
+  a completed job generated, `{variables: VariableMapping[]}`
+  (`EdaClient.compute_meta` -> `EdaComputedVariableMetadata`). It answers only
+  `text/plain`: `Accept: application/json` is a 406, so the client sends
+  `Accept: text/plain` and reads the text as JSON.
+- `EdaClient` reads four plots: `scatterplot` (any app, `computeConfig` only
+  when one is given), and `two_by_two`, `contingency_table` and `boxplot` through
+  `pass`. The bodies are `{studyId, filters, config, computeConfig?}` with no
+  `derivedVariables`; each response is parsed into a typed model that refuses
+  misaligned parallel arrays. Shapes: [visualizations.md](visualizations.md).
 - `GET /jobs/{jobId}` -> `{jobID, status}`; `GET /jobs/{jobId}/files` -> the
   output file listing; `GET /jobs/{jobId}/files/{name}` -> one file;
   `DELETE /jobs/{jobId}` -> 204, allowed only on an owned, finished job (403
@@ -159,10 +169,13 @@ hangs off a `pass` computation, whose descriptor is `{"type": "pass"}` with no
 `configuration`; a histogram, a scatterplot or a map sits under it. Every other
 compute plugin (`alphadiv`, `correlation`, ...) writes its own `type`, and the
 app stores a differential-expression configuration with every member optional
-until the researcher sets it. A reader therefore models three computation
+until the researcher sets it. A reader therefore models four computation
 descriptors, tried left to right: a complete `differentialexpression`
-(`EdaDifferentialExpressionDescriptor`), `pass` (`EdaPassDescriptor`), and any
+(`EdaDifferentialExpressionDescriptor`), a complete `dimensionalityreduction`
+(`EdaDimensionalityReductionDescriptor`), `pass` (`EdaPassDescriptor`), and any
 other `type` with its configuration kept as JSON (`EdaOtherComputeDescriptor`).
+The app stores a dimensionality-reduction configuration as `{dataFormat}` alone
+until the researcher picks the variables, and that draft is the last member.
 Visualizations are the same: a volcano plot with both thresholds
 (`EdaVolcanoDescriptor`), and any other with its configuration, filters,
 thumbnail and application context kept (`EdaOtherVisualizationDescriptor`).
@@ -198,11 +211,11 @@ generators emit Java and Kotlin from this same file. It is pinned at
 the one file it includes (`lib-hash-id` v1.1.0 `hash-id.raml`) and a sha256 per
 file in `schema-pin.json`.
 
-It describes the wire, with eleven exceptions. Each is a defect in the
-specification, not in `integrations/eda/models.py`: our models already match
+It describes the wire, with twenty-one exceptions. Each is a defect in the
+specification, not in `veupathdb/eda/models.py`: our models already match
 the service at every one of them. Counts marked live were measured against
-`https://plasmodb.org/eda` on 2026-09-04; counts marked recorded are what the
-trimmed fixtures on disk hold.
+`https://plasmodb.org/eda` on 2026-09-04, or on 2026-10-03 for the compute and
+plot rows; counts marked recorded are what the fixtures on disk hold.
 
 | RAML type | member | what the RAML says | what the service does | measured |
 |---|---|---|---|---|
@@ -217,16 +230,34 @@ trimmed fixtures on disk hold.
 | `DifferentialExpressionStatsResponse` | `pValueFloor` | not declared | sent on every response | present on every response (live) |
 | `DifferentialExpressionStatsResponse` | `adjustedPValueFloor` | not declared | sent on every response | present on every response (live) |
 | `Computation` | `displayName` | required `string` | stored and served without it | absent on the `pass` computation of `analysis_detail_pass_and_de`, the shape the EDA app writes (live, 2026-09-23) |
+| `DimensionalityReductionComputeConfig` | `nPCs` | required `number` | accepted without it | the recorded PCA job completes with `PC1` and `PC2` (recorded) |
+| `ScatterplotSpec` | `correlationMethod` | required | accepted without it | both recorded scatterplots send none (recorded) |
+| `BoxplotSpec` | `computeStats` | required | accepted without it | the recorded boxplot sends none and carries no `statsTable` (recorded) |
+| `BoxplotData` | `min` | not declared, type closed | sent on every series | present on the 1 series of `boxplot_sense_reads_by_genotype` (recorded) |
+| `BoxplotData` | `max` | not declared, type closed | sent on every series | present on the same series (recorded) |
+| `ContTableStatsTable` | `pvalue` | `number[]` | one number | `1` on `conttable_genotype_by_temperature` (recorded) |
+| `ContTableStatsTable` | `degreesFreedom` | `number[]` | one number | `2` on the same row (recorded) |
+| `ContTableStatsTable` | `chisq` | `number[]` | one number | `0` on the same row (recorded) |
+| `SampleSizeTable` | `xVariableDetails` | `StrataVariableDetails[]` | one object whose `value` is `string[]` | on the recorded boxplot and conttable (recorded) |
+| `VariableCompleteCases` | `variableDetails` | closed `VariableSpec` | adds `displayLabel` on a computed variable | `PC 1 (54.35% variance)` on `scatterplot_dimensionalityreduction` (recorded) |
 
 `isCategory` is also recorded in [data-model.md](data-model.md), which carries
 the 66664-variable scan behind it and the rule that follows: the category test
 is `type == "category"`, and the member is not modelled.
 
-The two undeclared members cost nothing to a validator, because a RAML type
-admits an unknown member unless it closes itself and
-`DifferentialExpressionStatsResponse` does not. They are listed because
+The two undeclared members of `DifferentialExpressionStatsResponse` cost
+nothing to a validator, because a RAML type admits an unknown member unless it
+closes itself and that type does not. They are listed because
 `VolcanoStatsResponse` models both, and a caller reading only the RAML would
-not know they exist.
+not know they exist. `BoxplotData` closes itself, so the gate admits `min` and
+`max` there as any value. A retyped member (`retyped-on-the-wire`) keeps its name
+and takes the draft-07 schema of what the service sends.
+
+The 2x2 statistics are a twenty-second disagreement the gate cannot hold:
+`TwoByTwoStatsTable` names `chisq`, `oddsratio` and `relativerisk`, the R
+producer and the web client name `chiSq`, `oddsRatio` and `relativeRisk`, and
+the deployment answers no twobytwo request to record (see
+[visualizations.md](visualizations.md)).
 
 ### The gate
 
@@ -234,21 +265,28 @@ not know they exist.
 to JSON Schema draft-07 and validates every recorded body under
 `src/veupathdb/testing/fixtures/eda/` against the
 type its endpoint returns. It is offline, needs no credential, and fails when a
-vendored file no longer matches its sha256. The fourteen recorded bodies bind eight
-types, whose transitive closure is 51 of the library's 414. `vendor`
+vendored file no longer matches its sha256. The twenty recorded bodies bind twelve
+types, whose transitive closure is 71 of the library's 414. `vendor`
 re-downloads the library at the commit the pin names and rewrites the pin only
 when a byte changed; bump `sha` first, then run it.
 
-The eleven rows above are the converter's only allowance, declared as
-`SPEC_DEFECTS` in `src/veupathdb/devtools/eda_schemas.py`. An
-eleventh error means either the service changed or a fixture is stale, and a
+The twenty-one rows above are the converter's only allowance, declared as
+`SPEC_DEFECTS` in `src/veupathdb/devtools/eda_schemas.py`. Any
+further error means either the service changed or a fixture is stale, and a
 row the pinned library stops contradicting is a failure too, so a spec fix
 upstream forces this table to shrink. The converter reads the constructs this
 library uses and refuses the rest, so a facet the service adds fails the parse
 rather than passing unchecked.
 
-Anchor: `src/veupathdb/devtools/eda_schemas.py` (the converter and the eleven rows),
+The compute and plot bodies are recorded by
+`python -m veupathdb.devtools.eda_capture record`, whose POST captures drive
+the PCA job to `complete` before they read it; each capture's request body is
+checked against its RAML request type in
+`tests/unit/devtools/test_eda_post_capture.py`.
+
+Anchor: `src/veupathdb/devtools/eda_schemas.py` (the converter and the twenty-one rows),
 with `tests/unit/devtools/test_eda_raml_converter.py` for the RAML-to-draft-07
-rules and `tests/unit/devtools/test_eda_schema_vendor.py` for what the vendor
+rules, `tests/unit/devtools/test_eda_spec_defects.py` for how a defect bends a
+type, and `tests/unit/devtools/test_eda_schema_vendor.py` for what the vendor
 command writes. The recorded bodies are gated in the consuming application, at
 `pathfinder: apps/api/src/pathfinder/tests/unit/devtools/test_eda_fixture_schemas.py`.

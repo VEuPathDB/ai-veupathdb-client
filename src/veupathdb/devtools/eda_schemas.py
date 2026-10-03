@@ -398,7 +398,10 @@ def verify_body(type_name: str, body: JsonValue) -> tuple[str, ...]:
 
 
 type DefectKind = Literal[
-    "renamed-on-the-wire", "required-but-absent", "undeclared-on-the-wire"
+    "renamed-on-the-wire",
+    "required-but-absent",
+    "undeclared-on-the-wire",
+    "retyped-on-the-wire",
 ]
 
 
@@ -408,8 +411,9 @@ class SpecDefect(BaseModel):
     ``renamed`` gives the name the service sends instead, and the declared
     member keeps its type under that name. A ``required-but-absent`` member
     leaves the type's ``required`` list. An ``undeclared-on-the-wire`` member is
-    one the service sends and the RAML never declares; nothing is relaxed for
-    it, because a RAML type admits unknown members unless it closes itself.
+    one the service sends and the RAML never declares; a closed type admits it
+    as any value, an open type already does. A ``retyped-on-the-wire`` member
+    keeps its name and takes ``wire_type``, the draft-07 schema of what is sent.
     """
 
     model_config = ConfigDict(frozen=True)
@@ -418,6 +422,7 @@ class SpecDefect(BaseModel):
     member: str
     kind: DefectKind
     renamed: str | None = None
+    wire_type: dict[str, JsonValue] | None = None
     measured: str
     records: str
 
@@ -425,6 +430,9 @@ class SpecDefect(BaseModel):
     def _only_a_rename_names_a_wire_member(self) -> Self:
         if (self.kind == "renamed-on-the-wire") != (self.renamed is not None):
             msg = f"{self.raml_type}.{self.member}: only a rename names a wire member"
+            raise ValueError(msg)
+        if (self.kind == "retyped-on-the-wire") != (self.wire_type is not None):
+            msg = f"{self.raml_type}.{self.member}: only a retype names a wire type"
             raise ValueError(msg)
         return self
 
@@ -437,9 +445,16 @@ class SpecDefect(BaseModel):
 
     def applied(self, definition: dict[str, JsonValue]) -> JsonValue:
         """*definition* bent to what the service sends, or left alone."""
-        if not self.holds(definition) or self.kind == "undeclared-on-the-wire":
+        if not self.holds(definition):
             return definition
         properties = _as_map(definition.get("properties"))
+        if self.kind == "undeclared-on-the-wire":
+            if definition.get("additionalProperties") is not False:
+                return definition
+            return {**definition, "properties": properties | {self.member: {}}}
+        if self.wire_type is not None:
+            properties[self.member] = self.wire_type
+            return {**definition, "properties": properties}
         required = _as_list(definition.get("required"))
         if self.renamed is not None:
             properties[self.renamed] = properties.pop(self.member)
@@ -530,11 +545,91 @@ SPEC_DEFECTS: tuple[SpecDefect, ...] = (
         measured="absent on the pass computation of the recorded analysis, 2026-09-23",
         records="docs/knowledge/eda/rest-surface.md",
     ),
+    SpecDefect(
+        raml_type="DimensionalityReductionComputeConfig",
+        member="nPCs",
+        kind="required-but-absent",
+        measured="a job without it completes with PC1 and PC2, 2026-10-03",
+        records="docs/knowledge/eda/rest-surface.md",
+    ),
+    SpecDefect(
+        raml_type="ScatterplotSpec",
+        member="correlationMethod",
+        kind="required-but-absent",
+        measured="a scatterplot without it answers 200, 2026-10-03",
+        records="docs/knowledge/eda/rest-surface.md",
+    ),
+    SpecDefect(
+        raml_type="BoxplotSpec",
+        member="computeStats",
+        kind="required-but-absent",
+        measured="a boxplot without it answers 200, 2026-10-03",
+        records="docs/knowledge/eda/rest-surface.md",
+    ),
+    SpecDefect(
+        raml_type="BoxplotData",
+        member="min",
+        kind="undeclared-on-the-wire",
+        measured="sent on every boxplot series of the recorded boxplot, 2026-10-03",
+        records="docs/knowledge/eda/rest-surface.md",
+    ),
+    SpecDefect(
+        raml_type="BoxplotData",
+        member="max",
+        kind="undeclared-on-the-wire",
+        measured="sent on every boxplot series of the recorded boxplot, 2026-10-03",
+        records="docs/knowledge/eda/rest-surface.md",
+    ),
+    *(
+        SpecDefect(
+            raml_type="ContTableStatsTable",
+            member=member,
+            kind="retyped-on-the-wire",
+            wire_type={"type": "number"},
+            measured="one number, not an array, on the recorded table, 2026-10-03",
+            records="docs/knowledge/eda/rest-surface.md",
+        )
+        for member in ("pvalue", "degreesFreedom", "chisq")
+    ),
+    SpecDefect(
+        raml_type="SampleSizeTable",
+        member="xVariableDetails",
+        kind="retyped-on-the-wire",
+        wire_type={
+            "type": "object",
+            "properties": {
+                "entityId": {"type": "string"},
+                "variableId": {"type": "string"},
+                "value": {"type": "array", "items": {"type": "string"}},
+            },
+            "required": ["entityId", "value", "variableId"],
+            "additionalProperties": False,
+        },
+        measured="one object whose value lists every x label, 2026-10-03",
+        records="docs/knowledge/eda/rest-surface.md",
+    ),
+    SpecDefect(
+        raml_type="VariableCompleteCases",
+        member="variableDetails",
+        kind="retyped-on-the-wire",
+        wire_type={
+            "type": "object",
+            "properties": {
+                "entityId": {"type": "string"},
+                "variableId": {"type": "string"},
+                "displayLabel": {"type": "string"},
+            },
+            "required": ["entityId", "variableId"],
+            "additionalProperties": False,
+        },
+        measured="displayLabel on each computed variable's row, 2026-10-03",
+        records="docs/knowledge/eda/rest-surface.md",
+    ),
 )
 """Where the pinned RAML describes a service that does not exist.
 
 Every entry is a defect in the specification: this client's own models already
-match the wire at each of these eleven members. The gate applies them so that
+match the wire at each of these members. The gate applies them so that
 whatever it still reports is drift.
 """
 
@@ -662,6 +757,36 @@ BINDINGS: tuple[FixtureBinding, ...] = (
         fixture="permissions",
         raml_type="PermissionsGetResponse",
         endpoint="GET /permissions",
+    ),
+    FixtureBinding(
+        fixture="compute_job_dimensionalityreduction",
+        raml_type="JobResponse",
+        endpoint="POST /computes/dimensionalityreduction",
+    ),
+    FixtureBinding(
+        fixture="computed_variables_dimensionalityreduction",
+        raml_type="ComputedVariableMetadata",
+        endpoint="POST /computes/dimensionalityreduction/meta",
+    ),
+    FixtureBinding(
+        fixture="scatterplot_dimensionalityreduction",
+        raml_type="ScatterplotPostResponse",
+        endpoint="POST /apps/dimensionalityreduction/visualizations/scatterplot",
+    ),
+    FixtureBinding(
+        fixture="conttable_genotype_by_temperature",
+        raml_type="ContTablePostResponse",
+        endpoint="POST /apps/pass/visualizations/conttable",
+    ),
+    FixtureBinding(
+        fixture="boxplot_sense_reads_by_genotype",
+        raml_type="BoxplotPostResponse",
+        endpoint="POST /apps/pass/visualizations/boxplot",
+    ),
+    FixtureBinding(
+        fixture="scatterplot_best_fit_sense_antisense",
+        raml_type="ScatterplotPostResponse",
+        endpoint="POST /apps/pass/visualizations/scatterplot",
     ),
     FixtureBinding(
         fixture="analysis_detail_pass_and_de",

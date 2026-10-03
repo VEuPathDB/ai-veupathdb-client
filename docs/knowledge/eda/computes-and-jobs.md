@@ -4,7 +4,7 @@ title: EDA computes and jobs
 description: Every EDA compute plugin, its exact computeConfig schema, and the asynchronous job lifecycle, live-verified on PlasmoDB with a real differential expression run.
 tags: [eda, computes, jobs, differentialexpression, deseq, correlation, dimensionalityreduction, async]
 generated: { by: claude-code/opus-5, at: 2026-08-27T00:00:00Z }
-verified: { by: claude-code/opus-5, at: 2026-08-27T00:00:00Z }
+verified: { by: claude-code/opus-5, at: 2026-10-03T00:00:00Z }
 status: stable
 ---
 
@@ -175,14 +175,26 @@ Live on all genomics projects, VectorBase, UniDB and MicrobiomeDB. Schema:
 }
 ```
 
-All four fields are required. `dataFormat` is the enum that `differentialexpression`
-does not have. Only PCA is implemented; a commented-out
+The RAML marks all four fields required, and `nPCs` is not: the EDA app's own
+configuration (`dimensionalityReduction.tsx` in `web-monorepo`) is
+`{identifierVariable, valueVariable, dataFormat}` with `dataFormat` defaulting to
+`normalizedValues`, and a job submitted without `nPCs` completed live with `PC1`
+and `PC2`. `EdaDimensionalityReductionConfig` models those three. `dataFormat`
+is the enum that `differentialexpression` does not have; `rawCounts` suits the
+`SEQUENCE_READ_COUNT_*` value variables. The variable constraints are the
+differential-expression ones: the identifier is `VEUPATHDB_GENE_ID` and both
+variables are on one entity. Only PCA is implemented; a commented-out
 `DimensionalityReductionMethod` enum (`pca`, `pcoa`, `mapper`) marks the intent.
 
 This compute **generates variables**: its `meta` output declares computed
 variables `PC1`, `PC2`, ... on the sample entity, which a visualization can then
-reference as ordinary `VariableSpec` values. Live on
-`STUDY_e973eadd57`:
+reference as ordinary `VariableSpec` values. Each `displayName` is the axis label
+with the share of variance the component explains. **The `meta` route answers
+only `text/plain`**: a request whose `Accept` is `application/json` is
+`406 Not Acceptable`, while `text/plain`, `*/*` and no `Accept` all return the
+JSON document as `text/plain`. `EdaClient.compute_meta` sends
+`Accept: text/plain` and parses the text as JSON. Live on `STUDY_e973eadd57`,
+recorded as `computed_variables_dimensionalityreduction`:
 
 ```
 POST /eda/computes/dimensionalityreduction/meta
@@ -307,7 +319,10 @@ Observed transitions:
 | 08:26:59 | same POST again | `{"jobID":"db04204e5386396e1ca2cb78469ab6fb","status":"in-progress"}` |
 | 08:27:33 | `GET /jobs/db04204e5386396e1ca2cb78469ab6fb` | `{"jobID":"db04204e5386396e1ca2cb78469ab6fb","status":"complete"}` |
 
-The whole run took under 35 seconds for 12 samples and 5720 genes. A
+The whole run took under 35 seconds for 12 samples and 5720 genes. The
+`dimensionalityreduction` job on the same counts (`rawCounts`, no filter) has id
+`2679abb0e5c81b345a21b8f211db6a9b` and is recorded complete as
+`compute_job_dimensionalityreduction`. A
 `dimensionalityreduction` job on the same data went from `queued` to `complete`
 in under 10 seconds; a `correlation` job on
 `STUDY_fd06cb37d3` did the same.
@@ -406,6 +421,9 @@ The `/{file}` route does not exist for `differentialexpression`, and
 `/statistics` does not exist for `dimensionalityreduction` (404 live). The
 `meta` and `tabular` names map to `output-meta` and `output-data`;
 `ComputeController.getResultFileStreamer` 404s on any other name.
+
+The `/{file}` routes stream text, so `meta` is read with `Accept: text/plain`
+(see the `dimensionalityreduction` section above).
 
 `dimensionalityreduction` tabular output, live, is a TSV keyed by the sample
 entity's id column:

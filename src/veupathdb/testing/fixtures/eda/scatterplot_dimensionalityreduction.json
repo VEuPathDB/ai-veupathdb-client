@@ -1,0 +1,189 @@
+{
+  "scatterplot": {
+    "data": [
+      {
+        "overlayVariableDetails": {
+          "variableId": "VAR_84f17484",
+          "entityId": "ENT_8151325d",
+          "value": "delta-DHC mutant"
+        },
+        "seriesX": [
+          "-32.8759958003351",
+          "-45.3261209288939",
+          "37.2967855338906",
+          "17.5188028100268"
+        ],
+        "seriesY": [
+          "-18.1168003956837",
+          "-13.2272286120369",
+          "-23.0828400229326",
+          "-23.4888748407649"
+        ],
+        "pointIds": [
+          "PB4_37C_Rep1",
+          "PB4_37C_Rep2",
+          "PB4_41C_Rep1",
+          "PB4_41C_Rep2"
+        ]
+      },
+      {
+        "overlayVariableDetails": {
+          "variableId": "VAR_84f17484",
+          "entityId": "ENT_8151325d",
+          "value": "delta-LRR5 mutant"
+        },
+        "seriesX": [
+          "-61.4351512946123",
+          "-50.227058404734",
+          "0.443609763729234",
+          "45.4558380786033"
+        ],
+        "seriesY": [
+          "43.0792816268799",
+          "10.9447707441747",
+          "5.12424133133646",
+          "1.92767239157473"
+        ],
+        "pointIds": [
+          "PB31_37C_Rep1",
+          "PB31_37C_Rep2",
+          "PB31_41C_Rep1",
+          "PB31_41C_Rep2"
+        ]
+      },
+      {
+        "overlayVariableDetails": {
+          "variableId": "VAR_84f17484",
+          "entityId": "ENT_8151325d",
+          "value": "wildtype"
+        },
+        "seriesX": [
+          "-7.2548330125957",
+          "-26.8849459871985",
+          "59.7446980845019",
+          "63.5443711576177"
+        ],
+        "seriesY": [
+          "-19.2972293300329",
+          "-9.22066006555882",
+          "22.7506369532308",
+          "22.6070302198135"
+        ],
+        "pointIds": [
+          "WT_37C_Rep1",
+          "WT_37C_Rep2",
+          "WT_41C_Rep1",
+          "WT_41C_Rep2"
+        ]
+      }
+    ],
+    "config": {
+      "variables": [
+        {
+          "variableClass": "native",
+          "variableSpec": {
+            "variableId": "VAR_84f17484",
+            "entityId": "ENT_8151325d"
+          },
+          "plotReference": "overlay",
+          "dataType": "string",
+          "dataShape": "categorical",
+          "isCollection": false,
+          "imputeZero": false,
+          "hasStudyDependentVocabulary": false
+        },
+        {
+          "variableClass": "computed",
+          "variableSpec": {
+            "variableId": "PC1",
+            "entityId": "ENT_8151325d"
+          },
+          "plotReference": "xAxis",
+          "displayName": "PC 1 (54.35% variance)",
+          "displayRangeMin": "-61.4351512946123",
+          "displayRangeMax": "63.5443711576177",
+          "dataType": "number",
+          "dataShape": "continuous",
+          "isCollection": false,
+          "imputeZero": false,
+          "hasStudyDependentVocabulary": false
+        },
+        {
+          "variableClass": "computed",
+          "variableSpec": {
+            "variableId": "PC2",
+            "entityId": "ENT_8151325d"
+          },
+          "plotReference": "yAxis",
+          "displayName": "PC 2 (12.79% variance)",
+          "displayRangeMin": "-23.4888748407649",
+          "displayRangeMax": "43.0792816268799",
+          "dataType": "number",
+          "dataShape": "continuous",
+          "isCollection": false,
+          "imputeZero": false,
+          "hasStudyDependentVocabulary": false
+        }
+      ],
+      "completeCasesAllVars": 12,
+      "completeCasesAxesVars": 12
+    }
+  },
+  "sampleSizeTable": [
+    {
+      "overlayVariableDetails": {
+        "variableId": "VAR_84f17484",
+        "entityId": "ENT_8151325d",
+        "value": "delta-DHC mutant"
+      },
+      "size": [
+        4
+      ]
+    },
+    {
+      "overlayVariableDetails": {
+        "variableId": "VAR_84f17484",
+        "entityId": "ENT_8151325d",
+        "value": "delta-LRR5 mutant"
+      },
+      "size": [
+        4
+      ]
+    },
+    {
+      "overlayVariableDetails": {
+        "variableId": "VAR_84f17484",
+        "entityId": "ENT_8151325d",
+        "value": "wildtype"
+      },
+      "size": [
+        4
+      ]
+    }
+  ],
+  "completeCasesTable": [
+    {
+      "variableDetails": {
+        "variableId": "PC1",
+        "entityId": "ENT_8151325d",
+        "displayLabel": "PC 1 (54.35% variance)"
+      },
+      "completeCases": 12
+    },
+    {
+      "variableDetails": {
+        "variableId": "PC2",
+        "entityId": "ENT_8151325d",
+        "displayLabel": "PC 2 (12.79% variance)"
+      },
+      "completeCases": 12
+    },
+    {
+      "variableDetails": {
+        "variableId": "VAR_84f17484",
+        "entityId": "ENT_8151325d"
+      },
+      "completeCases": 12
+    }
+  ]
+}
