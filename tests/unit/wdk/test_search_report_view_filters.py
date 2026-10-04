@@ -6,13 +6,14 @@ import pytest
 from tests.unit.wdk._step_writes import Recorder
 
 from veupathdb.devtools.fixtures import verify_body
+from veupathdb.json_types import JSONObject
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.wdk_models import WDKFilterValue, WDKSearchConfig
 
 _ONE_PER_GENE = WDKFilterValue(name="representativeTranscriptOnly", value={})
 _CONFIG = WDKSearchConfig(parameters={"organism": '["Plasmodium falciparum 3D7"]'})
-_PAGE = {"pagination": {"offset": 0, "numRecords": 10}}
+_PAGE: JSONObject = {"pagination": {"offset": 0, "numRecords": 10}}
 
 
 def _client(monkeypatch: pytest.MonkeyPatch) -> tuple[VEuPathDBClient, Recorder]:
@@ -20,6 +21,10 @@ def _client(monkeypatch: pytest.MonkeyPatch) -> tuple[VEuPathDBClient, Recorder]
     report = Recorder(
         reply=load_recorded("answer_report_by_molecular_weight").json_body()
     )
+    search = Recorder(
+        reply=load_recorded("search_genes_by_molecular_weight").json_body()
+    )
+    monkeypatch.setattr(client, "get", search)
     monkeypatch.setattr(client, "post", report)
     return client, report
 

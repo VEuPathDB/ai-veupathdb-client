@@ -34,7 +34,7 @@ def _held_step_api(
     api = StrategyAPI(VEuPathDBClient("https://example.invalid/service"), "1")
     put = Recorder()
     monkeypatch.setattr(api.client, "put", put)
-    monkeypatch.setattr(api, "_expand_tree_params_to_leaves", no_expansion)
+    monkeypatch.setattr(api.client, "expand_tree_params_to_leaves", no_expansion)
 
     async def details(record_type: str, search_name: str, **_: object) -> Any:
         del record_type, search_name

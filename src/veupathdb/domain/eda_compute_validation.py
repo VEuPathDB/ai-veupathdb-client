@@ -9,11 +9,13 @@ from collections.abc import Sequence
 from typing import Protocol
 
 from veupathdb.domain.eda_study import (
+    CATEGORICAL_DATA_SHAPES,
     CATEGORY_TYPE,
     VEUPATHDB_GENE_ID,
     StudyFacts,
     VariableFacts,
     ancestor_entity_ids,
+    data_shape_of,
     entity_by_id,
     listed,
     variable_by_id,
@@ -44,6 +46,8 @@ class VariableSpecFacts(Protocol):
 class LabeledRangeFacts(Protocol):
     @property
     def label(self) -> str: ...
+    @property
+    def min(self) -> str | None: ...
 
 
 class ComparatorFacts(Protocol):
@@ -178,6 +182,7 @@ def _comparator_errors(
             f"{CATEGORY_TYPE} variable. A category groups other variables and "
             f"holds no values, so no label can name a side of the comparison."
         )
+    errors.extend(_binned_shape_errors(comparator, comparator_variable))
     vocabulary = vocabulary_of(comparator_variable)
     if vocabulary is None:
         return errors
@@ -189,6 +194,32 @@ def _comparator_errors(
             f"{listed(vocabulary)}."
         )
     return errors
+
+
+def _binned_shape_errors(
+    comparator: ComparatorFacts,
+    variable: VariableFacts,
+) -> list[str]:
+    """A variable whose data shape is not categorical takes bins, not labels."""
+    shape = data_shape_of(variable)
+    if shape is None or shape in CATEGORICAL_DATA_SHAPES:
+        return []
+    groups = [*comparator.group_a, *comparator.group_b]
+    labels = [entry.label for entry in groups if entry.min is None]
+    if not labels:
+        return []
+    named = (
+        f"{variable.id} ({variable.display_name})"
+        if variable.display_name
+        else variable.id
+    )
+    return [
+        (
+            f"comparator.variable names {named}, whose data shape is {shape}. The "
+            f"plugin compares a {shape} variable by bins, each with a min and a max, "
+            f"and the labels {listed(labels)} carry no bin."
+        )
+    ]
 
 
 def _comparator_entity_errors(

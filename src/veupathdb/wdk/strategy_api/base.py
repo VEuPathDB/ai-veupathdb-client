@@ -1,4 +1,3 @@
-import json
 from collections.abc import Sequence
 
 from veupathdb.domain.parameters.phyletic import (
@@ -7,14 +6,7 @@ from veupathdb.domain.parameters.phyletic import (
     sort_profile_pattern,
     validate_phyletic_codes,
 )
-from veupathdb.domain.parameters.value_utils import decode_values
-from veupathdb.domain.parameters.wdk_vocab import (
-    FAKE_ALL_SENTINEL,
-    WDKTreeBoxVocabNode,
-    collect_leaf_terms,
-    find_vocab_node,
-)
-from veupathdb.errors import VEuPathDBError, validate_response
+from veupathdb.errors import validate_response
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
 from veupathdb.wdk.client import VEuPathDBClient
@@ -25,7 +17,6 @@ from veupathdb.wdk.strategy_api.helpers import (
     resolve_wdk_user_id,
 )
 from veupathdb.wdk.wdk_models import WDKAnswer, WDKFilterValue
-from veupathdb.wdk.wdk_parameters import WDKParameter
 
 logger = get_logger(__name__)
 
@@ -78,98 +69,6 @@ class StrategyAPIBase:
             return user_id
         await self._ensure_session()
         return self._resolved_user_id
-
-    async def _expand_tree_params_to_leaves(
-        self,
-        record_type: str,
-        search_name: str,
-        params: dict[str, str],
-    ) -> dict[str, str]:
-        """Expand parent tree nodes to leaf descendants for multi-pick-vocabulary params.
-
-        WDK tree params with ``countOnlyLeaves=true`` (like organism) silently
-        return 0 results when given a parent node.  The WDK frontend's
-        CheckboxTree auto-selects all leaf descendants when a parent is clicked.
-        We replicate that: fetch the search's param specs, find tree params
-        with ``countOnlyLeaves``, and expand any parent values to their leaves.
-        """
-        try:
-            response = await self.client.get_search_details(
-                record_type, search_name, expand_params=True
-            )
-            wdk_params = response.search_data.parameters
-            if not wdk_params:
-                return params
-            return self._expand_specs(wdk_params, params, search_name)
-        except VEuPathDBError:
-            logger.debug("Failed to expand tree params (non-fatal)")
-            return params
-
-    def _expand_specs(
-        self,
-        wdk_params: list[WDKParameter],
-        params: dict[str, str],
-        search_name: str,
-    ) -> dict[str, str]:
-        result = dict(params)
-        for spec in wdk_params:
-            if spec.name not in result:
-                continue
-            if spec.type not in ("multi-pick-vocabulary", "single-pick-vocabulary"):
-                continue
-            if not spec.count_only_leaves:
-                continue
-            vocab = spec.vocabulary
-            if not isinstance(vocab, WDKTreeBoxVocabNode):
-                continue
-            expanded = self._expand_single_tree_param(vocab, result[spec.name])
-            if expanded is not None:
-                original_values = decode_values(result[spec.name], spec.name)
-                if expanded != [str(v) for v in original_values]:
-                    logger.info(
-                        "Expanded tree param to leaves",
-                        param=spec.name,
-                        search=search_name,
-                        original_count=len(original_values),
-                        expanded_count=len(expanded),
-                    )
-                    result[spec.name] = json.dumps(expanded)
-        return result
-
-    def _expand_single_tree_param(
-        self, vocab: WDKTreeBoxVocabNode, raw_value: str
-    ) -> list[str] | None:
-        values = decode_values(raw_value, "tree-param")
-        if not values:
-            return None
-
-        expanded: list[str] = []
-        seen: set[str] = set()
-        for val in values:
-            val_str = str(val)
-            # The synthetic root names no real term. Expanding it would select
-            # the whole vocabulary instead of failing.
-            node = (
-                None
-                if val_str == FAKE_ALL_SENTINEL
-                else find_vocab_node(vocab, val_str)
-            )
-            if node is None:
-                if val_str not in seen:
-                    expanded.append(val_str)
-                    seen.add(val_str)
-                continue
-            leaves = collect_leaf_terms(node)
-            if not leaves:
-                if val_str not in seen:
-                    expanded.append(val_str)
-                    seen.add(val_str)
-            else:
-                for leaf in leaves:
-                    if leaf not in seen:
-                        expanded.append(leaf)
-                        seen.add(leaf)
-        return expanded
 
     async def _expand_profile_pattern_groups(
         self,

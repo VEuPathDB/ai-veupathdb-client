@@ -1,5 +1,20 @@
 # Knowledge log
 
+## 2026-10-04 - A report sends tree leaves, and a label comparator needs a categorical shape
+
+`VEuPathDBClient.expand_tree_params_to_leaves` reads the search and sends each parent
+term of a `countOnlyLeaves` tree as its leaves through `leaves_of_tree_values`
+(`wdk/tree_leaves.py`); `create_step` and `run_search_report` both send their parameters
+through it, so a step and a report of one configuration send the same leaves
+([WDK-VOCAB-002](wdk/rules/parameters-and-vocabularies.md)). A report with no parameters
+reads no search. A transport failure names the exception class when its text is empty:
+"Request failed after retries: ReadTimeout". `validate_compute_config` refuses a
+comparator group of labels alone on a variable whose `dataShape` is not `categorical`,
+`ordinal` or `binary`, and names the variable and its shape; a `continuous` variable is
+compared by bins with `min` and `max` ([computes-and-jobs](eda/computes-and-jobs.md)).
+`ValueVariableFacts` carries `data_shape` and `LabeledRangeFacts` carries `min`.
+`veupathdb-py` is 0.1.0a21.
+
 ## 2026-10-03 - The PCA compute and four statistical plots are read
 
 `EdaClient` runs `dimensionalityreduction` through the existing submit and poll, reads its

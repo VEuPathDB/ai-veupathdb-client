@@ -12,6 +12,9 @@ VEUPATHDB_GENE_ID = "VEUPATHDB_GENE_ID"
 
 CATEGORY_TYPE = "category"
 
+# The data shapes a vocabulary value names. EDA cuts any other shape into bins.
+CATEGORICAL_DATA_SHAPES = frozenset({"categorical", "ordinal", "binary"})
+
 _LISTED_LIMIT = 20
 
 
@@ -36,6 +39,8 @@ class ValueVariableFacts(VariableFacts, Protocol):
     def vocabulary(self) -> Sequence[str] | None: ...
     @property
     def is_multi_valued(self) -> bool: ...
+    @property
+    def data_shape(self) -> str | None: ...
 
 
 class EntityFacts(Protocol):
@@ -103,6 +108,14 @@ def vocabulary_of(variable: VariableFacts) -> Sequence[str] | None:
     match variable:
         case ValueVariableFacts():
             return variable.vocabulary
+        case _:
+            return None
+
+
+def data_shape_of(variable: VariableFacts) -> str | None:
+    match variable:
+        case ValueVariableFacts():
+            return variable.data_shape
         case _:
             return None
 

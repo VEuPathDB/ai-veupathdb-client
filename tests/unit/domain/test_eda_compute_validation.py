@@ -4,12 +4,19 @@ from dataclasses import dataclass, field
 
 from veupathdb.domain.eda_compute_validation import validate_compute_config
 from veupathdb.domain.eda_study import VEUPATHDB_GENE_ID
+from veupathdb.eda import (
+    EdaDifferentialExpressionConfig,
+    EdaStudyDetail,
+    EdaStudyDetailResponse,
+)
+from veupathdb.testing.eda_fixtures import FIXTURE_DIR
 
 from ._eda_facts import Ent, Study, Var, counts_study
 
 _COUNTS = "ENT_fd574cd6"
 _SAMPLES = "ENT_8151325d"
 _TEMPERATURE = "VAR_081ab087"
+_DEGREES = "VAR_7033e90f"
 _READS = "SEQUENCE_READ_COUNT_SENSE"
 
 
@@ -22,6 +29,7 @@ class Spec:
 @dataclass(frozen=True)
 class Group:
     label: str
+    min: str | None = None
 
 
 @dataclass(frozen=True)
@@ -250,6 +258,94 @@ class TestTheComparator:
                     comparator=_comparator(
                         ["anything"], ["else"], Spec("P", "FREE_TEXT")
                     ),
+                ),
+            )
+            == []
+        )
+
+
+def _recorded_study() -> EdaStudyDetail:
+    return EdaStudyDetailResponse.model_validate_json(
+        (FIXTURE_DIR / "study_detail_de.json").read_text()
+    ).study
+
+
+def _recorded_config(
+    variable_id: str, group_a: list[dict[str, str]], group_b: list[dict[str, str]]
+) -> EdaDifferentialExpressionConfig:
+    return EdaDifferentialExpressionConfig.model_validate(
+        {
+            "identifierVariable": {
+                "entityId": _COUNTS,
+                "variableId": VEUPATHDB_GENE_ID,
+            },
+            "valueVariable": {"entityId": _COUNTS, "variableId": _READS},
+            "comparator": {
+                "variable": {"entityId": _SAMPLES, "variableId": variable_id},
+                "groupA": group_a,
+                "groupB": group_b,
+            },
+            "differentialExpressionMethod": "DESeq",
+        }
+    )
+
+
+class TestAContinuousComparator:
+    def test_labels_alone_on_a_continuous_variable_are_refused(self) -> None:
+        """The recorded temperature variable is continuous and has no vocabulary."""
+        config = _recorded_config(_DEGREES, [{"label": "30"}], [{"label": "37"}])
+
+        assert validate_compute_config(_recorded_study(), config) == [
+            (
+                f"comparator.variable names {_DEGREES} (temperature), whose data "
+                "shape is continuous. The plugin compares a continuous variable by "
+                "bins, each with a min and a max, and the labels 30, 37 carry no bin."
+            )
+        ]
+
+    def test_bins_on_a_continuous_variable_are_accepted(self) -> None:
+        config = _recorded_config(
+            _DEGREES,
+            [{"label": "[30, 37)", "min": "30", "max": "37"}],
+            [{"label": "[37, 42]", "min": "37", "max": "42"}],
+        )
+
+        assert validate_compute_config(_recorded_study(), config) == []
+
+    def test_labels_on_the_recorded_categorical_variable_are_accepted(self) -> None:
+        config = _recorded_config(
+            _TEMPERATURE, [{"label": "normal"}], [{"label": "febrile"}]
+        )
+
+        assert validate_compute_config(_recorded_study(), config) == []
+
+    def test_an_ordinal_variable_is_named_by_its_labels(self) -> None:
+        study = Study(
+            id="S",
+            root_entity=Ent(
+                id="P",
+                variables=[
+                    Var(id="STAGE", vocabulary=["early", "late"], data_shape="ordinal")
+                ],
+                children=[
+                    Ent(
+                        id="E",
+                        variables=[
+                            Var(id=VEUPATHDB_GENE_ID),
+                            Var(id="SEQUENCE_READ_COUNT", type="integer"),
+                        ],
+                    )
+                ],
+            ),
+        )
+
+        assert (
+            validate_compute_config(
+                study,
+                Config(
+                    identifier_variable=Spec("E", VEUPATHDB_GENE_ID),
+                    value_variable=Spec("E", "SEQUENCE_READ_COUNT"),
+                    comparator=_comparator(["early"], ["late"], Spec("P", "STAGE")),
                 ),
             )
             == []

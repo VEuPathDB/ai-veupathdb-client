@@ -472,6 +472,13 @@ out-of-vocabulary group label. Both must be checked against the study metadata
 before submitting; the `422` shape (`errors.byKey.config`) is the only
 machine-readable rejection.
 
+A group of labels alone names vocabulary values, so it fits only a variable whose
+`dataShape` is `categorical`, `ordinal` or `binary`. A `continuous` variable has no
+vocabulary, and the EDA app compares it by bins: `differentialExpression.tsx` in
+`web-monorepo` reads quantile bins from the service and sends each one as a
+`LabeledRange` with `min` and `max`. `validate_compute_config` refuses a label-only
+group on a variable of any other data shape, and names the shape.
+
 ## Authentication
 
 Identical to the rest of the service, see

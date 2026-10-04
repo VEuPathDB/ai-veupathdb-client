@@ -7,7 +7,7 @@ import pydantic
 from pydantic import JsonValue, TypeAdapter
 
 from veupathdb.domain.parameters.values import FilterTermClause
-from veupathdb.errors import validate_response
+from veupathdb.errors import VEuPathDBError, validate_response
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
 from veupathdb.wdk._helpers import _validate_list
@@ -16,6 +16,7 @@ from veupathdb.wdk.ai_expression import (
     AiExpressionReport,
     AiExpressionReportConfig,
 )
+from veupathdb.wdk.tree_leaves import leaves_of_tree_values
 from veupathdb.wdk.wdk_models import (
     WDKAnswer,
     WDKFilterValue,
@@ -92,6 +93,29 @@ class SearchEndpoints:
             WDKSearchResponse,
             raw,
             f"WDK search response for {record_type}/{search_name}",
+        )
+
+    async def expand_tree_params_to_leaves(
+        self,
+        record_type: str,
+        search_name: str,
+        params: dict[str, str],
+    ) -> dict[str, str]:
+        """The parameters with each parent term of a countOnlyLeaves tree as its leaves.
+
+        When the search read fails, the values go unchanged and WDK judges them.
+        """
+        if not params:
+            return params
+        try:
+            response = await self.get_search_details(
+                record_type, search_name, expand_params=True
+            )
+        except VEuPathDBError:
+            logger.debug("Failed to expand tree params (non-fatal)")
+            return params
+        return leaves_of_tree_values(
+            response.search_data.parameters or [], params, search_name
         )
 
     async def get_search_details_with_params(
@@ -179,14 +203,17 @@ class SearchEndpoints:
         view_filters: Sequence[WDKFilterValue] | None = None,
     ) -> WDKAnswer:
         """Runs a report on a search and creates no step or strategy. The endpoint
-        needs no user session, so several calls can run in parallel.
+        needs no user session, so several calls can run in parallel. A tree value
+        goes as its leaves, as ``create_step`` sends it.
 
         :param view_filters: View filters, sent beside ``reportConfig``.
         """
+        parameters = await self.expand_tree_params_to_leaves(
+            record_type, search_name, dict(search_config.parameters)
+        )
+        sent = search_config.model_copy(update={"parameters": parameters})
         payload: JSONObject = {
-            "searchConfig": search_config.model_dump(
-                by_alias=True, exclude_defaults=True
-            ),
+            "searchConfig": sent.model_dump(by_alias=True, exclude_defaults=True),
             "reportConfig": report_config or {},
         }
         if view_filters is not None:

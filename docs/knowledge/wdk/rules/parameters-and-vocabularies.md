@@ -588,7 +588,7 @@ nothing. Skip the root or drop `@@fake@@` by name; there is no flag to test.
 
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/AbstractEnumParam.java#L457-L467
-- anchor: src/veupathdb/wdk/strategy_api/base.py:_expand_tree_params_to_leaves
+- anchor: src/veupathdb/wdk/tree_leaves.py:leaves_of_tree_values
 - status: ENFORCED by tests/unit/wdk/test_strategy_api_base.py::TestABranchBecomesItsLeaves::test_a_top_branch_expands_to_every_leaf_under_it
 
 `getNumSelected` builds the parameter tree, marks the selected terms on it, and
@@ -633,9 +633,11 @@ rule after a correctly-scoped step rendered as an empty required field
 
 **This client expands in two independent places, and both are named by a
 test.** `ParameterCanonicalizer` in `domain/parameters/` serves the validation
-path; `_expand_tree_params_to_leaves` is a separate implementation in
-`integrations/`, reached from `_prepare_search_config` on every `create_step`.
-Delete either and a branch term reaches WDK on that path.
+path; `leaves_of_tree_values` in `wdk/tree_leaves.py` is a separate
+implementation at the WDK boundary. `VEuPathDBClient.expand_tree_params_to_leaves`
+reads the search and applies it, and both `create_step` and `run_search_report`
+send their parameters through it, so a step and a report of one configuration
+send the same leaves. Delete either and a branch term reaches WDK on that path.
 
 **Having both is not sufficient, because order decides which one runs first.**
 Parameter validation resolves the search *with the values as they arrived* so it

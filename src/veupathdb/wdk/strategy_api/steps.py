@@ -146,9 +146,7 @@ class StepsMixin(StrategyAPIBase):
                 normalized["profile_pattern"],
             )
 
-        # A tree param with countOnlyLeaves=true counts only leaf values; a
-        # parent node returns 0 rows.
-        return await self._expand_tree_params_to_leaves(
+        return await self.client.expand_tree_params_to_leaves(
             record_type, search_name, normalized
         )
 

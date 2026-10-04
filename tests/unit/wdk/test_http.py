@@ -102,15 +102,25 @@ class _FlakyTransport(httpx.AsyncBaseTransport):
 class _TimingOutTransport(httpx.AsyncBaseTransport):
     """Times out every request and records the read timeout each one carried."""
 
-    def __init__(self) -> None:
+    def __init__(self, message: str = "slow") -> None:
         self.read_timeouts: list[float] = []
+        self._message = message
 
     async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
         if request.url.path.startswith("/app"):
             return httpx.Response(200, text="ok")
         self.read_timeouts.append(request.extensions["timeout"]["read"])
-        msg = "slow"
-        raise httpx.ReadTimeout(msg, request=request)
+        raise httpx.ReadTimeout(self._message, request=request)
+
+
+class _BrokenProtocolTransport(httpx.AsyncBaseTransport):
+    """Breaks every request off with a protocol error that carries no text."""
+
+    async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+        if request.url.path.startswith("/app"):
+            return httpx.Response(200, text="ok")
+        silent = ""
+        raise httpx.RemoteProtocolError(silent, request=request)
 
 
 def _cookie_pairs(request: httpx.Request) -> list[str]:
@@ -200,14 +210,14 @@ class TestANewTokenStartsANewWdkSession:
         client = await _client(
             transport, base_url="https://plasmodb.org/plasmo/service"
         )
-        client._client.cookies.set(
-            "JSESSIONID", "stale-session-A", domain="plasmodb.org"
-        )
+        jar = client._client
+        assert jar is not None
+        jar.cookies.set("JSESSIONID", "stale-session-A", domain="plasmodb.org")
 
         veupathdb_auth_token_ctx.set("token-B")
         await self._ping(client)
 
-        assert client._client.cookies.get("JSESSIONID") != "stale-session-A", (
+        assert jar.cookies.get("JSESSIONID") != "stale-session-A", (
             "JSESSIONID from the previous token must not leak into the new "
             "token's request chain. Either the jar should be cleared or "
             "_init_wdk_session should replace the cookie entirely."
@@ -345,6 +355,33 @@ class TestTheDelayedResultGuardStillRetries:
             "id": 1
         }
         assert transport.attempts == 2
+
+
+@pytest.mark.usefixtures("wdk_request_token")
+class TestARetriedFailureNamesItsCause:
+    async def test_a_timeout_with_no_text_is_named_by_its_class(self) -> None:
+        client = await _client(_TimingOutTransport(message=""))
+
+        with pytest.raises(WDKError) as raised:
+            await client.get("/users/current", attempts=1)
+
+        assert raised.value.detail == "Request failed after retries: ReadTimeout"
+
+    async def test_a_timeout_with_text_is_named_by_its_text(self) -> None:
+        client = await _client(_TimingOutTransport(message="slow"))
+
+        with pytest.raises(WDKError) as raised:
+            await client.get("/users/current", attempts=1)
+
+        assert raised.value.detail == "Request failed after retries: slow"
+
+    async def test_a_transport_error_with_no_text_is_named_by_its_class(self) -> None:
+        client = await _client(_BrokenProtocolTransport())
+
+        with pytest.raises(WDKError) as raised:
+            await client.get("/users/current")
+
+        assert raised.value.detail == "Request failed: RemoteProtocolError"
 
 
 @pytest.mark.usefixtures("wdk_request_token")

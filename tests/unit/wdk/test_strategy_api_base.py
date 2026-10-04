@@ -22,9 +22,8 @@ from veupathdb.domain.parameters.phyletic import (
 from veupathdb.domain.parameters.wdk_vocab import FAKE_ALL_SENTINEL, WDKVocabTerm
 from veupathdb.errors import VEuPathDBError
 from veupathdb.json_types import JSONObject
-from veupathdb.wdk.client import VEuPathDBClient
-from veupathdb.wdk.strategy_api.api import StrategyAPI
 from veupathdb.wdk.strategy_api.base import StrategyAPIBase
+from veupathdb.wdk.tree_leaves import leaves_of_tree_values
 from veupathdb.wdk.wdk_parameters import (
     WDKEnumParam,
     WDKParameter,
@@ -282,8 +281,7 @@ def _tree_param(*, count_only_leaves: bool = True) -> WDKParameter:
 
 
 def _expand(value: list[str], *, count_only_leaves: bool = True) -> list[str]:
-    api = StrategyAPI(VEuPathDBClient("https://example.invalid/service"), "1")
-    result = api._expand_specs(
+    result = leaves_of_tree_values(
         [_tree_param(count_only_leaves=count_only_leaves)],
         {"samples": json.dumps(value)},
         "GenesByProfile",

@@ -50,6 +50,11 @@ def _acts_for_a_user(path: str) -> bool:
     return bool(_USER_PATH.match(path))
 
 
+def _cause(error: BaseException | None) -> str:
+    """The error's text, or its class name when the text is empty."""
+    return str(error) or type(error).__name__
+
+
 def _inject_auth_cookie(request: httpx.Request, auth_token: str) -> None:
     """Set the ``Authorization`` cookie on a built request, replacing any jar value.
 
@@ -262,8 +267,8 @@ class HTTPClient:
             # Transient. Tenacity retries these.
             raise
         except httpx.RequestError as e:
-            logger.exception("VEuPathDB request error", error=str(e), path=path)
-            msg = f"Request failed: {e}"
+            logger.exception("VEuPathDB request error", error=_cause(e), path=path)
+            msg = f"Request failed: {_cause(e)}"
             raise WDKError(msg, status=502) from e
 
     @staticmethod
@@ -338,9 +343,9 @@ class HTTPClient:
                 path=path,
                 endpoint_group=metric_attrs["endpoint_group"],
                 site_host=metric_attrs["site_host"],
-                error=str(last),
+                error=_cause(last),
             )
-            msg = f"Request failed after retries: {last}"
+            msg = f"Request failed after retries: {_cause(last)}"
             raise WDKError(msg, status=status) from last
         except WDKError as error:
             metric_attrs = telemetry.metric_attrs(

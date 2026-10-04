@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pytest
 
+from veupathdb.devtools.fixtures import FIXTURES
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 # Ruff trusts an argv of string literals, so every varying value below rides the
@@ -100,4 +102,4 @@ def test_an_installed_copy_verifies_its_own_recorded_bodies(
     )
 
     summary = finished.stdout.splitlines()[-1]
-    assert "17 fixture(s), 3 schema check(s), 0 failed" in summary
+    assert f"{len(FIXTURES)} fixture(s), 3 schema check(s), 0 failed" in summary
