@@ -13,7 +13,8 @@ comparator group of labels alone on a variable whose `dataShape` is not `categor
 `ordinal` or `binary`, and names the variable and its shape; a `continuous` variable is
 compared by bins with `min` and `max` ([computes-and-jobs](eda/computes-and-jobs.md)).
 `ValueVariableFacts` carries `data_shape` and `LabeledRangeFacts` carries `min`.
-`veupathdb-py` is 0.1.0a21.
+A configuration with no term list names no tree parent, so it reads no search
+definition (`tree_leaves.holds_a_term_list`). `veupathdb-py` is 0.1.0a22.
 
 ## 2026-10-03 - The PCA compute and four statistical plots are read
 

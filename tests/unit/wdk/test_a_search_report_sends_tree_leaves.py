@@ -91,3 +91,21 @@ async def test_a_report_with_no_parameters_reads_no_search(
 
     assert catalog.paths == []
     assert sent.body["searchConfig"] == {"parameters": {}}
+
+
+async def test_a_report_with_no_term_list_reads_no_definition(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Only a multi-pick value names a tree parent, and WDK sends it as a list."""
+    client, sent = _client(monkeypatch)
+    catalog = _Catalog()
+    monkeypatch.setattr(client, "get", catalog)
+    by_id = WDKSearchConfig(parameters={"ds_gene_ids": "12345", "weight": "10"})
+
+    await client.run_search_report("transcript", "GeneByLocusTag", by_id, _PAGE)
+
+    assert catalog.paths == []
+    assert sent.body["searchConfig"]["parameters"] == {
+        "ds_gene_ids": "12345",
+        "weight": "10",
+    }

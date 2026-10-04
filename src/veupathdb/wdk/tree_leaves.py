@@ -22,6 +22,12 @@ logger = get_logger(__name__)
 _PICKS = ("multi-pick-vocabulary", "single-pick-vocabulary")
 
 
+def holds_a_term_list(params: dict[str, str]) -> bool:
+    """Whether a value is a JSON list of terms, the only form a multi-pick
+    value, and so a tree parent, travels in."""
+    return any(value.lstrip().startswith("[") for value in params.values())
+
+
 def leaves_of_tree_values(
     wdk_params: Sequence[WDKParameter],
     params: dict[str, str],

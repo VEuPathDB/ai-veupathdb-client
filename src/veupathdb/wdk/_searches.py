@@ -16,7 +16,7 @@ from veupathdb.wdk.ai_expression import (
     AiExpressionReport,
     AiExpressionReportConfig,
 )
-from veupathdb.wdk.tree_leaves import leaves_of_tree_values
+from veupathdb.wdk.tree_leaves import holds_a_term_list, leaves_of_tree_values
 from veupathdb.wdk.wdk_models import (
     WDKAnswer,
     WDKFilterValue,
@@ -104,8 +104,9 @@ class SearchEndpoints:
         """The parameters with each parent term of a countOnlyLeaves tree as its leaves.
 
         When the search read fails, the values go unchanged and WDK judges them.
+        A configuration with no term list names no tree parent and reads nothing.
         """
-        if not params:
+        if not holds_a_term_list(params):
             return params
         try:
             response = await self.get_search_details(
