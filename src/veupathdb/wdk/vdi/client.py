@@ -17,6 +17,7 @@ from veupathdb.errors import (
     validate_response,
 )
 from veupathdb.model import CamelModel
+from veupathdb.settings import user_agent_header
 from veupathdb.wdk.vdi.models import (
     RNASEQRC,
     VdiDatasetDetails,
@@ -139,6 +140,7 @@ class VdiClient:
                     base_url=self.base_url,
                     timeout=httpx.Timeout(self.timeout),
                     transport=self._transport,
+                    headers=user_agent_header(),
                 )
             return self._client
 

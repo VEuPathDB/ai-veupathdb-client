@@ -24,6 +24,7 @@ from veupathdb.errors import VEuPathDBError, VEuPathDBErrorCode
 from veupathdb.logging import get_logger
 from veupathdb.model import CamelModel
 from veupathdb.observer import get_observer
+from veupathdb.settings import user_agent_header
 from veupathdb.wdk._observability import (
     SiteSearchRequestTelemetry,
     site_search_retry_logger,
@@ -180,6 +181,7 @@ class SiteSearchClient:
                 headers={
                     "Accept": "application/json",
                     "Content-Type": "application/json",
+                    **user_agent_header(),
                 },
             )
             return self._client

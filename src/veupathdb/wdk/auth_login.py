@@ -21,6 +21,7 @@ from tenacity import (
 
 from veupathdb.errors import ExternalServiceError
 from veupathdb.logging import get_logger
+from veupathdb.settings import user_agent_header
 from veupathdb.wdk.factory import get_site
 
 logger = get_logger(__name__)
@@ -75,7 +76,7 @@ async def password_login(
     site = get_site(site_id)
     payload = {"email": email, "password": password, "redirectUrl": redirect_url}
     async with httpx.AsyncClient(
-        base_url=site.service_url, follow_redirects=False
+        base_url=site.service_url, follow_redirects=False, headers=user_agent_header()
     ) as client:
         response = await client.post("/login", json=payload)
         return extract_auth_cookie(response.headers.get_list("set-cookie"))
@@ -94,6 +95,7 @@ async def password_logout(site_id: str, auth_token: str) -> bool:
             base_url=site.service_url,
             follow_redirects=False,
             cookies={"Authorization": auth_token},
+            headers=user_agent_header(),
         ) as client:
             response = await client.get("/logout")
         ended = response.status_code < HTTPStatus.BAD_REQUEST
@@ -151,7 +153,9 @@ async def _fetch_oauth_signing_key(oauth_url: str) -> PyJWK:
     """Read the elliptic-curve signing key from the OAuth server's JWKS."""
     jwks_url = f"{oauth_url.rstrip('/')}{_JWKS_PATH}"
     try:
-        async with httpx.AsyncClient(timeout=_JWKS_TIMEOUT_SECONDS) as client:
+        async with httpx.AsyncClient(
+            timeout=_JWKS_TIMEOUT_SECONDS, headers=user_agent_header()
+        ) as client:
             response = await client.get(jwks_url)
             response.raise_for_status()
             jwks = _JWKS.model_validate(response.json())

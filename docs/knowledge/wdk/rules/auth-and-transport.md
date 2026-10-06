@@ -106,6 +106,27 @@ and throws
 when it matches. Matching on 202 alone is narrower than the reference client. This client
 has neither guard.
 
+### WDK-HTTP-005 - A request that runs a search is sent once, and one site runs a few at a time
+
+- class: HARD
+- upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/ProcessQueryInstance.java#L235-L297
+- anchor: src/veupathdb/wdk/_http.py:runs_a_search
+- status: ENFORCED by tests/unit/wdk/test_a_search_request.py::TestASearchIsSentOnce::test_a_server_error_on_a_report_is_not_sent_again
+
+A report, a step or strategy read (both compute `estimatedSize`) and an analysis run make
+WDK run a search. For a process query, `invokeWsf` runs the plugin to the end on the
+server thread, and nothing in it reads whether the client is still connected. A client
+that times out, or that receives a proxy 5xx, leaves the search running; a second attempt
+starts a second search beside it. A High Speed SNP Search starts about 1,000 processes,
+so a few of those at once exhaust the site's process limit.
+
+`runs_a_search` names these requests. Each one waits for one of
+`veupathdb_concurrent_searches_per_site` slots on its site's client, and it is retried
+only when it never reached the server (`ConnectError`) or when WDK answered the
+delayed-result sentinel (WDK-HTTP-003), which polls the search already running. A 5xx
+or a timeout is the result. Every request carries `veupathdb_user_agent`, so a site
+operator can tell which application sent it.
+
 ### WDK-HTTP-004 - A published WDK schema binds a body only where an endpoint annotates it, and this client's models are the contract everywhere else
 
 - class: CONTRACT

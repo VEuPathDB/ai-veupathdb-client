@@ -24,6 +24,7 @@ from veupathdb.errors import WDKError, WDKLoginRequiredError
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
 from veupathdb.observer import get_observer
+from veupathdb.settings import DEFAULT_CONCURRENT_SEARCHES_PER_SITE, user_agent_header
 from veupathdb.wdk._failures import wdk_failure
 from veupathdb.wdk._observability import (
     WdkRequestTelemetry,
@@ -39,6 +40,13 @@ logger = get_logger(__name__)
 
 _HTTP_SERVER_ERROR = 500
 _ATTEMPTS = 3
+_RETRYABLE = (
+    httpx.TimeoutException,
+    httpx.ConnectError,
+    httpx.HTTPStatusError,
+    WDKDelayedResultError,
+)
+_SEARCH_RETRYABLE = (httpx.ConnectError, WDKDelayedResultError)
 
 # Steps, strategies, datasets, baskets, favorites and preferences all hang off
 # a user, and ``/users/current`` resolves which user that is.
@@ -48,6 +56,19 @@ _USER_PATH = re.compile(r"^/users/")
 def _acts_for_a_user(path: str) -> bool:
     """True when the path names a WDK account or something inside one."""
     return bool(_USER_PATH.match(path))
+
+
+_REPORT = re.compile(r"/reports/[^/]+$")
+_ANALYSIS_RUN = re.compile(r"/analyses/[^/]+/result$")
+_ANSWERED_RESOURCE = re.compile(r"^/users/[^/]+/(?:steps|strategies)/[^/]+$")
+
+
+def runs_a_search(method: str, path: str) -> bool:
+    if _REPORT.search(path):
+        return True
+    if method == "POST":
+        return bool(_ANALYSIS_RUN.search(path))
+    return method == "GET" and bool(_ANSWERED_RESOURCE.match(path))
 
 
 def _cause(error: BaseException | None) -> str:
@@ -113,14 +134,17 @@ class HTTPClient:
         timeout: float = 30.0,
         auth_token: str | None = None,
         *,
-        max_connections: int = 1000,
-        max_keepalive_connections: int = 200,
+        max_connections: int = 64,
+        max_keepalive_connections: int = 16,
+        concurrent_searches: int = DEFAULT_CONCURRENT_SEARCHES_PER_SITE,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.auth_token = auth_token
         self.max_connections = int(max_connections)
         self.max_keepalive_connections = int(max_keepalive_connections)
+        self.concurrent_searches = concurrent_searches
+        self._search_slots = asyncio.Semaphore(concurrent_searches)
         self._client: httpx.AsyncClient | None = None
         self._client_lock = asyncio.Lock()
         # The JSESSIONID cookie in the shared jar is scoped to one identity.
@@ -146,6 +170,7 @@ class HTTPClient:
                     headers={
                         "Accept": "application/json",
                         "Content-Type": "application/json",
+                        **user_agent_header(),
                     },
                 )
             return self._client
@@ -272,7 +297,9 @@ class HTTPClient:
             raise WDKError(msg, status=502) from e
 
     @staticmethod
-    def _retrying(*, attempts: int, telemetry: WdkRequestTelemetry) -> AsyncRetrying:
+    def _retrying(
+        *, attempts: int, telemetry: WdkRequestTelemetry, searching: bool
+    ) -> AsyncRetrying:
         """The retry policy for one request.
 
         A non-idempotent request gets a single attempt: a proxy 502 can follow a
@@ -280,18 +307,55 @@ class HTTPClient:
         """
         return AsyncRetrying(
             retry=retry_if_exception_type(
-                (
-                    httpx.TimeoutException,
-                    httpx.ConnectError,
-                    httpx.HTTPStatusError,
-                    WDKDelayedResultError,
-                )
+                _SEARCH_RETRYABLE if searching else _RETRYABLE
             ),
             stop=stop_after_attempt(attempts),
             wait=wait_exponential(multiplier=1, min=1, max=10),
             before_sleep=wdk_retry_logger(telemetry),
             reraise=False,
         )
+
+    async def _search_attempt(
+        self,
+        method: str,
+        path: str,
+        auth_token: str | None,
+        params: JSONObject | None = None,
+        json: object = None,
+    ) -> JsonValue:
+        async with self._search_slots:
+            return await self._request_attempt(
+                method, path, auth_token, params=params, json=json
+            )
+
+    def _failed(
+        self,
+        last: BaseException | None,
+        telemetry: WdkRequestTelemetry,
+        start: float,
+        method: str,
+        path: str,
+    ) -> WDKError:
+        status_code = None
+        if isinstance(last, httpx.HTTPStatusError):
+            status_code = last.response.status_code
+        metric_attrs = telemetry.metric_attrs(
+            outcome="error",
+            status_code=status_code,
+        )
+        get_observer().on_wdk_request(time.monotonic() - start, metric_attrs)
+        status = 502 if status_code is None else status_code
+        log_fn = logger.warning if status >= _HTTP_SERVER_ERROR else logger.error
+        log_fn(
+            "VEuPathDB request failed after retries",
+            method=method,
+            path=path,
+            endpoint_group=metric_attrs["endpoint_group"],
+            site_host=metric_attrs["site_host"],
+            error=_cause(last),
+        )
+        msg = f"Request failed after retries: {_cause(last)}"
+        return WDKError(msg, status=status)
 
     async def _request(
         self,
@@ -305,6 +369,7 @@ class HTTPClient:
         """Make an HTTP request with retries, and record telemetry."""
         start = time.monotonic()
         auth_token = self._effective_token(path)
+        searching = runs_a_search(method, path)
         telemetry = WdkRequestTelemetry(
             method=method,
             path=path,
@@ -315,8 +380,9 @@ class HTTPClient:
             result: JsonValue = await self._retrying(
                 attempts=attempts,
                 telemetry=telemetry,
+                searching=searching,
             )(
-                self._request_attempt,
+                self._search_attempt if searching else self._request_attempt,
                 method,
                 path,
                 auth_token,
@@ -325,28 +391,9 @@ class HTTPClient:
             )
         except RetryError as e:
             last = e.last_attempt.exception()
-            status_code = None
-            if isinstance(last, httpx.HTTPStatusError):
-                status_code = last.response.status_code
-            metric_attrs = telemetry.metric_attrs(
-                outcome="error",
-                status_code=status_code,
-            )
-            get_observer().on_wdk_request(time.monotonic() - start, metric_attrs)
-            status = 502
-            if isinstance(last, httpx.HTTPStatusError):
-                status = last.response.status_code
-            log_fn = logger.warning if status >= _HTTP_SERVER_ERROR else logger.error
-            log_fn(
-                "VEuPathDB request failed after retries",
-                method=method,
-                path=path,
-                endpoint_group=metric_attrs["endpoint_group"],
-                site_host=metric_attrs["site_host"],
-                error=_cause(last),
-            )
-            msg = f"Request failed after retries: {_cause(last)}"
-            raise WDKError(msg, status=status) from last
+            raise self._failed(last, telemetry, start, method, path) from last
+        except (httpx.HTTPStatusError, httpx.TimeoutException) as last:
+            raise self._failed(last, telemetry, start, method, path) from last
         except WDKError as error:
             metric_attrs = telemetry.metric_attrs(
                 outcome="error",

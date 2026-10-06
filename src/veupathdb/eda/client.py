@@ -40,6 +40,7 @@ from veupathdb.eda.models import (
     VolcanoStatsResponse,
 )
 from veupathdb.errors import WDKLoginRequiredError
+from veupathdb.settings import user_agent_header
 
 FILTERS: TypeAdapter[list[EdaFilter]] = TypeAdapter(list[EdaFilter])
 JSON_BODY: TypeAdapter[JsonValue] = TypeAdapter(JsonValue)
@@ -92,7 +93,7 @@ class EdaClient:
                     base_url=self.base_url,
                     timeout=httpx.Timeout(self.timeout),
                     transport=self._transport,
-                    headers={"Content-Type": _JSON_ONLY},
+                    headers={"Content-Type": _JSON_ONLY, **user_agent_header()},
                 )
             return self._client
 

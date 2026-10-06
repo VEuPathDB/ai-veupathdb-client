@@ -135,6 +135,7 @@ class SiteRouter:
     def __init__(self) -> None:
         settings = get_veupathdb_settings()
         self._config = load_sites_config(settings.veupathdb_sites_config)
+        self._concurrent_searches = settings.veupathdb_concurrent_searches_per_site
         self._sites: dict[str, SiteInfo] = {}
         self._clients: dict[str, VEuPathDBClient] = {}
         self._site_search_clients: dict[str, SiteSearchClient] = {}
@@ -177,6 +178,7 @@ class SiteRouter:
                 self._clients[site_id] = VEuPathDBClient(
                     base_url=site.service_url,
                     timeout=float(timeout),
+                    concurrent_searches=self._concurrent_searches,
                 )
             return self._clients[site_id]
 

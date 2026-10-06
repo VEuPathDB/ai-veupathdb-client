@@ -2,12 +2,14 @@
 
 from collections.abc import Callable
 from functools import lru_cache
+from importlib.metadata import version
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 DEFAULT_OAUTH_URL = "https://auth.veupathdb.org"
 DEFAULT_INTERNAL_STRATEGY_NAME_PREFIX = "__internal__:"
+DEFAULT_CONCURRENT_SEARCHES_PER_SITE = 4
 
 
 class VEuPathDBSettings(BaseSettings):
@@ -39,6 +41,15 @@ class VEuPathDBSettings(BaseSettings):
     veupathdb_internal_strategy_name_prefix: str = Field(
         default=DEFAULT_INTERNAL_STRATEGY_NAME_PREFIX,
         description="Prefix that tags a helper strategy this deployment created. It is written into a real VEuPathDB account, so a deployment states its own.",
+    )
+    veupathdb_user_agent: str = Field(
+        default_factory=lambda: f"veupathdb-py/{version('veupathdb-py')}",
+        description="The User-Agent every request to a VEuPathDB service carries, so site operators can tell which application sent it.",
+    )
+    veupathdb_concurrent_searches_per_site: int = Field(
+        default=DEFAULT_CONCURRENT_SEARCHES_PER_SITE,
+        ge=1,
+        description="How many requests that make WDK run a search one process sends to one site at a time.",
     )
 
 
@@ -91,3 +102,7 @@ def veupathdb_settings_source() -> Callable[[], VEuPathDBSettings]:
 def get_veupathdb_settings() -> VEuPathDBSettings:
     """The settings in force for this process."""
     return _source.read()
+
+
+def user_agent_header() -> dict[str, str]:
+    return {"User-Agent": get_veupathdb_settings().veupathdb_user_agent}

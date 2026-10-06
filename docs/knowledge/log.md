@@ -1,5 +1,15 @@
 # Knowledge log
 
+## 2026-10-06 - A search is sent once, a site runs a few at a time, and every request names its sender
+
+A request that makes WDK run a search (`runs_a_search`: a report, a step or strategy read,
+an analysis run) waits for one of `veupathdb_concurrent_searches_per_site` slots (default 4)
+on its site's client and is not sent again after a 5xx or a timeout, because WDK keeps
+running the first search ([WDK-HTTP-005](wdk/rules/auth-and-transport.md)). A connection
+that never opened and the delayed-result sentinel are still retried. Every client that
+reaches a VEuPathDB service sends `veupathdb_user_agent` (default `veupathdb-py/<version>`;
+a host sets its own). The WDK connection pool is 64, from 1000. `veupathdb-py` is 0.1.0b2.
+
 ## 2026-10-04 - A report sends tree leaves, and a label comparator needs a categorical shape
 
 `VEuPathDBClient.expand_tree_params_to_leaves` reads the search and sends each parent

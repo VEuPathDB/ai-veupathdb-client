@@ -313,18 +313,19 @@ class TestReadsAreStillRetried:
         transport = _FlakyTransport(fail_times=2)
         client = await _client(transport)
 
-        assert await client.get("/users/1/steps/9") == {"id": 1}
+        assert await client.get("/users/1/strategies") == {"id": 1}
         assert transport.attempts == 3
 
-    async def test_a_report_post_is_retried_by_default(self) -> None:
-        # A report POST is a read with a body, and the delayed-result guard
-        # depends on it being retried.
+    async def test_a_report_post_is_sent_once_on_a_proxy_error(self) -> None:
+        # A report runs the search, and WDK keeps running a search the proxy
+        # already gave up on, so a second attempt is a second search.
         transport = _FlakyTransport(fail_times=2)
         client = await _client(transport)
 
-        await client.post("/users/1/steps/9/reports/standard", json={})
+        with pytest.raises(WDKError):
+            await client.post("/users/1/steps/9/reports/standard", json={})
 
-        assert transport.attempts == 3
+        assert transport.attempts == 1
 
 
 @pytest.mark.usefixtures("wdk_request_token")
@@ -396,7 +397,7 @@ class TestAReadCanCarryItsOwnPolicy:
         assert raised.value.status == 502
         assert transport.read_timeouts == [30.0]
 
-    async def test_a_strategy_read_keeps_three_attempts_and_the_site_timeout(
+    async def test_a_strategy_read_is_sent_once_with_the_site_timeout(
         self,
     ) -> None:
         transport = _TimingOutTransport()
@@ -405,4 +406,4 @@ class TestAReadCanCarryItsOwnPolicy:
         with pytest.raises(WDKError):
             await StrategyAPI(client, user_id="1").get_strategy(5)
 
-        assert transport.read_timeouts == [30.0, 30.0, 30.0]
+        assert transport.read_timeouts == [30.0]
