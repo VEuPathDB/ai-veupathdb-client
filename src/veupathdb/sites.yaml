@@ -8,7 +8,7 @@ sites:
     name: VEuPathDB
     display_name: VEuPathDB Portal (All organisms)
     base_url: https://veupathdb.org/veupathdb/service
-    project_id: EuPathDB
+    project_id: UniDB
     is_portal: true
 
   # Apicomplexan parasites

@@ -1,5 +1,14 @@
 # Knowledge log
 
+## 2026-10-07 - The portal's project id is UniDB
+
+The `veupathdb` site's `project_id` is `UniDB`, the id the portal's WDK `GET /service`,
+its page config and VDI's install targets name; `EuPathDB` made EDA answer 404 "Invalid
+project ID", site search find no searches, datasets, pathways or compounds, and a VDI
+upload name a target VDI does not install to.
+`tests/live/test_every_site_names_its_wdk_project.py` checks every site's `project_id`
+against its WDK `GET /service`. `veupathdb-py` is 0.1.0b3.
+
 ## 2026-10-06 - A search is sent once, a site runs a few at a time, and every request names its sender
 
 A request that makes WDK run a search (`runs_a_search`: a report, a step or strategy read,
