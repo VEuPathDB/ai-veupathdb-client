@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_SOURCE = PROJECT_ROOT / "src" / "veupathdb" / "testing" / "fixtures"
@@ -100,7 +100,14 @@ def test_the_sdist_leaves_the_production_backup_out(workspace: Path) -> None:
 
 
 @pytest.mark.wheel
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording(
+        "wdk/record_types.json",
+        "eda/studies_list.json",
+        "eda/gene_id_distribution_de_filtered.json",
+    ),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_an_installed_copy_reads_both_stores(installed_env: Path) -> None:
     """An interpreter that holds only the wheel reads a WDK and two EDA fixtures."""
     finished = subprocess.run(

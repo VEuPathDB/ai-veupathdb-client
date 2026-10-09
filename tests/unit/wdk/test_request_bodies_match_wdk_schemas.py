@@ -14,7 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from veupathdb.devtools.fixtures import ENFORCED_SCHEMAS, verify_body
 from veupathdb.domain.strategy.ops import CombineOp
 from veupathdb.json_types import JSONObject
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import fixture_request, load_recorded
 from veupathdb.wdk._search_config_body import search_config_write_body
 from veupathdb.wdk.wdk_models import (
@@ -138,7 +138,9 @@ def test_a_weighted_new_step_body_passes() -> None:
     assert verify_body("wdk.users.steps.post-request", _new_step_body(spec)) == ()
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/search_boolean_transcript.json"), reason=NEEDS_QA_RECORDING
+)
 def test_a_combined_step_body_passes_the_schema_wdk_binds() -> None:
     spec = CombinedStepSpec(
         primary_step_id=1,

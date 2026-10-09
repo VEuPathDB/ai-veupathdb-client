@@ -10,14 +10,13 @@ import pytest
 from pydantic import JsonValue
 from tests.live.conftest import Probe
 
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.summary import DriftLog
 from veupathdb.testing.wdk_fixtures import FIXTURES, FixtureRequest, load_recorded
 
 pytestmark = [
     pytest.mark.live_wdk,
     pytest.mark.asyncio,
-    pytest.mark.skip(reason=NEEDS_QA_RECORDING),
 ]
 
 
@@ -34,6 +33,11 @@ def _shape(body: JsonValue) -> str:
 
 @pytest.mark.parametrize("fixture", FIXTURES, ids=lambda f: f.name)
 class TestThePinnedFixturesStillHold:
+    @pytest.fixture(autouse=True)
+    def _recorded(self, fixture: FixtureRequest) -> None:
+        if needs_qa_recording(fixture.file):
+            pytest.skip(NEEDS_QA_RECORDING)
+
     async def test_the_status_is_unchanged(
         self, fixture: FixtureRequest, probe: Probe, drift_log: DriftLog
     ) -> None:

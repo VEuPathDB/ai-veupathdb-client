@@ -22,7 +22,7 @@ from veupathdb.eda.models import (
     EdaTwoByTwoConfig,
     EdaVariableSpec,
 )
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 
 pytestmark = pytest.mark.asyncio
 
@@ -65,7 +65,10 @@ def _answering(
     return httpx.MockTransport(handler)
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/compute_job_dimensionalityreduction.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 async def test_a_pca_submit_carries_the_pca_configuration() -> None:
     seen: list[httpx.Request] = []
     client = eda_client(
@@ -92,7 +95,10 @@ async def test_a_pca_submit_carries_the_pca_configuration() -> None:
     assert job.status == "complete"
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/computed_variables_dimensionalityreduction.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 async def test_the_meta_read_asks_for_text_and_parses_the_json_it_carries() -> None:
     """The meta route answers ``text/plain`` and refuses an ``application/json`` accept."""
     seen: list[httpx.Request] = []
@@ -124,7 +130,10 @@ async def test_the_meta_read_asks_for_text_and_parses_the_json_it_carries() -> N
     assert meta.variables[0].display_range_min == "-61.4351512946123"
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/scatterplot_dimensionalityreduction.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 async def test_the_pca_scatterplot_sends_the_compute_beside_the_plot() -> None:
     seen: list[httpx.Request] = []
     client = eda_client(
@@ -179,7 +188,10 @@ async def test_the_pca_scatterplot_sends_the_compute_beside_the_plot() -> None:
     assert [row.size for row in plot.sample_size_table] == [[4], [4], [4]]
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/scatterplot_best_fit_sense_antisense.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 async def test_a_pass_scatterplot_sends_no_compute_and_reads_the_best_fit() -> None:
     seen: list[httpx.Request] = []
     client = eda_client(
@@ -213,7 +225,10 @@ async def test_a_pass_scatterplot_sends_no_compute_and_reads_the_best_fit() -> N
     assert febrile.point_ids[0] == "PB31_41C_Rep1.PF3D7_0100100"
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/conttable_genotype_by_temperature.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 async def test_a_contingency_table_reads_the_counts_and_the_chi_squared_test() -> None:
     seen: list[httpx.Request] = []
     client = eda_client(
@@ -251,7 +266,10 @@ async def test_a_contingency_table_reads_the_counts_and_the_chi_squared_test() -
     assert table.sample_size_table[0].size == [4, 4, 4]
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/boxplot_sense_reads_by_genotype.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 async def test_a_boxplot_reads_one_group_per_label() -> None:
     seen: list[httpx.Request] = []
     client = eda_client(
@@ -294,7 +312,10 @@ async def test_a_boxplot_reads_one_group_per_label() -> None:
     assert plot.sample_size_table[0].size == [24, 24, 24]
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/boxplot_sense_reads_by_genotype.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 async def test_a_compute_backed_boxplot_carries_the_compute() -> None:
     seen: list[httpx.Request] = []
     client = eda_client(

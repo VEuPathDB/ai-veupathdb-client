@@ -15,7 +15,7 @@ from veupathdb.eda.models import (
     EdaStringSetFilter,
     EdaStudiesResponse,
 )
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
 
 pytestmark = [pytest.mark.live_wdk, pytest.mark.asyncio]
@@ -35,7 +35,9 @@ async def test_the_live_study_catalog_still_parses(require_wdk_creds: str) -> No
     assert any(s.source_type == "user_submitted" for s in studies)
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/studies_list.json"), reason=NEEDS_QA_RECORDING
+)
 async def test_the_recorded_fields_are_still_a_subset_of_the_live_ones(
     require_wdk_creds: str,
 ) -> None:

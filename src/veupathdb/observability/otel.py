@@ -29,6 +29,12 @@ wdk_request_duration_s = _wdk_meter.create_histogram(
     unit="s",
 )
 
+wdk_search_wait_s = _wdk_meter.create_histogram(
+    "veupathdb.wdk.search_wait",
+    description="Time a request that runs a search waited in line before it was sent",
+    unit="s",
+)
+
 site_search_requests = _site_search_meter.create_counter(
     "veupathdb.site_search.requests",
     description="Logical site-search requests by outcome",
@@ -57,6 +63,9 @@ class OpenTelemetryObserver:
 
     def on_wdk_retry(self, attrs: MetricAttrs, /) -> None:
         wdk_request_retries.add(1, attrs)
+
+    def on_wdk_search_wait(self, seconds: float, attrs: MetricAttrs, /) -> None:
+        wdk_search_wait_s.record(seconds, attrs)
 
     def on_site_search_request(self, seconds: float, attrs: MetricAttrs, /) -> None:
         site_search_requests.add(1, attrs)

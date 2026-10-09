@@ -1,5 +1,18 @@
 # Knowledge log
 
+## 2026-10-09 - A search waits in its turn's line, the host's gate and the site's slots
+
+A request that runs a search takes the line of its turn on its site (`search_turn`), the
+gate the host installs (`use_search_gate`, called with a `SearchRequest`), then one of the
+site's slots; each waits first come first served and none refuses
+([decision](decisions/a-search-waits-in-line-and-the-host-owns-the-gate.md)).
+`HIGH_SPEED_SNP_SEARCHES` names the thirteen searches ApiCommonModel runs on the
+High Speed SNP Search plugins ([WDK-HTTP-006](wdk/rules/auth-and-transport.md)). A client
+learns the search of each step and the tree of each strategy it creates or reads, so a
+step or strategy request names its searches. `budget_seconds` on `post` and
+`run_search_report` bounds a request from its send. `Observer.on_wdk_search_wait` reports each wait.
+`HTTPClient` takes a `site_id`, and the connection pool sizes are constants.
+
 ## 2026-10-09 - Tests run against QA, and a deployment names its site list
 
 The package ships no default site list: `load_sites_config` raises

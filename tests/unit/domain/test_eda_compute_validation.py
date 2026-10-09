@@ -11,7 +11,7 @@ from veupathdb.eda import (
     EdaStudyDetail,
     EdaStudyDetailResponse,
 )
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
 
 from ._eda_facts import Ent, Study, Var, counts_study
@@ -294,7 +294,9 @@ def _recorded_config(
 
 
 class TestAContinuousComparator:
-    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+    @pytest.mark.skipif(
+        needs_qa_recording("eda/study_detail_de.json"), reason=NEEDS_QA_RECORDING
+    )
     def test_labels_alone_on_a_continuous_variable_are_refused(self) -> None:
         """The recorded temperature variable is continuous and has no vocabulary."""
         config = _recorded_config(_DEGREES, [{"label": "30"}], [{"label": "37"}])
@@ -307,7 +309,9 @@ class TestAContinuousComparator:
             )
         ]
 
-    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+    @pytest.mark.skipif(
+        needs_qa_recording("eda/study_detail_de.json"), reason=NEEDS_QA_RECORDING
+    )
     def test_bins_on_a_continuous_variable_are_accepted(self) -> None:
         config = _recorded_config(
             _DEGREES,
@@ -317,7 +321,9 @@ class TestAContinuousComparator:
 
         assert validate_compute_config(_recorded_study(), config) == []
 
-    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+    @pytest.mark.skipif(
+        needs_qa_recording("eda/study_detail_de.json"), reason=NEEDS_QA_RECORDING
+    )
     def test_labels_on_the_recorded_categorical_variable_are_accepted(self) -> None:
         config = _recorded_config(
             _TEMPERATURE, [{"label": "normal"}], [{"label": "febrile"}]

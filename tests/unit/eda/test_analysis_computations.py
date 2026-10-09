@@ -21,7 +21,7 @@ from veupathdb.eda import (
     differential_expression_computations,
 )
 from veupathdb.json_types import JSONObject
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
 
 FIXTURE = "analysis_detail_pass_and_de.json"
@@ -61,7 +61,10 @@ def _computation(computation_id: str, descriptor: JSONObject) -> JSONObject:
     }
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/analysis_detail_pass_and_de.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_the_recorded_analysis_holds_a_pass_and_a_de_computation() -> None:
     detail = _detail()
 
@@ -72,7 +75,10 @@ def test_the_recorded_analysis_holds_a_pass_and_a_de_computation() -> None:
     ]
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/analysis_detail_pass_and_de.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_the_pass_computation_is_the_pass_member() -> None:
     passed = _detail().descriptor.computations[0]
 
@@ -80,7 +86,10 @@ def test_the_pass_computation_is_the_pass_member() -> None:
     assert passed.display_name is None
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/analysis_detail_pass_and_de.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_the_histogram_is_the_permissive_visualization_member() -> None:
     histogram = _detail().descriptor.computations[0].visualizations[0].descriptor
 
@@ -97,7 +106,10 @@ def test_the_histogram_is_the_permissive_visualization_member() -> None:
     assert histogram.thumbnail.startswith("data:image/png;base64,")
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/analysis_detail_pass_and_de.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_the_de_computation_is_the_de_member() -> None:
     de = _detail().descriptor.computations[1]
 
@@ -109,7 +121,10 @@ def test_the_de_computation_is_the_de_member() -> None:
     assert de.display_name == "Unnamed computation"
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/analysis_detail_pass_and_de.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_the_volcano_is_the_volcano_member_and_keeps_the_ui_settings() -> None:
     volcano = _detail().descriptor.computations[1].visualizations[0].descriptor
 
@@ -254,7 +269,10 @@ def test_the_helper_returns_the_de_computations_in_order() -> None:
     ]
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/analysis_detail_pass_and_de.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_the_helper_on_the_recorded_analysis_returns_the_one_de_computation() -> None:
     detail = _detail()
 
@@ -264,7 +282,10 @@ def test_the_helper_on_the_recorded_analysis_returns_the_one_de_computation() ->
     assert found[0].descriptor is detail.descriptor.computations[1].descriptor
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/analysis_detail_pass_and_de.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_a_read_descriptor_writes_back_every_key_the_site_stored() -> None:
     """A PATCH after a read keeps the computations PathFinder does not drive."""
     recorded = _recorded()
@@ -276,7 +297,10 @@ def test_a_read_descriptor_writes_back_every_key_the_site_stored() -> None:
     assert written == recorded["descriptor"]
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/analysis_detail_pass_and_de.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_a_read_detail_writes_back_every_modelled_wire_key() -> None:
     recorded = _recorded()
 

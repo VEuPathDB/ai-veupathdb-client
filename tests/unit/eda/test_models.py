@@ -29,7 +29,7 @@ from veupathdb.eda.models import (
     EdaVolcanoDescriptor,
     VolcanoStatsResponse,
 )
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
 
 
@@ -222,7 +222,9 @@ def test_a_subset_descriptor_holds_the_typed_filter_array() -> None:
     assert isinstance(subset.descriptor[0], EdaStringSetFilter)
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/compute_job_lookup.json"), reason=NEEDS_QA_RECORDING
+)
 def test_the_job_id_key_is_capital_i_capital_d() -> None:
     job = EdaComputeJob.model_validate(_load("compute_job_lookup.json"))
     assert len(job.job_id) == 32
@@ -241,7 +243,9 @@ def test_queue_position_is_absent_when_a_job_starts_at_once() -> None:
     assert job.queue_position is None
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/volcano_statistics.json"), reason=NEEDS_QA_RECORDING
+)
 def test_volcano_numbers_arrive_as_strings() -> None:
     parsed = VolcanoStatsResponse.model_validate(_load("volcano_statistics.json"))
     first = parsed.statistics[0]
@@ -274,13 +278,17 @@ def test_the_point_id_key_is_capital_i_capital_d_on_the_wire() -> None:
     assert parsed.statistics[0].point_id == "PF3D7_0100200"
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/count_unfiltered.json"), reason=NEEDS_QA_RECORDING
+)
 def test_count_response_carries_only_a_count() -> None:
     parsed = EdaCountResponse.model_validate(_load("count_unfiltered.json"))
     assert parsed.count == 4279
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/distribution_categorical.json"), reason=NEEDS_QA_RECORDING
+)
 def test_a_categorical_distribution_has_no_subset_min_or_mean() -> None:
     parsed = EdaDistributionResponse.model_validate(
         _load("distribution_categorical.json")
@@ -353,7 +361,9 @@ def test_study_overview_keeps_the_lowercase_sha1hash_key() -> None:
     assert overview.model_dump(by_alias=True)["sha1hash"] == "abc"
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/studies_list.json"), reason=NEEDS_QA_RECORDING
+)
 def test_a_user_study_carries_an_empty_sha1hash() -> None:
     parsed = EdaStudiesResponse.model_validate(_load("studies_list.json"))
     user_studies = [s for s in parsed.studies if s.source_type == "user_submitted"]
@@ -362,7 +372,9 @@ def test_a_user_study_carries_an_empty_sha1hash() -> None:
     assert all(s.dataset_id.startswith("EDAUD_") for s in user_studies)
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/permissions.json"), reason=NEEDS_QA_RECORDING
+)
 def test_permission_entry_spells_the_hash_with_a_capital_h() -> None:
     parsed = EdaPermissionsResponse.model_validate(_load("permissions.json"))
     entry = parsed.per_dataset["DS_53f554ec6a"]
@@ -371,7 +383,9 @@ def test_permission_entry_spells_the_hash_with_a_capital_h() -> None:
     assert entry.action_authorization.results_all is True
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/permissions.json"), reason=NEEDS_QA_RECORDING
+)
 def test_permission_entries_that_omit_declared_required_fields_still_parse() -> None:
     """24 of 880 live entries omit shortDisplayName or description."""
     parsed = EdaPermissionsResponse.model_validate(_load("permissions.json"))

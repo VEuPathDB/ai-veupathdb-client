@@ -12,11 +12,9 @@ from tests.unit.wdk.vdi._wire import recorded
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.settings import VEuPathDBSettings, use_veupathdb_settings_source
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.wdk.vdi.genomes import reference_genomes
 from veupathdb.wdk.vdi.models import VdiDatasetDependency
-
-pytestmark = pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 
 _SERVICE = "https://qa.plasmodb.org/plasmo.qa/service"
 _GENOMES = f"{_SERVICE}/record-types/organism/searches/GenomeDataTypes/reports/standard"
@@ -40,6 +38,10 @@ def _genome_rows() -> list[dict[str, str]]:
     return [record["attributes"] for record in raw["records"]]
 
 
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/genome_data_types.json", "vdi/service_root.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 @pytest.mark.usefixtures("no_credential")
 @respx.mock
 async def test_reference_genomes_build_the_sites_identifier() -> None:
@@ -85,6 +87,12 @@ async def test_reference_genomes_build_the_sites_identifier() -> None:
 _GIARDIA = "https://qa.giardiadb.org/giardiadb.qa/service"
 
 
+@pytest.mark.skipif(
+    needs_qa_recording(
+        "vdi/giardiadb_genome_data_types.json", "vdi/giardiadb_service_root.json"
+    ),
+    reason=NEEDS_QA_RECORDING,
+)
 @pytest.mark.usefixtures("no_credential")
 @respx.mock
 async def test_a_genome_whose_identifier_vdi_refuses_is_not_offered() -> None:

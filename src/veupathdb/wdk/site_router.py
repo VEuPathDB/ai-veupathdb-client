@@ -188,6 +188,7 @@ class SiteRouter:
                     base_url=site.service_url,
                     timeout=float(timeout),
                     concurrent_searches=self._concurrent_searches,
+                    site_id=site_id,
                 )
             return self._clients[site_id]
 

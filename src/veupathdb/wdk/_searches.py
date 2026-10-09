@@ -48,6 +48,8 @@ class SearchEndpoints:
         path: str,
         json: object = None,
         params: JSONObject | None = None,
+        *,
+        budget_seconds: float | None = None,
     ) -> JsonValue:
         """The HTTP client supplies this method at runtime."""
         raise NotImplementedError  # pragma: no cover
@@ -202,12 +204,15 @@ class SearchEndpoints:
         report_config: JSONObject | None = None,
         *,
         view_filters: Sequence[WDKFilterValue] | None = None,
+        budget_seconds: float | None = None,
     ) -> WDKAnswer:
         """Runs a report on a search and creates no step or strategy. The endpoint
         needs no user session, so several calls can run in parallel. A tree value
         goes as its leaves, as ``create_step`` sends it.
 
         :param view_filters: View filters, sent beside ``reportConfig``.
+        :param budget_seconds: How long the report may take once it is sent.
+            Time spent waiting for a search slot does not count.
         """
         parameters = await self.expand_tree_params_to_leaves(
             record_type, search_name, dict(search_config.parameters)
@@ -224,6 +229,7 @@ class SearchEndpoints:
         result = await self.post(
             f"/record-types/{record_type}/searches/{search_name}/reports/standard",
             json=payload,
+            budget_seconds=budget_seconds,
         )
         return validate_response(
             WDKAnswer, result, f"WDK answer for {record_type}/{search_name}"

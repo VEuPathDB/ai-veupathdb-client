@@ -9,13 +9,19 @@ import pytest
 from tests.unit.wdk._step_writes import Recorder
 
 from veupathdb.json_types import JSONObject
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.strategy_api.api import StrategyAPI
 from veupathdb.wdk.wdk_models import NewStepSpec, WDKSearchConfig
 
-pytestmark = pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+pytestmark = pytest.mark.skipif(
+    needs_qa_recording(
+        "wdk/answer_report_by_molecular_weight.json",
+        "wdk/search_genes_by_molecular_weight.json",
+    ),
+    reason=NEEDS_QA_RECORDING,
+)
 
 _SEARCH = "GenesByMolecularWeight"
 _PAGE: JSONObject = {"pagination": {"offset": 0, "numRecords": 0}}

@@ -5,6 +5,7 @@ import re
 import time
 from collections.abc import Mapping, Sequence
 from typing import cast
+from urllib.parse import urlparse
 
 import httpx
 from pydantic import JsonValue
@@ -30,15 +31,24 @@ from veupathdb.wdk._observability import (
     WdkRequestTelemetry,
     wdk_retry_logger,
 )
+from veupathdb.wdk._search_names import SearchNames, search_kind
 from veupathdb.wdk.delayed_result import (
     WDKDelayedResultError,
     is_delayed_result,
 )
 from veupathdb.wdk.probe import WDKProbe
+from veupathdb.wdk.search_load import (
+    SearchRequest,
+    in_turn_line,
+    search_gate,
+    waited_for,
+)
 
 logger = get_logger(__name__)
 
 _HTTP_SERVER_ERROR = 500
+_MAX_CONNECTIONS = 64
+_MAX_KEEPALIVE_CONNECTIONS = 16
 _ATTEMPTS = 3
 _RETRYABLE = (
     httpx.TimeoutException,
@@ -134,17 +144,16 @@ class HTTPClient:
         timeout: float = 30.0,
         auth_token: str | None = None,
         *,
-        max_connections: int = 64,
-        max_keepalive_connections: int = 16,
         concurrent_searches: int = DEFAULT_CONCURRENT_SEARCHES_PER_SITE,
+        site_id: str | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
+        self.site_id = site_id or urlparse(self.base_url).hostname or self.base_url
         self.timeout = timeout
         self.auth_token = auth_token
-        self.max_connections = int(max_connections)
-        self.max_keepalive_connections = int(max_keepalive_connections)
         self.concurrent_searches = concurrent_searches
         self._search_slots = asyncio.Semaphore(concurrent_searches)
+        self._search_names = SearchNames()
         self._client: httpx.AsyncClient | None = None
         self._client_lock = asyncio.Lock()
         # The JSESSIONID cookie in the shared jar is scoped to one identity.
@@ -162,10 +171,8 @@ class HTTPClient:
                     timeout=httpx.Timeout(self.timeout),
                     follow_redirects=True,
                     limits=httpx.Limits(
-                        max_connections=max(1, self.max_connections),
-                        max_keepalive_connections=max(
-                            0, self.max_keepalive_connections
-                        ),
+                        max_connections=_MAX_CONNECTIONS,
+                        max_keepalive_connections=_MAX_KEEPALIVE_CONNECTIONS,
                     ),
                     headers={
                         "Accept": "application/json",
@@ -222,6 +229,7 @@ class HTTPClient:
         auth_token: str | None,
         params: JSONObject | None = None,
         json: object = None,
+        budget_seconds: float | None = None,
     ) -> JsonValue:
         """Make one HTTP request attempt. Tenacity drives the retries."""
         client = await self._get_client()
@@ -256,7 +264,8 @@ class HTTPClient:
             )
             if auth_token:
                 _inject_auth_cookie(request, auth_token)
-            response = await client.send(request)
+            async with asyncio.timeout(budget_seconds):
+                response = await client.send(request)
             response.raise_for_status()
             if not response.content or not response.text.strip():
                 return None
@@ -322,10 +331,25 @@ class HTTPClient:
         auth_token: str | None,
         params: JSONObject | None = None,
         json: object = None,
+        budget_seconds: float | None = None,
     ) -> JsonValue:
-        async with self._search_slots:
+        request = SearchRequest(
+            site_id=self.site_id,
+            kind=search_kind(path),
+            search_names=self._search_names.of(path),
+        )
+        async with (
+            in_turn_line(self.site_id),
+            search_gate()(request),
+            waited_for(self.site_id, "site", self._search_slots),
+        ):
             return await self._request_attempt(
-                method, path, auth_token, params=params, json=json
+                method,
+                path,
+                auth_token,
+                params=params,
+                json=json,
+                budget_seconds=budget_seconds,
             )
 
     def _failed(
@@ -365,6 +389,7 @@ class HTTPClient:
         json: object = None,
         *,
         attempts: int = _ATTEMPTS,
+        budget_seconds: float | None = None,
     ) -> JsonValue:
         """Make an HTTP request with retries, and record telemetry."""
         start = time.monotonic()
@@ -388,6 +413,7 @@ class HTTPClient:
                 auth_token,
                 params=params,
                 json=json,
+                budget_seconds=budget_seconds,
             )
         except RetryError as e:
             last = e.last_attempt.exception()
@@ -404,6 +430,7 @@ class HTTPClient:
         else:
             metric_attrs = telemetry.metric_attrs(outcome="ok", status_code=200)
             get_observer().on_wdk_request(time.monotonic() - start, metric_attrs)
+            self._search_names.learn(method, path, json, result)
             return result
 
     async def probe(
@@ -453,6 +480,7 @@ class HTTPClient:
         params: JSONObject | None = None,
         *,
         idempotent: bool = True,
+        budget_seconds: float | None = None,
     ) -> JsonValue:
         """POST request.
 
@@ -465,6 +493,7 @@ class HTTPClient:
             params=params,
             json=json,
             attempts=_ATTEMPTS if idempotent else 1,
+            budget_seconds=budget_seconds,
         )
 
     async def patch(self, path: str, json: object = None) -> JsonValue:

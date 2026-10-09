@@ -192,8 +192,35 @@ set_observer(OpenTelemetryObserver())
 ```
 
 It feeds `veupathdb.wdk.requests`, `veupathdb.wdk.request_retries`,
-`veupathdb.wdk.request_duration` and the three `veupathdb.site_search.*`
-counterparts, and records nothing until the host configures a `MeterProvider`.
+`veupathdb.wdk.request_duration`, `veupathdb.wdk.search_wait` and the three
+`veupathdb.site_search.*` counterparts, and records nothing until the host
+configures a `MeterProvider`.
+
+## Search load
+
+A request that makes WDK run a search waits in three lines, and none refuses it:
+the line of its turn on its site, the host's gate, and one of the site's
+`veupathdb_concurrent_searches_per_site` slots. A host wraps a researcher's turn
+in `veupathdb.wdk.search_turn()`, so one turn sends one search to a site at a
+time, and installs a gate with `use_search_gate`. The gate is called with a
+`SearchRequest` (site, kind, the searches the request runs);
+`runs_an_expensive_search` reads it against `HIGH_SPEED_SNP_SEARCHES`.
+`budget_seconds` on `post` and `run_search_report` bounds a request from the
+moment it is sent, so time in line never counts against it.
+
+```
+from contextlib import asynccontextmanager
+
+from veupathdb.wdk import SearchRequest, use_search_gate
+
+
+@asynccontextmanager
+async def one_line(request: SearchRequest):
+    yield
+
+
+use_search_gate(one_line)
+```
 
 ## Who the request is
 
@@ -242,7 +269,9 @@ and none takes a flag that would. The bodies recorded on production sites are
 out of the package, under `fixtures-production-backup-2026-10-09/`, which no
 test and no build reads. Until the QA sites are recorded, the store holds the
 vendored schemas only: `verify` names each missing body, and every test that
-reads one is skipped with `veupathdb.testing.NEEDS_QA_RECORDING` as its reason.
+reads one is skipped with `veupathdb.testing.NEEDS_QA_RECORDING` as its reason while
+`veupathdb.testing.needs_qa_recording(...)` finds its recording absent. A recording
+written to the store lifts the skip with no change to the test.
 
 The two schema readers ride the `devtools` extra, so an installed copy runs the
 six commands after `pip install "veupathdb-py[devtools]"`:

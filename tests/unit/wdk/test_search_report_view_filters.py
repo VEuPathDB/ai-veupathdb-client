@@ -7,12 +7,18 @@ from tests.unit.wdk._step_writes import Recorder
 
 from veupathdb.devtools.fixtures import verify_body
 from veupathdb.json_types import JSONObject
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.wdk_models import WDKFilterValue, WDKSearchConfig
 
-pytestmark = pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+pytestmark = pytest.mark.skipif(
+    needs_qa_recording(
+        "wdk/answer_report_by_molecular_weight.json",
+        "wdk/search_genes_by_molecular_weight.json",
+    ),
+    reason=NEEDS_QA_RECORDING,
+)
 
 _ONE_PER_GENE = WDKFilterValue(name="representativeTranscriptOnly", value={})
 _CONFIG = WDKSearchConfig(parameters={"organism": '["Plasmodium falciparum 3D7"]'})

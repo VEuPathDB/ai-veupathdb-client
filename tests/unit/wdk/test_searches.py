@@ -11,7 +11,7 @@ from typing import Any
 
 import pytest
 
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk._failures import validation_bundle
 from veupathdb.wdk.client import VEuPathDBClient
@@ -89,21 +89,30 @@ class TestWdkVocab006TheRequestShapeEarnsNo400:
 
 
 class TestWdkVocab006TheRefusalsSplitAt400And422:
-    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+    @pytest.mark.skipif(
+        needs_qa_recording("wdk/refresh_without_changed_param.json"),
+        reason=NEEDS_QA_RECORDING,
+    )
     def test_wdk_vocab_006_a_missing_changed_param_is_a_400(self) -> None:
         recorded = load_recorded("refresh_without_changed_param")
 
         assert recorded.provenance.status == 400
         assert "'changedParam' property is required" in recorded.raw_text()
 
-    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+    @pytest.mark.skipif(
+        needs_qa_recording("wdk/refresh_with_a_non_string_value.json"),
+        reason=NEEDS_QA_RECORDING,
+    )
     def test_wdk_vocab_006_a_non_string_value_is_a_400(self) -> None:
         recorded = load_recorded("refresh_with_a_non_string_value")
 
         assert recorded.provenance.status == 400
         assert 'JSONObject["value"] is not a string' in recorded.raw_text()
 
-    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+    @pytest.mark.skipif(
+        needs_qa_recording("wdk/refresh_with_a_value_outside_the_vocabulary.json"),
+        reason=NEEDS_QA_RECORDING,
+    )
     def test_wdk_vocab_006_a_value_outside_the_vocabulary_is_a_422(self) -> None:
         recorded = load_recorded("refresh_with_a_value_outside_the_vocabulary")
 
@@ -112,13 +121,19 @@ class TestWdkVocab006TheRefusalsSplitAt400And422:
         assert bundle is not None
         assert "is invalid" in " ".join(bundle.messages())
 
-    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+    @pytest.mark.skipif(
+        needs_qa_recording("wdk/refresh_with_an_unknown_parameter.json"),
+        reason=NEEDS_QA_RECORDING,
+    )
     def test_wdk_vocab_006_an_unknown_parameter_is_a_422(self) -> None:
         recorded = load_recorded("refresh_with_an_unknown_parameter")
 
         assert recorded.provenance.status == 422
 
-    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+    @pytest.mark.skipif(
+        needs_qa_recording("wdk/refresh_with_an_unknown_parameter.json"),
+        reason=NEEDS_QA_RECORDING,
+    )
     def test_wdk_vocab_006_the_refusal_names_the_query_full_name(self) -> None:
         # A third naming vocabulary: neither the url segment nor the full name.
         recorded = load_recorded("refresh_with_an_unknown_parameter")
@@ -127,7 +142,13 @@ class TestWdkVocab006TheRefusalsSplitAt400And422:
         assert bundle is not None
         assert "GeneId.GenesByLocation" in " ".join(bundle.messages())
 
-    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+    @pytest.mark.skipif(
+        needs_qa_recording(
+            "wdk/refresh_with_a_value_outside_the_vocabulary.json",
+            "wdk/refresh_without_changed_param.json",
+        ),
+        reason=NEEDS_QA_RECORDING,
+    )
     def test_wdk_vocab_006_only_the_400s_are_about_our_serialization(self) -> None:
         prose = load_recorded("refresh_without_changed_param")
         verdict = load_recorded("refresh_with_a_value_outside_the_vocabulary")

@@ -4,11 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.eda_fixtures import recorded_distribution
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 @pytest.mark.parametrize(
     ("name", "subset_size", "distinct_genes"),
     [
@@ -21,13 +20,18 @@ from veupathdb.testing.eda_fixtures import recorded_distribution
 def test_a_distribution_counts_distinct_gene_ids_and_not_rows(
     name: str, subset_size: int, distinct_genes: int
 ) -> None:
+    if needs_qa_recording(f"eda/{name}.json"):
+        pytest.skip(NEEDS_QA_RECORDING)
     statistics = recorded_distribution(name).statistics
 
     assert statistics.subset_size == subset_size
     assert statistics.num_distinct_values == distinct_genes
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/gene_id_distribution_de_unfiltered.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_a_bin_is_one_gene_id_and_its_row_count() -> None:
     first = recorded_distribution("gene_id_distribution_de_unfiltered").histogram[0]
 

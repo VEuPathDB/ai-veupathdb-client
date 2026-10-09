@@ -6,11 +6,14 @@ import pytest
 from tests.unit.wdk._step_writes import Recorder
 
 from veupathdb.domain.parameters.values import FilterTermClause
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import fixture_request, load_recorded
 from veupathdb.wdk.client import VEuPathDBClient
 
-pytestmark = pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+pytestmark = pytest.mark.skipif(
+    needs_qa_recording("wdk/ontology_term_summary_ngs_snps_sex.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 
 _FIXTURE = "ontology_term_summary_ngs_snps_sex"
 _CONTEXT = {

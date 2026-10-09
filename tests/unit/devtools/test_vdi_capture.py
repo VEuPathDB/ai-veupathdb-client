@@ -23,7 +23,7 @@ from veupathdb.devtools.vdi_capture import (
     write_install,
 )
 from veupathdb.json_types import JSONObject
-from veupathdb.testing import FIXTURE_ROOT, NEEDS_QA_RECORDING
+from veupathdb.testing import FIXTURE_ROOT, NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.wdk.vdi.client import VdiClient
 from veupathdb.wdk.vdi.models import (
     RNASEQRC,
@@ -32,8 +32,6 @@ from veupathdb.wdk.vdi.models import (
     VdiInstallDisposition,
 )
 from veupathdb.wdk.vdi.rnaseqrc import RnaSeqCountFile, RnaSeqRcUpload
-
-pytestmark = pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 
 _INSTALL = (
     "rnaseqrc_import_in_progress",
@@ -123,6 +121,17 @@ async def _capture(service: _Service) -> tuple[CapturedInstall, list[float]]:
     return captured, waits
 
 
+@pytest.mark.skipif(
+    needs_qa_recording(
+        "vdi/plugins.json",
+        "vdi/rnaseqrc_data_running.json",
+        "vdi/rnaseqrc_import_complete_data_absent.json",
+        "vdi/rnaseqrc_import_in_progress.json",
+        "vdi/rnaseqrc_installed.json",
+        "vdi/rnaseqrc_post_response.json",
+    ),
+    reason=NEEDS_QA_RECORDING,
+)
 async def test_each_distinct_status_is_kept_once_and_the_dataset_is_deleted() -> None:
     service = _Service([_body(name) for name in _INSTALL])
 
@@ -148,6 +157,14 @@ async def test_each_distinct_status_is_kept_once_and_the_dataset_is_deleted() ->
     ]
 
 
+@pytest.mark.skipif(
+    needs_qa_recording(
+        "vdi/plugins.json",
+        "vdi/rnaseqrc_import_in_progress.json",
+        "vdi/rnaseqrc_post_response.json",
+    ),
+    reason=NEEDS_QA_RECORDING,
+)
 async def test_a_capture_that_fails_mid_poll_still_deletes() -> None:
     service = _Service([_body("rnaseqrc_import_in_progress")])
     client, recorder = _client(service)
@@ -176,6 +193,14 @@ async def test_a_capture_that_fails_mid_poll_still_deletes() -> None:
     ]
 
 
+@pytest.mark.skipif(
+    needs_qa_recording(
+        "vdi/plugins.json",
+        "vdi/rnaseqrc_import_failed.json",
+        "vdi/rnaseqrc_post_response.json",
+    ),
+    reason=NEEDS_QA_RECORDING,
+)
 async def test_the_written_body_names_no_account(tmp_path: Path) -> None:
     failed = _body("rnaseqrc_import_failed")
     failed["owner"] = {"userId": _ACCOUNT, "firstName": "Ada", "email": "a@b.org"}
@@ -207,6 +232,17 @@ async def test_the_written_body_names_no_account(tmp_path: Path) -> None:
     assert provenance["probe_post_response"].status == 202
 
 
+@pytest.mark.skipif(
+    needs_qa_recording(
+        "vdi/dataset_import_queued.json",
+        "vdi/rnaseqrc_data_running.json",
+        "vdi/rnaseqrc_import_complete_data_absent.json",
+        "vdi/rnaseqrc_import_in_progress.json",
+        "vdi/rnaseqrc_import_invalid.json",
+        "vdi/rnaseqrc_installed.json",
+    ),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_every_label_names_the_axis_that_moved_last() -> None:
     labels = [
         status_label(
@@ -232,6 +268,9 @@ def test_every_label_names_the_axis_that_moved_last() -> None:
     ]
 
 
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/provenance.json"), reason=NEEDS_QA_RECORDING
+)
 def test_every_body_in_the_store_has_provenance_and_nothing_else_does() -> None:
     store = FIXTURE_ROOT / "vdi"
 
@@ -240,6 +279,7 @@ def test_every_body_in_the_store_has_provenance_and_nothing_else_does() -> None:
     assert set(load_provenance(store)) == bodies
 
 
+@pytest.mark.skipif(needs_qa_recording("vdi/plugins.json"), reason=NEEDS_QA_RECORDING)
 async def test_a_compressed_response_is_recorded_decoded() -> None:
     plain = json.dumps(recorded("plugins")).encode()
 

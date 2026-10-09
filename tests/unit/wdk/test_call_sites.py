@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
 
 _SOURCE_ROOT = Path(__file__).resolve().parents[3] / "src" / "veupathdb"
@@ -156,7 +156,9 @@ def test_wdk_search_003_no_search_list_is_written_into_the_code() -> None:
     assert _modules_containing("GenesByMolecularWeight", under=_INTEGRATION) == []
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/search_boolean_transcript.json"), reason=NEEDS_QA_RECORDING
+)
 def test_the_fixture_store_records_where_every_body_came_from() -> None:
     recorded = load_recorded("search_boolean_transcript")
 

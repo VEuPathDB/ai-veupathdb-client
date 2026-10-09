@@ -11,7 +11,7 @@ import copy
 import pytest
 from tests.unit.wdk.vdi._wire import recorded
 
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.wdk.vdi.models import (
     VdiDatasetDetails,
     VdiDatasetStatus,
@@ -34,7 +34,6 @@ def _edited(name: str, **axes: object) -> VdiDatasetStatus:
     return VdiDatasetDetails.model_validate(body).status
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 @pytest.mark.parametrize(
     ("fixture", "expected"),
     [
@@ -51,10 +50,14 @@ def _edited(name: str, **axes: object) -> VdiDatasetStatus:
 def test_the_disposition_follows_the_recorded_install(
     fixture: str, expected: VdiInstallDisposition
 ) -> None:
+    if needs_qa_recording(f"vdi/{fixture}.json"):
+        pytest.skip(NEEDS_QA_RECORDING)
     assert _status(fixture).disposition(PROJECT) is expected
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/rnaseqrc_data_running.json"), reason=NEEDS_QA_RECORDING
+)
 def test_meta_complete_with_data_running_is_not_installed() -> None:
     status = _status("rnaseqrc_data_running")
 
@@ -62,7 +65,9 @@ def test_meta_complete_with_data_running_is_not_installed() -> None:
     assert status.disposition(PROJECT) is VdiInstallDisposition.CONTINUE
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/rnaseqrc_data_running.json"), reason=NEEDS_QA_RECORDING
+)
 def test_an_install_failure_on_another_project_does_not_stop_this_one() -> None:
     body = copy.deepcopy(recorded("rnaseqrc_data_running"))
     assert isinstance(body, dict)
@@ -79,7 +84,9 @@ def test_an_install_failure_on_another_project_does_not_stop_this_one() -> None:
     assert status.failure_messages(PROJECT) == []
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/rnaseqrc_installed.json"), reason=NEEDS_QA_RECORDING
+)
 def test_no_entry_for_the_project_continues() -> None:
     assert (
         _status("rnaseqrc_installed").disposition("ToxoDB")
@@ -87,14 +94,18 @@ def test_no_entry_for_the_project_continues() -> None:
     )
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/rnaseqrc_data_running.json"), reason=NEEDS_QA_RECORDING
+)
 def test_ready_for_reinstall_is_continue_slow() -> None:
     status = _edited("rnaseqrc_data_running", data={"status": "ready-for-reinstall"})
 
     assert status.disposition(PROJECT) is VdiInstallDisposition.CONTINUE_SLOW
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/rnaseqrc_data_running.json"), reason=NEEDS_QA_RECORDING
+)
 @pytest.mark.parametrize(
     "failure", ["failed-validation", "failed-installation", "missing-dependency"]
 )
@@ -107,7 +118,9 @@ def test_a_failed_data_axis_fails_the_install(failure: str) -> None:
     assert status.failure_messages(PROJECT) == ["no rows"]
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/rnaseqrc_data_running.json"), reason=NEEDS_QA_RECORDING
+)
 def test_an_unknown_status_continues() -> None:
     status = _edited("rnaseqrc_data_running", data={"status": "verifying"})
 
@@ -116,7 +129,9 @@ def test_an_unknown_status_continues() -> None:
     assert status.disposition(PROJECT) is VdiInstallDisposition.CONTINUE
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/rnaseqrc_import_invalid.json"), reason=NEEDS_QA_RECORDING
+)
 def test_an_invalid_import_reports_the_plugins_message_byte_for_byte() -> None:
     raw = recorded("rnaseqrc_import_invalid")
     assert isinstance(raw, dict)
@@ -134,7 +149,9 @@ def test_an_invalid_import_reports_the_plugins_message_byte_for_byte() -> None:
     ]
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/rnaseqrc_import_failed.json"), reason=NEEDS_QA_RECORDING
+)
 def test_a_failed_import_reports_every_message_in_order() -> None:
     messages = _status("rnaseqrc_import_failed").failure_messages(PROJECT)
 
@@ -149,12 +166,17 @@ def test_a_failed_import_reports_every_message_in_order() -> None:
     ]
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/rnaseqrc_data_running.json"), reason=NEEDS_QA_RECORDING
+)
 def test_a_dataset_still_moving_has_no_failure_messages() -> None:
     assert _status("rnaseqrc_data_running").failure_messages(PROJECT) == []
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/rnaseqrc_data_running.json", "vdi/rnaseqrc_installed.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_installed_targets_needs_both_axes() -> None:
     running = VdiDatasetDetails.model_validate(recorded("rnaseqrc_data_running"))
     done = VdiDatasetDetails.model_validate(recorded("rnaseqrc_installed"))
@@ -163,7 +185,10 @@ def test_installed_targets_needs_both_axes() -> None:
     assert done.installed_targets() == [PROJECT]
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/rnaseqrc_import_in_progress.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_a_rejected_upload_fails_with_its_message() -> None:
     body = copy.deepcopy(recorded("rnaseqrc_import_in_progress"))
     assert isinstance(body, dict)

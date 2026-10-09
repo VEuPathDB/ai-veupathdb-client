@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 
 from veupathdb.json_types import JSONObject
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.analysis_result import WDKAnalysisNotReadyError
 from veupathdb.wdk.client import VEuPathDBClient
@@ -110,7 +110,10 @@ class _Run:
         return {"resultData": []}
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/answer_report_by_molecular_weight.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 async def test_wdk_valid_011_a_form_default_is_not_applied_by_the_creation_call(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

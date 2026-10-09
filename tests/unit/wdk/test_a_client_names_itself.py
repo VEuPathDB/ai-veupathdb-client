@@ -58,7 +58,9 @@ def test_a_site_client_takes_the_hosts_search_cap() -> None:
     assert client.concurrent_searches == 3
 
 
-def test_a_client_holds_far_fewer_connections_than_before() -> None:
+async def test_a_client_holds_far_fewer_connections_than_before() -> None:
     client = VEuPathDBClient(base_url="https://example.invalid/service")
 
-    assert client.max_connections <= 100
+    pool = await client._get_client()
+
+    assert pool._transport._pool._max_connections <= 100

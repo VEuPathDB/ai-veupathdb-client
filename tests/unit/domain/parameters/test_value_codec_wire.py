@@ -38,7 +38,7 @@ from veupathdb.domain.parameters.values import (
     TimestampValue,
 )
 from veupathdb.domain.parameters.wdk_vocab import vocab_keys
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.wdk_models import WDKSearchResponse
 
@@ -83,7 +83,10 @@ class TestWdkParam001ElevenTypes:
     def test_wdk_param_001_param_kind_is_exactly_the_eleven(self) -> None:
         assert frozenset(get_args(ParamKind)) == _THE_ELEVEN
 
-    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+    @pytest.mark.skipif(
+        needs_qa_recording("wdk/search_genes_by_location.json"),
+        reason=NEEDS_QA_RECORDING,
+    )
     def test_wdk_param_001_display_type_is_a_separate_axis(self) -> None:
         # organismSinglePick is a multi-pick parameter drawn as a select.
         params = {p.name: p for p in _genes_by_location().search_data.parameters or []}
@@ -91,7 +94,10 @@ class TestWdkParam001ElevenTypes:
         assert params["organismSinglePick"].type == "multi-pick-vocabulary"
         assert params["organismSinglePick"].display_type == "select"
 
-    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+    @pytest.mark.skipif(
+        needs_qa_recording("wdk/search_genes_by_location.json"),
+        reason=NEEDS_QA_RECORDING,
+    )
     def test_wdk_param_001_a_select_multi_pick_still_sends_a_list(self) -> None:
         params = {p.name: p for p in _genes_by_location().search_data.parameters or []}
         kind = as_param_kind(params["organismSinglePick"].type)
@@ -100,7 +106,10 @@ class TestWdkParam001ElevenTypes:
 
         assert value == MultiPickValue(values=["Plasmodium falciparum 3D7"])
 
-    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+    @pytest.mark.skipif(
+        needs_qa_recording("wdk/search_genes_by_location.json"),
+        reason=NEEDS_QA_RECORDING,
+    )
     def test_wdk_param_001_every_declared_type_is_one_of_the_eleven(self) -> None:
         declared = {p.type for p in _genes_by_location().search_data.parameters or []}
 
@@ -191,7 +200,10 @@ class TestWdkParam003SinglePickIsABareTerm:
         with pytest.raises(PydanticValidationError):
             SinglePickValue(value=["Gene", "Transcript"])  # type: ignore[arg-type]
 
-    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+    @pytest.mark.skipif(
+        needs_qa_recording("wdk/search_genes_by_exon_count.json"),
+        reason=NEEDS_QA_RECORDING,
+    )
     def test_wdk_param_003_the_wire_value_is_one_of_the_declared_terms(self) -> None:
         search = WDKSearchResponse.model_validate(
             load_recorded("search_genes_by_exon_count").json_body()

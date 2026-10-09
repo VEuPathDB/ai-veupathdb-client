@@ -9,6 +9,7 @@ from veupathdb.json_types import (
 )
 from veupathdb.logging import get_logger
 from veupathdb.observer import (
+    MetricAttrs,
     NoObserver,
     Observer,
     get_observer,
@@ -33,6 +34,7 @@ __all__ = [
     "JSONArray",
     "JSONObject",
     "JSONValue",
+    "MetricAttrs",
     "NoObserver",
     "Observer",
     "VEuPathDBSettings",

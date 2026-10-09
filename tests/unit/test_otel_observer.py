@@ -36,6 +36,10 @@ def reader(monkeypatch: pytest.MonkeyPatch) -> Iterator[InMemoryMetricReader]:
             wdk.create_histogram("veupathdb.wdk.request_duration"),
         ),
         (
+            "wdk_search_wait_s",
+            wdk.create_histogram("veupathdb.wdk.search_wait"),
+        ),
+        (
             "site_search_requests",
             site_search.create_counter("veupathdb.site_search.requests"),
         ),
@@ -132,6 +136,19 @@ async def test_a_retried_wdk_call_records_the_retry_and_its_error_kind(
     assert attrs["error_kind"] == "connect_error"
     assert attrs["outcome"] == "retry"
     assert attrs["retried"] == "true"
+
+
+async def test_a_search_feeds_the_wait_instrument_for_its_slot(
+    reader: InMemoryMetricReader,
+) -> None:
+    client = HTTPClient(_BASE_URL, auth_token="a-token", site_id="plasmodb")
+
+    with patch.object(client, "_request_attempt", AsyncMock(return_value={"ok": True})):
+        await client._request("POST", f"{_SEARCH_PATH}/reports/standard")
+
+    assert _points(reader, "veupathdb.wdk.search_wait") == [
+        (1, {"site": "plasmodb", "line": "site"})
+    ]
 
 
 async def test_a_site_search_call_feeds_the_site_search_instruments(

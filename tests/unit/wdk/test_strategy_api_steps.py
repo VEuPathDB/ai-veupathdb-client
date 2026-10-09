@@ -20,7 +20,7 @@ from tests.unit.wdk._step_writes import Recorder, no_expansion
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.errors import WDKError
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.strategy_api.api import StrategyAPI
@@ -230,7 +230,9 @@ class TestANewStepSendsItsAnswerParamsEmpty:
         assert post.body["searchConfig"]["parameters"] == {"organism": '["Pf3D7"]'}
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/search_boolean_transcript.json"), reason=NEEDS_QA_RECORDING
+)
 async def test_wdk_step_006_the_names_are_read_from_the_search(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

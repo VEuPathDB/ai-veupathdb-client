@@ -25,5 +25,5 @@ the two recording reads in `tests/packaging/`, the recording comparisons in
 QA answers automated clients first: outside the VEuPathDB network the QA sites answer
 with a pre-release login. Then run `fixtures record`, `eda_capture record` and one
 `vdi_capture record` per install the backup holds, re-measure every count, identifier
-and vocabulary a test or a knowledge page pins, drop the skip markers, delete the backup
-directory, and remove this item and its line.
+and vocabulary a test or a knowledge page pins (the skips lift by themselves once each
+recording is in the store), delete the backup directory, and remove this item and its line.

@@ -21,7 +21,7 @@ from veupathdb.eda import (
     analysis_descriptor_patch,
 )
 from veupathdb.json_types import JSONObject
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
 
 __all__ = ["registered_token"]
@@ -132,7 +132,10 @@ def test_the_patch_body_of_a_read_descriptor_is_the_stored_one() -> None:
     assert analysis_descriptor_patch(_read()) == _STORED
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("eda/analysis_detail_pass_and_de.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_the_patch_body_of_the_recorded_analysis_is_the_stored_one() -> None:
     recorded = TypeAdapter(JSONObject).validate_json(
         (FIXTURE_DIR / "analysis_detail_pass_and_de.json").read_text()

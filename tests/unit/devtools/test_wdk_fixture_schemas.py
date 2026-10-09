@@ -12,7 +12,7 @@ from veupathdb.devtools.fixtures import (
     schema_pin_drift,
     verify_body,
 )
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import (
     FIXTURES,
     SCHEMA_DIR,
@@ -67,7 +67,10 @@ def test_a_fixture_only_binds_a_schema_wdk_enforces() -> None:
     assert {schema_file(name) for name in bound} <= set(load_schema_pin().files)
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/record_type_build.json", "wdk/record_types.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_every_recorded_fixture_passes_the_schema_its_endpoint_binds() -> None:
     failures = {
         (check.fixture, check.direction): check.errors
@@ -77,7 +80,10 @@ def test_every_recorded_fixture_passes_the_schema_its_endpoint_binds() -> None:
     assert failures == {}
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/record_type_build.json", "wdk/record_types.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_each_binding_is_checked_in_the_direction_wdk_validates() -> None:
     checked = {
         (check.fixture, check.direction, check.schema_name) for check in schema_checks()
@@ -89,7 +95,9 @@ def test_each_binding_is_checked_in_the_direction_wdk_validates() -> None:
     }
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/record_types.json"), reason=NEEDS_QA_RECORDING
+)
 def test_a_recorded_list_response_with_one_wrong_element_fails() -> None:
     segments = _RECORD_TYPES.validate_python(load_recorded("record_types").json_body())
     errors = verify_body("wdk.records.get", [*segments, 7])
@@ -97,7 +105,9 @@ def test_a_recorded_list_response_with_one_wrong_element_fails() -> None:
     assert errors[0].endswith("is not valid under any of the given schemas")
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/record_type_build.json"), reason=NEEDS_QA_RECORDING
+)
 def test_a_recorded_object_response_with_a_retyped_field_fails() -> None:
     body = _RECORD_TYPE.validate_python(load_recorded("record_type_build").json_body())
     body["urlSegment"] = 4
@@ -106,7 +116,9 @@ def test_a_recorded_object_response_with_a_retyped_field_fails() -> None:
     )
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/record_type_build.json"), reason=NEEDS_QA_RECORDING
+)
 def test_a_recorded_object_response_with_an_extra_field_fails() -> None:
     body = _RECORD_TYPE.validate_python(load_recorded("record_type_build").json_body())
     body["notAWdkField"] = "x"
@@ -147,6 +159,9 @@ def test_an_in_schema_without_a_request_body_is_refused() -> None:
         )
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/record_type_build.json", "wdk/record_types.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_the_verify_command_passes_over_the_whole_store() -> None:
     assert main(["verify"]) == 0

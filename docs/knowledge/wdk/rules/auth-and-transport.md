@@ -127,6 +127,33 @@ delayed-result sentinel (WDK-HTTP-003), which polls the search already running. 
 or a timeout is the result. Every request carries `veupathdb_user_agent`, so a site
 operator can tell which application sent it.
 
+### WDK-HTTP-006 - A High Speed SNP Search is one of thirteen searches, and a host runs one at a time per site
+
+- class: HARD
+- upstream: https://github.com/VEuPathDB/ApiCommonModel/blob/99da11affa47aacb5478b48e2907987f508b17e7/Model/lib/wdk/model/questions/queries/snpQueries.xml#L26-L135
+- anchor: src/veupathdb/wdk/search_load.py:HIGH_SPEED_SNP_SEARCHES
+- status: ENFORCED by tests/unit/wdk/test_search_load.py::test_the_list_is_every_high_speed_snp_search
+
+WDK's search metadata does not say which query a search runs. ApiCommonModel does: a
+`processQuery` whose `processName` is in
+`org.apidb.apicomplexa.wsfplugin.highspeedsnpsearch` runs the High Speed SNP Search
+plugins. At ApiCommonModel `99da11af` those are `GenesByNgsSnps` in
+[`geneQueries.xml`](https://github.com/VEuPathDB/ApiCommonModel/blob/99da11affa47aacb5478b48e2907987f508b17e7/Model/lib/wdk/model/questions/queries/geneQueries.xml#L2684-L2686),
+the five `NgsSnpsBy*` queries in `snpQueries.xml` (above), the four `VariantsBy*` queries in
+[`variantQueries.xml`](https://github.com/VEuPathDB/ApiCommonModel/blob/99da11affa47aacb5478b48e2907987f508b17e7/Model/lib/wdk/model/questions/queries/variantQueries.xml#L41-L176)
+and `SnpsByGeneId`, `SnpsByStrain` and `SnpsByIsolatePattern` in
+[`snpChipQueries.xml`](https://github.com/VEuPathDB/ApiCommonModel/blob/99da11affa47aacb5478b48e2907987f508b17e7/Model/lib/wdk/model/questions/queries/snpChipQueries.xml#L34-L79).
+Each question file names its search by the query's own name, so the thirteen names are
+the URL segments a request sends. `NgsSnpBySourceId`, `VariantBySourceId`,
+`SnpAlignmentForm`, `VariantAlignmentForm` and `SnpsByIsolateType` are SQL queries and are
+not on the list.
+
+Every request that runs a search passes the host's gate (`use_search_gate`) with the site,
+its kind and every search it runs: a report names its search in the path, and a step or
+strategy request names the searches of the steps and trees this client created or read. Inside a
+turn (`search_turn`), one site receives one search of that turn at a time; the per-site
+slots of WDK-HTTP-005 are taken inside the gate. Every limit waits; none refuses.
+
 ### WDK-HTTP-004 - A published WDK schema binds a body only where an endpoint annotates it, and this client's models are the contract everywhere else
 
 - class: CONTRACT

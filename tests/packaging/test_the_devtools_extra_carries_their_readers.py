@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from veupathdb.devtools.fixtures import FIXTURES
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -84,7 +84,10 @@ print(veupathdb.devtools.eda_schemas.__name__)
 
 
 @pytest.mark.wheel
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording(*(request.file for request in FIXTURES)),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_an_installed_copy_verifies_its_own_recorded_bodies(
     env_with_the_extra: Path,
 ) -> None:
@@ -104,4 +107,6 @@ def test_an_installed_copy_verifies_its_own_recorded_bodies(
     )
 
     summary = finished.stdout.splitlines()[-1]
-    assert f"{len(FIXTURES)} fixture(s), 3 schema check(s), 0 failed" in summary
+    assert (
+        f"{len(FIXTURES)} fixture(s), 0 missing, 3 schema check(s), 0 failed" in summary
+    )

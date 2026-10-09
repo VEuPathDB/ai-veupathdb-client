@@ -10,7 +10,7 @@ from veupathdb.domain.parameters.phyletic import (
     read_census,
     sort_profile_pattern,
 )
-from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.wdk_models import WDKSearch
 
@@ -40,7 +40,10 @@ def test_wdk_site_004_the_tokens_are_written_in_ascending_code_order() -> None:
     assert sort_profile_pattern("%pfal:Y%atum:N%") == "%atum:N%pfal:Y%"
 
 
-@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/search_genes_by_molecular_weight.json"),
+    reason=NEEDS_QA_RECORDING,
+)
 def test_wdk_site_007_a_search_carries_the_properties_the_deployment_sent() -> None:
     """A radio pair travels in `properties`, which the parse leaves as it is sent."""
     body = load_recorded("search_genes_by_molecular_weight").json_body()
