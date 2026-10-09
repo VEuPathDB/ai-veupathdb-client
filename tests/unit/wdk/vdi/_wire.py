@@ -19,10 +19,10 @@ from veupathdb.wdk.vdi.client import VdiClient
 
 FIXTURES = FIXTURE_ROOT / "vdi"
 
-BASE_URL = "https://plasmodb.org/vdi"
+BASE_URL = "https://qa.plasmodb.org/vdi"
 TOKEN = "registered.vdi.token"
 DEPLOYMENT_TOKEN = "service.account.token"
-PROBE_ID = "soV5JEQEcF00p"
+PROBE_ID = "vdiTestData01"
 
 
 @pytest.fixture

@@ -9,6 +9,7 @@ import httpx
 import pytest
 
 from veupathdb.errors import VEuPathDBError
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_fixtures import FIXTURE_DIR, RecordedWDKResponse
 from veupathdb.wdk.site_search_client import (
     STREAM_MEDIA_TYPE,
@@ -29,7 +30,7 @@ def _recorded_stream() -> RecordedWDKResponse:
 
 
 def _client_over(handler: httpx.MockTransport) -> SiteSearchClient:
-    client = SiteSearchClient("https://plasmodb.org", "PlasmoDB")
+    client = SiteSearchClient("https://qa.plasmodb.org", "PlasmoDB")
     client._client = httpx.AsyncClient(transport=handler)
     return client
 
@@ -68,6 +69,7 @@ def test_a_line_with_no_columns_is_not_a_record() -> None:
     ]
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_the_recorded_stream_reaches_past_what_one_page_holds() -> None:
     """The fixture is the same query the paged form caps at fifty records."""
     lines = _recorded_stream().raw_text().splitlines()
@@ -83,6 +85,7 @@ def test_the_recorded_stream_reaches_past_what_one_page_holds() -> None:
     ]
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_the_recorded_stream_is_ordered_by_descending_score() -> None:
     records = [
         record

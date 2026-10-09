@@ -19,8 +19,8 @@ from veupathdb.wdk import current_user
 from veupathdb.wdk.current_user import fetch_current_user, resolve_registered_email
 from veupathdb.wdk.wdk_models import WDKUserInfo
 
-_WEBAPP = "https://plasmodb.org/plasmo/app"
-_CURRENT_USER = "https://plasmodb.org/plasmo/service/users/current"
+_WEBAPP = "https://qa.plasmodb.org/plasmo.qa/app"
+_CURRENT_USER = "https://qa.plasmodb.org/plasmo.qa/service/users/current"
 
 _REGISTERED = {
     "id": 12345678,
@@ -90,7 +90,7 @@ async def test_a_refused_token_names_nobody() -> None:
 @respx.mock
 async def test_a_guest_answer_is_the_guest_profile() -> None:
     _allow_session_init()
-    guest = {"id": 99, "email": "guest@veupathdb.org", "isGuest": True}
+    guest = {"id": 99, "email": "guest@example.org", "isGuest": True}
     respx.get(_CURRENT_USER).mock(return_value=httpx.Response(200, json=guest))
     reset = veupathdb_auth_token_ctx.set("a-token")
     try:
@@ -186,7 +186,7 @@ async def test_the_registered_email_comes_from_the_token_the_caller_passes() -> 
 @respx.mock
 async def test_a_guest_has_no_registered_email() -> None:
     _allow_session_init()
-    guest = {"id": 99, "email": "guest@veupathdb.org", "isGuest": True}
+    guest = {"id": 99, "email": "guest@example.org", "isGuest": True}
     respx.get(_CURRENT_USER).mock(return_value=httpx.Response(200, json=guest))
     assert await resolve_registered_email("a-token", "plasmodb") is None
 

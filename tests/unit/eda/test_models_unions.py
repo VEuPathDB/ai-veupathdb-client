@@ -30,6 +30,7 @@ from veupathdb.eda.models import (
     EdaVariable,
     VolcanoStatsResponse,
 )
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
 
 PROVENANCE = "provenance.json"
@@ -61,11 +62,13 @@ READERS: dict[str, type[BaseModel]] = {
 }
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_every_fixture_file_has_a_reader() -> None:
     on_disk = {p.name for p in FIXTURE_DIR.glob("*.json")} - {PROVENANCE}
     assert on_disk == set(READERS)
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 @pytest.mark.parametrize("name", sorted(READERS))
 def test_fixture_validates(name: str) -> None:
     """Every recorded response validates against the model that reads it."""
@@ -329,6 +332,7 @@ def test_an_unknown_variable_type_is_refused() -> None:
         )
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_the_entity_tree_is_recursive_and_children_are_optional() -> None:
     raw = json.loads((FIXTURE_DIR / "study_detail_de.json").read_text())
     detail = EdaStudyDetailResponse.model_validate(raw).study

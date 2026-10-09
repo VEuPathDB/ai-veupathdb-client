@@ -38,6 +38,8 @@ from referencing import Registry
 from referencing.jsonschema import DRAFT4, Schema
 
 from veupathdb.devtools.pins import VendoredPin, pin_drift
+from veupathdb.devtools.qa_sites import use_qa_sites
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_fixtures import (
     FIXTURE_DIR,
     FIXTURES,
@@ -148,7 +150,10 @@ class SchemaCheck(BaseModel):
 
 
 def schema_checks() -> tuple[SchemaCheck, ...]:
-    """One check per manifest binding: request bodies in, recorded responses out."""
+    """One check per manifest binding: request bodies in, recorded responses out.
+
+    A response that is not recorded has no check; ``verify`` names it.
+    """
     checks: list[SchemaCheck] = []
     for request in FIXTURES:
         if request.in_schema is not None:
@@ -160,7 +165,7 @@ def schema_checks() -> tuple[SchemaCheck, ...]:
                     errors=verify_body(request.in_schema, request.body),
                 )
             )
-        if request.out_schema is not None:
+        if request.out_schema is not None and request.file.exists():
             checks.append(
                 SchemaCheck(
                     fixture=request.name,
@@ -260,7 +265,8 @@ async def _vendor_from_upstream() -> int:
 
 
 async def record_one(request: FixtureRequest) -> RecordedWDKResponse:
-    """Ask a live site and return the response, without writing it."""
+    """Ask the request's QA site and write the response into the store."""
+    use_qa_sites()
     client = get_wdk_client(request.site)
     probe = await client.probe(
         request.method, request.path, params=dict(request.params), json=request.body
@@ -314,7 +320,12 @@ def _verify_fixtures() -> int:
 
     checks = schema_checks()
     failed = 0
+    missing = 0
     for request in FIXTURES:
+        if not request.file.exists():
+            missing += 1
+            print(f"{request.name:44} MISSING {NEEDS_QA_RECORDING}")
+            continue
         bound = [check for check in checks if check.fixture == request.name]
         if not bound:
             print(f"{request.name:44} ----  no WDK schema binds this endpoint")
@@ -329,7 +340,8 @@ def _verify_fixtures() -> int:
 
     covered = {check.schema_name for check in checks}
     print(
-        f"{len(FIXTURES)} fixture(s), {len(checks)} schema check(s), {failed} failed; "
+        f"{len(FIXTURES)} fixture(s), {missing} missing, "
+        f"{len(checks)} schema check(s), {failed} failed; "
         f"{len(covered)} of {len(ENFORCED_SCHEMAS)} enforced schemas checked; "
         f"{len(pin.files)} files pinned at {pin.repo}@{pin.sha[:12]}"
     )

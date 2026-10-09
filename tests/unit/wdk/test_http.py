@@ -136,7 +136,7 @@ class TestThePerRequestAuthorizationCookieWins:
     def test_replaces_jar_authorization_cookie(self) -> None:
         request = httpx.Request(
             "GET",
-            "https://plasmodb.org/plasmo/service/users/current",
+            "https://qa.plasmodb.org/plasmo.qa/service/users/current",
             headers={"cookie": "Authorization=stale-jar-guest; JSESSIONID=abc123"},
         )
         _inject_auth_cookie(request, "real-user-token")
@@ -149,7 +149,7 @@ class TestThePerRequestAuthorizationCookieWins:
     def test_appends_when_no_authorization_present(self) -> None:
         request = httpx.Request(
             "GET",
-            "https://plasmodb.org/plasmo/service/users/current",
+            "https://qa.plasmodb.org/plasmo.qa/service/users/current",
             headers={"cookie": "JSESSIONID=abc123"},
         )
         _inject_auth_cookie(request, "real-user-token")
@@ -158,7 +158,7 @@ class TestThePerRequestAuthorizationCookieWins:
 
     def test_sets_cookie_header_when_absent(self) -> None:
         request = httpx.Request(
-            "GET", "https://plasmodb.org/plasmo/service/users/current"
+            "GET", "https://qa.plasmodb.org/plasmo.qa/service/users/current"
         )
         _inject_auth_cookie(request, "real-user-token")
         assert _cookie_pairs(request) == ["Authorization=real-user-token"]
@@ -174,7 +174,7 @@ class TestANewTokenStartsANewWdkSession:
         """Two tokens on one client produce two session init calls."""
         transport = _CapturingTransport()
         client = await _client(
-            transport, base_url="https://plasmodb.org/plasmo/service"
+            transport, base_url="https://qa.plasmodb.org/plasmo.qa/service"
         )
 
         veupathdb_auth_token_ctx.set("token-A")
@@ -192,7 +192,7 @@ class TestANewTokenStartsANewWdkSession:
         """One token produces one session init call."""
         transport = _CapturingTransport()
         client = await _client(
-            transport, base_url="https://plasmodb.org/plasmo/service"
+            transport, base_url="https://qa.plasmodb.org/plasmo.qa/service"
         )
 
         veupathdb_auth_token_ctx.set("token-same")
@@ -208,11 +208,11 @@ class TestANewTokenStartsANewWdkSession:
         """A new session removes the session cookie of the previous token."""
         transport = _CapturingTransport()
         client = await _client(
-            transport, base_url="https://plasmodb.org/plasmo/service"
+            transport, base_url="https://qa.plasmodb.org/plasmo.qa/service"
         )
         jar = client._client
         assert jar is not None
-        jar.cookies.set("JSESSIONID", "stale-session-A", domain="plasmodb.org")
+        jar.cookies.set("JSESSIONID", "stale-session-A", domain="qa.plasmodb.org")
 
         veupathdb_auth_token_ctx.set("token-B")
         await self._ping(client)
@@ -231,7 +231,7 @@ class TestAUserResourceNeedsTheUsersOwnToken:
         client = await _client(transport, auth_token=SERVICE_ACCOUNT)
 
         with pytest.raises(WDKLoginRequiredError) as raised:
-            await client.get("/users/1248677203/steps/9")
+            await client.get("/users/1000000103/steps/9")
 
         assert raised.value.code == VEuPathDBErrorCode.WDK_LOGIN_REQUIRED
         assert raised.value.status == 401
@@ -242,7 +242,7 @@ class TestAUserResourceNeedsTheUsersOwnToken:
         client = await _client(transport, auth_token=SERVICE_ACCOUNT)
 
         with pytest.raises(WDKLoginRequiredError):
-            await client.post("/users/1248677203/steps", json={}, idempotent=False)
+            await client.post("/users/1000000103/steps", json={}, idempotent=False)
 
         assert transport.paths == []
 
@@ -261,8 +261,8 @@ class TestAUserResourceNeedsTheUsersOwnToken:
         client = await _client(transport, auth_token=SERVICE_ACCOUNT)
         veupathdb_auth_token_ctx.set(USER_TOKEN)
 
-        assert await client.get("/users/1248677203/steps/9") == {"id": 1}
-        assert "/service/users/1248677203/steps/9" in transport.paths
+        assert await client.get("/users/1000000103/steps/9") == {"id": 1}
+        assert "/service/users/1000000103/steps/9" in transport.paths
 
 
 @pytest.mark.usefixtures("no_request_token")

@@ -42,9 +42,9 @@ def _jwks(private_key: ec.EllipticCurvePrivateKey) -> dict[str, Any]:
 def _token(private_key: ec.EllipticCurvePrivateKey) -> str:
     return jwt.encode(
         {
-            "sub": "1248677203",
+            "sub": "1000000103",
             "is_guest": False,
-            "iss": "https://auth.veupathdb.org",
+            "iss": OAUTH_URL,
             "aud": "apiComponentSite",
             "azp": "apiComponentSite",
             "exp": int(time.time()) + 3600,

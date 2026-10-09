@@ -22,12 +22,14 @@ from veupathdb.eda.errors import (
 )
 from veupathdb.eda.models import EdaBinSpec
 from veupathdb.errors import WDKLoginRequiredError
+from veupathdb.testing import NEEDS_QA_RECORDING
 
 pytestmark = pytest.mark.asyncio
 
 __all__ = ["registered_token"]
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_the_request_carries_the_authorization_cookie() -> None:
     seen: list[httpx.Request] = []
 
@@ -66,6 +68,7 @@ async def test_a_request_with_no_token_never_reaches_the_wire() -> None:
     assert calls == []
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_list_studies_parses_the_recorded_catalog() -> None:
     client = eda_client(
         httpx.MockTransport(
@@ -78,6 +81,7 @@ async def test_list_studies_parses_the_recorded_catalog() -> None:
     assert any(s.source_type == "user_submitted" for s in studies)
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_get_study_unwraps_the_study_envelope() -> None:
     seen: list[httpx.Request] = []
 
@@ -93,6 +97,7 @@ async def test_get_study_unwraps_the_study_envelope() -> None:
     assert study.root_entity.id == "GENE_PHENOTYPE_DATA_ENTITY"
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_get_permissions_returns_the_resolution_map() -> None:
     client = eda_client(
         httpx.MockTransport(
@@ -131,6 +136,7 @@ async def test_count_posts_the_filter_array_and_returns_an_int() -> None:
     }
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_a_distribution_omits_the_bin_spec_for_a_categorical_variable() -> None:
     seen: list[httpx.Request] = []
 
@@ -156,6 +162,7 @@ async def test_a_distribution_omits_the_bin_spec_for_a_categorical_variable() ->
     assert response.histogram[0].value == 4011
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_a_distribution_sends_a_bin_spec_when_one_is_given() -> None:
     seen: list[dict[str, object]] = []
 
@@ -175,6 +182,7 @@ async def test_a_distribution_sends_a_bin_spec_when_one_is_given() -> None:
     assert seen[0]["binSpec"] == {"binWidth": 7.0, "binUnits": "day"}
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_submit_compute_sends_autostart_and_the_study_id() -> None:
     seen: list[httpx.Request] = []
 
@@ -199,6 +207,7 @@ async def test_submit_compute_sends_autostart_and_the_study_id() -> None:
     assert len(job.job_id) == 32
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_a_statistics_read_repeats_the_submit_body_that_addresses_the_job() -> (
     None
 ):
@@ -239,6 +248,7 @@ async def test_a_statistics_read_repeats_the_submit_body_that_addresses_the_job(
     assert len(stats.statistics) == 201
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_get_job_addresses_the_job_by_its_derivable_id() -> None:
     seen: list[httpx.Request] = []
 

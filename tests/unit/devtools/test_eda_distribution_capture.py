@@ -21,9 +21,10 @@ from veupathdb.devtools.eda_capture import (
 from veupathdb.devtools.eda_schemas import BINDINGS, verify_wire_body
 from veupathdb.eda import EdaClient
 from veupathdb.json_types import JSONObject
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
 
-_BASE = "https://plasmodb.org/eda"
+_BASE = "https://qa.plasmodb.org/eda"
 _SPECIES = {
     "entityId": "GENE_PHENOTYPE_DATA_ENTITY",
     "variableId": "VAR_035294d0",
@@ -143,6 +144,7 @@ async def test_a_capture_posts_the_request_and_keeps_the_first_bins() -> None:
     }
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_a_write_keeps_the_body_and_states_the_trim(tmp_path: Path) -> None:
     (tmp_path / "provenance.json").write_text(
         (FIXTURE_DIR / "provenance.json").read_text()

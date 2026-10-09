@@ -12,8 +12,8 @@ from veupathdb.wdk.factory import (
 def test_the_vdi_base_url_is_the_site_origin_plus_vdi() -> None:
     site = get_site("plasmodb")
 
-    assert site.base_url == "https://plasmodb.org/plasmo/service"
-    assert site.vdi_base_url == "https://plasmodb.org/vdi"
+    assert site.base_url == "https://qa.plasmodb.org/plasmo.qa/service"
+    assert site.vdi_base_url == "https://qa.plasmodb.org/vdi"
 
 
 def test_every_configured_site_derives_a_vdi_base_url() -> None:
@@ -25,8 +25,8 @@ def test_every_configured_site_derives_a_vdi_base_url() -> None:
 def test_the_dataset_page_sits_beside_the_strategy_pages() -> None:
     site = get_site("plasmodb")
 
-    assert site.dataset_url("soV5JEQEcF00p") == (
-        "https://plasmodb.org/plasmo/app/workspace/datasets/soV5JEQEcF00p"
+    assert site.dataset_url("vdiTestData01") == (
+        "https://qa.plasmodb.org/plasmo.qa/app/workspace/datasets/vdiTestData01"
     )
 
 
@@ -37,4 +37,4 @@ def test_the_factory_builds_one_client_per_site() -> None:
 
     assert first is again
     assert first is not other
-    assert first.base_url == "https://plasmodb.org/vdi"
+    assert first.base_url == "https://qa.plasmodb.org/vdi"

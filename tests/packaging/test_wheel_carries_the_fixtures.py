@@ -1,10 +1,13 @@
 """The built wheel carries the recorded stores, and an installed copy reads them."""
 
 import subprocess
+import tarfile
 import zipfile
 from pathlib import Path
 
 import pytest
+
+from veupathdb.testing import NEEDS_QA_RECORDING
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_SOURCE = PROJECT_ROOT / "src" / "veupathdb" / "testing" / "fixtures"
@@ -77,6 +80,27 @@ def test_the_wheel_holds_every_recorded_file(built_wheel: Path) -> None:
 
 
 @pytest.mark.wheel
+def test_the_wheel_carries_the_qa_list_and_no_production_list(
+    built_wheel: Path,
+) -> None:
+    with zipfile.ZipFile(built_wheel) as archive:
+        names = set(archive.namelist())
+    assert "veupathdb/testing/qa_sites.yaml" in names
+    assert "veupathdb/sites.yaml" not in names
+    assert not any("production" in name for name in names)
+
+
+@pytest.mark.wheel
+def test_the_sdist_leaves_the_production_backup_out(workspace: Path) -> None:
+    (sdist,) = sorted((workspace / "dist").glob("*.tar.gz"))
+    with tarfile.open(sdist) as archive:
+        names = archive.getnames()
+    assert any(name.endswith("/qa_sites.yaml") for name in names)
+    assert not any("fixtures-production-backup" in name for name in names)
+
+
+@pytest.mark.wheel
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_an_installed_copy_reads_both_stores(installed_env: Path) -> None:
     """An interpreter that holds only the wheel reads a WDK and two EDA fixtures."""
     finished = subprocess.run(

@@ -5,10 +5,13 @@ from __future__ import annotations
 import pytest
 from tests.unit.wdk._step_writes import Recorder
 
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.strategy_api.api import StrategyAPI
 from veupathdb.wdk.wdk_models import WDKFilterValue
+
+pytestmark = pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 
 _ONE_PER_GENE = WDKFilterValue(name="representativeTranscriptOnly", value={})
 _PAGE = {"offset": 0, "numRecords": 10}

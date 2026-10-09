@@ -1,6 +1,7 @@
-"""What a consumer's suite reads: the recorded stores, the live tally and the account."""
+"""What a consumer's suite reads: the recorded stores, the QA site list, the live tally and the account."""
 
 from veupathdb.testing.fixture_store import FIXTURE_ROOT
+from veupathdb.testing.qa_sites import NEEDS_QA_RECORDING, QA_SITES_FILE
 from veupathdb.testing.summary import (
     DriftLog,
     LiveLaneSummary,
@@ -18,7 +19,9 @@ from veupathdb.testing.wdk_credentials import (
 
 __all__ = [
     "FIXTURE_ROOT",
+    "NEEDS_QA_RECORDING",
     "NO_CREDENTIALS_REASON",
+    "QA_SITES_FILE",
     "DriftLog",
     "LiveLaneSummary",
     "Observation",

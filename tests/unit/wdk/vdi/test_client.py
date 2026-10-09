@@ -21,6 +21,7 @@ from tests.unit.wdk.vdi._wire import (
 )
 
 from veupathdb.errors import WDKLoginRequiredError
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.wdk.vdi.client import (
     VdiDatasetGoneError,
     VdiServiceError,
@@ -134,6 +135,7 @@ class _Recorder:
 
 @pytest.mark.usefixtures("registered_token")
 class TestCreatingAGeneList:
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_the_request_is_a_multipart_post_carrying_details_and_the_file(
         self,
     ) -> None:
@@ -164,6 +166,7 @@ class TestCreatingAGeneList:
         }
         assert "PF3D7_1133400\nPF3D7_0709000\n" in sent
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_the_uploaded_file_holds_one_gene_id_per_line(self) -> None:
         recorder = _Recorder(202, recorded("dataset_post_response"))
         client = vdi_client(recorder.transport())
@@ -180,6 +183,7 @@ class TestCreatingAGeneList:
         ]
         assert parts[1].body == b"PF3D7_1133400\nPF3D7_0709000\n"
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_a_gene_list_with_no_ids_is_refused_before_the_call(self) -> None:
         recorder = _Recorder(202, recorded("dataset_post_response"))
         client = vdi_client(recorder.transport())
@@ -190,6 +194,7 @@ class TestCreatingAGeneList:
 
         assert recorder.requests == []
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_the_request_carries_the_bearer_the_service_accepted(self) -> None:
         recorder = _Recorder(202, recorded("dataset_post_response"))
         client = vdi_client(recorder.transport())
@@ -202,6 +207,7 @@ class TestCreatingAGeneList:
 
 @pytest.mark.usefixtures("registered_token")
 class TestReadingAndRemoving:
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_get_reads_the_three_status_axes(self) -> None:
         recorder = _Recorder(200, recorded("dataset_installed"))
         client = vdi_client(recorder.transport())
@@ -241,6 +247,7 @@ class TestReadingAndRemoving:
 
 @pytest.mark.usefixtures("registered_token")
 class TestCreatingAnRnaSeqRcDataset:
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_create_rnaseqrc_sends_details_and_one_part_per_file(self) -> None:
         router = _Router(_upload_routes())
         client = vdi_client(router.transport())
@@ -284,6 +291,7 @@ class TestCreatingAnRnaSeqRcDataset:
             ),
         ]
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_the_extensions_come_from_the_plugin_listing(self) -> None:
         router = _Router(_upload_routes())
         client = vdi_client(router.transport())
@@ -300,6 +308,7 @@ class TestCreatingAnRnaSeqRcDataset:
             ("GET", "/vdi/plugins")
         ]
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_details_for_another_type_are_refused_before_any_call(
         self,
     ) -> None:
@@ -316,6 +325,7 @@ class TestCreatingAnRnaSeqRcDataset:
 
 @pytest.mark.usefixtures("registered_token")
 class TestListingAndPlugins:
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_list_datasets_sends_the_target_and_owned(self) -> None:
         router = _Router({("GET", "/vdi/datasets"): (200, recorded("datasets_owned"))})
         client = vdi_client(router.transport())
@@ -360,6 +370,7 @@ class TestListingAndPlugins:
             "ownership": "shared",
         }
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     @pytest.mark.usefixtures("deployment_token")
     async def test_plugins_carries_no_credential(self) -> None:
         router = _Router({("GET", "/vdi/plugins"): (200, recorded("plugins"))})
@@ -388,6 +399,7 @@ class TestTheClientNeverActsWithoutTheUsersOwnLogin:
             await client.get(PROBE_ID)
         await client.close()
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_a_call_with_no_registered_token_is_refused(self) -> None:
         recorder = _Recorder(200, recorded("dataset_installed"))
         client = vdi_client(recorder.transport())
@@ -422,6 +434,7 @@ class TestTheClientNeverActsWithoutTheUsersOwnLogin:
             await client.list_datasets("PlasmoDB")
         await client.close()
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     @pytest.mark.usefixtures("deployment_token")
     async def test_an_rnaseqrc_upload_never_travels_as_the_deployment(self) -> None:
         router = _Router(_upload_routes())
@@ -447,6 +460,7 @@ class TestAFailureNamesTheServiceAndTheStatus:
         assert caught.value.status == 422
         assert caught.value.detail == "POST /vdi/datasets: no such type"
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_an_invalid_input_refusal_carries_the_services_reason(
         self,
     ) -> None:

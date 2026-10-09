@@ -3,11 +3,12 @@ from __future__ import annotations
 import httpx
 import pytest
 
+from veupathdb.testing import QA_SITES_FILE
 from veupathdb.wdk.site_router import load_sites_config
 
 pytestmark = [pytest.mark.live_wdk, pytest.mark.asyncio]
 
-_SITES = load_sites_config(None).sites
+_SITES = load_sites_config(str(QA_SITES_FILE)).sites
 
 
 @pytest.mark.parametrize("site_id", sorted(_SITES))

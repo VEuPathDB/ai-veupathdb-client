@@ -30,7 +30,7 @@ _WITH_NO_HIDDEN_DEFAULT = """
 def _document(name: str, text: str, status: int = 200) -> WDKProbe:
     return WDKProbe(
         method="GET",
-        url=f"https://plasmodb.org/plasmo/service/{name}",
+        url=f"https://qa.plasmodb.org/plasmo.qa/service/{name}",
         status=status,
         contentType="application/json",
         text=text,

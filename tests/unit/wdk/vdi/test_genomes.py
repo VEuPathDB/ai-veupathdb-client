@@ -12,10 +12,13 @@ from tests.unit.wdk.vdi._wire import recorded
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.settings import VEuPathDBSettings, use_veupathdb_settings_source
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.wdk.vdi.genomes import reference_genomes
 from veupathdb.wdk.vdi.models import VdiDatasetDependency
 
-_SERVICE = "https://plasmodb.org/plasmo/service"
+pytestmark = pytest.mark.skip(reason=NEEDS_QA_RECORDING)
+
+_SERVICE = "https://qa.plasmodb.org/plasmo.qa/service"
 _GENOMES = f"{_SERVICE}/record-types/organism/searches/GenomeDataTypes/reports/standard"
 
 
@@ -79,7 +82,7 @@ async def test_reference_genomes_build_the_sites_identifier() -> None:
     }
 
 
-_GIARDIA = "https://giardiadb.org/giardiadb/service"
+_GIARDIA = "https://qa.giardiadb.org/giardiadb.qa/service"
 
 
 @pytest.mark.usefixtures("no_credential")

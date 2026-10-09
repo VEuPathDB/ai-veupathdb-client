@@ -15,4 +15,4 @@ A pinned `tree` link, which is how a repo is named without naming a branch:
 https://github.com/VEuPathDB/ApiCommonModel/tree/301b2be012af713411e9b0e216ed93c51d04c239/
 
 A non-github URL is not a citation of upstream and is left alone:
-https://plasmodb.org/plasmo/service/record-types/transcript/searches
+https://qa.plasmodb.org/plasmo.qa/service/record-types/transcript/searches

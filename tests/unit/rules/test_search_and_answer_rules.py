@@ -7,6 +7,7 @@ from typing import Any
 import pytest
 
 from veupathdb.json_types import JSONObject
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk._failures import wdk_failure
 from veupathdb.wdk.client import VEuPathDBClient
@@ -49,6 +50,7 @@ def _search_body() -> JSONObject:
     return search
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_wdk_ans_001_a_step_report_body_carries_only_the_report_config(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -60,6 +62,7 @@ async def test_wdk_ans_001_a_step_report_body_carries_only_the_report_config(
     assert list(report.bodies[0]) == ["reportConfig"]
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_wdk_ans_002_no_attributes_asked_for_sends_no_attributes_key(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -71,6 +74,7 @@ async def test_wdk_ans_002_no_attributes_asked_for_sends_no_attributes_key(
     assert "attributes" not in report.bodies[0]["reportConfig"]
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_wdk_ans_003_a_count_asks_for_zero_records(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -85,6 +89,7 @@ async def test_wdk_ans_003_a_count_asks_for_zero_records(
     }
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_wdk_ans_005_a_paged_read_goes_through_the_standard_reporter(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -106,6 +111,7 @@ def test_wdk_ans_007_the_word_plugin_serves_its_description_as_pathway_name() ->
     assert row.pathway_name == "protein kinase activity"
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_wdk_search_001_the_wrong_record_type_is_a_404_naming_the_record_class() -> (
     None
 ):
@@ -122,6 +128,7 @@ def test_wdk_search_001_the_wrong_record_type_is_a_404_naming_the_record_class()
     assert "OrganismRecordClass" in str(refusal)
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_wdk_search_002_the_full_name_is_not_an_address_and_the_url_segment_is() -> (
     None
 ):
@@ -135,6 +142,7 @@ def test_wdk_search_002_the_full_name_is_not_an_address_and_the_url_segment_is()
     assert recorded.provenance.url.endswith(f"/searches/{search.full_name}")
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_wdk_search_004_the_parameter_list_is_param_names_and_a_group_is_presentation() -> (
     None
 ):
@@ -151,6 +159,7 @@ def test_wdk_search_004_the_parameter_list_is_param_names_and_a_group_is_present
     assert [param.name for param in search.parameters or []] == search.param_names
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_wdk_ans_010_an_empty_search_config_still_sends_its_parameters(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

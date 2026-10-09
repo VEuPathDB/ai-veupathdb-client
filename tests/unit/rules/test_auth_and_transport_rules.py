@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import pytest
+
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk._failures import bundle_rows, validation_bundle, wdk_failure
 
@@ -10,6 +13,7 @@ _REFRESH = (
 )
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_wdk_http_002_a_422_serves_json_under_text_plain() -> None:
     """The recorded 422 is `text/plain` and its body parses as a bundle."""
     recorded = load_recorded("refresh_with_a_value_outside_the_vocabulary")
@@ -19,6 +23,7 @@ def test_wdk_http_002_a_422_serves_json_under_text_plain() -> None:
     assert validation_bundle(recorded.raw_text()) is not None
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_wdk_http_002_the_status_is_what_the_refusal_carries() -> None:
     """A refusal keeps the status it arrived with, whatever the body is."""
     recorded = load_recorded("refresh_without_changed_param")
@@ -30,6 +35,7 @@ def test_wdk_http_002_the_status_is_what_the_refusal_carries() -> None:
     assert validation_bundle(recorded.raw_text()) is None
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_wdk_valid_006_an_unspecified_level_carries_prose_and_no_keyed_row() -> None:
     """`UNSPECIFIED` marks a bundle whose message names no parameter."""
     recorded = load_recorded("refresh_with_a_value_outside_the_vocabulary")

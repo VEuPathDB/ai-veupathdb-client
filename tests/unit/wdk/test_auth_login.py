@@ -75,9 +75,9 @@ def _token(
 ) -> str:
     return jwt.encode(
         {
-            "sub": "1248677203",
+            "sub": "1000000103",
             "is_guest": is_guest,
-            "iss": "https://auth.veupathdb.org",
+            "iss": OAUTH_URL,
             "aud": "apiComponentSite",
             "azp": "apiComponentSite",
             "exp": int(time.time()) + expires_in,
@@ -95,7 +95,7 @@ async def test_a_registered_user_token_validates() -> None:
     claims = await validate_oauth_token(_token(private_key), OAUTH_URL)
 
     assert claims is not None
-    assert claims.sub == "1248677203"
+    assert claims.sub == "1000000103"
     assert claims.is_guest is False
 
 
@@ -229,7 +229,7 @@ async def test_the_signing_key_is_fetched_once_for_many_tokens() -> None:
 
 @respx.mock
 async def test_the_logout_sends_the_token_as_the_authorization_cookie() -> None:
-    route = respx.get("https://plasmodb.org/plasmo/service/logout").mock(
+    route = respx.get("https://qa.plasmodb.org/plasmo.qa/service/logout").mock(
         return_value=httpx.Response(302, headers={"location": "/"})
     )
 
@@ -239,7 +239,7 @@ async def test_the_logout_sends_the_token_as_the_authorization_cookie() -> None:
 
 @respx.mock
 async def test_a_refused_logout_reports_that_no_session_ended() -> None:
-    respx.get("https://plasmodb.org/plasmo/service/logout").mock(
+    respx.get("https://qa.plasmodb.org/plasmo.qa/service/logout").mock(
         return_value=httpx.Response(500, text="boom")
     )
 
@@ -253,7 +253,7 @@ async def test_a_refused_logout_reports_that_no_session_ended() -> None:
 
 @respx.mock
 async def test_an_unreachable_site_reports_that_no_session_ended() -> None:
-    respx.get("https://plasmodb.org/plasmo/service/logout").mock(
+    respx.get("https://qa.plasmodb.org/plasmo.qa/service/logout").mock(
         side_effect=httpx.ConnectError("refused")
     )
 

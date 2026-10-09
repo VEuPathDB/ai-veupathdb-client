@@ -1,5 +1,17 @@
 # Knowledge log
 
+## 2026-10-09 - Tests run against QA, and a deployment names its site list
+
+The package ships no default site list: `load_sites_config` raises
+`SitesConfigNotSetError` when `VEUPATHDB_SITES_CONFIG` names no file, and the production
+list is `docs/sites/production.yaml`. The wheel carries the QA list at
+`veupathdb.testing.QA_SITES_FILE`; every test and every recorder reads it, and no
+recorder takes an option that reaches another list. The bodies recorded on production
+moved to `fixtures-production-backup-2026-10-09/`; `verify` names each missing body and
+every test that reads one is skipped with `NEEDS_QA_RECORDING`.
+`scripts/check-test-sites.mjs` fails on a production or beta host outside `docs/`
+([decision](decisions/tests-run-against-qa-and-a-deployment-names-its-sites.md)).
+
 ## 2026-10-07 - The portal's project id is UniDB
 
 The `veupathdb` site's `project_id` is `UniDB`, the id the portal's WDK `GET /service`,

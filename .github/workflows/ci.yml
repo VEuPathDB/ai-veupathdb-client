@@ -51,6 +51,11 @@ jobs:
       - name: Check that the wheel carries the recorded stores
         run: uv run pytest tests/packaging -m wheel --override-ini addopts=''
 
+      - name: Check that no test, recorder or default names a production site
+        run: |
+          node scripts/check-test-sites.mjs
+          node --test scripts/check-test-sites.test.mjs
+
       - name: Check the knowledge bundle
         run: |
           node scripts/check-knowledge.mjs

@@ -11,6 +11,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.ai_expression import (
     AI_EXPRESSION_REPORT_PATH,
@@ -83,6 +84,7 @@ class TestTheRecordedSummarizedGene:
         report = await client.get_ai_expression_report(f"{SUMMARIZED_GENE},PlasmoDB")
         return report.gene(SUMMARIZED_GENE)
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_the_summary_and_its_topics_parse(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -116,6 +118,7 @@ class TestTheRecordedSummarizedGene:
             "sense/antisense transcription",
         ]
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_every_summary_line_names_its_experiment_and_assay(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -135,6 +138,7 @@ class TestTheRecordedSummarizedGene:
         assert {line.assay_type for line in lines} == {"RNA-Seq", "array"}
         assert len({line.experiment_name for line in lines}) == 41
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_the_absent_counts_read_none_and_not_zero(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -145,6 +149,7 @@ class TestTheRecordedSummarizedGene:
         assert gene.num_experiments_complete is None
         assert gene.experiment_status == {}
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_it_states_that_the_summary_covers_every_experiment(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -153,6 +158,7 @@ class TestTheRecordedSummarizedGene:
         assert gene is not None
         assert gene.based_on_incomplete_data is False
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_the_report_names_only_the_gene_that_was_asked_for(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -176,6 +182,7 @@ class TestTheRecordedGeneWithExperimentsOutstanding:
         report = await client.get_ai_expression_report(f"{INCOMPLETE_GENE},PlasmoDB")
         return report.gene(INCOMPLETE_GENE)
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_it_carries_the_counts_and_no_summary(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -187,6 +194,7 @@ class TestTheRecordedGeneWithExperimentsOutstanding:
         assert gene.num_experiments == 41
         assert gene.num_experiments_complete == 0
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_every_experiment_of_it_reads_expired(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -196,6 +204,7 @@ class TestTheRecordedGeneWithExperimentsOutstanding:
         assert len(gene.experiment_status) == 41
         assert set(gene.experiment_status.values()) == {AiExpressionStatus.EXPIRED}
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     async def test_an_entry_that_omits_the_flag_reads_none(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:

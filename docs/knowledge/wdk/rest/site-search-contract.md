@@ -78,9 +78,9 @@ Nothing else is on the line. **A streamed record carries no organism, no product
 name and no matched fields**, which is why a consumer describes a streamed identifier from
 WDK before showing it.
 
-The pinned response is
-`src/veupathdb/testing/fixtures/wdk/site_search_stream_genes.json`, recorded from
-plasmodb.org on 2026-09-04. Re-record it with the request in
+The pinned response is `site_search_stream_genes.json`, recorded from production
+PlasmoDB on 2026-09-04 and held in `fixtures-production-backup-2026-10-09/wdk/` until a
+QA recording replaces it. Re-record it with the request in
 `pathfinder: apps/api/src/pathfinder/tests/live/test_site_search_stream_drift.py`, which
 is also what checks it against the live service.
 

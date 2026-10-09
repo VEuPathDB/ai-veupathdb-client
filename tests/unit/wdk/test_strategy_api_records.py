@@ -22,7 +22,7 @@ def _api(monkeypatch: pytest.MonkeyPatch) -> tuple[StrategyAPI, VEuPathDBClient]
 
     async def get(path: str, **_: object) -> Any:
         del path
-        return {"id": 4315616, "isGuest": False}
+        return {"id": 1000000104, "isGuest": False}
 
     monkeypatch.setattr(client, "get", get)
     return StrategyAPI(client), client
@@ -41,7 +41,7 @@ async def test_wdk_filter_006_a_refusal_is_not_treated_as_a_broken_request(
 
     monkeypatch.setattr(client, "post", post)
 
-    result = await api.get_column_distribution(440085983, "primary_key")
+    result = await api.get_column_distribution(900000001, "primary_key")
 
     assert result == WDKColumnDistribution()
 
@@ -58,8 +58,8 @@ async def test_wdk_filter_006_the_distribution_is_asked_of_the_step(
 
     monkeypatch.setattr(client, "post", post)
 
-    await api.get_column_distribution(440085983, "gene_product")
+    await api.get_column_distribution(900000001, "gene_product")
 
     assert paths == [
-        "/users/4315616/steps/440085983/columns/gene_product/reports/byValue"
+        "/users/1000000104/steps/900000001/columns/gene_product/reports/byValue"
     ]

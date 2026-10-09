@@ -31,7 +31,7 @@ class VEuPathDBSettings(BaseSettings):
 
     veupathdb_sites_config: str | None = Field(
         default=None,
-        description="Optional path to a YAML file for site list and base URLs; defaults to bundled sites.yaml if unset.",
+        description="Path to the YAML file that lists the sites this deployment reaches. Required: the package ships no default list, and the first site read fails without one.",
     )
     veupathdb_auth_token: str | None = Field(default=None, repr=False)
     veupathdb_oauth_url: str = Field(

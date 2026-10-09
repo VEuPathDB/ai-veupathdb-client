@@ -18,6 +18,7 @@ from veupathdb.domain.parameters.wdk_vocab import (
     flatten_vocab,
 )
 from veupathdb.json_types import JSONObject
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.wdk_models import WDKSearchResponse
@@ -48,6 +49,7 @@ class _Echo:
         return self._body
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_wdk_param_007_a_numeric_bound_is_a_string_parameter_flagged_is_number() -> (
     None
 ):
@@ -59,6 +61,7 @@ def test_wdk_param_007_a_numeric_bound_is_a_string_parameter_flagged_is_number()
     assert bound["isNumber"] is True
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_wdk_param_008_the_revise_endpoint_answer_is_what_wdk_substituted(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -80,6 +83,7 @@ async def test_wdk_param_008_the_revise_endpoint_answer_is_what_wdk_substituted(
     )
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_wdk_param_011_a_hidden_required_parameter_is_filled_from_its_default() -> None:
     """`isVisible: false` hides the parameter; WDK still requires a value."""
     recorded = _recorded_parameters("search_with_a_hidden_required_parameter")
@@ -112,6 +116,7 @@ def test_wdk_vocab_001_the_synthetic_root_is_not_a_selectable_term() -> None:
     assert [option.value for option in flatten_vocab(tree)] == ["pfal"]
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_wdk_vocab_003_the_order_of_dependent_params_carries_nothing() -> None:
     """A parent fills before its dependents, whatever order the list arrived in."""
     recorded = _recorded_parameters("search_genes_by_location")
@@ -173,6 +178,7 @@ async def test_wdk_vocab_005_an_empty_array_names_no_stale_dependent(
     assert refreshed == []
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 @pytest.mark.parametrize(
     ("fixture", "marked"),
     [
@@ -192,6 +198,7 @@ def test_wdk_param_013_the_organism_parameter_is_the_one_wdk_marks(
     assert [p.name for p in search.parameters or [] if p.is_organism] == [marked]
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_wdk_param_013_an_organisms_property_is_not_the_mark() -> None:
     """Every GenesByLocation parameter lists `organisms`; only one is marked."""
     search = WDKSearchResponse.model_validate(

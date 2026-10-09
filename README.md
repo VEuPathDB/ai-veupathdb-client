@@ -59,7 +59,7 @@ from veupathdb.wdk import (
 
 
 def site_ids() -> list[str]:
-    """Every site the bundled sites.yaml declares."""
+    """Every site the site list in force declares."""
     return [site.id for site in list_sites()]
 
 
@@ -98,15 +98,21 @@ if __name__ == "__main__":
     asyncio.run(kinase_step("<a registered VEuPathDB token>"))
 ```
 
-## Where `sites.yaml` comes from
+## A deployment names its site list
 
-The package bundles `veupathdb/sites.yaml`: 12 sites, their base URLs and
-project ids, plus `routing.portal_timeout` and `routing.component_timeout`.
-`veupathdb.wdk.load_sites_config` reads it through
-`importlib.resources`. To serve a different list, point
-`VEUPATHDB_SITES_CONFIG` at your own YAML of the same shape
-(`src/veupathdb/sites-plasmodb.yaml` is a one-site example), or install a
-settings source with `veupathdb.use_veupathdb_settings_source`.
+The package ships no default site list. A deployment points
+`VEUPATHDB_SITES_CONFIG` at a YAML file that names its sites, their base URLs
+and project ids, plus `routing.portal_timeout` and `routing.component_timeout`,
+or installs a settings source that names one with
+`veupathdb.use_veupathdb_settings_source`. A process with neither fails at its
+first site read with `veupathdb.wdk.SitesConfigNotSetError`, which names the
+setting.
+
+`docs/sites/production.yaml` lists the production sites, for a deployment that
+serves production to copy. It is not in the wheel. The wheel carries one list,
+the QA sites (`qa.<site>.org/<project>.qa/service`), at
+`veupathdb.testing.QA_SITES_FILE`: the list every test and every recorder in
+this repository reads.
 
 A settings source may be installed at any point in the process. Installing one
 drops the site router, the cached sites config and every cached per-site
@@ -212,7 +218,11 @@ WDK_TEST_EMAIL=... WDK_TEST_PASSWORD=... \
 ```
 
 The hermetic lane opens no socket and needs no credential. The live lane skips
-without `WDK_TEST_TOKEN`, or `WDK_TEST_EMAIL` and `WDK_TEST_PASSWORD`.
+without `WDK_TEST_TOKEN`, or `WDK_TEST_EMAIL` and `WDK_TEST_PASSWORD`. Both
+lanes read the QA site list, whatever the environment names: `tests/conftest.py`
+puts `veupathdb.testing.QA_SITES_FILE` in force for every test. No test reaches
+a production or beta site, and `node scripts/check-test-sites.mjs` fails on a
+production or beta host anywhere in this repository outside `docs/`.
 
 The recorded WDK and EDA bodies, their schema pins and the vendored schema
 trees live inside the package, under
@@ -224,9 +234,18 @@ installed copy reads them.
 path of its own. `veupathdb.testing.eda_fixtures.recorded_distribution(name)` reads
 one recorded `/distribution` body as an `EdaDistributionResponse`.
 
-Recorded bodies and vendored schemas are refreshed, never hand-edited. The two
-schema readers ride the `devtools` extra, so an installed copy runs the six
-commands after `pip install "veupathdb-py[devtools]"`:
+Recorded bodies and vendored schemas are refreshed, never hand-edited. Every
+recorder (`fixtures record`, `eda_capture record`, `vdi_capture record`) puts
+the QA site list in force before it sends a request, and `capture_wdk` keeps
+only exchanges with a QA host, so no recorder reaches a production or beta site
+and none takes a flag that would. The bodies recorded on production sites are
+out of the package, under `fixtures-production-backup-2026-10-09/`, which no
+test and no build reads. Until the QA sites are recorded, the store holds the
+vendored schemas only: `verify` names each missing body, and every test that
+reads one is skipped with `veupathdb.testing.NEEDS_QA_RECORDING` as its reason.
+
+The two schema readers ride the `devtools` extra, so an installed copy runs the
+six commands after `pip install "veupathdb-py[devtools]"`:
 
 ```
 uv run python -m veupathdb.devtools.fixtures record     # needs VEUPATHDB_AUTH_TOKEN

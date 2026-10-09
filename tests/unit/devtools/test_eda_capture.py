@@ -22,9 +22,10 @@ from veupathdb.devtools.eda_capture import (
 from veupathdb.eda import EdaAnalysesClient, EdaAnalysisDescriptor, EdaClient
 from veupathdb.eda.errors import EdaServerError
 from veupathdb.json_types import JSONObject
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
 
-_BASE = "https://plasmodb.org/eda"
+_BASE = "https://qa.plasmodb.org/eda"
 _USER = "1234"
 _ROOT = f"/eda/users/{_USER}/analyses/PlasmoDB"
 _STORED: JSONObject = {
@@ -102,6 +103,7 @@ async def test_a_failed_read_still_deletes_the_analysis() -> None:
     assert [r.method for r in seen] == ["POST", "PATCH", "GET", "DELETE"]
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_a_write_keeps_the_body_and_names_no_account(tmp_path: Path) -> None:
     (tmp_path / "provenance.json").write_text(
         (FIXTURE_DIR / "provenance.json").read_text()
@@ -136,6 +138,7 @@ def test_a_write_keeps_the_body_and_names_no_account(tmp_path: Path) -> None:
     )
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_the_store_provenance_reads_back_unchanged() -> None:
     """Every entry on disk survives a read and a write through the model."""
     on_disk = json.loads((FIXTURE_DIR / "provenance.json").read_text())

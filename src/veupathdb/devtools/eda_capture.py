@@ -29,6 +29,7 @@ from urllib.parse import urlencode
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, TypeAdapter
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
+from veupathdb.devtools.qa_sites import use_qa_sites
 from veupathdb.domain import VEUPATHDB_GENE_ID
 from veupathdb.eda.analyses import EdaAnalysesClient
 from veupathdb.eda.client import (
@@ -612,7 +613,8 @@ def write_post(
 
 
 async def record_analyses(wanted: list[AnalysisCapture]) -> int:
-    """Record each analysis capture under the registered test account."""
+    """Record each analysis capture on its QA site under the registered test account."""
+    use_qa_sites()
     if not wanted:
         return 0
     token = await registered_wdk_token()
@@ -642,7 +644,8 @@ async def record_analyses(wanted: list[AnalysisCapture]) -> int:
 
 
 async def record_distributions(wanted: list[DistributionCapture]) -> int:
-    """Record each distribution capture under the deployment's token."""
+    """Record each distribution capture on its QA site under the deployment's token."""
+    use_qa_sites()
     today = datetime.datetime.now(tz=datetime.UTC).date().isoformat()
     for capture in wanted:
         body = await capture_distribution(capture, client=get_eda_client(capture.site))
@@ -658,7 +661,8 @@ async def record_distributions(wanted: list[DistributionCapture]) -> int:
 
 
 async def record_posts(wanted: list[PostCapture]) -> int:
-    """Record each POST capture under the deployment's token."""
+    """Record each POST capture on its QA site under the deployment's token."""
+    use_qa_sites()
     today = datetime.datetime.now(tz=datetime.UTC).date().isoformat()
     for capture in wanted:
         captured = await capture_post(capture, client=get_eda_client(capture.site))
@@ -683,7 +687,8 @@ def _declared() -> list[tuple[str, str]]:
 
 
 async def record(names: list[str]) -> int:
-    """Record the named captures, or every capture when none are named."""
+    """Record the named captures on the QA sites, or every capture when none are named."""
+    use_qa_sites()
     unknown = sorted(set(names) - {name for name, _site in _declared()})
     if unknown:
         msg = f"no capture is named {', '.join(unknown)}"

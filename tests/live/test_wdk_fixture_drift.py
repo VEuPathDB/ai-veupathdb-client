@@ -10,10 +10,15 @@ import pytest
 from pydantic import JsonValue
 from tests.live.conftest import Probe
 
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.summary import DriftLog
 from veupathdb.testing.wdk_fixtures import FIXTURES, FixtureRequest, load_recorded
 
-pytestmark = [pytest.mark.live_wdk, pytest.mark.asyncio]
+pytestmark = [
+    pytest.mark.live_wdk,
+    pytest.mark.asyncio,
+    pytest.mark.skip(reason=NEEDS_QA_RECORDING),
+]
 
 
 def _shape(body: JsonValue) -> str:

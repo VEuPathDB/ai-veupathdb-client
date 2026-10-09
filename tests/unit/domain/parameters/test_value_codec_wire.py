@@ -38,6 +38,7 @@ from veupathdb.domain.parameters.values import (
     TimestampValue,
 )
 from veupathdb.domain.parameters.wdk_vocab import vocab_keys
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.wdk_models import WDKSearchResponse
 
@@ -68,7 +69,7 @@ _ONE_OF_EVERY_KIND: dict[str, ParamValue] = {
     "a_multi_pick": MultiPickValue(values=["product", "name"]),
     "a_filter": FilterValue(filters=[FilterTermClause(field="organism")]),
     "an_input_dataset": InputDatasetValue(dataset_id="558341"),
-    "an_input_step": InputStepValue(step_id="440085983"),
+    "an_input_step": InputStepValue(step_id="900000001"),
 }
 
 
@@ -82,6 +83,7 @@ class TestWdkParam001ElevenTypes:
     def test_wdk_param_001_param_kind_is_exactly_the_eleven(self) -> None:
         assert frozenset(get_args(ParamKind)) == _THE_ELEVEN
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_param_001_display_type_is_a_separate_axis(self) -> None:
         # organismSinglePick is a multi-pick parameter drawn as a select.
         params = {p.name: p for p in _genes_by_location().search_data.parameters or []}
@@ -89,6 +91,7 @@ class TestWdkParam001ElevenTypes:
         assert params["organismSinglePick"].type == "multi-pick-vocabulary"
         assert params["organismSinglePick"].display_type == "select"
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_param_001_a_select_multi_pick_still_sends_a_list(self) -> None:
         params = {p.name: p for p in _genes_by_location().search_data.parameters or []}
         kind = as_param_kind(params["organismSinglePick"].type)
@@ -97,6 +100,7 @@ class TestWdkParam001ElevenTypes:
 
         assert value == MultiPickValue(values=["Plasmodium falciparum 3D7"])
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_param_001_every_declared_type_is_one_of_the_eleven(self) -> None:
         declared = {p.type for p in _genes_by_location().search_data.parameters or []}
 
@@ -133,7 +137,7 @@ class TestWdkMap001DriftIsNoticedInBothDirections:
             "multi-pick-vocabulary": '["product"]',
             "filter": '{"filters": []}',
             "input-dataset": "558341",
-            "input-step": "440085983",
+            "input-step": "900000001",
         }
 
         assert frozenset(wire_by_kind) == _THE_ELEVEN
@@ -187,6 +191,7 @@ class TestWdkParam003SinglePickIsABareTerm:
         with pytest.raises(PydanticValidationError):
             SinglePickValue(value=["Gene", "Transcript"])  # type: ignore[arg-type]
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_param_003_the_wire_value_is_one_of_the_declared_terms(self) -> None:
         search = WDKSearchResponse.model_validate(
             load_recorded("search_genes_by_exon_count").json_body()
@@ -202,12 +207,12 @@ class TestWdkParam009HandlesAreBareIssuedIds:
     """WDK-PARAM-009: an input value is an id WDK issued, sent bare."""
 
     def test_wdk_param_009_an_input_step_wire_value_is_the_bare_id(self) -> None:
-        assert InputStepValue(step_id="440085983").to_wire() == "440085983"
+        assert InputStepValue(step_id="900000001").to_wire() == "900000001"
 
     def test_wdk_param_009_an_input_step_id_is_read_back_by_long_parse_long(
         self,
     ) -> None:
-        assert int(InputStepValue(step_id="440085983").to_wire()) == 440085983
+        assert int(InputStepValue(step_id="900000001").to_wire()) == 900000001
 
     def test_wdk_param_009_an_input_dataset_wire_value_is_the_bare_id(self) -> None:
         assert InputDatasetValue(dataset_id="558341").to_wire() == "558341"

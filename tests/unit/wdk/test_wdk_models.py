@@ -14,6 +14,7 @@ import pytest
 from pydantic import ValidationError
 
 from veupathdb.domain.strategy.ops import BOOLEAN_OPERATORS, CombineOp, parse_op
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.wdk_models import (
     CombinedStepSpec,
@@ -301,19 +302,23 @@ class TestComparingAnAttributeToText:
 
 
 class TestWdkStep001KindIsTheAnswerParameterCount:
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_step_001_a_leaf_declares_no_answer_parameter(self) -> None:
         assert _input_step_names(_search("search_genes_by_molecular_weight")) == []
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_step_001_a_transform_declares_one(self) -> None:
         assert _input_step_names(_search("search_genes_by_orthologs")) == [
             "gene_result"
         ]
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_step_001_a_combined_step_declares_two(self) -> None:
         names = _input_step_names(_search("search_boolean_transcript"))
 
         assert len(names) == 2
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_step_001_an_input_parameter_has_no_naming_convention(self) -> None:
         # `bq_left_op_*` is specific to the generated boolean query.
         transform = _search("search_genes_by_orthologs")
@@ -321,6 +326,7 @@ class TestWdkStep001KindIsTheAnswerParameterCount:
         assert _input_step_names(transform) == ["gene_result"]
         assert not any(n.startswith("bq_") for n in _input_step_names(transform))
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_step_001_the_order_of_declaration_is_the_slot_order(self) -> None:
         # Ordinal 0 is the primary input, ordinal 1 the secondary.
         left, right = _input_step_names(_search("search_boolean_transcript"))
@@ -330,6 +336,7 @@ class TestWdkStep001KindIsTheAnswerParameterCount:
 
 
 class TestWdkStep006OperandNamesEmbedTheFullName:
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_step_006_the_operand_names_carry_the_record_class_full_name(
         self,
     ) -> None:
@@ -341,11 +348,13 @@ class TestWdkStep006OperandNamesEmbedTheFullName:
             "bq_operator",
         ]
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_step_006_the_operator_name_is_a_bare_constant(self) -> None:
         search = _search("search_boolean_transcript")
 
         assert "bq_operator" in search.param_names
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_step_006_the_step_reports_the_url_segment_instead(self) -> None:
         # There is no string transformation from one to the other.
         search = _search("search_boolean_transcript")
@@ -355,12 +364,14 @@ class TestWdkStep006OperandNamesEmbedTheFullName:
 
 
 class TestWdkStep008BothOperandsAreOneRecordClass:
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_step_008_the_allowed_inputs_are_the_same_single_class(self) -> None:
         search = _search("search_boolean_transcript")
 
         assert search.allowed_primary_input_record_class_names == ["transcript"]
         assert search.allowed_secondary_input_record_class_names == ["transcript"]
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_step_008_the_result_is_that_same_class(self) -> None:
         assert _search("search_boolean_transcript").output_record_class_name == (
             "transcript"

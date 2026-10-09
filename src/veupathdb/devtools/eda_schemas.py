@@ -37,6 +37,7 @@ from jsonschema import Draft7Validator
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, model_validator
 
 from veupathdb.devtools.pins import VendoredPin, pin_drift
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR, SCHEMA_PIN_FILE, UPSTREAM_DIR
 
 LIBRARY_FILE = "library.raml"
@@ -812,7 +813,7 @@ class BindingCheck(BaseModel):
 
 
 def binding_checks() -> tuple[BindingCheck, ...]:
-    """One check per binding, over the wire document."""
+    """One check per recorded binding, over the wire document."""
     return tuple(
         BindingCheck(
             fixture=binding.fixture,
@@ -822,6 +823,7 @@ def binding_checks() -> tuple[BindingCheck, ...]:
             ),
         )
         for binding in BINDINGS
+        if binding.file.exists()
     )
 
 
@@ -937,6 +939,9 @@ def _verify() -> int:
 
     checks = binding_checks()
     failed = [check for check in checks if check.errors]
+    missing = [binding for binding in BINDINGS if not binding.file.exists()]
+    for binding in missing:
+        print(f"{binding.fixture:42} MISSING {NEEDS_QA_RECORDING}")
     for check in checks:
         state = "FAIL" if check.errors else "PASS"
         print(f"{check.fixture:42} {state:5} {check.raml_type}")
@@ -945,7 +950,8 @@ def _verify() -> int:
 
     bound = tuple(sorted({check.raml_type for check in checks}))
     print(
-        f"{len(checks)} fixture(s), {len(failed)} failed; "
+        f"{len(BINDINGS)} fixture(s), {len(missing)} missing, "
+        f"{len(failed)} failed; "
         f"{len(bound)} bound type(s) reaching {len(reached_types(bound))} "
         f"of {len(pinned().library.types)} pinned; "
         f"{len(SPEC_DEFECTS)} recorded spec defect(s); "

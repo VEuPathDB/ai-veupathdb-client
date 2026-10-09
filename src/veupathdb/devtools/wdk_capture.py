@@ -15,15 +15,15 @@ from urllib.parse import urlparse
 import httpx
 from pydantic import BaseModel
 
-from veupathdb.settings import get_veupathdb_settings
+from veupathdb.testing.qa_sites import QA_SITES_FILE
 from veupathdb.wdk.site_router import load_sites_config
 
 _SAFE = re.compile(r"[^A-Za-z0-9._-]+")
 
 
 def _wdk_hosts() -> frozenset[str]:
-    """Every host the site registry declares."""
-    config = load_sites_config(get_veupathdb_settings().veupathdb_sites_config)
+    """Every host the QA site list declares. A capture records no other site."""
+    config = load_sites_config(str(QA_SITES_FILE))
     hosts = (urlparse(site.base_url).hostname for site in config.sites.values())
     return frozenset(host for host in hosts if host)
 

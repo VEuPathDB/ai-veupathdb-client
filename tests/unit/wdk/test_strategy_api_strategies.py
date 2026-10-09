@@ -20,7 +20,7 @@ def _api(
 
     async def get(path: str, **_: object) -> Any:
         paths.append(path)
-        return {"id": 4315616, "isGuest": False}
+        return {"id": 1000000104, "isGuest": False}
 
     async def post(path: str, **_: object) -> Any:
         paths.append(path)
@@ -40,7 +40,7 @@ async def test_wdk_http_001_a_later_call_carries_the_resolved_id(
 
     assert paths == [
         "/users/current",
-        "/users/4315616/strategies/9/duplicated-step-tree",
+        "/users/1000000104/strategies/9/duplicated-step-tree",
     ]
 
 

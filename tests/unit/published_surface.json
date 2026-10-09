@@ -25,6 +25,7 @@
     "WDKExchange",
     "capture_wdk",
     "is_wdk_host",
+    "use_qa_sites",
     "wdk_record"
   ],
   "veupathdb.devtools.eda_schemas": [
@@ -299,9 +300,11 @@
     "DriftLog",
     "FIXTURE_ROOT",
     "LiveLaneSummary",
+    "NEEDS_QA_RECORDING",
     "NO_CREDENTIALS_REASON",
     "Observation",
     "Outcomes",
+    "QA_SITES_FILE",
     "SiteTally",
     "WdkTestAccount",
     "registered_wdk_token",
@@ -347,6 +350,7 @@
     "SiteSearchDocument",
     "SiteSearchResponse",
     "SiteSearchStreamRecord",
+    "SitesConfigNotSetError",
     "StepsMixin",
     "StrategyAPI",
     "TemporaryResultsAPI",

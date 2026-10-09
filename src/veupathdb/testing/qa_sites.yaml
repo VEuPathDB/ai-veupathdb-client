@@ -1,118 +1,104 @@
-# VEuPathDB Sites Configuration
-# Base URLs and project ID mappings for all VEuPathDB resources.
-# Override this file at runtime with env: VEUPATHDB_SITES_CONFIG=/path/to/your.yaml
-
 sites:
-  # Portal (queries across all component sites)
   veupathdb:
     name: VEuPathDB
     display_name: VEuPathDB Portal (All organisms)
-    base_url: https://veupathdb.org/veupathdb/service
+    base_url: https://qa.veupathdb.org/veupathdb.qa/service
     project_id: UniDB
     is_portal: true
 
-  # Apicomplexan parasites
   plasmodb:
     name: PlasmoDB
     display_name: PlasmoDB (Plasmodium)
-    base_url: https://plasmodb.org/plasmo/service
+    base_url: https://qa.plasmodb.org/plasmo.qa/service
     project_id: PlasmoDB
     is_portal: false
 
   toxodb:
     name: ToxoDB
     display_name: ToxoDB (Toxoplasma)
-    base_url: https://toxodb.org/toxo/service
+    base_url: https://qa.toxodb.org/toxo.qa/service
     project_id: ToxoDB
     is_portal: false
 
   cryptodb:
     name: CryptoDB
     display_name: CryptoDB (Cryptosporidium)
-    base_url: https://cryptodb.org/cryptodb/service
+    base_url: https://qa.cryptodb.org/cryptodb.qa/service
     project_id: CryptoDB
     is_portal: false
 
   piroplasmadb:
     name: PiroplasmaDB
     display_name: PiroplasmaDB (Piroplasma)
-    base_url: https://piroplasmadb.org/piro/service
+    base_url: https://qa.piroplasmadb.org/piro.qa/service
     project_id: PiroplasmaDB
     is_portal: false
 
-  # Other protozoan parasites
   giardiadb:
     name: GiardiaDB
     display_name: GiardiaDB (Giardia)
-    base_url: https://giardiadb.org/giardiadb/service
+    base_url: https://qa.giardiadb.org/giardiadb.qa/service
     project_id: GiardiaDB
     is_portal: false
 
   amoebadb:
     name: AmoebaDB
     display_name: AmoebaDB (Amoeba)
-    base_url: https://amoebadb.org/amoeba/service
+    base_url: https://qa.amoebadb.org/amoeba.qa/service
     project_id: AmoebaDB
     is_portal: false
 
   microsporidiadb:
     name: MicrosporidiaDB
     display_name: MicrosporidiaDB (Microsporidia)
-    base_url: https://microsporidiadb.org/micro/service
+    base_url: https://qa.microsporidiadb.org/micro.qa/service
     project_id: MicrosporidiaDB
     is_portal: false
 
   tritrypdb:
     name: TriTrypDB
     display_name: TriTrypDB (Kinetoplastids)
-    base_url: https://tritrypdb.org/tritrypdb/service
+    base_url: https://qa.tritrypdb.org/tritrypdb.qa/service
     project_id: TriTrypDB
     is_portal: false
 
   trichdb:
     name: TrichDB
     display_name: TrichDB (Trichomonas)
-    base_url: https://trichdb.org/trichdb/service
+    base_url: https://qa.trichdb.org/trichdb.qa/service
     project_id: TrichDB
     is_portal: false
 
-  # Fungi
   fungidb:
     name: FungiDB
     display_name: FungiDB (Fungi)
-    base_url: https://fungidb.org/fungidb/service
+    base_url: https://qa.fungidb.org/fungidb.qa/service
     project_id: FungiDB
     is_portal: false
 
-  # Hosts and vectors
   hostdb:
     name: HostDB
     display_name: HostDB (Hosts)
-    base_url: https://hostdb.org/hostdb/service
+    base_url: https://qa.hostdb.org/hostdb.qa/service
     project_id: HostDB
     is_portal: false
 
   vectorbase:
     name: VectorBase
     display_name: VectorBase (Vectors)
-    base_url: https://vectorbase.org/vectorbase/service
+    base_url: https://qa.vectorbase.org/vectorbase.qa/service
     project_id: VectorBase
     is_portal: false
 
-  # Orthology
   orthomcl:
     name: OrthoMCL
     display_name: OrthoMCL (Orthologs)
-    base_url: https://orthomcl.org/orthomcl/service
+    base_url: https://qa.orthomcl.org/orthomcl.qa/service
     project_id: OrthoMCL
     is_portal: false
 
-# Default site to use
 default_site: veupathdb
 
-# Routing (timeouts for WDK client)
 routing:
-  # Portal timeout (portal can be slow due to fan-out)
   portal_timeout: 120
-  # Component site timeout
   component_timeout: 30

@@ -10,6 +10,7 @@ import pytest
 from pydantic import ValidationError as PydanticValidationError
 
 from veupathdb.domain.strategy.validation import StepValidation, StepValidationErrors
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.wdk_models import WDKStep
 
@@ -89,6 +90,7 @@ class TestWdkValid001TheBundleIsLevelAndIsValid:
         assert bundle.errors is None
         assert bundle.messages() == []
 
+    @pytest.mark.skip(reason=NEEDS_QA_RECORDING)
     def test_wdk_valid_001_errors_split_general_from_by_key(self) -> None:
         recorded = load_recorded("refresh_with_a_value_outside_the_vocabulary")
         bundle = StepValidation.model_validate(recorded.json_body())
@@ -110,7 +112,7 @@ class TestWdkValid001TheBundleIsLevelAndIsValid:
 
 
 _INPUT_REFUSED = (
-    "The step referenced by ID '440085983' is not runnable because: "
+    "The step referenced by ID '900000001' is not runnable because: "
     '{"keyedErrors":{},"validationLevel":"RUNNABLE","validationStatus":"INVALID"}'
 )
 

@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+import pytest
+
 from veupathdb.domain.parameters.values import MultiPickValue, StringValue
 from veupathdb.domain.strategy.ast import StrategyStepNode
 from veupathdb.domain.strategy.ops import CombineOp
 from veupathdb.domain.strategy.organism import extract_output_organisms
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.wdk_models import WDKSearchResponse
+
+pytest.skip(NEEDS_QA_RECORDING, allow_module_level=True)
 
 _PF = "Plasmodium falciparum 3D7"
 _PV = "Plasmodium vivax P01"

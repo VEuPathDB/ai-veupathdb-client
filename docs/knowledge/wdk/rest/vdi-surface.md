@@ -277,9 +277,10 @@ importer splits on `[\s,;]+` and writes one id per line
 
 # The recorded bodies
 
-The bodies above are package data under `veupathdb/testing/fixtures/vdi/`, reached as
-`veupathdb.testing.FIXTURE_ROOT / "vdi"`, with `provenance.json` naming the method, URL,
+The bodies above were recorded on production and are held in
+`fixtures-production-backup-2026-10-09/vdi/`, out of the package, until a QA recording
+replaces them under `veupathdb.testing.FIXTURE_ROOT / "vdi"`, with `provenance.json` naming the method, URL,
 status and elapsed seconds of each. The owner block and the account id inside VDI's
 messages are replaced. `python -m veupathdb.devtools.vdi_capture record NAME ...` records
-one install live through `VdiClient`, writes `NAME_<state>.json` per distinct state, and
+one install on a QA site through `VdiClient`, writes `NAME_<state>.json` per distinct state, and
 deletes the dataset, confirming the 404 and the owned listing.

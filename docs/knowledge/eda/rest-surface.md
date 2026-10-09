@@ -194,7 +194,8 @@ never drops the researcher's own computations or their settings.
 `differential_expression_computations` selects the complete DE computations in
 document order; no caller indexes `computations[0]`.
 
-Anchor: `src/veupathdb/testing/fixtures/eda/analysis_detail_pass_and_de.json`,
+Anchor: `analysis_detail_pass_and_de.json` (recorded on production and held in
+`fixtures-production-backup-2026-10-09/eda/` until a QA recording replaces it),
 recorded by `python -m veupathdb.devtools.eda_capture record` (create, PATCH,
 GET, DELETE on the `DS_e973eadd57` RNA-Seq study) and bound to `AnalysisDetail`
 in `eda_schemas`; enforced by `tests/unit/eda/test_analysis_computations.py` and

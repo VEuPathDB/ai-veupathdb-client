@@ -37,7 +37,7 @@ def test_the_quickstart_names_only_symbols_the_package_exports(
     assert callable(quickstart["kinase_step"])
 
 
-def test_the_quickstart_lists_the_bundled_sites(quickstart: dict[str, Any]) -> None:
+def test_the_quickstart_lists_the_sites_in_force(quickstart: dict[str, Any]) -> None:
     listed = quickstart["site_ids"]()
 
     assert "plasmodb" in listed

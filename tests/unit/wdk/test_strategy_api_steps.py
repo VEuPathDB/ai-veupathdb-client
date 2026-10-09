@@ -20,6 +20,7 @@ from tests.unit.wdk._step_writes import Recorder, no_expansion
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.errors import WDKError
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.strategy_api.api import StrategyAPI
@@ -229,6 +230,7 @@ class TestANewStepSendsItsAnswerParamsEmpty:
         assert post.body["searchConfig"]["parameters"] == {"organism": '["Pf3D7"]'}
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 async def test_wdk_step_006_the_names_are_read_from_the_search(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -296,7 +298,7 @@ class TestAWriteCarriesTheStepsOwnInputs:
     async def test_the_input_step_param_is_the_steps_own_value(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        api, put = self._transform_api(monkeypatch, held_input="440533233")
+        api, put = self._transform_api(monkeypatch, held_input="900000002")
 
         await api.update_step_search_config(
             9,
@@ -306,13 +308,13 @@ class TestAWriteCarriesTheStepsOwnInputs:
             user_id="1",
         )
 
-        assert put.body["parameters"]["gene_result"] == "440533233"
+        assert put.body["parameters"]["gene_result"] == "900000002"
         assert put.body["parameters"]["isSyntenic"] == "yes"
 
     async def test_a_stated_input_never_overrides_the_steps_own(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        api, put = self._transform_api(monkeypatch, held_input="440533233")
+        api, put = self._transform_api(monkeypatch, held_input="900000002")
 
         await api.update_step_search_config(
             9,
@@ -322,13 +324,13 @@ class TestAWriteCarriesTheStepsOwnInputs:
             user_id="1",
         )
 
-        assert put.body["parameters"]["gene_result"] == "440533233"
+        assert put.body["parameters"]["gene_result"] == "900000002"
 
     async def test_the_step_is_read_once_for_its_inputs_and_its_filters(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         reads: list[str] = []
-        api, _ = self._transform_api(monkeypatch, held_input="440533233", reads=reads)
+        api, _ = self._transform_api(monkeypatch, held_input="900000002", reads=reads)
 
         await api.update_step_search_config(
             9,

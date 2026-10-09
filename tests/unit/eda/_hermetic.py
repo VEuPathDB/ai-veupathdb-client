@@ -36,7 +36,7 @@ def fixture(name: str) -> object:
 
 
 def eda_client(handler: httpx.MockTransport) -> EdaClient:
-    return EdaClient(base_url="https://plasmodb.org/eda", transport=handler)
+    return EdaClient(base_url="https://qa.plasmodb.org/eda", transport=handler)
 
 
 def species_filter() -> EdaStringSetFilter:

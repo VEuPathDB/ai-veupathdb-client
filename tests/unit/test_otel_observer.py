@@ -18,7 +18,7 @@ from veupathdb.observer import NoObserver, get_observer, set_observer
 from veupathdb.wdk._http import HTTPClient
 from veupathdb.wdk.site_search_client import SiteSearchClient, SiteSearchResponse
 
-_BASE_URL = "https://plasmodb.org/plasmo/service"
+_BASE_URL = "https://qa.plasmodb.org/plasmo.qa/service"
 _SEARCH_PATH = "/record-types/gene/searches/GenesByText"
 
 
@@ -84,7 +84,7 @@ async def test_a_wdk_call_feeds_the_request_counter_and_the_duration(
     expected = {
         "method": "GET",
         "endpoint_group": "record_types",
-        "site_host": "plasmodb.org",
+        "site_host": "qa.plasmodb.org",
         "has_auth": "true",
         "status_family": "2xx",
         "outcome": "ok",
@@ -137,7 +137,7 @@ async def test_a_retried_wdk_call_records_the_retry_and_its_error_kind(
 async def test_a_site_search_call_feeds_the_site_search_instruments(
     reader: InMemoryMetricReader,
 ) -> None:
-    client = SiteSearchClient("https://plasmodb.org", "PlasmoDB")
+    client = SiteSearchClient("https://qa.plasmodb.org", "PlasmoDB")
     response = SiteSearchResponse()
 
     with patch.object(client, "_search_attempt", AsyncMock(return_value=response)):
@@ -146,7 +146,7 @@ async def test_a_site_search_call_feeds_the_site_search_instruments(
     expected = {
         "method": "POST",
         "endpoint_group": "site_search",
-        "site_host": "plasmodb.org",
+        "site_host": "qa.plasmodb.org",
         "has_auth": "false",
         "status_family": "2xx",
         "outcome": "ok",

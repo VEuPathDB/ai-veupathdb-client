@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from veupathdb.devtools.fixtures import FIXTURES
+from veupathdb.testing import NEEDS_QA_RECORDING
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -83,6 +84,7 @@ print(veupathdb.devtools.eda_schemas.__name__)
 
 
 @pytest.mark.wheel
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_an_installed_copy_verifies_its_own_recorded_bodies(
     env_with_the_extra: Path,
 ) -> None:

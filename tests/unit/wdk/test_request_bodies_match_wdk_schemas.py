@@ -14,6 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from veupathdb.devtools.fixtures import ENFORCED_SCHEMAS, verify_body
 from veupathdb.domain.strategy.ops import CombineOp
 from veupathdb.json_types import JSONObject
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_fixtures import fixture_request, load_recorded
 from veupathdb.wdk._search_config_body import search_config_write_body
 from veupathdb.wdk.wdk_models import (
@@ -137,6 +138,7 @@ def test_a_weighted_new_step_body_passes() -> None:
     assert verify_body("wdk.users.steps.post-request", _new_step_body(spec)) == ()
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_a_combined_step_body_passes_the_schema_wdk_binds() -> None:
     spec = CombinedStepSpec(
         primary_step_id=1,
@@ -291,7 +293,7 @@ def test_a_step_tree_write_passes_the_schema_wdk_binds() -> None:
         ),
         WDKDatasetConfigStrategy(
             source_type="strategy",
-            source_content=WDKDatasetStrategyContent(strategy_id=330423363),
+            source_content=WDKDatasetStrategyContent(strategy_id=900000005),
         ),
         WDKDatasetConfigFile(
             source_type="file",
@@ -305,7 +307,7 @@ def test_a_step_tree_write_passes_the_schema_wdk_binds() -> None:
         WDKDatasetConfigUrl(
             source_type="url",
             source_content=WDKDatasetUrlContent(
-                url="https://plasmodb.org/genes.txt",
+                url="https://qa.plasmodb.org/genes.txt",
                 parser="list",
                 search_name=_LOCUS_TAG_SEARCH,
                 parameter_name=_LOCUS_TAG_PARAM,

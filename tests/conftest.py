@@ -5,17 +5,20 @@ from collections.abc import Generator
 import pytest
 
 from veupathdb.settings import VEuPathDBSettings, use_veupathdb_settings_source
+from veupathdb.testing import QA_SITES_FILE
 from veupathdb.wdk import forget_signing_keys
 
 
 @pytest.fixture(autouse=True)
-def _library_defaults() -> Generator[None]:
-    """Read the bundled sites.yaml, carry no service token, cache no signing key.
+def _library_defaults(monkeypatch: pytest.MonkeyPatch) -> Generator[None]:
+    """Read the QA site list, carry no service token, cache no signing key.
 
-    Installing the source drops the router and the sites config built from the
-    previous one.
+    The environment names the QA list too, so a test that builds its own
+    settings reads it. Installing the source drops the router and the sites
+    config built from the previous one.
     """
-    settings = VEuPathDBSettings(veupathdb_sites_config=None, veupathdb_auth_token=None)
+    monkeypatch.setenv("VEUPATHDB_SITES_CONFIG", str(QA_SITES_FILE))
+    settings = VEuPathDBSettings(veupathdb_auth_token=None)
     use_veupathdb_settings_source(lambda: settings)
     forget_signing_keys()
     yield

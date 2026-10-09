@@ -28,6 +28,7 @@ import httpx
 from pydantic import BaseModel, ConfigDict, TypeAdapter
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
+from veupathdb.devtools.qa_sites import use_qa_sites
 from veupathdb.json_types import JSONObject
 from veupathdb.testing.fixture_store import FIXTURE_ROOT
 from veupathdb.testing.wdk_credentials import (
@@ -226,6 +227,7 @@ def write_install(
     into: Path,
 ) -> list[Path]:
     """Write each body as NAME_<label>.json with its provenance, and return the paths."""
+    into.mkdir(parents=True, exist_ok=True)
     entries = load_provenance(into) if (into / PROVENANCE_FILE).exists() else {}
     written: list[Path] = []
     reads = [(captured.post, "POST", f"{base_url}/datasets", 202)] + [
@@ -256,7 +258,8 @@ def write_install(
 async def record_install(
     name: str, *, site_id: str, upload: RnaSeqRcUpload, genome: str | None
 ) -> CapturedInstall:
-    """Run one capture live and write it into the store."""
+    """Run one capture on a QA site and write it into the store."""
+    use_qa_sites()
     token = await registered_wdk_token()
     if token is None:
         raise RuntimeError(NO_CREDENTIALS_REASON)

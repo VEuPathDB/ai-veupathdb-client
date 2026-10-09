@@ -21,9 +21,10 @@ from veupathdb.devtools.eda_capture import (
 )
 from veupathdb.devtools.eda_schemas import BINDINGS, verify_wire_body
 from veupathdb.eda import EdaClient
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
 
-_BASE = "https://plasmodb.org/eda"
+_BASE = "https://qa.plasmodb.org/eda"
 _JOB = "2679abb0e5c81b345a21b8f211db6a9b"
 _REQUEST_TYPES = {
     "compute_job_dimensionalityreduction": "DimensionalityReductionPluginRequest",
@@ -81,6 +82,7 @@ def test_every_request_body_is_one_the_service_accepts(capture: PostCapture) -> 
     assert verify_wire_body(_REQUEST_TYPES[capture.name], capture.body) == ()
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 @pytest.mark.parametrize("capture", POST_CAPTURES, ids=lambda c: c.name)
 def test_every_recorded_body_is_bound_and_on_disk(capture: PostCapture) -> None:
     bound = {b.fixture: b for b in BINDINGS}
@@ -147,6 +149,7 @@ async def test_a_failed_job_stops_the_capture() -> None:
     assert [r.url.path for r in seen] == ["/eda/computes/dimensionalityreduction"]
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_a_write_names_the_query_and_the_content_type(tmp_path: Path) -> None:
     (tmp_path / "provenance.json").write_text(
         (FIXTURE_DIR / "provenance.json").read_text()
@@ -174,6 +177,7 @@ def test_a_write_names_the_query_and_the_content_type(tmp_path: Path) -> None:
     )
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_the_recorded_meta_body_came_as_text() -> None:
     entry = load_provenance(FIXTURE_DIR)["computed_variables_dimensionalityreduction"]
 

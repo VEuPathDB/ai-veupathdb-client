@@ -139,7 +139,7 @@ the weaker argument and should not be the one anyone relies on.
 # The identity read gets one attempt and ten seconds
 
 Every other read goes through the transport's retry policy: three attempts, with waits of
-1 s and 2 s between them, each attempt bounded by the site's timeout from `sites.yaml`
+1 s and 2 s between them, each attempt bounded by the site's timeout from the site list in force
 (30 s on a component site, 120 s on the portal). `fetch_current_user` does not. An
 identity check answers a person who waits on a page, so it answers fast or not at all: one
 attempt, under a deadline of `IDENTITY_READ_TIMEOUT_SECONDS` (10 s). The deadline covers

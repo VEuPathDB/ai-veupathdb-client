@@ -9,4 +9,5 @@ Choices with a real alternative, each naming what was rejected and why.
 - [The published surface is a list of packages, checked in name by name](the-published-surface-is-a-list-of-packages.md) - the sixteen surfaces, why eight of them stay modules, and the consumer import lines that change
 - [Installing a settings source drops what the old one built](installing-a-settings-source-drops-what-the-old-one-built.md) - why a source may be installed at any point, and why an ordering note was not enough
 - [The schema readers are an extra, not a dependency group](the-schema-readers-are-an-extra-not-a-group.md) - why `veupathdb.devtools` ships with a `devtools` extra rather than leaving the wheel
+- [Tests run against QA, and a deployment names its site list](tests-run-against-qa-and-a-deployment-names-its-sites.md) - why the package ships no default site list, why every test and recorder reads QA, and where the production recordings went
 - [A rule is proven in this checkout, or it says so](a-rule-is-proven-in-this-checkout.md) - why no rule status names another repository's test

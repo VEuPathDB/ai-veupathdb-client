@@ -21,6 +21,7 @@ from veupathdb.eda import (
     analysis_descriptor_patch,
 )
 from veupathdb.json_types import JSONObject
+from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
 
 __all__ = ["registered_token"]
@@ -131,6 +132,7 @@ def test_the_patch_body_of_a_read_descriptor_is_the_stored_one() -> None:
     assert analysis_descriptor_patch(_read()) == _STORED
 
 
+@pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 def test_the_patch_body_of_the_recorded_analysis_is_the_stored_one() -> None:
     recorded = TypeAdapter(JSONObject).validate_json(
         (FIXTURE_DIR / "analysis_detail_pass_and_de.json").read_text()
@@ -211,7 +213,7 @@ async def test_patch_descriptor_sends_the_patch_body() -> None:
     client = eda_client(httpx.MockTransport(handler))
     analyses = EdaAnalysesClient(client=client, project_id="PlasmoDB")
     await analyses.patch_descriptor(
-        user_id="1", analysis_id="t4fszEJ", descriptor=_read()
+        user_id="1", analysis_id="testAn1", descriptor=_read()
     )
     await client.close()
 

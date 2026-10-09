@@ -164,8 +164,8 @@ deployment's own business; these two are where the measurements below were taken
 | toxodb.org | `https://toxodb.org/toxo/service` | 234 searches on the same path, same date. Confirms that per-site search availability is real, and that platform behavior is not. |
 | orthomcl.org | `https://orthomcl.org/orthomcl/service` | Used once, by [WDK-SITE-003](rules/site-model-params.md), and only as a contrast. It runs the same WDK platform over a different site model, and it is the site whose `GroupsByPhyleticPattern.phyletic_expression` grammar the `profile_pattern` default was written in. It is not a general verification site: nothing else in the bundle should be confirmed there, because it runs a site model neither of the two verification sites runs. |
 
-The full list of configured sites and their base paths is in
-`src/veupathdb/sites.yaml`. Each is `<host>/<project
+The production sites and their base paths are listed in `docs/sites/production.yaml`,
+and the QA sites every test reads in `src/veupathdb/testing/qa_sites.yaml`. Each is `<host>/<project
 segment>/service`, and the project segment is not derivable from the host: plasmodb.org
 uses `plasmo`, toxodb.org uses `toxo`, tritrypdb.org uses `tritrypdb`.
 

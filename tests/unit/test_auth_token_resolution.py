@@ -26,11 +26,11 @@ from veupathdb.wdk.vdi.client import VdiClient
 SETTINGS_TOKEN = "token-from-settings"
 CONSTRUCTOR_TOKEN = "token-from-constructor"
 REQUEST_TOKEN = "token-from-contextvar"
-EDA_BASE_URL = "https://plasmodb.org/eda"
-VDI_BASE_URL = "https://plasmodb.org/vdi"
-DATASET_ID = "soV5JEQEcF00p"
+EDA_BASE_URL = "https://qa.plasmodb.org/eda"
+VDI_BASE_URL = "https://qa.plasmodb.org/vdi"
+DATASET_ID = "vdiTestData01"
 PROJECT_ID = "PlasmoDB"
-WDK_USER_ID = "1216062453"
+WDK_USER_ID = "1000000102"
 
 
 @pytest.fixture
@@ -80,7 +80,7 @@ class _Recorder:
 
 async def _wdk_client(recorder: _Recorder, auth_token: str | None) -> HTTPClient:
     """A WDK client whose transport answers without reaching a site."""
-    client = HTTPClient(base_url="https://plasmodb.org/plasmo/service")
+    client = HTTPClient(base_url="https://qa.plasmodb.org/plasmo.qa/service")
     client.auth_token = auth_token
     async with client._client_lock:
         client._client = httpx.AsyncClient(

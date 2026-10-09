@@ -6,29 +6,47 @@ from urllib.parse import urlparse
 import httpx
 
 from veupathdb.devtools.wdk_capture import WDKExchange, is_wdk_host, wdk_record
+from veupathdb.settings import VEuPathDBSettings, use_veupathdb_settings_source
+from veupathdb.testing import QA_SITES_FILE
 from veupathdb.wdk.site_router import load_sites_config
 
 
 def test_every_configured_site_host_is_a_wdk_host() -> None:
     hosts = [
-        urlparse(site.base_url).hostname for site in load_sites_config().sites.values()
+        urlparse(site.base_url).hostname
+        for site in load_sites_config(str(QA_SITES_FILE)).sites.values()
     ]
-    assert "orthomcl.org" in hosts
+    assert "qa.orthomcl.org" in hosts
     assert all(host is not None and is_wdk_host(host) for host in hosts)
 
 
 def test_is_wdk_host_matches_veupath_sites() -> None:
-    assert is_wdk_host("vectorbase.org")
-    assert is_wdk_host("plasmodb.org")
-    assert is_wdk_host("www.toxodb.org")
+    assert is_wdk_host("qa.vectorbase.org")
+    assert is_wdk_host("qa.plasmodb.org")
+    assert is_wdk_host("www.qa.toxodb.org")
     assert not is_wdk_host("api.openai.com")
     assert not is_wdk_host("example.com")
+
+
+def test_a_host_outside_the_qa_list_is_not_captured(tmp_path: Path) -> None:
+    sites = tmp_path / "sites.yaml"
+    sites.write_text(
+        "sites:\n"
+        "  demodb:\n"
+        "    base_url: https://demodb.example/demo/service\n"
+        "    project_id: DemoDB\n"
+    )
+    installed = VEuPathDBSettings(veupathdb_sites_config=str(sites))
+    use_veupathdb_settings_source(lambda: installed)
+
+    assert not is_wdk_host("demodb.example")
+    assert is_wdk_host("qa.plasmodb.org")
 
 
 def test_wdk_record_captures_request_and_response() -> None:
     request = httpx.Request(
         "POST",
-        "https://vectorbase.org/vectorbase/service/record-types/transcript/searches/GenesByText",
+        "https://qa.vectorbase.org/vectorbase.qa/service/record-types/transcript/searches/GenesByText",
         json={"searchConfig": {"parameters": {"text_expression": "obp"}}},
     )
     rec = wdk_record(
@@ -48,7 +66,7 @@ def test_wdk_record_captures_request_and_response() -> None:
 
 
 def test_wdk_record_keeps_raw_when_not_json() -> None:
-    request = httpx.Request("GET", "https://plasmodb.org/plasmo/service/x")
+    request = httpx.Request("GET", "https://qa.plasmodb.org/plasmo.qa/service/x")
     rec = wdk_record(
         request=request,
         status=500,
@@ -62,7 +80,7 @@ def test_wdk_record_keeps_raw_when_not_json() -> None:
 
 def test_exchange_filename_is_safe_and_ordered() -> None:
     request = httpx.Request(
-        "POST", "https://vectorbase.org/x/service/searches/GenesByText"
+        "POST", "https://qa.vectorbase.org/x/service/searches/GenesByText"
     )
     rec = wdk_record(
         request=request, status=200, request_body=b"", response_body=b"{}", ms=1.0
@@ -74,7 +92,7 @@ def test_exchange_filename_is_safe_and_ordered() -> None:
 
 
 def test_exchange_roundtrips_to_disk(tmp_path: Path) -> None:
-    request = httpx.Request("GET", "https://toxodb.org/toxo/service/x")
+    request = httpx.Request("GET", "https://qa.toxodb.org/toxo.qa/service/x")
     rec = wdk_record(
         request=request,
         status=200,

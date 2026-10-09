@@ -3,7 +3,6 @@
 import threading
 from collections.abc import Callable
 from functools import lru_cache
-from importlib.resources import files
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -45,12 +44,22 @@ class SitesConfig(BaseModel):
     routing: RoutingConfig = Field(default_factory=RoutingConfig)
 
 
+class SitesConfigNotSetError(RuntimeError):
+    def __init__(self) -> None:
+        super().__init__(
+            "No VEuPathDB site list is set. Set VEUPATHDB_SITES_CONFIG to the path "
+            "of a sites YAML file, or install a settings source that names one."
+        )
+
+
 @lru_cache
 def load_sites_config(config_path: str | None = None) -> SitesConfig:
-    """Loads and validates the sites configuration from YAML. An empty path selects
-    the sites.yaml bundled with this package."""
+    """Loads and validates the sites configuration from YAML. The package ships
+    no default list, so a deployment always names its own."""
     named = config_path.strip() if config_path else ""
-    source = files("veupathdb") / "sites.yaml" if not named else Path(named).resolve()
+    if not named:
+        raise SitesConfigNotSetError
+    source = Path(named).resolve()
     logger.info("Loading sites config", path=str(source))
     raw = yaml.safe_load(source.read_text())
     if not isinstance(raw, dict):

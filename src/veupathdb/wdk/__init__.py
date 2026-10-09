@@ -38,6 +38,7 @@ from veupathdb.wdk.probe import WDKProbe
 from veupathdb.wdk.record_types import resolve_record_type
 from veupathdb.wdk.site_router import (
     SiteInfo,
+    SitesConfigNotSetError,
     get_site_router,
     load_sites_config,
     reset_site_router,
@@ -166,6 +167,7 @@ __all__ = [
     "SiteSearchDocument",
     "SiteSearchResponse",
     "SiteSearchStreamRecord",
+    "SitesConfigNotSetError",
     "StepsMixin",
     "StrategyAPI",
     "TemporaryResultsAPI",

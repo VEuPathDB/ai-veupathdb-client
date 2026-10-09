@@ -23,7 +23,7 @@ from veupathdb.devtools.vdi_capture import (
     write_install,
 )
 from veupathdb.json_types import JSONObject
-from veupathdb.testing import FIXTURE_ROOT
+from veupathdb.testing import FIXTURE_ROOT, NEEDS_QA_RECORDING
 from veupathdb.wdk.vdi.client import VdiClient
 from veupathdb.wdk.vdi.models import (
     RNASEQRC,
@@ -32,6 +32,8 @@ from veupathdb.wdk.vdi.models import (
     VdiInstallDisposition,
 )
 from veupathdb.wdk.vdi.rnaseqrc import RnaSeqCountFile, RnaSeqRcUpload
+
+pytestmark = pytest.mark.skip(reason=NEEDS_QA_RECORDING)
 
 _INSTALL = (
     "rnaseqrc_import_in_progress",
@@ -164,7 +166,7 @@ async def test_a_capture_that_fails_mid_poll_still_deletes() -> None:
         )
     await client.close()
 
-    one = "/vdi/datasets/x4Z5JRpM9F0M8"
+    one = "/vdi/datasets/vdiTestData02"
     assert service.requests == [
         ("GET", "/vdi/plugins"),
         ("POST", "/vdi/datasets"),
