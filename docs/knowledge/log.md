@@ -1,5 +1,11 @@
 # Knowledge log
 
+## 2026-10-10 - A range value reads its JSON text
+
+`param_value_from_raw` reads a `number-range` or `date-range` value given as the JSON text
+of its object, the form WDK sends as a range's `initialDisplayValue` and takes on the wire.
+Other text for a range kind is refused with `ValueError`.
+
 ## 2026-10-09 - A search waits in its turn's line, the host's gate and the site's slots
 
 A request that runs a search takes the line of its turn on its site (`search_turn`), the

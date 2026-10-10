@@ -14,6 +14,7 @@ from veupathdb.domain.parameters.value_codec import (
     param_value_from_raw,
 )
 from veupathdb.domain.parameters.values import (
+    DateRangeValue,
     FilterTermClause,
     FilterValue,
     MultiPickValue,
@@ -73,6 +74,24 @@ class TestFromRaw:
     def test_from_raw_number_range_from_dict(self) -> None:
         value = param_value_from_raw({"min": 1, "max": 5}, "number-range")
         assert value == NumberRangeValue(min=1.0, max=5.0)
+
+    @pytest.mark.parametrize(
+        "text", ['{"min":"20","max":"28"}', '{"min": 20, "max": 28}']
+    )
+    def test_from_raw_number_range_from_its_wire_text(self, text: str) -> None:
+        value = param_value_from_raw(text, "number-range")
+        assert value == NumberRangeValue(min=20.0, max=28.0)
+
+    def test_from_raw_date_range_from_its_wire_text(self) -> None:
+        value = param_value_from_raw(
+            '{"min":"2020-01-01","max":"2020-12-31"}', "date-range"
+        )
+        assert value == DateRangeValue(min="2020-01-01", max="2020-12-31")
+
+    @pytest.mark.parametrize("text", ["20-28", "[20, 28]", ""])
+    def test_from_raw_number_range_refuses_other_text(self, text: str) -> None:
+        with pytest.raises(ValueError, match="number-range"):
+            param_value_from_raw(text, "number-range")
 
 
 class TestCoerceParamValue:

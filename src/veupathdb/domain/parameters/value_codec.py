@@ -154,12 +154,20 @@ _PARAM_VALUE_TYPES = (
 )
 
 
+def _object_from_text(text: str) -> object:
+    try:
+        return json.loads(text)
+    except ValueError:
+        return text
+
+
 def param_value_from_raw(raw: object, kind: ParamKind) -> ParamValue:
     """Build a typed ``ParamValue`` of *kind* from an untyped scalar, list or dict.
 
     An already-typed value (a ``ParamValue`` instance or a dict carrying
     ``type``) is coerced to *kind*; a structural kind (a range or a filter) is
-    validated from its object form. *kind* comes from the WDK parameter spec.
+    validated from its object form or that object's JSON text. *kind* comes from
+    the WDK parameter spec.
     """
 
     if isinstance(raw, _PARAM_VALUE_TYPES):
@@ -175,6 +183,8 @@ def param_value_from_raw(raw: object, kind: ParamKind) -> ParamValue:
         "filter": FilterValue,
     }
     model = structural.get(kind)
+    if model is not None and isinstance(raw, str):
+        raw = _object_from_text(raw)
     if model is not None and isinstance(raw, dict):
         return model.model_validate(raw)
     msg = f"cannot build a {kind!r} parameter value from {raw!r}"
