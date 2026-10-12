@@ -39,7 +39,7 @@ def named_config(tmp_path: Path) -> Generator[Path]:
 
 
 def test_the_host_settings_serve_the_client() -> None:
-    installed = VEuPathDBSettings(veupathdb_auth_token="a-service-token")
+    installed = VEuPathDBSettings(veupathdb_user_agent="a-host/1.0")
     use_veupathdb_settings_source(lambda: installed)
 
     assert get_veupathdb_settings() is installed
@@ -48,7 +48,7 @@ def test_the_host_settings_serve_the_client() -> None:
 def test_the_installed_source_is_read_back_and_restored() -> None:
     """A host that swaps the source puts back the callable that was there."""
     previous = veupathdb_settings_source()
-    installed = VEuPathDBSettings(veupathdb_auth_token="a-service-token")
+    installed = VEuPathDBSettings(veupathdb_user_agent="a-host/1.0")
     use_veupathdb_settings_source(lambda: installed)
     use_veupathdb_settings_source(previous)
 

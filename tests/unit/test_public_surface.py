@@ -31,6 +31,7 @@ MODULES = (
     "veupathdb.devtools.eda_schemas",
     "veupathdb.devtools.fixtures",
     "veupathdb.errors",
+    "veupathdb.guest_token",
     "veupathdb.model",
     "veupathdb.observability.otel",
     "veupathdb.testing.eda_fixtures",

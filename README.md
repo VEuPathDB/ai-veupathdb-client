@@ -6,16 +6,19 @@ Wire models mirror the WDK REST API field for field (`searchName`, not
 `search_name`); the 11 parameter type discriminants are a tagged union; step
 trees keep primary and secondary inputs.
 
-**VEuPathDB refuses guest and anonymous service calls.** Every user-scoped call
-needs a registered VEuPathDB token. A user-independent read resolves it through
-`veupathdb.auth_context.resolve_veupathdb_auth_token`: the contextvar
-`veupathdb_auth_token_ctx` first, then the client's own `auth_token=`, then
-`VEUPATHDB_AUTH_TOKEN`. The deployment's token never reaches a researcher's own
-data. A WDK path under `/users/` is refused unless the contextvar carries the
+**Most VEuPathDB paths serve registered users only.** A few open paths (the
+service root, record types, the category ontology, a handful of reports, EDA's
+study list) accept a guest. A request travels with the contextvar
+`veupathdb_auth_token_ctx` first, then the client's own `auth_token=`, and with
+neither, as one shared guest token: `veupathdb.guest_token.GuestTokens` mints it
+once at a site's service root, serves it on every site and on EDA, and mints a
+new one shortly before it expires or after a 401. The client never sends a
+request with no token, because a site mints a new guest account for each one,
+and the shared cookie jar never stores an `Authorization` cookie. A path the
+guest is refused on (401 or 403) raises `WDKLoginRequiredError`. A WDK path
+under `/users/` is refused before it is sent unless the contextvar carries the
 token; every VDI call and every EDA path under `/users/` is refused unless the
-contextvar or the client's own `auth_token=` carries it. So the deployment's
-service account reads record types, searches, parameter metadata and EDA
-studies, and never a WDK account, a user dataset or an EDA analysis.
+contextvar or the client's own `auth_token=` carries it.
 
 ## The published surface
 
@@ -25,7 +28,7 @@ Each published package declares what a consumer may read, and
 `veupathdb`, `veupathdb.auth_context`, `veupathdb.devtools`,
 `veupathdb.devtools.eda_schemas`, `veupathdb.devtools.fixtures`,
 `veupathdb.domain`, `veupathdb.domain.parameters`, `veupathdb.domain.strategy`,
-`veupathdb.eda`, `veupathdb.errors`, `veupathdb.model`,
+`veupathdb.eda`, `veupathdb.errors`, `veupathdb.guest_token`, `veupathdb.model`,
 `veupathdb.observability.otel`, `veupathdb.testing`,
 `veupathdb.testing.eda_fixtures`, `veupathdb.testing.wdk_fixtures`,
 `veupathdb.wdk`.
@@ -277,10 +280,10 @@ The two schema readers ride the `devtools` extra, so an installed copy runs the
 six commands after `pip install "veupathdb-py[devtools]"`:
 
 ```
-uv run python -m veupathdb.devtools.fixtures record     # needs VEUPATHDB_AUTH_TOKEN
+uv run python -m veupathdb.devtools.fixtures record     # needs WDK_TEST_*
 uv run python -m veupathdb.devtools.fixtures vendor
 uv run python -m veupathdb.devtools.fixtures verify
-uv run python -m veupathdb.devtools.eda_capture record   # analyses need WDK_TEST_*
+uv run python -m veupathdb.devtools.eda_capture record   # needs WDK_TEST_*
 uv run python -m veupathdb.devtools.eda_schemas vendor
 uv run python -m veupathdb.devtools.eda_schemas verify
 ```

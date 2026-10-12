@@ -352,8 +352,8 @@ so every site needs `"<sourceId>,<projectId>"`. Measured on 2026-09-04:
 `"PF3D7_1133400"` alone returns **422** with
 `RecordClass 'GeneRecordClasses.GeneRecordClass' PK requires exactly 2 values [ source_id, project_id ]`,
 and `"PF3D7_1133400,PlasmoDB"` returns **200**. The same call anonymously returns **401**
-`Valid API Key required for this endpoint`; the deployment's service token and a registered
-user's token both answer 200, so this is a user-independent read.
+`Valid API Key required for this endpoint`; the tokens of two different registered users
+both answer 200, so the read needs a registered user but not a particular one.
 
 A cache miss is a 200, not a 404. The body is one object per record keyed by gene id, and
 the entry carries `resultStatus` plus, on a status that answers no summary, `numExperiments`,

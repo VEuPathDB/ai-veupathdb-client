@@ -11,6 +11,7 @@ import os
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.wdk.auth_login import password_login
 
 LOGIN_SITE_ID = "plasmodb"
@@ -61,3 +62,14 @@ async def registered_wdk_token() -> str | None:
         )
         raise RuntimeError(msg)
     return token
+
+
+async def act_as_the_test_account() -> None:
+    """Carry the account's token on every later request of this context.
+
+    Raises when the environment names no account.
+    """
+    token = await registered_wdk_token()
+    if token is None:
+        raise RuntimeError(NO_CREDENTIALS_REASON)
+    veupathdb_auth_token_ctx.set(token)

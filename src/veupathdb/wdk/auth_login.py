@@ -20,6 +20,7 @@ from tenacity import (
 )
 
 from veupathdb.errors import ExternalServiceError
+from veupathdb.guest_token import authorization_cookies
 from veupathdb.logging import get_logger
 from veupathdb.settings import user_agent_header
 from veupathdb.wdk.factory import get_site
@@ -53,17 +54,14 @@ def _is_guest_jwt(token: str) -> bool:
 
 def extract_auth_cookie(set_cookie_headers: list[str]) -> str | None:
     """Return the first non-guest ``Authorization`` cookie value, or None."""
-    candidates: list[str] = []
-    for header in set_cookie_headers:
-        if not header.startswith("Authorization="):
-            continue
-        value = header.split(";", 1)[0].split("=", 1)[1].strip('"')
-        if value:
-            candidates.append(value)
-    for token in candidates:
-        if not _is_guest_jwt(token):
-            return token
-    return None
+    return next(
+        (
+            token
+            for token in authorization_cookies(set_cookie_headers)
+            if not _is_guest_jwt(token)
+        ),
+        None,
+    )
 
 
 async def password_login(

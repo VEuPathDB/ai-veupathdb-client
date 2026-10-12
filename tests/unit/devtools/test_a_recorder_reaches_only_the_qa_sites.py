@@ -7,7 +7,7 @@ import pytest
 import respx
 
 from veupathdb.devtools import eda_capture, vdi_capture
-from veupathdb.devtools.fixtures import record_one
+from veupathdb.devtools.fixtures import record_all, record_one
 from veupathdb.settings import VEuPathDBSettings, use_veupathdb_settings_source
 from veupathdb.testing import QA_SITES_FILE, wdk_fixtures
 from veupathdb.wdk import list_sites, load_sites_config
@@ -31,9 +31,7 @@ def another_site_list(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         "    base_url: https://demodb.example/demo/service\n"
         "    project_id: PlasmoDB\n"
     )
-    installed = VEuPathDBSettings(
-        veupathdb_sites_config=str(sites), veupathdb_auth_token="a-service-token"
-    )
+    installed = VEuPathDBSettings(veupathdb_sites_config=str(sites))
     use_veupathdb_settings_source(lambda: installed)
 
 
@@ -51,6 +49,48 @@ async def test_a_wdk_recording_asks_the_qa_site(
     assert route.called
     assert recorded.provenance.url == f"{QA_PLASMODB}/record-types"
     assert (tmp_path / "record_types.json").is_file()
+
+
+@respx.mock
+async def test_a_wdk_recording_travels_as_the_test_account(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("WDK_TEST_TOKEN", "recording.account.token")
+    monkeypatch.setattr(wdk_fixtures, "FIXTURE_DIR", tmp_path)
+    route = respx.get(f"{QA_PLASMODB}/record-types").mock(
+        return_value=httpx.Response(200, json=[])
+    )
+
+    assert await record_all(["record_types"]) == 1
+
+    assert route.calls.last.request.headers["cookie"] == (
+        "Authorization=recording.account.token"
+    )
+
+
+@respx.mock
+async def test_a_wdk_recording_needs_the_test_account() -> None:
+    with pytest.raises(RuntimeError, match="WDK_TEST_TOKEN"):
+        await record_all(["record_types"])
+
+    assert not respx.calls
+
+
+@pytest.mark.parametrize(
+    ("record", "captures"),
+    [
+        (eda_capture.record_distributions, eda_capture.DISTRIBUTION_CAPTURES[:1]),
+        (eda_capture.record_posts, eda_capture.POST_CAPTURES[:1]),
+    ],
+)
+@respx.mock
+async def test_an_eda_recording_needs_the_test_account(
+    record: Recorder, captures: list[object]
+) -> None:
+    with pytest.raises(RuntimeError, match="WDK_TEST_TOKEN"):
+        await record(captures)
+
+    assert not respx.calls
 
 
 @pytest.mark.parametrize(

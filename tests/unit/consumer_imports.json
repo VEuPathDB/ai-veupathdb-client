@@ -382,10 +382,19 @@
       "WDKLoginRequiredError",
       "param_message_rows"
     ],
+    "veupathdb.guest_token": [
+      "use_guest_tokens"
+    ],
     "veupathdb.model": [
       "CamelModel",
       "NonFiniteToNone",
       "NonFiniteToNoneRounded"
+    ],
+    "veupathdb.testing": [
+      "NEEDS_QA_RECORDING",
+      "QA_SITES_FILE",
+      "hermetic_guest_tokens",
+      "needs_qa_recording"
     ],
     "veupathdb.testing.wdk_fixtures": [
       "load_recorded"

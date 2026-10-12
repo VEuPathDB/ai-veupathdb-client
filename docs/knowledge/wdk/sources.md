@@ -174,7 +174,7 @@ every verification here was a request any anonymous client could repeat. On 2026
 `GET /plasmo/service/record-types/transcript/searches/GenesByMolecularWeight` with no
 cookie is a **401** pointing at the API-key page, so re-verifying any rule in this bundle
 now carries the registered account. The nightly lane resolves it from `WDK_TEST_EMAIL` and
-`WDK_TEST_PASSWORD`, and the fixture recorder from `VEUPATHDB_AUTH_TOKEN`; no credential
+`WDK_TEST_PASSWORD`, and every recorder from `WDK_TEST_TOKEN` or the same pair; no credential
 is written down here or anywhere else in the repository.
 
 Some checks need a user without needing an account. `GET /service/users/current` returns a

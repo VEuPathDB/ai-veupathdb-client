@@ -13,8 +13,9 @@ Usage::
     python -m veupathdb.devtools.fixtures verify
     python -m veupathdb.devtools.fixtures vendor
 
-Recording needs ``VEUPATHDB_AUTH_TOKEN``: VEuPathDB refuses anonymous service
-calls. Every request below is user-independent, so no account is addressed.
+Recording needs ``WDK_TEST_TOKEN``, or ``WDK_TEST_EMAIL``/``WDK_TEST_PASSWORD``:
+most of these paths serve registered users only. Every request below is
+user-independent, so no account is addressed.
 """
 
 from __future__ import annotations
@@ -40,6 +41,7 @@ from referencing.jsonschema import DRAFT4, Schema
 from veupathdb.devtools.pins import VendoredPin, pin_drift
 from veupathdb.devtools.qa_sites import use_qa_sites
 from veupathdb.testing import NEEDS_QA_RECORDING
+from veupathdb.testing.wdk_credentials import act_as_the_test_account
 from veupathdb.testing.wdk_fixtures import (
     FIXTURE_DIR,
     FIXTURES,
@@ -295,6 +297,7 @@ async def record_one(request: FixtureRequest) -> RecordedWDKResponse:
 async def record_all(names: list[str]) -> int:
     """Record the named fixtures, or the whole manifest when none are named."""
     wanted = [fixture_request(name) for name in names] if names else list(FIXTURES)
+    await act_as_the_test_account()
     for request in wanted:
         recorded = await record_one(request)
         size = request.file.stat().st_size

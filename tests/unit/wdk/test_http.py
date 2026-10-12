@@ -1,7 +1,7 @@
 """The WDK transport: session identity, auth cookies, and what may be retried.
 
-One client per site serves every task, so the clients share a cookie jar. The
-global service account may not act on a user's WDK resources, and a create is
+One client per site serves every task, so the clients share a cookie jar. A
+client's own token may not act on a user's WDK resources, and a create is
 attempted once because a second attempt is a second object.
 """
 
@@ -24,7 +24,7 @@ from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.delayed_result import DELAYED_RESULT_MESSAGE
 from veupathdb.wdk.strategy_api.api import StrategyAPI
 
-SERVICE_ACCOUNT = "service.account.token"
+CLIENT_TOKEN = "client.constructor.token"
 USER_TOKEN = "registered.user.token"
 
 
@@ -168,7 +168,8 @@ class TestANewTokenStartsANewWdkSession:
     """Each async test runs in its own context, so a token it sets stays there."""
 
     async def _ping(self, client: HTTPClient) -> None:
-        await client._request_attempt("GET", "/ping", client._effective_token("/ping"))
+        credential = await client._credential("/ping")
+        await client._request_attempt("GET", "/ping", credential.token)
 
     async def test_reinits_when_token_changes(self) -> None:
         """Two tokens on one client produce two session init calls."""
@@ -228,7 +229,7 @@ class TestANewTokenStartsANewWdkSession:
 class TestAUserResourceNeedsTheUsersOwnToken:
     async def test_a_step_read_is_refused_and_never_leaves(self) -> None:
         transport = _RecordingTransport()
-        client = await _client(transport, auth_token=SERVICE_ACCOUNT)
+        client = await _client(transport, auth_token=CLIENT_TOKEN)
 
         with pytest.raises(WDKLoginRequiredError) as raised:
             await client.get("/users/1000000103/steps/9")
@@ -239,7 +240,7 @@ class TestAUserResourceNeedsTheUsersOwnToken:
 
     async def test_a_step_create_is_refused(self) -> None:
         transport = _RecordingTransport()
-        client = await _client(transport, auth_token=SERVICE_ACCOUNT)
+        client = await _client(transport, auth_token=CLIENT_TOKEN)
 
         with pytest.raises(WDKLoginRequiredError):
             await client.post("/users/1000000103/steps", json={}, idempotent=False)
@@ -249,7 +250,7 @@ class TestAUserResourceNeedsTheUsersOwnToken:
     async def test_the_identity_probe_is_refused_too(self) -> None:
         """``/users/current`` resolves a WDK account, so it needs one."""
         transport = _RecordingTransport()
-        client = await _client(transport, auth_token=SERVICE_ACCOUNT)
+        client = await _client(transport, auth_token=CLIENT_TOKEN)
 
         with pytest.raises(WDKLoginRequiredError):
             await client.get("/users/current")
@@ -258,7 +259,7 @@ class TestAUserResourceNeedsTheUsersOwnToken:
 
     async def test_the_users_own_token_is_served(self) -> None:
         transport = _RecordingTransport()
-        client = await _client(transport, auth_token=SERVICE_ACCOUNT)
+        client = await _client(transport, auth_token=CLIENT_TOKEN)
         veupathdb_auth_token_ctx.set(USER_TOKEN)
 
         assert await client.get("/users/1000000103/steps/9") == {"id": 1}
@@ -266,17 +267,17 @@ class TestAUserResourceNeedsTheUsersOwnToken:
 
 
 @pytest.mark.usefixtures("no_request_token")
-class TestUserIndependentReadsStillRunAsTheApplication:
+class TestUserIndependentReadsRunAsTheClientsOwnToken:
     async def test_a_search_listing_is_served(self) -> None:
         transport = _RecordingTransport()
-        client = await _client(transport, auth_token=SERVICE_ACCOUNT)
+        client = await _client(transport, auth_token=CLIENT_TOKEN)
 
         assert await client.get("/record-types/transcript/searches") == {"id": 1}
         assert "/service/record-types/transcript/searches" in transport.paths
 
     async def test_a_search_detail_read_is_served(self) -> None:
         transport = _RecordingTransport()
-        client = await _client(transport, auth_token=SERVICE_ACCOUNT)
+        client = await _client(transport, auth_token=CLIENT_TOKEN)
 
         assert await client.get("/record-types/transcript/searches/GenesByText") == {
             "id": 1

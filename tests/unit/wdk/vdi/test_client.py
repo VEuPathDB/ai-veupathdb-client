@@ -12,7 +12,6 @@ from tests.unit.wdk.vdi._wire import (
     BASE_URL,
     PROBE_ID,
     TOKEN,
-    deployment_token,
     form_parts,
     no_request_transport,
     recorded,
@@ -36,7 +35,7 @@ from veupathdb.wdk.vdi.models import (
 )
 from veupathdb.wdk.vdi.rnaseqrc import RnaSeqCountFile, RnaSeqRcUpload
 
-__all__ = ["deployment_token", "registered_token"]
+__all__ = ["registered_token"]
 
 GENELIST = VdiDatasetType(name="genelist", version="1.0")
 
@@ -394,7 +393,6 @@ class TestListingAndPlugins:
     @pytest.mark.skipif(
         needs_qa_recording("vdi/plugins.json"), reason=NEEDS_QA_RECORDING
     )
-    @pytest.mark.usefixtures("deployment_token")
     async def test_plugins_carries_no_credential(self) -> None:
         router = _Router({("GET", "/vdi/plugins"): (200, recorded("plugins"))})
         client = vdi_client(router.transport())
@@ -414,8 +412,7 @@ class TestListingAndPlugins:
 
 
 class TestTheClientNeverActsWithoutTheUsersOwnLogin:
-    @pytest.mark.usefixtures("deployment_token")
-    async def test_a_read_never_travels_as_the_deployment(self) -> None:
+    async def test_a_read_never_travels_as_the_guest(self) -> None:
         client = vdi_client(no_request_transport())
 
         with pytest.raises(WDKLoginRequiredError):
@@ -435,24 +432,21 @@ class TestTheClientNeverActsWithoutTheUsersOwnLogin:
 
         assert recorder.requests == []
 
-    @pytest.mark.usefixtures("deployment_token")
-    async def test_a_publish_never_travels_as_the_deployment(self) -> None:
+    async def test_a_publish_never_travels_as_the_guest(self) -> None:
         client = vdi_client(no_request_transport())
 
         with pytest.raises(WDKLoginRequiredError):
             await client.create_genelist(details=_meta(), gene_ids=["PF3D7_1133400"])
         await client.close()
 
-    @pytest.mark.usefixtures("deployment_token")
-    async def test_a_delete_never_travels_as_the_deployment(self) -> None:
+    async def test_a_delete_never_travels_as_the_guest(self) -> None:
         client = vdi_client(no_request_transport())
 
         with pytest.raises(WDKLoginRequiredError):
             await client.delete(PROBE_ID)
         await client.close()
 
-    @pytest.mark.usefixtures("deployment_token")
-    async def test_a_listing_never_travels_as_the_deployment(self) -> None:
+    async def test_a_listing_never_travels_as_the_guest(self) -> None:
         client = vdi_client(no_request_transport())
 
         with pytest.raises(WDKLoginRequiredError):
@@ -463,8 +457,7 @@ class TestTheClientNeverActsWithoutTheUsersOwnLogin:
         needs_qa_recording("vdi/plugins.json", "vdi/rnaseqrc_post_response.json"),
         reason=NEEDS_QA_RECORDING,
     )
-    @pytest.mark.usefixtures("deployment_token")
-    async def test_an_rnaseqrc_upload_never_travels_as_the_deployment(self) -> None:
+    async def test_an_rnaseqrc_upload_never_travels_as_the_guest(self) -> None:
         router = _Router(_upload_routes())
         client = vdi_client(router.transport())
 

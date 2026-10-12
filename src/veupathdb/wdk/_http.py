@@ -3,7 +3,10 @@
 import asyncio
 import re
 import time
+import urllib.request
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+from http.cookiejar import Cookie, CookieJar, DefaultCookiePolicy
 from typing import cast
 from urllib.parse import urlparse
 
@@ -17,11 +20,9 @@ from tenacity import (
     wait_exponential,
 )
 
-from veupathdb.auth_context import (
-    resolve_veupathdb_auth_token,
-    veupathdb_auth_token_ctx,
-)
+from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.errors import WDKError, WDKLoginRequiredError
+from veupathdb.guest_token import Credential, guest_tokens
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
 from veupathdb.observer import get_observer
@@ -29,6 +30,7 @@ from veupathdb.settings import DEFAULT_CONCURRENT_SEARCHES_PER_SITE, user_agent_
 from veupathdb.wdk._failures import wdk_failure
 from veupathdb.wdk._observability import (
     WdkRequestTelemetry,
+    _endpoint_group,
     wdk_retry_logger,
 )
 from veupathdb.wdk._search_names import SearchNames, search_kind
@@ -57,6 +59,8 @@ _RETRYABLE = (
     WDKDelayedResultError,
 )
 _SEARCH_RETRYABLE = (httpx.ConnectError, WDKDelayedResultError)
+_UNAUTHORIZED = 401
+_TOKEN_REFUSED = frozenset({_UNAUTHORIZED, 403})
 
 # Steps, strategies, datasets, baskets, favorites and preferences all hang off
 # a user, and ``/users/current`` resolves which user that is.
@@ -103,6 +107,13 @@ def _inject_auth_cookie(request: httpx.Request, auth_token: str) -> None:
     request.headers["cookie"] = "; ".join(kept)
 
 
+class _NoAuthorizationPolicy(DefaultCookiePolicy):
+    """Keeps every cookie but ``Authorization``, which each request sets itself."""
+
+    def set_ok(self, cookie: Cookie, request: urllib.request.Request) -> bool:
+        return cookie.name != "Authorization" and super().set_ok(cookie, request)
+
+
 def _convert_params_for_httpx(
     params: JSONObject | None,
 ) -> (
@@ -135,6 +146,16 @@ def _convert_params_for_httpx(
     return result
 
 
+@dataclass(frozen=True)
+class _Call:
+    method: str
+    path: str
+    params: JSONObject | None
+    json: object
+    attempts: int
+    budget_seconds: float | None
+
+
 class HTTPClient:
     """Low-level HTTP transport for VEuPathDB WDK REST services."""
 
@@ -146,6 +167,7 @@ class HTTPClient:
         *,
         concurrent_searches: int = DEFAULT_CONCURRENT_SEARCHES_PER_SITE,
         site_id: str | None = None,
+        transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.site_id = site_id or urlparse(self.base_url).hostname or self.base_url
@@ -155,6 +177,7 @@ class HTTPClient:
         self._search_slots = asyncio.Semaphore(concurrent_searches)
         self._search_names = SearchNames()
         self._client: httpx.AsyncClient | None = None
+        self._transport = transport
         self._client_lock = asyncio.Lock()
         # The JSESSIONID cookie in the shared jar is scoped to one identity.
         # A change of token requires a new session.
@@ -168,6 +191,8 @@ class HTTPClient:
             if self._client is None or self._client.is_closed:
                 self._client = httpx.AsyncClient(
                     base_url=self.base_url,
+                    transport=self._transport,
+                    cookies=CookieJar(policy=_NoAuthorizationPolicy()),
                     timeout=httpx.Timeout(self.timeout),
                     follow_redirects=True,
                     limits=httpx.Limits(
@@ -202,14 +227,20 @@ class HTTPClient:
         except httpx.HTTPError, OSError, RuntimeError:
             logger.debug("Failed to initialize WDK session (non-fatal)")
 
-    def _effective_token(self, path: str) -> str | None:
+    async def _credential(self, path: str) -> Credential:
         """Resolve the token one request travels with.
 
-        Only the request's own token may reach a WDK account.
+        Only the request's own token may reach a WDK account. With no token of
+        its own, a request travels as the shared guest.
         """
-        if _acts_for_a_user(path) and not veupathdb_auth_token_ctx.get():
+        request_token = veupathdb_auth_token_ctx.get()
+        if request_token:
+            return Credential(request_token)
+        if _acts_for_a_user(path):
             raise WDKLoginRequiredError
-        return resolve_veupathdb_auth_token(self.auth_token)
+        if self.auth_token:
+            return Credential(self.auth_token)
+        return Credential(await guest_tokens().token(self.base_url), guest=True)
 
     async def close(self) -> None:
         """Close the HTTP client and clear session state.
@@ -226,31 +257,25 @@ class HTTPClient:
         self,
         method: str,
         path: str,
-        auth_token: str | None,
+        auth_token: str,
         params: JSONObject | None = None,
         json: object = None,
         budget_seconds: float | None = None,
     ) -> JsonValue:
         """Make one HTTP request attempt. Tenacity drives the retries."""
         client = await self._get_client()
-        telemetry = WdkRequestTelemetry(
-            method=method,
-            path=path,
-            base_url=self.base_url,
-            has_auth=bool(auth_token),
-        )
 
         logger.debug(
             "VEuPathDB request",
             method=method,
             path=path,
             base_url=self.base_url,
-            endpoint_group=telemetry.metric_attrs(outcome="pending")["endpoint_group"],
+            endpoint_group=_endpoint_group(path),
         )
 
         try:
             # WDK authenticates through an Authorization cookie, not a header.
-            if auth_token and auth_token != self._initialized_for_token:
+            if auth_token != self._initialized_for_token:
                 # A JSESSIONID belongs to one identity and must not be reused.
                 client.cookies.delete("JSESSIONID")
                 self._initialized_for_token = auth_token
@@ -262,8 +287,7 @@ class HTTPClient:
                 params=httpx_params,
                 json=json,
             )
-            if auth_token:
-                _inject_auth_cookie(request, auth_token)
+            _inject_auth_cookie(request, auth_token)
             async with asyncio.timeout(budget_seconds):
                 response = await client.send(request)
             response.raise_for_status()
@@ -328,7 +352,7 @@ class HTTPClient:
         self,
         method: str,
         path: str,
-        auth_token: str | None,
+        auth_token: str,
         params: JSONObject | None = None,
         json: object = None,
         budget_seconds: float | None = None,
@@ -391,29 +415,53 @@ class HTTPClient:
         attempts: int = _ATTEMPTS,
         budget_seconds: float | None = None,
     ) -> JsonValue:
-        """Make an HTTP request with retries, and record telemetry."""
+        """Make an HTTP request with retries, and record telemetry.
+
+        A guest token answered with 401 is minted again and the request sent
+        once more. A guest refused with 401 or 403 needs a registered user.
+        """
+        call = _Call(method, path, params, json, attempts, budget_seconds)
+        credential = await self._credential(path)
+        if not credential.guest:
+            return await self._send(call, credential)
+        try:
+            return await self._send(call, credential)
+        except WDKError as refusal:
+            if refusal.status not in _TOKEN_REFUSED:
+                raise
+            if refusal.status != _UNAUTHORIZED:
+                raise WDKLoginRequiredError from refusal
+        renewed = await guest_tokens().renew(credential.token, self.base_url)
+        try:
+            return await self._send(call, Credential(renewed, guest=True))
+        except WDKError as refusal:
+            if refusal.status in _TOKEN_REFUSED:
+                raise WDKLoginRequiredError from refusal
+            raise
+
+    async def _send(self, call: _Call, credential: Credential) -> JsonValue:
         start = time.monotonic()
-        auth_token = self._effective_token(path)
+        method, path = call.method, call.path
         searching = runs_a_search(method, path)
         telemetry = WdkRequestTelemetry(
             method=method,
             path=path,
             base_url=self.base_url,
-            has_auth=bool(auth_token),
+            has_auth=not credential.guest,
         )
         try:
             result: JsonValue = await self._retrying(
-                attempts=attempts,
+                attempts=call.attempts,
                 telemetry=telemetry,
                 searching=searching,
             )(
                 self._search_attempt if searching else self._request_attempt,
                 method,
                 path,
-                auth_token,
-                params=params,
-                json=json,
-                budget_seconds=budget_seconds,
+                credential.token,
+                params=call.params,
+                json=call.json,
+                budget_seconds=call.budget_seconds,
             )
         except RetryError as e:
             last = e.last_attempt.exception()
@@ -430,7 +478,7 @@ class HTTPClient:
         else:
             metric_attrs = telemetry.metric_attrs(outcome="ok", status_code=200)
             get_observer().on_wdk_request(time.monotonic() - start, metric_attrs)
-            self._search_names.learn(method, path, json, result)
+            self._search_names.learn(method, path, call.json, result)
             return result
 
     async def probe(
@@ -445,15 +493,14 @@ class HTTPClient:
         A 4xx is the measurement, so nothing here raises on one.
         """
         client = await self._get_client()
-        auth_token = self._effective_token(path)
+        credential = await self._credential(path)
         request = client.build_request(
             method=method,
             url=path,
             params=_convert_params_for_httpx(params),
             json=json,
         )
-        if auth_token:
-            _inject_auth_cookie(request, auth_token)
+        _inject_auth_cookie(request, credential.token)
         response = await client.send(request)
         return WDKProbe(
             method=method,

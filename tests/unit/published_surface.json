@@ -19,7 +19,6 @@
     "veupathdb_settings_source"
   ],
   "veupathdb.auth_context": [
-    "resolve_veupathdb_auth_token",
     "veupathdb_auth_token_ctx"
   ],
   "veupathdb.devtools": [
@@ -289,6 +288,15 @@
     "param_message_rows",
     "validate_response"
   ],
+  "veupathdb.guest_token": [
+    "Credential",
+    "GUEST_RENEWAL_MARGIN_SECONDS",
+    "GuestClaims",
+    "GuestTokens",
+    "authorization_cookies",
+    "guest_tokens",
+    "use_guest_tokens"
+  ],
   "veupathdb.model": [
     "CamelModel",
     "NonFiniteToNone",
@@ -300,6 +308,7 @@
   "veupathdb.testing": [
     "DriftLog",
     "FIXTURE_ROOT",
+    "HERMETIC_GUEST_TOKEN",
     "LiveLaneSummary",
     "NEEDS_QA_RECORDING",
     "NO_CREDENTIALS_REASON",
@@ -308,6 +317,7 @@
     "QA_SITES_FILE",
     "SiteTally",
     "WdkTestAccount",
+    "hermetic_guest_tokens",
     "needs_qa_recording",
     "registered_wdk_token",
     "summary_path",

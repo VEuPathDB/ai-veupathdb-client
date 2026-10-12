@@ -33,7 +33,6 @@ class VEuPathDBSettings(BaseSettings):
         default=None,
         description="Path to the YAML file that lists the sites this deployment reaches. Required: the package ships no default list, and the first site read fails without one.",
     )
-    veupathdb_auth_token: str | None = Field(default=None, repr=False)
     veupathdb_oauth_url: str = Field(
         default=DEFAULT_OAUTH_URL,
         description="The OAuth server that signs VEuPathDB bearer tokens. One server serves every site.",

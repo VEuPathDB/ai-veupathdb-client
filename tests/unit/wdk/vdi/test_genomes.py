@@ -11,8 +11,11 @@ import respx
 from tests.unit.wdk.vdi._wire import recorded
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
-from veupathdb.settings import VEuPathDBSettings, use_veupathdb_settings_source
-from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
+from veupathdb.testing import (
+    HERMETIC_GUEST_TOKEN,
+    NEEDS_QA_RECORDING,
+    needs_qa_recording,
+)
 from veupathdb.wdk.vdi.genomes import reference_genomes
 from veupathdb.wdk.vdi.models import VdiDatasetDependency
 
@@ -21,15 +24,19 @@ _GENOMES = f"{_SERVICE}/record-types/organism/searches/GenomeDataTypes/reports/s
 
 
 @pytest.fixture
-def no_credential() -> Iterator[None]:
-    """Both reads answer with no credential, so none is configured."""
-    use_veupathdb_settings_source(lambda: VEuPathDBSettings(veupathdb_auth_token=None))
+def as_the_guest() -> Iterator[None]:
+    """Both reads are open paths, so they travel as the shared guest."""
     reset = veupathdb_auth_token_ctx.set(None)
     try:
         yield
     finally:
         veupathdb_auth_token_ctx.reset(reset)
-        use_veupathdb_settings_source(VEuPathDBSettings)
+
+
+def _webapp(service: str) -> None:
+    respx.get(service.replace("/service", "/app")).mock(
+        return_value=httpx.Response(200, text="ok")
+    )
 
 
 def _genome_rows() -> list[dict[str, str]]:
@@ -42,9 +49,10 @@ def _genome_rows() -> list[dict[str, str]]:
     needs_qa_recording("vdi/genome_data_types.json", "vdi/service_root.json"),
     reason=NEEDS_QA_RECORDING,
 )
-@pytest.mark.usefixtures("no_credential")
+@pytest.mark.usefixtures("as_the_guest")
 @respx.mock
 async def test_reference_genomes_build_the_sites_identifier() -> None:
+    _webapp(_SERVICE)
     respx.get(f"{_SERVICE}/").mock(
         return_value=httpx.Response(200, json=recorded("service_root"))
     )
@@ -74,7 +82,7 @@ async def test_reference_genomes_build_the_sites_identifier() -> None:
     )
     sent = report.calls.last.request
     assert "authorization" not in sent.headers
-    assert "cookie" not in sent.headers
+    assert sent.headers["cookie"] == f"Authorization={HERMETIC_GUEST_TOKEN}"
     assert json.loads(sent.content) == {
         "searchConfig": {"parameters": {}},
         "reportConfig": {
@@ -93,9 +101,10 @@ _GIARDIA = "https://qa.giardiadb.org/giardiadb.qa/service"
     ),
     reason=NEEDS_QA_RECORDING,
 )
-@pytest.mark.usefixtures("no_credential")
+@pytest.mark.usefixtures("as_the_guest")
 @respx.mock
 async def test_a_genome_whose_identifier_vdi_refuses_is_not_offered() -> None:
+    _webapp(_GIARDIA)
     respx.get(f"{_GIARDIA}/").mock(
         return_value=httpx.Response(200, json=recorded("giardiadb_service_root"))
     )

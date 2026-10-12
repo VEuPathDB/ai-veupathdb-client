@@ -13,7 +13,6 @@ import httpx
 import pytest
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
-from veupathdb.settings import VEuPathDBSettings, use_veupathdb_settings_source
 from veupathdb.testing import FIXTURE_ROOT
 from veupathdb.wdk.vdi.client import VdiClient
 
@@ -21,7 +20,6 @@ FIXTURES = FIXTURE_ROOT / "vdi"
 
 BASE_URL = "https://qa.plasmodb.org/vdi"
 TOKEN = "registered.vdi.token"
-DEPLOYMENT_TOKEN = "service.account.token"
 PROBE_ID = "vdiTestData01"
 
 
@@ -32,15 +30,6 @@ def registered_token() -> Iterator[str]:
         yield TOKEN
     finally:
         veupathdb_auth_token_ctx.reset(reset)
-
-
-@pytest.fixture
-def deployment_token() -> Iterator[str]:
-    """A deployment that exports its own service token."""
-    installed = VEuPathDBSettings(veupathdb_auth_token=DEPLOYMENT_TOKEN)
-    use_veupathdb_settings_source(lambda: installed)
-    yield DEPLOYMENT_TOKEN
-    use_veupathdb_settings_source(VEuPathDBSettings)
 
 
 def no_request_transport() -> httpx.MockTransport:

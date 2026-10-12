@@ -19,7 +19,7 @@ _TOKEN_REFUSED = frozenset({401, 403})
 async def fetch_current_user(site_id: str) -> WDKUserInfo | None:
     """The WDK user the request's token names.
 
-    None when the request carries no token, so a service account is never
+    None when the request carries no token, so the shared guest is never
     reported as the signed-in user, and None when the site refuses the token.
     A site that does not answer raises ``WDKError``.
     """

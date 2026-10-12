@@ -9,10 +9,7 @@ from typing import Literal
 import httpx
 from pydantic import JsonValue, TypeAdapter
 
-from veupathdb.auth_context import (
-    resolve_user_auth_token,
-    resolve_veupathdb_auth_token,
-)
+from veupathdb.auth_context import resolve_user_auth_token, veupathdb_auth_token_ctx
 from veupathdb.eda.errors import eda_failure
 from veupathdb.eda.models import (
     EdaBinSpec,
@@ -39,8 +36,10 @@ from veupathdb.eda.models import (
     EdaTwoByTwoResponse,
     VolcanoStatsResponse,
 )
-from veupathdb.errors import WDKLoginRequiredError
+from veupathdb.errors import SiteNotFoundError, WDKLoginRequiredError
+from veupathdb.guest_token import Credential, guest_tokens
 from veupathdb.settings import user_agent_header
+from veupathdb.wdk.factory import list_sites
 
 FILTERS: TypeAdapter[list[EdaFilter]] = TypeAdapter(list[EdaFilter])
 JSON_BODY: TypeAdapter[JsonValue] = TypeAdapter(JsonValue)
@@ -53,6 +52,7 @@ _TEXT_ONLY = "text/plain"
 _NO_COMPUTE_APP = "pass"
 
 _FIRST_ERROR_STATUS = 400
+_UNAUTHORIZED = 401
 
 # Analyses, derived variables and preferences hang off a user.
 _USER_PATH_PREFIX = "/users/"
@@ -61,7 +61,7 @@ _USER_PATH_PREFIX = "/users/"
 class EdaClient:
     """One site's EDA service.
 
-    A study read may travel as the deployment; a path under ``/users/`` never does.
+    A study read may travel as the shared guest; a path under ``/users/`` never does.
     """
 
     def __init__(
@@ -97,14 +97,22 @@ class EdaClient:
                 )
             return self._client
 
-    def _token(self, path: str) -> str:
+    async def _credential(self, path: str) -> Credential:
         """Only the researcher's own token reaches a path under ``/users/``."""
         if path.startswith(_USER_PATH_PREFIX):
-            return resolve_user_auth_token(self.auth_token)
-        token = resolve_veupathdb_auth_token(self.auth_token)
-        if not token:
-            raise WDKLoginRequiredError
-        return token
+            return Credential(resolve_user_auth_token(self.auth_token))
+        token = veupathdb_auth_token_ctx.get() or self.auth_token
+        if token:
+            return Credential(token)
+        return Credential(await guest_tokens().token(self._service_url()), guest=True)
+
+    def _service_url(self) -> str:
+        """The WDK service of the configured site this EDA service belongs to."""
+        sites = list_sites()
+        for site in sites:
+            if site.eda_base_url == self.base_url:
+                return site.service_url
+        raise SiteNotFoundError(self.base_url, [site.id for site in sites])
 
     async def send(
         self,
@@ -115,19 +123,29 @@ class EdaClient:
         params: dict[str, str] | None = None,
         accept: str = _JSON_ONLY,
     ) -> httpx.Response:
-        """One call, raised as an EDA error on any status from 400 up."""
+        """One call, raised as an EDA error on any status from 400 up.
+
+        A guest token answered with 401 is minted again and the call sent once
+        more; a second 401 needs a registered user.
+        """
         client = await self._http()
-        request = client.build_request(
-            method,
-            path,
-            json=json,
-            params=params,
-            headers={
-                "Accept": accept,
-                "Cookie": f"Authorization={self._token(path)}",
-            },
-        )
-        response = await client.send(request)
+        credential = await self._credential(path)
+
+        def build(token: str) -> httpx.Request:
+            return client.build_request(
+                method,
+                path,
+                json=json,
+                params=params,
+                headers={"Accept": accept, "Cookie": f"Authorization={token}"},
+            )
+
+        response = await client.send(build(credential.token))
+        if credential.guest and response.status_code == _UNAUTHORIZED:
+            renewed = await guest_tokens().renew(credential.token, self._service_url())
+            response = await client.send(build(renewed))
+            if response.status_code == _UNAUTHORIZED:
+                raise WDKLoginRequiredError
         if response.status_code >= _FIRST_ERROR_STATUS:
             raise eda_failure(method, path, response.status_code, response.text)
         return response

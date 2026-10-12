@@ -27,14 +27,10 @@ from pathlib import Path
 import httpx
 from pydantic import BaseModel, ConfigDict, TypeAdapter
 
-from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.devtools.qa_sites import use_qa_sites
 from veupathdb.json_types import JSONObject
 from veupathdb.testing.fixture_store import FIXTURE_ROOT
-from veupathdb.testing.wdk_credentials import (
-    NO_CREDENTIALS_REASON,
-    registered_wdk_token,
-)
+from veupathdb.testing.wdk_credentials import act_as_the_test_account
 from veupathdb.wdk.factory import get_site
 from veupathdb.wdk.vdi.client import VdiClient, VdiDatasetGoneError
 from veupathdb.wdk.vdi.genomes import reference_genomes
@@ -260,10 +256,7 @@ async def record_install(
 ) -> CapturedInstall:
     """Run one capture on a QA site and write it into the store."""
     use_qa_sites()
-    token = await registered_wdk_token()
-    if token is None:
-        raise RuntimeError(NO_CREDENTIALS_REASON)
-    veupathdb_auth_token_ctx.set(token)
+    await act_as_the_test_account()
     site = get_site(site_id)
     offered = [] if genome is None else await reference_genomes(site_id)
     dependencies = [g for g in offered if g.resource_identifier == genome]

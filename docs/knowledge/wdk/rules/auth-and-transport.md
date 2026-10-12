@@ -222,7 +222,7 @@ edited 2026-08-03, which declares eleven; the schemas declare eight and include
 
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/filter/CheckLoginFilter.java#L135-L148
-- anchor: src/veupathdb/wdk/_http.py:_effective_token
+- anchor: src/veupathdb/wdk/_http.py:_credential
 - status: ENFORCED by tests/unit/wdk/test_http.py::TestAUserResourceNeedsTheUsersOwnToken::test_a_step_read_is_refused_and_never_leaves
 
 `CheckLoginFilter` runs before every endpoint. With no bearer token it does not return
@@ -245,10 +245,11 @@ a 200, and an empty answer that reads like a scientific negative.
 
 The filter still behaves this way; what changed on 2026-08-19 is what the minted guest
 can then do, which is nothing ([transport-quirks](../rest/transport-quirks.md)). So the
-hazard is no longer a silent wrong answer, it is a 403 on every call. This client mints
-no guests and refuses a user-scoped WDK call that carries no registered token before it
-leaves the process, which is what the anchor pins
-(`pathfinder: docs/knowledge/decisions/wdk-requires-registered-login.md`).
+hazard is no longer a silent wrong answer, it is a 403 on every call but a few open paths.
+This client never sends a request with no token: a request with no researcher token
+travels as one shared guest token, minted once per process
+([transport-quirks](../rest/transport-quirks.md)). It refuses a user-scoped WDK call that
+carries no researcher token before it leaves the process, which is what the anchor pins.
 
 ### WDK-AUTH-002 - A request carries exactly one `Authorization` cookie pair
 
@@ -271,8 +272,9 @@ response", and it is still wide enough to be the hazard: the unauthenticated war
 a container makes at boot are exactly the case, and they deposit a guest token in the
 shared jar that outlives them. httpx then merges that jar into the cookie header before
 per-request injection runs, so appending the real token would send the stale guest
-alongside it. `_inject_auth_cookie` strips every jar-held `Authorization` pair from the
-built request and appends exactly one.
+alongside it. The shared client's jar refuses to store an `Authorization` cookie, and
+`_inject_auth_cookie` strips any `Authorization` pair from the built request and appends
+exactly one.
 
 The legacy `wdk_check_auth` cookie is cleared on every response unconditionally, which is
 what makes the whole filter look like it always writes cookies. It is a different cookie
@@ -342,32 +344,32 @@ The same token was checked on toxodb.org and the portal after logout and answere
 `isGuest: false` with the same user id on both, so this is not per-site.
 
 
-### WDK-AUTH-005 - A user dataset and an EDA analysis travel only with the researcher's own token; the deployment's token never stands in
+### WDK-AUTH-005 - A user dataset and an EDA analysis travel only with the researcher's own token; the guest token never stands in
 
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/vdi-service/blob/34eb6f2f331bc5a8cd686d63588102b46d30b4dd/project/core/module/rest-service/src/main/kotlin/vdi/service/rest/server/controllers/DatasetListController.kt#L25-L65
 - anchor: src/veupathdb/auth_context.py:resolve_user_auth_token
-- status: ENFORCED by tests/unit/test_auth_token_resolution.py::test_vdi_refuses_the_settings_token_with_an_empty_contextvar
+- status: ENFORCED by tests/unit/test_auth_token_resolution.py::test_vdi_refuses_the_guest_with_an_empty_contextvar
 
 VDI keys every dataset call to the user the token names.
 [`ControllerBase.userID`](https://github.com/VEuPathDB/vdi-service/blob/34eb6f2f331bc5a8cd686d63588102b46d30b4dd/project/core/module/rest-service/src/main/kotlin/vdi/service/rest/server/controllers/ControllerBase.kt#L49-L61)
 is read from the authenticated request, `GET /datasets` lists that user's datasets and
-`POST /datasets` creates the new one under that user. A registered service account is a
-user like any other, so a publish sent as the deployment answers 202 and the gene list
-lands in the service account's workspace, where the researcher never sees it; a poll or a
-delete reads or removes the service account's copy.
+`POST /datasets` creates the new one under that user. Any token other than the
+researcher's names another user, so a publish sent under it lands in that user's
+workspace, where the researcher never sees it; a poll or a delete reads or removes that
+user's copy.
 
 EDA addresses an analysis by the user id in its path, and
 [`UserService`](https://github.com/VEuPathDB/service-eda/blob/b3bb8bac06de4340b4b2c21d9aa4a94d9b3de61f/src/main/java/org/veupathdb/service/eda/user/service/UserService.java#L44-L59)
-checks that id against the token's user through `Utils.getAuthorizedUser`. Under the
-deployment's token that is a 403 at best, and a write into the service account's own
-analyses when the id is the service account's.
+checks that id against the token's user through `Utils.getAuthorizedUser`. Under any
+other user's token that is a 403 at best, and a write into that user's own analyses when
+the id is theirs.
 
 So both clients resolve the token for these calls from the request's contextvar or the
 client's own `auth_token=` and nothing else. With neither, `resolve_user_auth_token`
 raises `WDKLoginRequiredError` before a request is built: every `VdiClient` call, and
 every `EdaClient` path under `/users/`. A worker task that carries no token is refused,
-not served as the deployment. EDA study, subsetting and compute reads are
-user-independent and keep the settings token as the last fallback. The WDK side is
+not served as the guest. EDA study, subsetting and compute reads are user-independent
+and travel as the shared guest when no researcher token is present. The WDK side is
 stricter: a WDK path under `/users/` accepts the contextvar only
 ([WDK-AUTH-001](#wdk-auth-001---a-request-with-no-credential-is-not-rejected-wdk-mints-a-new-guest-user-for-it)).

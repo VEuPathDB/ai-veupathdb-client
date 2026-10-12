@@ -21,8 +21,11 @@ from veupathdb.eda.errors import (
     EdaInvalidInputError,
 )
 from veupathdb.eda.models import EdaBinSpec
-from veupathdb.errors import WDKLoginRequiredError
-from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
+from veupathdb.testing import (
+    HERMETIC_GUEST_TOKEN,
+    NEEDS_QA_RECORDING,
+    needs_qa_recording,
+)
 
 pytestmark = pytest.mark.asyncio
 
@@ -51,7 +54,7 @@ async def test_the_request_carries_the_authorization_cookie() -> None:
     assert seen[0].url.path == "/eda/studies"
 
 
-async def test_a_request_with_no_token_never_reaches_the_wire() -> None:
+async def test_a_request_with_no_token_travels_as_the_guest() -> None:
     calls: list[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -61,13 +64,14 @@ async def test_a_request_with_no_token_never_reaches_the_wire() -> None:
     token = veupathdb_auth_token_ctx.set(None)
     client = eda_client(httpx.MockTransport(handler))
     try:
-        with pytest.raises(WDKLoginRequiredError):
-            await client.count(study_id="S", entity_id="E", filters=[])
+        assert await client.count(study_id="S", entity_id="E", filters=[]) == 0
     finally:
         veupathdb_auth_token_ctx.reset(token)
         await client.close()
 
-    assert calls == []
+    assert [call.headers["cookie"] for call in calls] == [
+        f"Authorization={HERMETIC_GUEST_TOKEN}"
+    ]
 
 
 @pytest.mark.skipif(

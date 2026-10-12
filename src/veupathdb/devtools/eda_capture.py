@@ -11,9 +11,8 @@ Usage::
     python -m veupathdb.devtools.eda_capture list
     python -m veupathdb.devtools.eda_capture record [--only NAME ...]
 
-An analysis needs WDK_TEST_TOKEN, or WDK_TEST_EMAIL/WDK_TEST_PASSWORD: the
-analysis routes are keyed by a registered user. A distribution, a compute and a
-visualization need VEUPATHDB_AUTH_TOKEN, the deployment's token.
+Every capture needs WDK_TEST_TOKEN, or WDK_TEST_EMAIL/WDK_TEST_PASSWORD, and
+records under that registered account.
 """
 
 from __future__ import annotations
@@ -28,7 +27,6 @@ from urllib.parse import urlencode
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, TypeAdapter
 
-from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.devtools.qa_sites import use_qa_sites
 from veupathdb.domain import VEUPATHDB_GENE_ID
 from veupathdb.eda.analyses import EdaAnalysesClient
@@ -53,10 +51,7 @@ from veupathdb.eda.models import (
 )
 from veupathdb.json_types import JSONObject
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
-from veupathdb.testing.wdk_credentials import (
-    NO_CREDENTIALS_REASON,
-    registered_wdk_token,
-)
+from veupathdb.testing.wdk_credentials import act_as_the_test_account
 from veupathdb.wdk.factory import get_site, get_wdk_client
 
 PROVENANCE_FILE = "provenance.json"
@@ -617,10 +612,7 @@ async def record_analyses(wanted: list[AnalysisCapture]) -> int:
     use_qa_sites()
     if not wanted:
         return 0
-    token = await registered_wdk_token()
-    if token is None:
-        raise RuntimeError(NO_CREDENTIALS_REASON)
-    veupathdb_auth_token_ctx.set(token)
+    await act_as_the_test_account()
     today = datetime.datetime.now(tz=datetime.UTC).date().isoformat()
     for capture in wanted:
         analyses = get_eda_analyses_client(capture.site)
@@ -644,8 +636,11 @@ async def record_analyses(wanted: list[AnalysisCapture]) -> int:
 
 
 async def record_distributions(wanted: list[DistributionCapture]) -> int:
-    """Record each distribution capture on its QA site under the deployment's token."""
+    """Record each distribution capture on its QA site under the registered test account."""
     use_qa_sites()
+    if not wanted:
+        return 0
+    await act_as_the_test_account()
     today = datetime.datetime.now(tz=datetime.UTC).date().isoformat()
     for capture in wanted:
         body = await capture_distribution(capture, client=get_eda_client(capture.site))
@@ -661,8 +656,11 @@ async def record_distributions(wanted: list[DistributionCapture]) -> int:
 
 
 async def record_posts(wanted: list[PostCapture]) -> int:
-    """Record each POST capture on its QA site under the deployment's token."""
+    """Record each POST capture on its QA site under the registered test account."""
     use_qa_sites()
+    if not wanted:
+        return 0
+    await act_as_the_test_account()
     today = datetime.datetime.now(tz=datetime.UTC).date().isoformat()
     for capture in wanted:
         captured = await capture_post(capture, client=get_eda_client(capture.site))

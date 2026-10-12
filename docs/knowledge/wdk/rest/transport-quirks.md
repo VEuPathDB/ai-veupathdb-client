@@ -36,9 +36,29 @@ toxodb.org that day, `GET /record-types/transcript/searches/GenesByTaxon` answer
 only available to registered users, and requires an API key." with a freshly minted
 guest cookie, while a registered user's token answers 200. `POST /users/current/steps`
 behaves the same way. The minting behavior below is unchanged and still describes the
-wire; what changed is that the token it hands back opens nothing. This client therefore
-mints no guests at all, and requires a registered login for every WDK-backed feature
-(`pathfinder: docs/knowledge/decisions/wdk-requires-registered-login.md`).
+wire; what changed is that the token it hands back opens almost nothing.
+
+A short list of open paths still accepts no token or a guest token, as VEuPathDB's
+`ApiCheckLoginFilter` (ApiCommonWebsite, a subclass of WDK's `CheckLoginFilter`) declares
+it: the service root, `login`, `ontologies/Categories`, `record-types` and each
+`record-types/<type>`, `users/current`, and a few dataset and organism reports. Every other
+path, including `record-types/<type>/searches`, a search's details, a dependent-parameter
+refresh, every other standard report and everything under `users/<id>/`, needs a
+registered user. The list is edited upstream, so this client does not copy it: it lets the
+site decide and reads the refusal.
+
+The invariant this client holds:
+
+- **No request leaves with no token.** Each one would make WDK mint a guest, which is a new
+  row in VEuPathDB's account database.
+- **A request with no researcher token travels as one shared guest.**
+  `veupathdb.guest_token.GuestTokens` mints it once per process by a `GET` of a site's
+  service root that carries no cookie, and reads `exp` from its claims. One guest token is
+  accepted on every site and on EDA's `/studies`. It is minted again ten minutes before
+  `exp`, and once after a site answers it with 401; the request is then sent once more.
+- **A site that refuses the guest with 401 or 403 needs a registered user**, and the client
+  raises `WDKLoginRequiredError`. A refusal of a researcher's own token stays a `WDKError`.
+- **A path under `/users/` never travels as the guest** ([WDK-AUTH-001](../rules/auth-and-transport.md)).
 
 Be exact about the scope, because the loose version of this sentence caused a defect in
 this bundle. The response filter is guarded on a request property that `useNewGuest` is
@@ -49,9 +69,9 @@ credential and is why the filter looks like it always writes cookies.
 
 Two practical consequences fall out of that, both already rules:
 
-- A shared HTTP client accumulates guest tokens in its jar - one per unauthenticated call
-  it ever made, including boot-time warmup - so a request must be built to carry exactly
-  one `Authorization` pair ([WDK-AUTH-002](../rules/auth-and-transport.md)).
+- A shared HTTP client would accumulate any guest token a response sets, so its jar
+  refuses to store an `Authorization` cookie and a request is built to carry exactly one
+  `Authorization` pair ([WDK-AUTH-002](../rules/auth-and-transport.md)).
 - A shared client also accumulates a `JSESSIONID`, which must not outlive the identity
   that created it ([WDK-AUTH-003](../rules/auth-and-transport.md)).
 

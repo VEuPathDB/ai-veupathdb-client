@@ -1,5 +1,17 @@
 # Knowledge log
 
+## 2026-10-12 - Open paths travel as one shared guest
+
+The client sends no request without a token and holds no deployment token:
+`veupathdb_auth_token` left the settings and `resolve_veupathdb_auth_token` left
+`veupathdb.auth_context`. A request with no researcher token travels as one guest token,
+minted once per process by `veupathdb.guest_token.GuestTokens` and sent on every site and
+on EDA ([transport-quirks](wdk/rest/transport-quirks.md)). A site that refuses the guest
+raises `WDKLoginRequiredError`. The shared WDK cookie jar never stores an `Authorization`
+cookie ([WDK-AUTH-002](wdk/rules/auth-and-transport.md)). The recorders act as the
+registered test account named by `WDK_TEST_TOKEN` or `WDK_TEST_EMAIL`/`WDK_TEST_PASSWORD`,
+and `veupathdb.testing.hermetic_guest_tokens` mints a guest with no network for a hermetic suite.
+
 ## 2026-10-10 - A range value reads its JSON text
 
 `param_value_from_raw` reads a `number-range` or `date-range` value given as the JSON text

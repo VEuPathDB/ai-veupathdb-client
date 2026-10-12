@@ -21,18 +21,19 @@ access management, staff, metrics, and download endpoints.
 Same WDK bearer token the WDK client already holds
 (`src/veupathdb/wdk/auth_login.py:password_login`). Verified live:
 
-- No credential -> `401 {"status":"unauthorized"}` even for `/studies`.
-  Guest access is refused, consistent with
-  the registered-login decision (`pathfinder: docs/knowledge/decisions/wdk-requires-registered-login.md`).
+- No credential -> `401 {"status":"unauthorized"}` even for `/studies`: the
+  EDA service mints no guest. A guest token minted by a WDK site is accepted
+  on `/studies`, which then lists the studies a guest may see, the public ones.
 - `Cookie: Authorization={token}` -> 200, and `Authorization: Bearer {token}`
   -> 200 (both live-verified; the bearer form is what the WSF plugins send).
   The `Auth-Key: {token}` header form returns 401.
 - A path under `/users/` names an account, and the service checks that id
   against the token's user. `EdaClient` sends such a path only with the
-  request's contextvar token or its own `auth_token=`, never the deployment's
-  settings token, and raises `WDKLoginRequiredError` before the request with
-  neither (`WDK-AUTH-005`). Study, subsetting and compute paths keep the
-  settings token as the last fallback.
+  request's contextvar token or its own `auth_token=`, never the shared guest
+  token, and raises `WDKLoginRequiredError` before the request with neither
+  (`WDK-AUTH-005`). Study, subsetting and compute paths travel as the shared
+  guest when neither is present; a guest answered 401 is minted again once,
+  and a second 401 raises `WDKLoginRequiredError`.
 
 ## Metadata
 

@@ -107,8 +107,8 @@ class _VdiProblem(CamelModel):
 class VdiClient:
     """One site's VDI service. The request's own registered token authenticates it.
 
-    The deployment's service account is never a substitute: a dataset belongs
-    to the researcher who published it.
+    The shared guest is never a substitute: a dataset belongs to the
+    researcher who published it.
     """
 
     def __init__(

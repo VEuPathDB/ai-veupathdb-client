@@ -40,8 +40,8 @@ This client sends the bearer header. `/plugins` is the only endpoint below that 
 without a credential, and `VdiClient.plugins` sends none.
 
 VDI keys every dataset to the user the token names, so every other `VdiClient` call takes
-the token from the request's contextvar or the client's own `auth_token=` and never from
-the deployment's settings; with neither it raises `WDKLoginRequiredError` and sends
+the token from the request's contextvar or the client's own `auth_token=` and never
+from the shared guest; with neither it raises `WDKLoginRequiredError` and sends
 nothing ([WDK-AUTH-005](../rules/auth-and-transport.md)).
 
 # Endpoints
