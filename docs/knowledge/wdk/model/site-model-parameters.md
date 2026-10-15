@@ -327,6 +327,29 @@ what was searched - `geneParams.xml`, `geneQueries.xml`, `geneQuestions.xml` and
 `Model/bin` tooling in ApiCommonModel, and the two site clients in web-monorepo - and not
 a claim that no explanation exists.
 
+# OrthoMCL's `phyletic_expression` and the taxonomy it names
+
+`GroupsByPhyleticPattern` on orthomcl.org has one parameter, `phyletic_expression`, a free
+string in the grammar the search's own description states. Read on qa.orthomcl.org on
+2026-10-14:
+
+- A unit is a taxa specification, an operator and a count. The specification is one code,
+  or codes joined by `+`, or `ALL`. The operators are `>`, `<`, `=`, `>=` and `<=`. A bare
+  count counts sequences; a count ending in `T` counts taxa.
+- `AND` and `OR` join units and parentheses group them. The description does not state
+  which of the two binds first, so `PhyleticExpression.parse` refuses the two side by side
+  without parentheses.
+- "Present in some but not all of a list" is `list>=1T AND list<NT`; "absent from at least
+  k of N" is `list<=(N-k)T`.
+
+The codes are not on the search. They are on the helper record of `helper/ByDefault`, in
+two tables: `RootTaxons` holds the 48 clades (`taxon_abbrev`, uppercase, with `ALL` as the
+root) and `Taxons` holds the 857 species (`three_letter_abbrev`, four lowercase letters
+despite the name). Every row names its parent by `orthomcl_clade_id`, and a species row
+repeats once for each clade above it, under `taxon_group`. `ortho_taxonomy_of` reads both
+into the same `PhyleticTree` the genomics-site maps produce, so a code lookup and a code
+check are one implementation for both searches.
+
 # What a converter has to get right
 
 Five things, in the order they bite:

@@ -38,7 +38,7 @@ NO_SPECIES = "n/a"
 NO_CONSTRAINT_PATTERN = "%"
 """The pattern of an empty selection: every census matches it."""
 
-_ROOT_CODE = "ALL"
+PHYLETIC_ROOT_CODE = "ALL"
 """The tree root, which the reference client also writes as ``All Organisms``.
 Authoring resolves neither form: a pattern over every species exceeds the
 parameter's 4000 character cap and states more than the request means."""
@@ -53,6 +53,17 @@ class PhyleticNode(BaseModel):
     label: str
     depth: int
     children: list[PhyleticNode] = Field(default_factory=list)
+
+
+class TaxonEntry(BaseModel):
+    """One clade or species that names its parent by id."""
+
+    model_config = ConfigDict(frozen=True)
+
+    id: str
+    parent_id: str | None
+    code: str
+    label: str
 
 
 class ResolvedTerms(BaseModel):
@@ -114,7 +125,7 @@ class PhyleticTree(BaseModel):
         stack: list[PhyleticNode] = []
         by_code: dict[str, PhyleticNode] = {}
         for entry in term_map:
-            if not entry.term or entry.term == _ROOT_CODE:
+            if not entry.term or entry.term == PHYLETIC_ROOT_CODE:
                 continue
             depth = depths.get(entry.term, _DEFAULT_DEPTH)
             node = PhyleticNode(
@@ -133,6 +144,60 @@ class PhyleticTree(BaseModel):
             by_code[node.code] = node
             stack.append(node)
         return cls(roots=roots)
+
+    @classmethod
+    def from_taxa(cls, taxa: Sequence[TaxonEntry]) -> PhyleticTree:
+        """Build the tree from entries that name their parent by id.
+
+        The root ``ALL`` is not a selectable node, so its children are the roots.
+        An entry whose parent is not listed is a root as well.
+        """
+        listed = {taxon.id for taxon in taxa}
+        below: dict[str | None, list[TaxonEntry]] = {}
+        for taxon in taxa:
+            parent = taxon.parent_id if taxon.parent_id in listed else None
+            below.setdefault(parent, []).append(taxon)
+
+        def grow(parent: str | None, depth: int) -> list[PhyleticNode]:
+            nodes: list[PhyleticNode] = []
+            for taxon in below.get(parent, []):
+                if taxon.code == PHYLETIC_ROOT_CODE:
+                    nodes.extend(grow(taxon.id, depth))
+                    continue
+                nodes.append(
+                    PhyleticNode(
+                        code=taxon.code,
+                        label=taxon.label,
+                        depth=depth,
+                        children=grow(taxon.id, depth + 1),
+                    )
+                )
+            return nodes
+
+        return cls(roots=grow(None, _DEFAULT_DEPTH))
+
+    def codes(self) -> set[str]:
+        """The code of every selectable node."""
+        return {node.code for node in self.nodes()}
+
+    def species_under(self, codes: Sequence[str]) -> set[str]:
+        """The species the codes stand for: a species itself, a clade its
+        species, and the root every species."""
+        named = set(codes)
+        found: set[str] = set()
+
+        def walk(node: PhyleticNode, *, inside: bool) -> None:
+            inside = inside or node.code in named
+            if not node.children:
+                if inside:
+                    found.add(node.code)
+                return
+            for child in node.children:
+                walk(child, inside=inside)
+
+        for root in self.roots:
+            walk(root, inside=PHYLETIC_ROOT_CODE in named)
+        return found
 
     def nodes(self) -> Iterator[PhyleticNode]:
         """Every selectable node, in tree order. The root is not one of them."""
@@ -277,13 +342,19 @@ def read_census(pattern: str) -> CensusRead:
 _PATTERN_PARAM = "profile_pattern"
 
 
-def _refuse_pattern(title: str, fault: str, repair: str) -> NoReturn:
-    """Refuse a ``profile_pattern`` value, naming the parameter in the rows."""
+def refuse_phyletic_value(
+    param_name: str, title: str, fault: str, repair: str
+) -> NoReturn:
+    """Refuse a phyletic parameter value, naming the parameter in the rows."""
     raise ValidationError(
         title=title,
         detail=f"{fault} {repair}",
-        errors=param_message_rows({_PATTERN_PARAM: [fault]}),
+        errors=param_message_rows({param_name: [fault]}),
     )
+
+
+def _refuse_pattern(title: str, fault: str, repair: str) -> NoReturn:
+    refuse_phyletic_value(_PATTERN_PARAM, title, fault, repair)
 
 
 def _refuse_repeated_code(code: str, pattern: str) -> NoReturn:
@@ -328,7 +399,12 @@ def sort_profile_pattern(pattern: str) -> str:
     return pattern if read.states is None else encode_profile_pattern(read.states)
 
 
-def validate_phyletic_codes(codes: Sequence[str], known_codes: set[str]) -> None:
+def validate_phyletic_codes(
+    codes: Sequence[str],
+    known_codes: set[str],
+    *,
+    param_name: str = _PATTERN_PARAM,
+) -> None:
     """Refuse a code the phyletic tree does not carry.
 
     WDK matches the pattern with LIKE, so an unknown code returns a count
@@ -336,8 +412,9 @@ def validate_phyletic_codes(codes: Sequence[str], known_codes: set[str]) -> None
     """
     invalid_codes = [code for code in codes if code not in known_codes]
     if invalid_codes:
-        _refuse_pattern(
-            "Invalid species codes in profile_pattern",
+        refuse_phyletic_value(
+            param_name,
+            f"Invalid species codes in {param_name}",
             f"Unknown codes: {', '.join(invalid_codes[:5])}.",
             "Use lookup_phyletic_codes() to find valid codes "
             "(e.g. 'pfal' for P. falciparum, 'hsap' for H. sapiens).",

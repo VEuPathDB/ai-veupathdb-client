@@ -1,5 +1,13 @@
 # Knowledge log
 
+## 2026-10-14 - OrthoMCL's phyletic expression has a grammar here
+
+`PhyleticExpression` parses, writes and reads aloud OrthoMCL's `phyletic_expression`, and
+`check_expression` refuses, on the parameter it was stated in, a code the taxonomy lacks and
+a unit every group meets or none can, counted over `PhyleticTree.species_under`. `ortho_taxonomy_of` builds a `PhyleticTree` from OrthoMCL's taxon tables through the new
+`PhyleticTree.from_taxa`, so both phyletic searches share one tree, one code set and one
+refusal ([site-model parameters](wdk/model/site-model-parameters.md)).
+
 ## 2026-10-12 - Open paths travel as one shared guest
 
 The client sends no request without a token and holds no deployment token:

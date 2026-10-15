@@ -95,7 +95,7 @@ class StrategyAPIBase:
         if tree is None:
             logger.debug("The phyletic tree is unreadable; the pattern stands")
             return encode_profile_pattern(states)
-        validate_phyletic_codes(list(states), {node.code for node in tree.nodes()})
+        validate_phyletic_codes(list(states), tree.codes())
         return encode_profile_pattern(
             tree.leaf_states(
                 [code for code, s in states.items() if s == "include"],

@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 from veupathdb.domain.parameters.wdk_vocab import (
     WDKTreeBoxVocabNode,
     WDKVocabNodeData,
     WDKVocabTerm,
 )
-from veupathdb.wdk.phyletic_tree import phyletic_tree_of
+from veupathdb.wdk.phyletic_tree import ortho_taxonomy_of, phyletic_tree_of
+from veupathdb.wdk.wdk_models import WDKAnswer
 from veupathdb.wdk.wdk_parameters import (
     WDKEnumParam,
     WDKParameter,
@@ -127,3 +130,76 @@ class TestAnUnreadableTree:
         assert isinstance(indent_map, WDKEnumParam)
         assert indent_map.vocabulary == []
         assert phyletic_tree_of(params) is None
+
+
+def _taxon_answer(tables: dict[str, object]) -> WDKAnswer:
+    return WDKAnswer.model_validate(
+        {
+            "meta": {"totalCount": 1, "responseCount": 1, "recordClassName": "helper"},
+            "records": [{"id": [], "attributes": {}, "tables": tables}],
+        }
+    )
+
+
+class TestOrthoMCLsTaxonomy:
+    """OrthoMCL's helper record carries its clades and species as two tables."""
+
+    _CLADES: ClassVar[list[dict[str, str | None]]] = [
+        {
+            "orthomcl_clade_id": "4386",
+            "parent_id": None,
+            "taxon_abbrev": "ALL",
+            "name": "Root",
+        },
+        {
+            "orthomcl_clade_id": "4387",
+            "parent_id": "4386",
+            "taxon_abbrev": "EUKA",
+            "name": "Eukaryota ",
+        },
+        {
+            "orthomcl_clade_id": "4396",
+            "parent_id": "4387",
+            "taxon_abbrev": "HAEM",
+            "name": "Haemosporida",
+        },
+    ]
+    _SPECIES: ClassVar[list[dict[str, str]]] = [
+        {
+            "orthomcl_clade_id": "5105",
+            "parent_id": "4396",
+            "three_letter_abbrev": "pfal",
+            "name": "Plasmodium falciparum 3D7",
+            "taxon_group": "Haemosporida",
+        },
+        {
+            "orthomcl_clade_id": "5105",
+            "parent_id": "4396",
+            "three_letter_abbrev": "pfal",
+            "name": "Plasmodium falciparum 3D7",
+            "taxon_group": "Eukaryota ",
+        },
+        {
+            "orthomcl_clade_id": "4698",
+            "parent_id": "4396",
+            "three_letter_abbrev": "pfag",
+            "name": "Plasmodium falciparum 7G8",
+            "taxon_group": "Haemosporida",
+        },
+    ]
+
+    def test_reads_one_tree_with_each_species_once(self) -> None:
+        tree = ortho_taxonomy_of(
+            _taxon_answer({"RootTaxons": self._CLADES, "Taxons": self._SPECIES})
+        )
+
+        assert tree is not None
+        assert [(n.code, n.label, n.depth) for n in tree.nodes()] == [
+            ("EUKA", "Eukaryota", 1),
+            ("HAEM", "Haemosporida", 2),
+            ("pfal", "Plasmodium falciparum 3D7", 3),
+            ("pfag", "Plasmodium falciparum 7G8", 3),
+        ]
+
+    def test_an_answer_without_the_tables_is_no_taxonomy(self) -> None:
+        assert ortho_taxonomy_of(_taxon_answer({})) is None

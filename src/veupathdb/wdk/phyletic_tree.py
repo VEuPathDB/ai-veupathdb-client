@@ -1,7 +1,25 @@
-"""Reads the phyletic clade tree off a WDK search definition."""
+"""Reads the phyletic clade tree off a WDK search definition, or off OrthoMCL's
+taxon tables."""
 
-from veupathdb.domain.parameters.phyletic import PHYLETIC_PARAM_NAMES, PhyleticTree
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+
+from veupathdb import JSONObject
+from veupathdb.domain.parameters.phyletic import (
+    PHYLETIC_PARAM_NAMES,
+    PhyleticTree,
+    TaxonEntry,
+)
+from veupathdb.wdk.wdk_models import WDKAnswer
 from veupathdb.wdk.wdk_parameters import WDKParameter
+
+ORTHO_TAXONOMY_RECORD_TYPE = "helper"
+ORTHO_TAXONOMY_SEARCH = "ByDefault"
+ORTHO_TAXONOMY_REPORT: JSONObject = {
+    "attributes": ["primary_key"],
+    "tables": ["RootTaxons", "Taxons"],
+}
+"""OrthoMCL's taxonomy: one helper record whose two tables hold the clades and
+the species, each row naming its parent by clade id."""
 
 
 def phyletic_tree_of(params: list[WDKParameter]) -> PhyleticTree | None:
@@ -22,3 +40,52 @@ def phyletic_tree_of(params: list[WDKParameter]) -> PhyleticTree | None:
     if term_map and not indent_map:
         return None
     return PhyleticTree.from_vocab(term_map, indent_map)
+
+
+class _TaxonRow(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str = Field(alias="orthomcl_clade_id")
+    parent_id: str | None = None
+    name: str
+
+    @field_validator("name")
+    @classmethod
+    def _trimmed(cls, value: str) -> str:
+        return value.strip()
+
+
+class _CladeRow(_TaxonRow):
+    code: str = Field(alias="taxon_abbrev")
+
+
+class _SpeciesRow(_TaxonRow):
+    code: str = Field(alias="three_letter_abbrev")
+
+
+class _TaxonTables(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    RootTaxons: list[_CladeRow]
+    Taxons: list[_SpeciesRow]
+
+
+def ortho_taxonomy_of(answer: WDKAnswer) -> PhyleticTree | None:
+    """The tree OrthoMCL's taxon tables hold, or ``None`` when the answer lacks
+    them. A species row repeats once per clade above it, so each code is kept once."""
+    if not answer.records:
+        return None
+    try:
+        tables = _TaxonTables.model_validate(answer.records[0].tables)
+    except ValidationError:
+        return None
+    listed: list[_CladeRow | _SpeciesRow] = [*tables.RootTaxons, *tables.Taxons]
+    rows: dict[str, _CladeRow | _SpeciesRow] = {}
+    for row in listed:
+        rows.setdefault(row.code, row)
+    return PhyleticTree.from_taxa(
+        [
+            TaxonEntry(id=row.id, parent_id=row.parent_id, code=code, label=row.name)
+            for code, row in rows.items()
+        ]
+    )

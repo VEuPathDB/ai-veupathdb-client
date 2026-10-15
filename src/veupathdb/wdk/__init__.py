@@ -33,7 +33,13 @@ from veupathdb.wdk.factory import (
     get_wdk_client,
     list_sites,
 )
-from veupathdb.wdk.phyletic_tree import phyletic_tree_of
+from veupathdb.wdk.phyletic_tree import (
+    ORTHO_TAXONOMY_RECORD_TYPE,
+    ORTHO_TAXONOMY_REPORT,
+    ORTHO_TAXONOMY_SEARCH,
+    ortho_taxonomy_of,
+    phyletic_tree_of,
+)
 from veupathdb.wdk.probe import WDKProbe
 from veupathdb.wdk.record_types import resolve_record_type
 from veupathdb.wdk.search_load import (
@@ -164,6 +170,9 @@ __all__ = [
     "GENELIST_PLUGIN_NAME",
     "GENELIST_PLUGIN_VERSION",
     "HIGH_SPEED_SNP_SEARCHES",
+    "ORTHO_TAXONOMY_RECORD_TYPE",
+    "ORTHO_TAXONOMY_REPORT",
+    "ORTHO_TAXONOMY_SEARCH",
     "RNASEQRC",
     "SAMPLE_INFO_MAX_BYTES",
     "STREAM_MEDIA_TYPE",
@@ -266,6 +275,7 @@ __all__ = [
     "list_sites",
     "load_sites_config",
     "open_search_gate",
+    "ortho_taxonomy_of",
     "password_login",
     "password_logout",
     "phyletic_tree_of",

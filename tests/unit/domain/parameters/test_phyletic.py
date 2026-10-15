@@ -11,6 +11,7 @@ from veupathdb.domain.parameters.phyletic import (
     PhyleticBinding,
     PhyleticTree,
     PhyleticUnresolved,
+    TaxonEntry,
     census_states,
     derive_binding,
     encode_profile_pattern,
@@ -326,3 +327,48 @@ class TestARefusalNamesTheParameter:
             census_states("nonsense")
 
         assert "lookup_phyletic_codes()" in str(err.value.detail)
+
+
+class TestATreeFromTaxa:
+    """OrthoMCL publishes its taxonomy as rows that name their parent by id."""
+
+    def _taxa(self) -> list[TaxonEntry]:
+        return [
+            TaxonEntry(id="7", parent_id="2", code="pfal", label="P. falciparum 3D7"),
+            TaxonEntry(id="1", parent_id=None, code="ALL", label="Root"),
+            TaxonEntry(id="2", parent_id="1", code="HAEM", label="Haemosporida"),
+            TaxonEntry(id="3", parent_id="1", code="BACT", label="Bacteria"),
+            TaxonEntry(id="8", parent_id="3", code="ecol", label="E. coli"),
+            TaxonEntry(id="9", parent_id="2", code="pfag", label="P. falciparum 7G8"),
+        ]
+
+    def test_the_root_is_dropped_and_each_row_hangs_under_its_parent(self) -> None:
+        tree = PhyleticTree.from_taxa(self._taxa())
+
+        assert [(r.code, r.depth) for r in tree.roots] == [("HAEM", 1), ("BACT", 1)]
+        assert [(c.code, c.depth) for c in tree.roots[0].children] == [
+            ("pfal", 2),
+            ("pfag", 2),
+        ]
+
+    def test_a_clade_selects_its_species(self) -> None:
+        tree = PhyleticTree.from_taxa(self._taxa())
+
+        assert tree.leaf_states(["HAEM"], []) == {
+            "pfal": "include",
+            "pfag": "include",
+        }
+
+    def test_codes_are_every_selectable_node(self) -> None:
+        tree = PhyleticTree.from_taxa(self._taxa())
+
+        assert tree.codes() == {"HAEM", "BACT", "pfal", "pfag", "ecol"}
+
+
+def test_an_unknown_code_names_the_parameter_it_was_stated_in() -> None:
+    with pytest.raises(ValidationError) as err:
+        validate_phyletic_codes(["zzzz"], {"pfal"}, param_name="phyletic_expression")
+
+    assert err.value.errors == [
+        {"param": "phyletic_expression", "messages": ["Unknown codes: zzzz."]}
+    ]
