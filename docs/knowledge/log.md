@@ -1,5 +1,11 @@
 # Knowledge log
 
+## 2026-10-15 - A cleaned value keeps its lines and no indent
+
+`strip_html_tags` joins the words of each line with one space and drops blank lines, so
+OrthoMCL's clade counts read one clade per line, as `Microsporidia: 49 / 51`, without the
+tabs and spaces the site indents them with.
+
 ## 2026-10-15 - Hidden text is not read
 
 `strip_html_tags` drops an element a site styles `display:none` together with its text.
