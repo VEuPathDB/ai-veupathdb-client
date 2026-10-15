@@ -1,5 +1,11 @@
 # Knowledge log
 
+## 2026-10-15 - Hidden text is not read
+
+`strip_html_tags` drops an element a site styles `display:none` together with its text.
+A site writes a sort key there before the value it shows: OrthoMCL's BLAST `evalue`
+reads `7.0E-161`, not the sort key and the value run together.
+
 ## 2026-10-14 - OrthoMCL's phyletic expression has a grammar here
 
 `PhyleticExpression` parses, writes and reads aloud OrthoMCL's `phyletic_expression`, and
