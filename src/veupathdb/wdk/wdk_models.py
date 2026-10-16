@@ -186,6 +186,13 @@ class WDKReporter(WDKModel):
     scopes: list[str] = Field(default_factory=list)
 
 
+class WDKColumnTools(WDKModel):
+    """The column reporters and filters the site offers on one attribute."""
+
+    reports: list[str] = Field(default_factory=list)
+    filters: list[str] = Field(default_factory=list)
+
+
 class WDKAttributeField(WDKModel):
     """WDK attribute field metadata, from expanded record-type responses."""
 
@@ -200,6 +207,7 @@ class WDKAttributeField(WDKModel):
     truncate_to: int = 0
     formats: list[WDKReporter] = Field(default_factory=list)
     properties: dict[str, list[str]] = Field(default_factory=dict)
+    tools: WDKColumnTools = Field(default_factory=WDKColumnTools)
 
 
 class WDKParameterGroup(WDKModel):

@@ -1,6 +1,6 @@
 [project]
 name = "veupathdb-py"
-version = "0.1.0b11"
+version = "0.1.0b12"
 description = "Python client for the VEuPathDB WDK and EDA services"
 requires-python = ">=3.14"
 dependencies = [

@@ -1,5 +1,12 @@
 # Knowledge log
 
+## 2026-10-16 - A search's column is counted by value
+
+`run_search_column_report` counts a search's records by each value of one column with the
+site's `byValue` column reporter, and creates no step; the search config's `columnFilters`
+apply first. `WDKAttributeField.tools` names the column reporters and filters the site
+offers on an attribute.
+
 ## 2026-10-16 - A site-search query is six words at most
 
 The site-search service refuses a query of more than six words with a 400

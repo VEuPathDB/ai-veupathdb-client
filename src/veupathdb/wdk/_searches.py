@@ -19,6 +19,7 @@ from veupathdb.wdk.ai_expression import (
 from veupathdb.wdk.tree_leaves import holds_a_term_list, leaves_of_tree_values
 from veupathdb.wdk.wdk_models import (
     WDKAnswer,
+    WDKColumnDistribution,
     WDKFilterValue,
     WDKOntologyTermSummary,
     WDKRecordType,
@@ -233,6 +234,40 @@ class SearchEndpoints:
         )
         return validate_response(
             WDKAnswer, result, f"WDK answer for {record_type}/{search_name}"
+        )
+
+    async def run_search_column_report(
+        self,
+        record_type: str,
+        search_name: str,
+        search_config: WDKSearchConfig,
+        column: str,
+        *,
+        budget_seconds: float | None = None,
+    ) -> WDKColumnDistribution:
+        """Counts the search's records by each value of one column, with the
+        site's ``byValue`` column reporter. It creates no step, and the search
+        config's column filters apply first. A tree value goes as its leaves.
+
+        :param budget_seconds: How long the report may take once it is sent.
+        """
+        parameters = await self.expand_tree_params_to_leaves(
+            record_type, search_name, dict(search_config.parameters)
+        )
+        sent = search_config.model_copy(update={"parameters": parameters})
+        result = await self.post(
+            f"/record-types/{record_type}/searches/{search_name}"
+            f"/columns/{column}/reports/byValue",
+            json={
+                "searchConfig": sent.model_dump(by_alias=True, exclude_defaults=True),
+                "reportConfig": {},
+            },
+            budget_seconds=budget_seconds,
+        )
+        return validate_response(
+            WDKColumnDistribution,
+            result,
+            f"WDK column report for {record_type}/{search_name}/{column}",
         )
 
     async def get_ai_expression_report(self, primary_keys: str) -> AiExpressionReport:
