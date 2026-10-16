@@ -38,6 +38,50 @@ STREAM_MEDIA_TYPE = "application/x-ndjson"
 _COLUMN_SEPARATOR = "\t"
 _PRIMARY_KEY_ADAPTER: TypeAdapter[list[str]] = TypeAdapter(list[str])
 
+_MAX_QUERY_WORDS = 6
+
+_FILLER_WORDS = frozenset(
+    {
+        "a",
+        "an",
+        "and",
+        "are",
+        "as",
+        "at",
+        "by",
+        "for",
+        "from",
+        "in",
+        "into",
+        "is",
+        "its",
+        "of",
+        "on",
+        "or",
+        "per",
+        "that",
+        "the",
+        "their",
+        "these",
+        "this",
+        "those",
+        "to",
+        "what",
+        "which",
+        "with",
+    }
+)
+
+
+def _fit_query_words(search_text: str) -> str:
+    words = search_text.split()
+    for index in range(len(words) - 1, -1, -1):
+        if len(words) <= _MAX_QUERY_WORDS:
+            break
+        if words[index].lower() in _FILLER_WORDS:
+            del words[index]
+    return " ".join(words[:_MAX_QUERY_WORDS])
+
 
 class SiteSearchDocumentTypeField(CamelModel):
     """A field descriptor within a document type."""
@@ -283,7 +327,7 @@ class SiteSearchClient:
     ) -> dict[str, object]:
         """The body both forms share. Only the paged form adds a pagination key."""
         body: dict[str, object] = {
-            "searchText": search_text or "*",
+            "searchText": _fit_query_words(search_text) or "*",
             "restrictToProject": self._project_id,
         }
         if organisms:

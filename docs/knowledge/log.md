@@ -1,5 +1,12 @@
 # Knowledge log
 
+## 2026-10-16 - A site-search query is six words at most
+
+The site-search service refuses a query of more than six words with a 400
+(`SearchRequest.MAX_TERMS_IN_QUERY` in VEuPathDB/SiteSearchService). `SiteSearchClient` sends
+at most six: it drops filler words from the end first, then keeps the first six words. Both the
+paged and the streamed form send the fitted text.
+
 ## 2026-10-15 - A cleaned value keeps its lines and no indent
 
 `strip_html_tags` joins the words of each line with one space and drops blank lines, so
