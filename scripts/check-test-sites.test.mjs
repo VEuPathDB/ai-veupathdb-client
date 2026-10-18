@@ -60,7 +60,6 @@ test("each offence names the file, the line and the host", () => {
 
 test("only the allowlisted paths are exempt", () => {
   assert.ok(isAllowed("docs/sites/production.yaml"));
-  assert.ok(isAllowed("fixtures-production-backup-2026-10-09/wdk/record_types.json"));
   assert.equal(isAllowed("src/veupathdb/testing/qa_sites.yaml"), false);
   assert.equal(isAllowed("src/veupathdb/testing/fixtures/wdk/record_types.json"), false);
   assert.equal(isAllowed("tests/conftest.py"), false);

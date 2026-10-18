@@ -185,7 +185,11 @@ class TestTheRecordedListing:
         entries = [VdiDatasetListEntry.model_validate(entry) for entry in raw]
 
         assert len(entries) == len(raw)
-        assert {entry.type.name for entry in entries} == {"genelist", "rnaseqrc"}
+        assert {entry.type.name for entry in entries} == {
+            "genelist",
+            "phenotype",
+            "rnaseqrc",
+        }
         installed = [
             entry
             for entry in entries
@@ -196,8 +200,8 @@ class TestTheRecordedListing:
             for entry in entries
             if entry.status.disposition("PlasmoDB") is VdiInstallDisposition.FAILED
         ]
-        assert len(installed) == 6
-        assert len(failed) == 3
+        assert len(installed) == 5
+        assert len(failed) == 1
 
     @pytest.mark.skipif(
         needs_qa_recording("vdi/datasets_owned.json"), reason=NEEDS_QA_RECORDING
@@ -213,7 +217,7 @@ class TestTheRecordedListing:
             and entry.status.import_.status is VdiImportStatus.INVALID
         ]
 
-        assert [entry.dataset_id for entry in invalid] == ["vdiTestData05"]
+        assert [entry.dataset_id for entry in invalid] == ["gp184tltg90x4"]
         assert invalid[0].status.failure_messages("PlasmoDB") == []
 
 

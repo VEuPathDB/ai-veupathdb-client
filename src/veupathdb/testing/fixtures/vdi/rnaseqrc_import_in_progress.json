@@ -1,0 +1,69 @@
+{
+  "installTargets": [
+    "PlasmoDB"
+  ],
+  "name": "veupathdb-py fixture rnaseqrc",
+  "summary": "Recorded by vdi_capture and deleted after the capture.",
+  "origin": "direct-upload",
+  "dependencies": [],
+  "publications": [],
+  "contacts": [],
+  "linkedDatasets": [],
+  "experimentalOrganisms": [],
+  "funding": [],
+  "daysForApproval": -1,
+  "datasetSources": [],
+  "datasetId": "vdiTestData02",
+  "type": {
+    "name": "rnaseqrc",
+    "version": "1.0",
+    "category": "RNA-Seq raw counts"
+  },
+  "visibility": "private",
+  "owner": {
+    "userId": 1000000001,
+    "firstName": "Recorded",
+    "lastName": "Owner",
+    "email": "recorded.owner@example.invalid",
+    "affiliation": "Example University"
+  },
+  "created": "2026-10-17T23:00:04.639343051Z",
+  "shortName": "veupathdb-py fixture rnaseqrc",
+  "metadataContentFlags": {},
+  "relatedDatasets": [],
+  "status": {
+    "upload": {
+      "status": "success"
+    },
+    "import": {
+      "status": "in-progress"
+    },
+    "install": [
+      {
+        "installTarget": "PlasmoDB",
+        "meta": {
+          "status": "complete"
+        }
+      }
+    ]
+  },
+  "files": {
+    "upload": {
+      "zipSize": 622,
+      "contents": [
+        {
+          "fileName": "counts.tsv",
+          "fileSize": 334
+        },
+        {
+          "fileName": "sample-info.txt",
+          "fileSize": 61
+        },
+        {
+          "fileName": "manifest.tsv",
+          "fileSize": 50
+        }
+      ]
+    }
+  }
+}

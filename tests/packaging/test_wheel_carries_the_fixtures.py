@@ -91,12 +91,11 @@ def test_the_wheel_carries_the_qa_list_and_no_production_list(
 
 
 @pytest.mark.wheel
-def test_the_sdist_leaves_the_production_backup_out(workspace: Path) -> None:
+def test_the_sdist_carries_the_qa_site_list(workspace: Path) -> None:
     (sdist,) = sorted((workspace / "dist").glob("*.tar.gz"))
     with tarfile.open(sdist) as archive:
         names = archive.getnames()
     assert any(name.endswith("/qa_sites.yaml") for name in names)
-    assert not any("fixtures-production-backup" in name for name in names)
 
 
 @pytest.mark.wheel

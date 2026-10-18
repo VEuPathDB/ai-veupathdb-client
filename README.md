@@ -268,11 +268,11 @@ Recorded bodies and vendored schemas are refreshed, never hand-edited. Every
 recorder (`fixtures record`, `eda_capture record`, `vdi_capture record`) puts
 the QA site list in force before it sends a request, and `capture_wdk` keeps
 only exchanges with a QA host, so no recorder reaches a production or beta site
-and none takes a flag that would. The bodies recorded on production sites are
-out of the package, under `fixtures-production-backup-2026-10-09/`, which no
-test and no build reads. Until the QA sites are recorded, the store holds the
-vendored schemas only: `verify` names each missing body, and every test that
-reads one is skipped with `veupathdb.testing.NEEDS_QA_RECORDING` as its reason while
+and none takes a flag that would. Every body in the store is recorded on a QA
+site. Two states QA does not hold on request have no recording, a cached AI
+expression summary and a VDI import that crashed: `verify` names each missing
+body, and every test that reads one is skipped with
+`veupathdb.testing.NEEDS_QA_RECORDING` as its reason while
 `veupathdb.testing.needs_qa_recording(...)` finds its recording absent. A recording
 written to the store lifts the skip with no change to the test.
 

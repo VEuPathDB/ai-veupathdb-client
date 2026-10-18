@@ -1,0 +1,255 @@
+[
+  {
+    "datasetId": "Y518ZRlgBR0Q5",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "rnaseqrc",
+      "version": "1.0",
+      "category": "RNA-Seq raw counts"
+    },
+    "visibility": "private",
+    "name": "pathfinder-uat-deseq",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "complete"
+      },
+      "install": [
+        {
+          "installTarget": "PlasmoDB",
+          "meta": {
+            "status": "complete"
+          },
+          "data": {
+            "status": "complete"
+          }
+        }
+      ]
+    },
+    "fileCount": 3,
+    "fileSizeTotal": 7955,
+    "created": "2026-10-17T21:39:52.190034-04:00",
+    "summary": "Unstranded counts, 200 Plasmodium falciparum 3D7 genes, control and treated, for PathFinder UAT."
+  },
+  {
+    "datasetId": "hh18RZlcxx0xw",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "rnaseqrc",
+      "version": "1.0",
+      "category": "RNA-Seq raw counts"
+    },
+    "visibility": "private",
+    "name": "PathFinder live check counts",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "complete"
+      },
+      "install": [
+        {
+          "installTarget": "PlasmoDB",
+          "meta": {
+            "status": "complete"
+          },
+          "data": {
+            "status": "complete"
+          }
+        }
+      ]
+    },
+    "fileCount": 3,
+    "fileSizeTotal": 419,
+    "created": "2026-10-17T19:05:10.719255-04:00",
+    "summary": "An unstranded counts upload PathFinder's tests read."
+  },
+  {
+    "datasetId": "gp184tltg90x4",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "rnaseqrc",
+      "version": "1.0",
+      "category": "RNA-Seq raw counts"
+    },
+    "visibility": "private",
+    "name": "PathFinder check invalid counts",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "invalid"
+      }
+    },
+    "fileCount": 3,
+    "fileSizeTotal": 445,
+    "created": "2026-10-17T19:00:31.167869-04:00",
+    "summary": "A counts upload that fails its import, kept so the owned listing holds a failed row."
+  },
+  {
+    "datasetId": "Ed18Aclt0E0xA",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "rnaseqrc",
+      "version": "1.0",
+      "category": "RNA-Seq raw counts"
+    },
+    "visibility": "private",
+    "name": "PathFinder live check stranded no label",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "complete"
+      },
+      "install": [
+        {
+          "installTarget": "PlasmoDB",
+          "meta": {
+            "status": "complete"
+          },
+          "data": {
+            "status": "complete"
+          }
+        }
+      ]
+    },
+    "fileCount": 4,
+    "fileSizeTotal": 722,
+    "created": "2026-10-17T18:56:15.769024-04:00",
+    "summary": "A stranded counts upload PathFinder's tests read."
+  },
+  {
+    "datasetId": "4d18NklMl80w4",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "phenotype",
+      "version": "1.0",
+      "category": "Phenotype"
+    },
+    "visibility": "private",
+    "name": "pathfinder-uat-phenotype",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "complete"
+      },
+      "install": [
+        {
+          "installTarget": "PlasmoDB",
+          "meta": {
+            "status": "complete"
+          },
+          "data": {
+            "status": "complete"
+          }
+        }
+      ]
+    },
+    "fileCount": 1,
+    "fileSizeTotal": 4109,
+    "created": "2026-10-17T18:45:12.03998-04:00",
+    "summary": "Fitness scores for 200 Plasmodium falciparum 3D7 genes, for PathFinder UAT."
+  },
+  {
+    "datasetId": "Ud18NklEhB0wF",
+    "owner": {
+      "userId": 1000000001,
+      "firstName": "Recorded",
+      "lastName": "Owner",
+      "email": "recorded.owner@example.invalid",
+      "affiliation": "Example University"
+    },
+    "type": {
+      "name": "genelist",
+      "version": "1.0",
+      "category": "Gene List"
+    },
+    "visibility": "private",
+    "name": "pathfinder-uat-genelist",
+    "origin": "direct-upload",
+    "installTargets": [
+      "PlasmoDB"
+    ],
+    "status": {
+      "upload": {
+        "status": "success"
+      },
+      "import": {
+        "status": "complete"
+      },
+      "install": [
+        {
+          "installTarget": "PlasmoDB",
+          "meta": {
+            "status": "complete"
+          },
+          "data": {
+            "status": "complete"
+          }
+        }
+      ]
+    },
+    "fileCount": 1,
+    "fileSizeTotal": 280,
+    "created": "2026-10-17T18:44:04.357153-04:00",
+    "summary": "20 Plasmodium falciparum 3D7 gene ids for PathFinder UAT."
+  }
+]

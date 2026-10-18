@@ -174,3 +174,16 @@ def test_a_write_keeps_the_body_and_states_the_trim(tmp_path: Path) -> None:
         ),
     )
     assert "analysis_detail_pass_and_de" in load_provenance(tmp_path)
+
+
+def test_the_first_write_into_an_empty_store_starts_its_provenance(
+    tmp_path: Path,
+) -> None:
+    capture = _named("gene_id_distribution_phenotype_unfiltered")
+    body: JSONObject = {"histogram": [_bin("PBANKA_0100100")], "statistics": {}}
+
+    write_distribution(
+        capture, body, base_url=_BASE, recorded_at="2026-10-18", into=tmp_path
+    )
+
+    assert list(load_provenance(tmp_path)) == [capture.name]

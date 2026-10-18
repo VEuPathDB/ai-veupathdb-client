@@ -36,7 +36,6 @@ from veupathdb.wdk.vdi.rnaseqrc import RnaSeqCountFile, RnaSeqRcUpload
 _INSTALL = (
     "rnaseqrc_import_in_progress",
     "rnaseqrc_import_in_progress",
-    "rnaseqrc_import_complete_data_absent",
     "rnaseqrc_data_running",
     "rnaseqrc_installed",
 )
@@ -125,7 +124,6 @@ async def _capture(service: _Service) -> tuple[CapturedInstall, list[float]]:
     needs_qa_recording(
         "vdi/plugins.json",
         "vdi/rnaseqrc_data_running.json",
-        "vdi/rnaseqrc_import_complete_data_absent.json",
         "vdi/rnaseqrc_import_in_progress.json",
         "vdi/rnaseqrc_installed.json",
         "vdi/rnaseqrc_post_response.json",
@@ -140,17 +138,16 @@ async def test_each_distinct_status_is_kept_once_and_the_dataset_is_deleted() ->
     assert captured.outcome is VdiInstallDisposition.INSTALLED
     assert [status.label for status in captured.statuses] == [
         "import_in_progress",
-        "import_complete_data_absent",
         "data_running",
         "installed",
     ]
     assert captured.statuses[-1].body == recorded("rnaseqrc_installed")
-    assert waits == [2.0, 2.0, 2.0, 2.0, 2.0]
+    assert waits == [2.0, 2.0, 2.0, 2.0]
     one = f"/vdi/datasets/{captured.dataset_id}"
     assert service.requests == [
         ("GET", "/vdi/plugins"),
         ("POST", "/vdi/datasets"),
-        *[("GET", one)] * 5,
+        *[("GET", one)] * 4,
         ("DELETE", one),
         ("GET", one),
         ("GET", "/vdi/datasets"),
@@ -236,7 +233,6 @@ async def test_the_written_body_names_no_account(tmp_path: Path) -> None:
     needs_qa_recording(
         "vdi/dataset_import_queued.json",
         "vdi/rnaseqrc_data_running.json",
-        "vdi/rnaseqrc_import_complete_data_absent.json",
         "vdi/rnaseqrc_import_in_progress.json",
         "vdi/rnaseqrc_import_invalid.json",
         "vdi/rnaseqrc_installed.json",
@@ -244,18 +240,24 @@ async def test_the_written_body_names_no_account(tmp_path: Path) -> None:
     reason=NEEDS_QA_RECORDING,
 )
 def test_every_label_names_the_axis_that_moved_last() -> None:
+    before_data = _body("rnaseqrc_data_running")
+    before_data["status"]["install"][0]["data"] = None
+    bodies = [
+        recorded("rnaseqrc_import_in_progress"),
+        before_data,
+        *(
+            recorded(name)
+            for name in (
+                "rnaseqrc_data_running",
+                "rnaseqrc_installed",
+                "rnaseqrc_import_invalid",
+                "dataset_import_queued",
+            )
+        ),
+    ]
     labels = [
-        status_label(
-            VdiDatasetDetails.model_validate(recorded(name)).status, "PlasmoDB"
-        )
-        for name in (
-            "rnaseqrc_import_in_progress",
-            "rnaseqrc_import_complete_data_absent",
-            "rnaseqrc_data_running",
-            "rnaseqrc_installed",
-            "rnaseqrc_import_invalid",
-            "dataset_import_queued",
-        )
+        status_label(VdiDatasetDetails.model_validate(body).status, "PlasmoDB")
+        for body in bodies
     ]
 
     assert labels == [

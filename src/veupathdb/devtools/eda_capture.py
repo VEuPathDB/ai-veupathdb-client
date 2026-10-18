@@ -514,7 +514,8 @@ def _write_fixture(
     name: str, body: JSONObject, provenance: EdaFixtureProvenance, *, into: Path
 ) -> None:
     (into / f"{name}.json").write_text(json.dumps(body, indent=2) + "\n")
-    entries = load_provenance(into) | {name: provenance}
+    held = load_provenance(into) if (into / PROVENANCE_FILE).exists() else {}
+    entries = held | {name: provenance}
     ordered = dict(sorted(entries.items()))
     (into / PROVENANCE_FILE).write_text(
         _PROVENANCE.dump_json(ordered, indent=2).decode() + "\n"

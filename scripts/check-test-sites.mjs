@@ -7,7 +7,6 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 export const ALLOWED = [
   "docs/",
-  "fixtures-production-backup-2026-10-09/",
   "src/veupathdb/settings.py",
 ];
 

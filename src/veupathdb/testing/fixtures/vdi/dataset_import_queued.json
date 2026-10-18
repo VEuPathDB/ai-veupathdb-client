@@ -1,0 +1,62 @@
+{
+  "installTargets": [
+    "PlasmoDB"
+  ],
+  "name": "veupathdb-py probe",
+  "summary": "A probe gene list, deleted after the capture.",
+  "origin": "direct-upload",
+  "dependencies": [],
+  "publications": [],
+  "contacts": [],
+  "linkedDatasets": [],
+  "experimentalOrganisms": [],
+  "funding": [],
+  "daysForApproval": -1,
+  "datasetSources": [],
+  "datasetId": "vdiTestData01",
+  "type": {
+    "name": "genelist",
+    "version": "1.0",
+    "category": "Gene List"
+  },
+  "visibility": "private",
+  "owner": {
+    "userId": 1000000001,
+    "firstName": "Recorded",
+    "lastName": "Owner",
+    "email": "recorded.owner@example.invalid",
+    "affiliation": "Example University"
+  },
+  "created": "2026-10-18T02:48:01.256765381Z",
+  "shortName": "veupathdb-py probe",
+  "metadataContentFlags": {},
+  "relatedDatasets": [],
+  "status": {
+    "upload": {
+      "status": "success"
+    },
+    "import": {
+      "status": "queued"
+    }
+  },
+  "files": {
+    "upload": {
+      "zipSize": 159,
+      "contents": [
+        {
+          "fileName": "gene-list.txt",
+          "fileSize": 28
+        }
+      ]
+    },
+    "install": {
+      "zipSize": 179,
+      "contents": [
+        {
+          "fileName": "formatted_gene_list.txt",
+          "fileSize": 28
+        }
+      ]
+    }
+  }
+}

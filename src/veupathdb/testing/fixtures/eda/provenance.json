@@ -1,0 +1,222 @@
+{
+  "analysis_detail_pass_and_de": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "GET",
+    "url": "https://qa.plasmodb.org/eda/users/{user-id}/analyses/PlasmoDB/smQNdXY",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "analysisId,apiVersion,creationTime,description,descriptor,displayName,isPublic,modificationTime,numComputations,numFilters,numVisualizations,studyId,studyVersion",
+    "recorded_at": "2026-10-17",
+    "trim": ""
+  },
+  "boxplot_sense_reads_by_genotype": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/apps/pass/visualizations/boxplot",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "boxplot,completeCasesTable,sampleSizeTable",
+    "recorded_at": "2026-10-17",
+    "trim": ""
+  },
+  "compute_job_dimensionalityreduction": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/computes/dimensionalityreduction?autostart=true",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "jobID,status",
+    "recorded_at": "2026-10-17",
+    "trim": ""
+  },
+  "compute_job_lookup": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/computes/differentialexpression",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "jobID,status",
+    "recorded_at": "2026-10-17",
+    "trim": ""
+  },
+  "computed_variables_dimensionalityreduction": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/computes/dimensionalityreduction/meta",
+    "status": 200,
+    "content_type": "text/plain",
+    "body_shape": "variables",
+    "recorded_at": "2026-10-17",
+    "trim": ""
+  },
+  "conttable_genotype_by_temperature": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/apps/pass/visualizations/conttable",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "completeCasesTable,mosaic,sampleSizeTable,statsTable",
+    "recorded_at": "2026-10-17",
+    "trim": ""
+  },
+  "count_filtered": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/studies/STUDY_53f554ec6a/entities/GENE_PHENOTYPE_DATA_ENTITY/count",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "count",
+    "recorded_at": "2026-10-17",
+    "trim": ""
+  },
+  "count_unfiltered": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/studies/STUDY_53f554ec6a/entities/GENE_PHENOTYPE_DATA_ENTITY/count",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "count",
+    "recorded_at": "2026-10-17",
+    "trim": ""
+  },
+  "distribution_categorical": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/studies/STUDY_53f554ec6a/entities/GENE_PHENOTYPE_DATA_ENTITY/variables/VAR_035294d0/distribution",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "histogram,statistics",
+    "recorded_at": "2026-10-17",
+    "trim": ""
+  },
+  "gene_id_distribution_de_filtered": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/studies/STUDY_e973eadd57/entities/ENT_fd574cd6/variables/VEUPATHDB_GENE_ID/distribution",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "histogram,statistics",
+    "recorded_at": "2026-10-17",
+    "trim": "the first 20 histogram bins; the statistics are whole"
+  },
+  "gene_id_distribution_de_unfiltered": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/studies/STUDY_e973eadd57/entities/ENT_fd574cd6/variables/VEUPATHDB_GENE_ID/distribution",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "histogram,statistics",
+    "recorded_at": "2026-10-17",
+    "trim": "the first 20 histogram bins; the statistics are whole"
+  },
+  "gene_id_distribution_phenotype_filtered": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/studies/STUDY_53f554ec6a/entities/GENE_PHENOTYPE_DATA_ENTITY/variables/VEUPATHDB_GENE_ID/distribution",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "histogram,statistics",
+    "recorded_at": "2026-10-17",
+    "trim": "the first 20 histogram bins; the statistics are whole"
+  },
+  "gene_id_distribution_phenotype_unfiltered": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/studies/STUDY_53f554ec6a/entities/GENE_PHENOTYPE_DATA_ENTITY/variables/VEUPATHDB_GENE_ID/distribution",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "histogram,statistics",
+    "recorded_at": "2026-10-17",
+    "trim": "the first 20 histogram bins; the statistics are whole"
+  },
+  "permissions": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "GET",
+    "url": "https://qa.plasmodb.org/eda/permissions",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "perDataset",
+    "recorded_at": "2026-10-17",
+    "trim": "the first 40 perDataset entries, plus every entry that omits shortDisplayName or description, plus DS_53f554ec6a; a description's link to a record page names the QA host"
+  },
+  "scatterplot_best_fit_sense_antisense": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/apps/pass/visualizations/scatterplot",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "completeCasesTable,sampleSizeTable,scatterplot",
+    "recorded_at": "2026-10-17",
+    "trim": ""
+  },
+  "scatterplot_dimensionalityreduction": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/apps/dimensionalityreduction/visualizations/scatterplot",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "completeCasesTable,sampleSizeTable,scatterplot",
+    "recorded_at": "2026-10-17",
+    "trim": ""
+  },
+  "studies_list": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "GET",
+    "url": "https://qa.plasmodb.org/eda/studies",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "studies",
+    "recorded_at": "2026-10-17",
+    "trim": "the first 40 studies entries plus every entry whose sha1hash is the empty string"
+  },
+  "study_detail_de": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "GET",
+    "url": "https://qa.plasmodb.org/eda/studies/STUDY_e973eadd57",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "study",
+    "recorded_at": "2026-10-17",
+    "trim": ""
+  },
+  "study_detail_phenotype": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "GET",
+    "url": "https://qa.plasmodb.org/eda/studies/STUDY_53f554ec6a",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "study",
+    "recorded_at": "2026-10-17",
+    "trim": ""
+  },
+  "volcano_statistics": {
+    "site": "plasmodb",
+    "deployment": "https://qa.plasmodb.org/eda",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/eda/computes/differentialexpression/statistics",
+    "status": 200,
+    "content_type": "application/json",
+    "body_shape": "adjustedPValueFloor,effectSizeLabel,pValueFloor,statistics",
+    "recorded_at": "2026-10-17",
+    "trim": "the first 200 statistics rows plus the one row that omits pValue"
+  }
+}

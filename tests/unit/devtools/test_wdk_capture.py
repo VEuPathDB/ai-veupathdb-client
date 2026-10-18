@@ -78,6 +78,20 @@ def test_wdk_record_keeps_raw_when_not_json() -> None:
     assert rec.response_text == "<html>boom</html>"
 
 
+def test_a_list_answer_is_kept_as_json() -> None:
+    """A refreshed-dependent-params answer and a search listing are JSON lists."""
+    request = httpx.Request("GET", "https://qa.plasmodb.org/plasmo.qa/service/x")
+    rec = wdk_record(
+        request=request,
+        status=200,
+        request_body=b"",
+        response_body=b'[{"name": "domain_typeahead"}]',
+        ms=1.0,
+    )
+    assert rec.response_json == [{"name": "domain_typeahead"}]
+    assert rec.response_text is None
+
+
 def test_exchange_filename_is_safe_and_ordered() -> None:
     request = httpx.Request(
         "POST", "https://qa.vectorbase.org/x/service/searches/GenesByText"

@@ -371,10 +371,7 @@ class TestListingAndPlugins:
             installed,
             failed,
             installed,
-            failed,
             installed,
-            installed,
-            failed,
             installed,
         ]
 

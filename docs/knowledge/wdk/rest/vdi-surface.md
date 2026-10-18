@@ -277,10 +277,11 @@ importer splits on `[\s,;]+` and writes one id per line
 
 # The recorded bodies
 
-The bodies above were recorded on production and are held in
-`fixtures-production-backup-2026-10-09/vdi/`, out of the package, until a QA recording
-replaces them under `veupathdb.testing.FIXTURE_ROOT / "vdi"`, with `provenance.json` naming the method, URL,
-status and elapsed seconds of each. The owner block and the account id inside VDI's
+The bodies above are recorded on QA under `veupathdb.testing.FIXTURE_ROOT / "vdi"`,
+with `provenance.json` naming the method, URL, status and elapsed seconds of each. QA
+passes `import_complete_data_absent` in under a second and holds no crashed import on
+request, so the first has no recording (a test takes the `data` axis out of the recorded
+`data_running` body) and the second skips its tests. The owner block and the account id inside VDI's
 messages are replaced. `python -m veupathdb.devtools.vdi_capture record NAME ...` records
 one install on a QA site through `VdiClient`, writes `NAME_<state>.json` per distinct state, and
 deletes the dataset, confirming the 404 and the owned listing.

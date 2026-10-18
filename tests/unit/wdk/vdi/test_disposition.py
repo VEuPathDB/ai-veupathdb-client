@@ -38,7 +38,6 @@ def _edited(name: str, **axes: object) -> VdiDatasetStatus:
     ("fixture", "expected"),
     [
         ("rnaseqrc_import_in_progress", VdiInstallDisposition.CONTINUE),
-        ("rnaseqrc_import_complete_data_absent", VdiInstallDisposition.CONTINUE),
         ("rnaseqrc_data_running", VdiInstallDisposition.CONTINUE),
         ("rnaseqrc_installed", VdiInstallDisposition.INSTALLED),
         ("rnaseqrc_import_invalid", VdiInstallDisposition.FAILED),
@@ -53,6 +52,16 @@ def test_the_disposition_follows_the_recorded_install(
     if needs_qa_recording(f"vdi/{fixture}.json"):
         pytest.skip(NEEDS_QA_RECORDING)
     assert _status(fixture).disposition(PROJECT) is expected
+
+
+@pytest.mark.skipif(
+    needs_qa_recording("vdi/rnaseqrc_data_running.json"), reason=NEEDS_QA_RECORDING
+)
+def test_an_install_entry_before_its_data_axis_continues() -> None:
+    status = _edited("rnaseqrc_data_running", data=None)
+
+    assert status.install[0].data is None
+    assert status.disposition(PROJECT) is VdiInstallDisposition.CONTINUE
 
 
 @pytest.mark.skipif(

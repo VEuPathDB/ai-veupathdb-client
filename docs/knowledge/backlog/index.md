@@ -9,4 +9,4 @@ left, so this file and the items beside it are exactly what remains.
 
 ## Ranked
 
-1. [The production recordings are recorded again on QA](the-production-recordings-are-recorded-again-on-qa.md) - every test that reads a recording is skipped until the QA sites are recorded
+1. [Two states QA does not hold on request are recorded](two-states-qa-does-not-hold-on-request-are-recorded.md) - a cached AI summary and a crashed import have no QA recording

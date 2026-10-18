@@ -1,0 +1,12 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/record-types/organism/searches/GenesByMolecularWeight",
+    "status": 404,
+    "content_type": "text/plain",
+    "recorded_at": "2026-10-17",
+    "reads": "WDK-SEARCH-001"
+  },
+  "text": "There is no search \"GenesByMolecularWeight\" associated with record type \"OrganismRecordClass\""
+}

@@ -1,0 +1,27 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/record-types/transcript/searches/GenesByNgsSnps/variation_sample_meta/ontology-term-summary",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-10-17",
+    "reads": "WDK-PARAM-014"
+  },
+  "body": {
+    "internalsFilteredCount": 12,
+    "valueCounts": [
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": "female"
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": "male"
+      }
+    ],
+    "internalsCount": 12
+  }
+}

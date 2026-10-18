@@ -15,6 +15,7 @@ from urllib.parse import urlparse
 import httpx
 from pydantic import BaseModel
 
+from veupathdb.json_types import JSONValue
 from veupathdb.testing.qa_sites import QA_SITES_FILE
 from veupathdb.wdk.site_router import load_sites_config
 
@@ -33,13 +34,12 @@ def is_wdk_host(host: str) -> bool:
     return any(host == known or host.endswith("." + known) for known in _wdk_hosts())
 
 
-def _maybe_json(body: bytes) -> tuple[dict[str, Any] | None, str | None]:
+def _maybe_json(body: bytes) -> tuple[JSONValue, str | None]:
     text = body.decode("utf-8", errors="replace")
     try:
-        parsed = json.loads(text)
+        return json.loads(text), None
     except json.JSONDecodeError, ValueError:
         return None, text
-    return (parsed, None) if isinstance(parsed, dict) else (None, text)
 
 
 class WDKExchange(BaseModel):
@@ -47,9 +47,9 @@ class WDKExchange(BaseModel):
     url: str
     status: int
     ms: float
-    request_json: dict[str, Any] | None = None
+    request_json: JSONValue = None
     request_text: str | None = None
-    response_json: dict[str, Any] | None = None
+    response_json: JSONValue = None
     response_text: str | None = None
 
     def filename(self, seq: int) -> str:

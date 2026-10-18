@@ -1,0 +1,12 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/record-types/transcript/searches/GenesByLocation/refreshed-dependent-params",
+    "status": 400,
+    "content_type": "text/plain",
+    "recorded_at": "2026-10-17",
+    "reads": "WDK-VOCAB-006"
+  },
+  "text": "'changedParam' property is required at this endpoint"
+}

@@ -1,5 +1,18 @@
 # Knowledge log
 
+## 2026-10-18 - The recorded stores are QA recordings
+
+The WDK, EDA and VDI stores under `veupathdb.testing.fixtures` are recorded from the QA
+sites, one request at a time, under a registered account, and the production backup is
+deleted. QA matches production on the site-search stream (352 records), the two genome
+lists (64 and 16, three GiardiaDB identifiers over 50 characters) and the refused upload.
+The service roots drop their sign-in links, which name the shared production sign-in host.
+Two states have no recording: a cached AI expression summary, which only the site's own
+summary job makes, and a crashed VDI import. QA passes `import_complete_data_absent` in
+under a second, so a test takes the `data` axis out of the recorded `data_running` body
+instead. `wdk_record` keeps a JSON list answer as JSON. A first EDA capture into an empty
+store starts its provenance file instead of failing.
+
 ## 2026-10-16 - A search's column is counted by value
 
 `run_search_column_report` counts a search's records by each value of one column with the
