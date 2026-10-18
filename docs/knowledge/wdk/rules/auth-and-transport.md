@@ -30,8 +30,10 @@ the target is not the requesting user, and WDK throws `ForbiddenException`. Iden
 reachability under a correct token, a loud 403 under a wrong one. That is the entire
 argument for the rule, and it is the only part of it that is checkable.
 
-`_ensure_session` resolves the id once per client from `GET /users/current` and every
-later call reuses it. `src/veupathdb/wdk/current_user.py` is the other module allowed to
+`_ensure_session` resolves the id from `GET /users/current` and every later call reuses it.
+The site client keeps the id each login token names (`remembered_user_id`, keyed by a hash
+of the token), so a strategy API built for each call reads it once per token, and a request
+with no login token of its own keeps nothing. `src/veupathdb/wdk/current_user.py` is the other module allowed to
 name the alias: reading who the token is has no concrete id to address yet.
 
 The docstring on `_ensure_session` gives a different reason: that some deployments answer

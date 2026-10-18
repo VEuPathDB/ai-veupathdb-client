@@ -23,39 +23,6 @@ logger = get_logger(__name__)
 class StepsMixin(StrategyAPIBase):
     """Mixin providing step creation and update methods."""
 
-    async def _get_boolean_search_name(self, record_type: str) -> str:
-        """Resolve the boolean combine search name for a record type."""
-        if record_type in self._boolean_search_cache:
-            return self._boolean_search_cache[record_type]
-
-        searches = await self.client.get_searches(record_type)
-        for search in searches:
-            if search.url_segment.startswith("boolean_question"):
-                self._boolean_search_cache[record_type] = search.url_segment
-                return search.url_segment
-
-        msg = f"No boolean combine search found for record type '{record_type}'"
-        raise DataParsingError(msg)
-
-    async def _get_boolean_param_names(self, record_type: str) -> tuple[str, str, str]:
-        """Resolve parameter names for boolean combine search."""
-        boolean_search = await self._get_boolean_search_name(record_type)
-        response = await self.client.get_search_details(record_type, boolean_search)
-        param_names = response.search_data.param_names
-
-        left = next((p for p in param_names if p.startswith("bq_left_op")), None)
-        right = next((p for p in param_names if p.startswith("bq_right_op")), None)
-        op = next((p for p in param_names if p.startswith("bq_operator")), None)
-
-        if not left or not right or not op:
-            msg = (
-                f"Boolean param names not found for record type '{record_type}' "
-                f"(left={left}, right={right}, op={op}, params={param_names})"
-            )
-            raise DataParsingError(msg)
-
-        return left, right, op
-
     async def _get_answer_param_names(
         self,
         record_type: str,
@@ -198,23 +165,20 @@ class StepsMixin(StrategyAPIBase):
     ) -> WDKIdentifier:
         """Create a combined step that applies a boolean operator."""
         uid = await self._get_user_id(user_id)
-        boolean_search = await self._get_boolean_search_name(record_type)
-        left_param, right_param, op_param = await self._get_boolean_param_names(
-            record_type
-        )
+        boolean = await self.client.boolean_search(record_type)
 
         search_config: JSONObject = {
             "parameters": {
                 # WDK requires empty operands; inputs are wired via the stepTree.
-                left_param: "",
-                right_param: "",
-                op_param: spec.boolean_operator.value,
+                boolean.left_param: "",
+                boolean.right_param: "",
+                boolean.operator_param: spec.boolean_operator.value,
             },
         }
         if spec.wdk_weight is not None:
             search_config["wdkWeight"] = spec.wdk_weight
         payload: JSONObject = {
-            "searchName": boolean_search,
+            "searchName": boolean.search_name,
             "searchConfig": search_config,
         }
         if spec.custom_name:

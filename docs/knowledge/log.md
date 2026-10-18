@@ -1,5 +1,13 @@
 # Knowledge log
 
+## 2026-10-18 - The site client keeps the user id and the boolean search
+
+- 0.1.0b14: `resolve_wdk_user_id` reads `GET /users/current` once per login token and the
+  site client keeps the id (`HTTPClient.remembered_user_id`, keyed by a hash of the token),
+  and `SearchEndpoints.boolean_search` reads a record type's boolean search and its operand
+  names once per site client. A host that builds a strategy API per call no longer reads
+  them again on every step.
+
 ## 2026-10-18 - The recorded stores are QA recordings
 
 The WDK, EDA and VDI stores under `veupathdb.testing.fixtures` are recorded from the QA

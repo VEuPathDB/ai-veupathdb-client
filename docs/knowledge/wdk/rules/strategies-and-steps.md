@@ -147,7 +147,7 @@ which runs a search with no step and no strategy at all.
 
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/BooleanQuery.java#L85-L110
-- anchor: src/veupathdb/wdk/strategy_api/steps.py:_get_boolean_param_names
+- anchor: src/veupathdb/wdk/_searches.py:boolean_search
 - status: ENFORCED by tests/unit/wdk/test_wdk_models.py::test_wdk_step_006_the_operand_names_carry_the_record_class_full_name
 
 `setRecordClass` builds three parameters:
@@ -165,7 +165,8 @@ The trap is that a step's `recordClassName` is the record class's **url segment*
 [not its full name](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/formatter/StepFormatter.java#L86-L90).
 There is no string transformation from one to the other; the pairing is site model data. So
 the operand names cannot be constructed from anything on the step and must be read from the
-boolean search's own parameter list, which is what `_get_boolean_param_names` does.
+boolean search's own parameter list, which is what `boolean_search` does. The site client
+keeps the answer per record type, so a strategy API built for each call reads it once.
 
 The operator's accepted values are the vocabulary **terms**, and four of the six differ
 from their display labels because

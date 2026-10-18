@@ -253,11 +253,16 @@ async def test_wdk_step_006_the_names_are_read_from_the_search(
     monkeypatch.setattr(client, "get_search_details", details)
     monkeypatch.setattr(client, "get_searches", searches)
 
-    left, right, operator = await api._get_boolean_param_names("transcript")
+    boolean = await api.client.boolean_search("transcript")
 
-    assert left == "bq_left_op_TranscriptRecordClasses_TranscriptRecordClass"
-    assert right == "bq_right_op_TranscriptRecordClasses_TranscriptRecordClass"
-    assert operator == "bq_operator"
+    assert (
+        boolean.left_param == "bq_left_op_TranscriptRecordClasses_TranscriptRecordClass"
+    )
+    assert (
+        boolean.right_param
+        == "bq_right_op_TranscriptRecordClasses_TranscriptRecordClass"
+    )
+    assert boolean.operator_param == "bq_operator"
 
 
 class TestAWriteCarriesTheStepsOwnInputs:

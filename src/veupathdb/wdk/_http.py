@@ -1,10 +1,11 @@
 """Core HTTP transport for VEuPathDB WDK REST API with retries and cookies."""
 
 import asyncio
+import hashlib
 import re
 import time
 import urllib.request
-from collections.abc import Mapping, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import dataclass
 from http.cookiejar import Cookie, CookieJar, DefaultCookiePolicy
 from typing import cast
@@ -34,6 +35,7 @@ from veupathdb.wdk._observability import (
     wdk_retry_logger,
 )
 from veupathdb.wdk._search_names import SearchNames, search_kind
+from veupathdb.wdk._searches import BooleanSearch
 from veupathdb.wdk.delayed_result import (
     WDKDelayedResultError,
     is_delayed_result,
@@ -75,6 +77,13 @@ def _acts_for_a_user(path: str) -> bool:
 _REPORT = re.compile(r"/reports/[^/]+$")
 _ANALYSIS_RUN = re.compile(r"/analyses/[^/]+/result$")
 _ANSWERED_RESOURCE = re.compile(r"^/users/[^/]+/(?:steps|strategies)/[^/]+$")
+
+
+_KEPT_USER_IDS = 4096
+
+
+def _token_key(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
 
 
 def runs_a_search(method: str, path: str) -> bool:
@@ -179,6 +188,8 @@ class HTTPClient:
         self._client: httpx.AsyncClient | None = None
         self._transport = transport
         self._client_lock = asyncio.Lock()
+        self._user_ids: dict[str, str] = {}
+        self._boolean_searches: dict[str, BooleanSearch] = {}
         # The JSESSIONID cookie in the shared jar is scoped to one identity.
         # A change of token requires a new session.
         self._initialized_for_token: str | None = None
@@ -241,6 +252,24 @@ class HTTPClient:
         if self.auth_token:
             return Credential(self.auth_token)
         return Credential(await guest_tokens().token(self.base_url), guest=True)
+
+    async def remembered_user_id(
+        self, read: Callable[[], Awaitable[str | None]]
+    ) -> str | None:
+        token = veupathdb_auth_token_ctx.get()
+        if not token:
+            return await read()
+        key = _token_key(token)
+        held = self._user_ids.get(key)
+        if held is not None:
+            return held
+        read_id = await read()
+        if read_id is None:
+            return None
+        if len(self._user_ids) >= _KEPT_USER_IDS:
+            self._user_ids.pop(next(iter(self._user_ids)))
+        self._user_ids[key] = read_id
+        return read_id
 
     async def close(self) -> None:
         """Close the HTTP client and clear session state.

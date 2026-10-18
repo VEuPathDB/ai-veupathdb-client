@@ -2,12 +2,13 @@
 
 import contextlib
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 import pydantic
 from pydantic import JsonValue, TypeAdapter
 
 from veupathdb.domain.parameters.values import FilterTermClause
-from veupathdb.errors import VEuPathDBError, validate_response
+from veupathdb.errors import DataParsingError, VEuPathDBError, validate_response
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
 from veupathdb.wdk._helpers import _validate_list
@@ -36,9 +37,30 @@ _RECORD_TYPE_ADAPTER: TypeAdapter[WDKRecordType] = TypeAdapter(WDKRecordType)
 _PARAMETER_ADAPTER: TypeAdapter[WDKParameter] = TypeAdapter(WDKParameter)
 
 
+@dataclass(frozen=True)
+class BooleanSearch:
+    search_name: str
+    left_param: str
+    right_param: str
+    operator_param: str
+
+
+def _named(params: Sequence[str], prefix: str, record_type: str) -> str:
+    found = next((p for p in params if p.startswith(prefix)), None)
+    if found is None:
+        msg = (
+            f"Boolean param {prefix} not found for record type '{record_type}' "
+            f"(params={list(params)})"
+        )
+        raise DataParsingError(msg)
+    return found
+
+
 class SearchEndpoints:
     """The search and record-type WDK endpoints. This mixin needs the HTTP client that
     supplies the get and post methods."""
+
+    _boolean_searches: dict[str, BooleanSearch]
 
     async def get(self, path: str, params: JSONObject | None = None) -> JsonValue:
         """The HTTP client supplies this method at runtime."""
@@ -78,6 +100,33 @@ class SearchEndpoints:
         """Returns the searches for a record type."""
         raw = await self.get(f"/record-types/{record_type}/searches")
         return _validate_list(raw, _SEARCH_ADAPTER)
+
+    async def boolean_search(self, record_type: str) -> BooleanSearch:
+        held = self._boolean_searches.get(record_type)
+        if held is not None:
+            return held
+        name = next(
+            (
+                search.url_segment
+                for search in await self.get_searches(record_type)
+                if search.url_segment.startswith("boolean_question")
+            ),
+            None,
+        )
+        if name is None:
+            msg = f"No boolean combine search found for record type '{record_type}'"
+            raise DataParsingError(msg)
+        params = (
+            await self.get_search_details(record_type, name)
+        ).search_data.param_names
+        found = BooleanSearch(
+            search_name=name,
+            left_param=_named(params, "bq_left_op", record_type),
+            right_param=_named(params, "bq_right_op", record_type),
+            operator_param=_named(params, "bq_operator", record_type),
+        )
+        self._boolean_searches[record_type] = found
+        return found
 
     async def get_search_details(
         self,

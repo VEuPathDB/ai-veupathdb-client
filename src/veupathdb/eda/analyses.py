@@ -15,9 +15,7 @@ from veupathdb.eda.models import (
 )
 from veupathdb.errors import WDKLoginRequiredError
 from veupathdb.wdk.client import VEuPathDBClient
-from veupathdb.wdk.strategy_api.helpers import (
-    resolve_wdk_user_id,
-)
+from veupathdb.wdk.strategy_api.helpers import resolve_wdk_user_id
 
 ANALYSIS_SUMMARIES: TypeAdapter[list[EdaAnalysisSummary]] = TypeAdapter(
     list[EdaAnalysisSummary],

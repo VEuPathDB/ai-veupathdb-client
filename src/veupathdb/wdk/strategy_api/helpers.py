@@ -55,13 +55,17 @@ async def resolve_wdk_user_id(client: VEuPathDBClient) -> str | None:
     """Resolve the concrete WDK user ID from a ``/users/current`` call.
 
     This is the one call that may name the alias. Every later request carries
-    the numeric id, which an ownership check can refuse.
+    the numeric id, which an ownership check can refuse. The site client keeps
+    the id each login token names, so the call is made once per token.
 
     :returns: Resolved user ID string, or ``None`` if resolution failed.
     """
-    me = await client.get("/users/current")
-    try:
-        user = WDKUserInfo.model_validate(me)
-        return str(user.id)
-    except pydantic.ValidationError:
-        return None
+
+    async def read() -> str | None:
+        me = await client.get("/users/current")
+        try:
+            return str(WDKUserInfo.model_validate(me).id)
+        except pydantic.ValidationError:
+            return None
+
+    return await client.remembered_user_id(read)
