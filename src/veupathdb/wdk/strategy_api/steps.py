@@ -30,18 +30,11 @@ class StepsMixin(StrategyAPIBase):
     ) -> set[str]:
         """Return the ``input-step`` (AnswerParam) names for a search.
 
-        Results are cached per record type and search name. A failed catalog
-        read raises.
+        A failed catalog read raises.
         """
-        cache_key = f"{record_type}/{search_name}"
-        if cache_key in self._answer_param_cache:
-            return self._answer_param_cache[cache_key]
-
         response = await self.client.get_search_details(record_type, search_name)
         params = response.search_data.parameters or []
-        names = {p.name for p in params if p.type == "input-step"}
-        self._answer_param_cache[cache_key] = names
-        return names
+        return {p.name for p in params if p.type == "input-step"}
 
     async def _empty_answer_params(
         self,

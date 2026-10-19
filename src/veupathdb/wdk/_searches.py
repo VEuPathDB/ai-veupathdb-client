@@ -1,12 +1,14 @@
 """Search and record-type endpoint methods for VEuPathDBClient."""
 
 import contextlib
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
+from contextvars import ContextVar
 from dataclasses import dataclass
 
 import pydantic
 from pydantic import JsonValue, TypeAdapter
 
+from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.domain.parameters.values import FilterTermClause
 from veupathdb.errors import DataParsingError, VEuPathDBError, validate_response
 from veupathdb.json_types import JSONObject
@@ -36,6 +38,24 @@ _SEARCH_ADAPTER: TypeAdapter[WDKSearch] = TypeAdapter(WDKSearch)
 _RECORD_TYPE_ADAPTER: TypeAdapter[WDKRecordType] = TypeAdapter(WDKRecordType)
 _PARAMETER_ADAPTER: TypeAdapter[WDKParameter] = TypeAdapter(WDKParameter)
 
+type _DefinitionKey = tuple[str, str | None, str, str, bool]
+
+_read_definitions: ContextVar[dict[_DefinitionKey, WDKSearchResponse] | None] = (
+    ContextVar("read_search_definitions", default=None)
+)
+
+
+@contextlib.contextmanager
+def search_definitions_read_once() -> Iterator[None]:
+    if _read_definitions.get() is not None:
+        yield
+        return
+    reset = _read_definitions.set({})
+    try:
+        yield
+    finally:
+        _read_definitions.reset(reset)
+
 
 @dataclass(frozen=True)
 class BooleanSearch:
@@ -60,6 +80,7 @@ class SearchEndpoints:
     """The search and record-type WDK endpoints. This mixin needs the HTTP client that
     supplies the get and post methods."""
 
+    base_url: str
     _boolean_searches: dict[str, BooleanSearch]
 
     async def get(self, path: str, params: JSONObject | None = None) -> JsonValue:
@@ -136,16 +157,29 @@ class SearchEndpoints:
         expand_params: bool = True,
     ) -> WDKSearchResponse:
         """Returns the full search configuration, including its parameters."""
+        held = _read_definitions.get()
+        key: _DefinitionKey = (
+            self.base_url,
+            veupathdb_auth_token_ctx.get(),
+            record_type,
+            search_name,
+            expand_params,
+        )
+        if held is not None and key in held:
+            return held[key]
         params: JSONObject | None = {"expandParams": "true"} if expand_params else None
         raw = await self.get(
             f"/record-types/{record_type}/searches/{search_name}",
             params=params,
         )
-        return validate_response(
+        details = validate_response(
             WDKSearchResponse,
             raw,
             f"WDK search response for {record_type}/{search_name}",
         )
+        if held is not None:
+            held[key] = details
+        return details
 
     async def expand_tree_params_to_leaves(
         self,

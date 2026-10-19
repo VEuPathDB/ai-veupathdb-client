@@ -1,5 +1,14 @@
 # Knowledge log
 
+## 2026-10-19 - A scope reads each search definition once
+
+- 0.1.0b15: `search_definitions_read_once` keeps the search definitions read inside it,
+  keyed by site, login token, record type, search and the expand flag, and drops them when
+  it ends. A definition is built for the user who asks and a vocabulary may list that
+  user's own data (WDK-VOCAB-008), so nothing is kept across logins or past the scope. A
+  step write inside one reads its search once, where it read it twice; the strategy API no
+  longer keeps input-param names of its own.
+
 ## 2026-10-18 - The site client keeps the user id and the boolean search
 
 - 0.1.0b14: `resolve_wdk_user_id` reads `GET /users/current` once per login token and the

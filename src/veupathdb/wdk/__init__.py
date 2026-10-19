@@ -5,6 +5,7 @@ from veupathdb.wdk._failures import (
     validation_bundle,
     wdk_failure,
 )
+from veupathdb.wdk._searches import search_definitions_read_once
 from veupathdb.wdk.ai_expression import (
     AI_EXPRESSION_REPORT_PATH,
     AiExpressionReport,
@@ -285,6 +286,7 @@ __all__ = [
     "resolve_record_type",
     "resolve_registered_email",
     "runs_an_expensive_search",
+    "search_definitions_read_once",
     "search_gate",
     "search_turn",
     "strip_internal_wdk_strategy_name",

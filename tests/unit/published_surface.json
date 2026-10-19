@@ -468,6 +468,7 @@
     "resolve_record_type",
     "resolve_registered_email",
     "runs_an_expensive_search",
+    "search_definitions_read_once",
     "search_gate",
     "search_turn",
     "strip_internal_wdk_strategy_name",

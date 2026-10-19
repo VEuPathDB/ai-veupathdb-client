@@ -27,7 +27,6 @@ class StrategyAPIBase:
         self._initial_user_id = user_id
         self._resolved_user_id = user_id
         self._session_initialized = False
-        self._answer_param_cache: dict[str, set[str]] = {}
 
     def _normalize_parameters(self, parameters: JSONObject) -> dict[str, str]:
         """Normalize parameters to WDK string values; drop ``None``.

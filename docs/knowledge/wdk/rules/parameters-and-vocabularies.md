@@ -1,7 +1,7 @@
 ---
 type: Rules
 title: Parameter and vocabulary rules
-description: The eleven types and the exact string each takes, the mark that names a search's organism parameter, the shape a filter clause value takes per facet, what a filter term's summary counts and where its labels come from, the two encodings a vocabulary value can have and which one is silently wrong, and why a dependent value is only meaningful under the parent it was read with.
+description: The eleven types and the exact string each takes, the mark that names a search's organism parameter, the shape a filter clause value takes per facet, what a filter term's summary counts and where its labels come from, the two encodings a vocabulary value can have and which one is silently wrong, why a dependent value is only meaningful under the parent it was read with, and why a search definition belongs to the user who read it.
 tags: [wdk-alignment, rules, parameters, vocabularies, dependent-params, wire-format]
 generated: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
 verified: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
@@ -815,3 +815,38 @@ the site's own indent convention agree exactly.
 A client that requires the third element to be null cannot read a nested
 vocabulary at all: it fails the whole search document, not the one parameter, so
 the search reads as one the site does not have.
+
+### WDK-VOCAB-008 - A search definition is built for the user who asks, and a vocabulary may list that user's own data
+
+- class: SILENT
+- upstream: https://github.com/VEuPathDB/WDK/blob/599395d6aadaa1ff9ebaafdd55083f8148890f09/Model/src/main/java/org/gusdb/wdk/model/query/spec/ParameterContainerInstanceSpecBuilder.java#L105-L110
+- anchor: src/veupathdb/wdk/_searches.py:search_definitions_read_once
+- status: ENFORCED by tests/unit/wdk/test_a_scope_reads_each_search_definition_once.py::test_a_second_login_in_one_scope_reads_its_own_definition
+
+`GET /record-types/{type}/searches/{name}` builds the search's parameters for the
+requesting user (`QuestionService.getQuestionNew`). Any query a parameter reads,
+its vocabulary query included, may name the internal `user_id` param, and
+`ParameterContainerInstanceSpecBuilder` fills it with the requesting user's id and
+overwrites any value a caller sends. `AbstractDependentParam.resolveDependentQuery`
+lets a vocabulary query take `user_id` without declaring it as a depended param.
+
+WDK's own vocabulary cache keys a vocabulary by project, parameter, context search,
+vocabulary query and depended values, with no user
+([`FlatVocabularyFetcher.getCacheKey`](https://github.com/VEuPathDB/WDK/blob/599395d6aadaa1ff9ebaafdd55083f8148890f09/Model/src/main/java/org/gusdb/wdk/model/query/param/FlatVocabularyFetcher.java#L47-L57)).
+A vocabulary that depends on the user is marked `isCacheable="false"`, and
+[`FlatVocabParam.getVocabInstance`](https://github.com/VEuPathDB/WDK/blob/599395d6aadaa1ff9ebaafdd55083f8148890f09/Model/src/main/java/org/gusdb/wdk/model/query/param/FlatVocabParam.java#L124-L136)
+then runs it again for every request. The definition WDK sends does not say which
+parameters those are: the `isCacheable` it carries is the search's, not a
+vocabulary's.
+
+EbrcModelCommon has one:
+[`datasetSelection`](https://github.com/VEuPathDB/EbrcModelCommon/blob/8438f9806212260dd20665a9f312441883585ef6/Model/lib/wdk/model/questions/params/datasetParams.xml#L135-L140), "A Gene List dataset you have imported into
+your workspace", reads [`datasetVQ.geneListUserDataset`](https://github.com/VEuPathDB/EbrcModelCommon/blob/8438f9806212260dd20665a9f312441883585ef6/Model/lib/wdk/model/questions/params/datasetParams.xml#L180-L181), which
+takes `InternalParams.user_id` and is not cacheable. A step analysis form uses it,
+not a gene search, but a site release can add one.
+
+So a client may keep a definition only for one login. `search_definitions_read_once`
+keeps the definitions one request, turn or job reads, keyed by site, login token,
+record type, search and the expand flag, and drops them when the scope ends. The
+search list and a parameter's name are the model's and the same for every user,
+so the combine search the client keeps once per record type is safe.
