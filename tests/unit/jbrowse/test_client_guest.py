@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from collections.abc import Iterator
+from collections.abc import AsyncIterator, Iterator
 
 import httpx
 import jwt
@@ -83,3 +83,30 @@ async def test_a_renewed_guest_refused_again_needs_a_login(
         await jbrowse([401, 401], sent).store_bytes("x/genome.fasta", (0, 9))
     assert len(mints) == 2
     assert len(sent) == 2
+
+
+class RefusedBody(httpx.AsyncByteStream):
+    def __init__(self) -> None:
+        self.reads = 0
+        self.closed = False
+
+    async def __aiter__(self) -> AsyncIterator[bytes]:
+        self.reads += 1
+        yield b"Unauthorized"
+
+    async def aclose(self) -> None:
+        self.closed = True
+
+
+async def test_every_refused_guest_answer_is_closed_unread(
+    mints: list[str],
+) -> None:
+    bodies = [RefusedBody(), RefusedBody()]
+
+    def answer(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(401, stream=bodies[len(mints) - 1])
+
+    reader = JBrowseClient(base_url=PLASMO_WEB, transport=httpx.MockTransport(answer))
+    with pytest.raises(WDKLoginRequiredError):
+        await reader.store_bytes("x/genome.fasta", (0, 9))
+    assert [(b.reads, b.closed) for b in bodies] == [(0, True), (0, True)]

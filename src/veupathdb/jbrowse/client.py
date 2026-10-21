@@ -67,7 +67,7 @@ class JBrowseClient:
             return Credential(token)
         return Credential(await guest_tokens().token(self._service_url()), guest=True)
 
-    async def _get(
+    async def _open(
         self, path: str, params: dict[str, str] | None, headers: dict[str, str]
     ) -> httpx.Response:
         client = await self._http()
@@ -81,21 +81,42 @@ class JBrowseClient:
                 headers={**headers, "Cookie": f"Authorization={token}"},
             )
 
-        response = await client.send(build(credential.token))
+        response = await client.send(build(credential.token), stream=True)
         if credential.guest and response.status_code == _UNAUTHORIZED:
+            await response.aclose()
             renewed = await guest_tokens().renew(credential.token, self._service_url())
-            response = await client.send(build(renewed))
+            response = await client.send(build(renewed), stream=True)
             if response.status_code == _UNAUTHORIZED:
+                await response.aclose()
                 raise WDKLoginRequiredError
-        if not response.is_success:
-            raise JBrowseError(_GET, str(response.request.url), response.status_code)
         return response
 
+    async def _get(
+        self,
+        path: str,
+        params: dict[str, str] | None,
+        headers: dict[str, str],
+        *,
+        partial: bool = False,
+    ) -> bytes:
+        response = await self._open(path, params, headers)
+        try:
+            refused = not response.is_success or (
+                partial and response.status_code != _PARTIAL_CONTENT
+            )
+            if refused:
+                raise JBrowseError(
+                    _GET, str(response.request.url), response.status_code
+                )
+            return await response.aread()
+        finally:
+            await response.aclose()
+
     async def track_list(self, kind: TrackKind, abbrev: str) -> TrackList:
-        response = await self._get(
+        body = await self._get(
             f"/service/jbrowse/{kind}/{abbrev}", None, {"Accept": "application/json"}
         )
-        return TrackList.model_validate_json(response.content)
+        return TrackList.model_validate_json(body)
 
     async def store_bytes(
         self, data_path: str, byte_range: tuple[int, int] | None = None
@@ -105,9 +126,9 @@ class JBrowseClient:
             if byte_range is None
             else {"Range": f"bytes={byte_range[0]}-{byte_range[1]}"}
         )
-        response = await self._get(
-            "/service/jbrowse/store", {"data": data_path}, headers
+        return await self._get(
+            "/service/jbrowse/store",
+            {"data": data_path},
+            headers,
+            partial=byte_range is not None,
         )
-        if byte_range is not None and response.status_code != _PARTIAL_CONTENT:
-            raise JBrowseError(_GET, str(response.request.url), response.status_code)
-        return response.content

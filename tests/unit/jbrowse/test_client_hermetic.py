@@ -1,4 +1,4 @@
-from collections.abc import Iterator
+from collections.abc import AsyncIterator, Iterator
 
 import httpx
 import pytest
@@ -22,6 +22,26 @@ def registered_token() -> Iterator[None]:
 
 def client(handler: httpx.MockTransport) -> JBrowseClient:
     return JBrowseClient(base_url=BASE, transport=handler)
+
+
+class WatchedBody(httpx.AsyncByteStream):
+    def __init__(self, body: bytes) -> None:
+        self.body = body
+        self.reads = 0
+        self.closed = False
+
+    async def __aiter__(self) -> AsyncIterator[bytes]:
+        self.reads += 1
+        if self.reads > 1:
+            raise AssertionError
+        yield self.body
+
+    async def aclose(self) -> None:
+        self.closed = True
+
+
+def answering(status: int, body: WatchedBody) -> httpx.MockTransport:
+    return httpx.MockTransport(lambda request: httpx.Response(status, stream=body))
 
 
 async def test_a_track_list_is_read_from_the_organism_path() -> None:
@@ -111,3 +131,26 @@ async def test_a_redirect_to_a_login_page_is_raised() -> None:
             "organismSpecific", "pfal3D7"
         )
     assert (raised.value.upstream_status, raised.value.status) == (307, 502)
+
+
+async def test_a_store_that_ignores_the_range_is_refused_unread() -> None:
+    body = WatchedBody(b"A" * 1000)
+    with pytest.raises(JBrowseError) as raised:
+        await client(answering(200, body)).store_bytes("x/genome.fasta", (0, 9))
+    assert raised.value.upstream_status == 200
+    assert (body.reads, body.closed) == (0, True)
+
+
+async def test_an_error_status_is_refused_unread() -> None:
+    body = WatchedBody(b"<html>Not Found</html>")
+    with pytest.raises(JBrowseError) as raised:
+        await client(answering(404, body)).store_bytes("x/genome.fasta")
+    assert raised.value.upstream_status == 404
+    assert (body.reads, body.closed) == (0, True)
+
+
+async def test_a_partial_answer_is_read_once_and_closed() -> None:
+    body = WatchedBody(b"ACGTACGTAC")
+    read = await client(answering(206, body)).store_bytes("x/genome.fasta", (0, 9))
+    assert read == b"ACGTACGTAC"
+    assert (body.reads, body.closed) == (1, True)

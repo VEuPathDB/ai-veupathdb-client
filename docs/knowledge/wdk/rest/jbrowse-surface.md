@@ -46,6 +46,8 @@ reads only the `data` value and sends it to its own site's web base.
 
 - A ranged read must answer 206. A 200 to a ranged request means the store ignored the
   range and sent the whole file, so `store_bytes` refuses it.
+- The client reads the status before the body. An answer it refuses or renews is closed
+  without reading its body, so a refused 200 does not download the whole file.
 - Any status that is not a success raises `JBrowseError`: HTTP 502 to the host, with the
   method, the URL and the status the site answered in `upstream_status`.
 - The credential is the login token in `veupathdb_auth_token_ctx`, else the shared guest

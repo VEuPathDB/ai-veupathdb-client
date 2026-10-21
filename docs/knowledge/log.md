@@ -1,5 +1,12 @@
 # Knowledge log
 
+## 2026-10-21 - A refused JBrowse answer is closed unread
+
+- 0.1.0b17: `JBrowseClient` sends each read as a stream and checks the status before it
+  reads the body. A 401, a status that is not a success, and a 200 to a ranged read are
+  closed without reading their body, so the client does not download the whole file
+  from a store that ignores the range. See [the JBrowse surface](wdk/rest/jbrowse-surface.md).
+
 ## 2026-10-21 - The JBrowse reader reads a genome window
 
 - 0.1.0b16: `veupathdb.jbrowse` reads a site's JBrowse track list and its store, and
