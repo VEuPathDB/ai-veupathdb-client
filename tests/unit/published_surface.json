@@ -304,6 +304,21 @@
     "guest_tokens",
     "use_guest_tokens"
   ],
+  "veupathdb.jbrowse": [
+    "FaiEntry",
+    "GenomeIndexError",
+    "GenomeReader",
+    "GenomeWindow",
+    "JBrowseClient",
+    "JBrowseError",
+    "TrackConfig",
+    "TrackKind",
+    "TrackList",
+    "close_all_jbrowse_clients",
+    "data_prefix",
+    "get_jbrowse_client",
+    "parse_fai"
+  ],
   "veupathdb.model": [
     "CamelModel",
     "NonFiniteToNone",

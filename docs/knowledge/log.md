@@ -1,5 +1,12 @@
 # Knowledge log
 
+## 2026-10-21 - The JBrowse reader reads a genome window
+
+- 0.1.0b16: `veupathdb.jbrowse` reads a site's JBrowse track list and its store, and
+  `GenomeReader` reads a window of genome sequence through the FASTA index under the
+  track list's data prefix. A ranged read must answer 206, and a refusal is a 502 that
+  carries the site's status. See [the JBrowse surface](wdk/rest/jbrowse-surface.md).
+
 ## 2026-10-19 - A scope reads each search definition once
 
 - 0.1.0b15: `search_definitions_read_once` keeps the search definitions read inside it,

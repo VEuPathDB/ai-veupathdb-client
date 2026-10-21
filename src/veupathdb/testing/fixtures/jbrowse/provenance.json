@@ -1,0 +1,23 @@
+{
+  "pfal3D7_crt_exon1.fasta": {
+    "site": "plasmodb",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/jbrowse/store?data=Pfalciparum3D7%2FgenomeAndProteome%2Ffasta%2Fgenome.fasta",
+    "status": 206,
+    "recorded_at": "2026-10-21",
+    "reads": "Pf3D7_07_v3:403222-403312, bytes=7139187-7139278"
+  },
+  "pfal3D7_genome.fasta.fai": {
+    "site": "plasmodb",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/jbrowse/store?data=Pfalciparum3D7%2FgenomeAndProteome%2Ffasta%2Fgenome.fasta.fai",
+    "status": 200,
+    "recorded_at": "2026-10-21",
+    "reads": "the pfal3D7 genome index"
+  },
+  "pfal3D7_organism_tracks.json": {
+    "site": "plasmodb",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/jbrowse/organismSpecific/pfal3D7",
+    "status": 200,
+    "recorded_at": "2026-10-21",
+    "reads": "the pfal3D7 organism track list"
+  }
+}

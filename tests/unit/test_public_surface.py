@@ -19,6 +19,7 @@ PACKAGES = (
     "veupathdb.domain.parameters",
     "veupathdb.domain.strategy",
     "veupathdb.eda",
+    "veupathdb.jbrowse",
     "veupathdb.testing",
     "veupathdb.wdk",
 )

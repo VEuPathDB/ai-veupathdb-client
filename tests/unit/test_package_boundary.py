@@ -36,7 +36,11 @@ FORBIDDEN_ROOTS = {
 }
 
 # The wire models are declarations, so they reach the model library and nothing else.
-WIRE_MODEL_MODULES = {f"{CLIENT}.wdk.wdk_models", f"{CLIENT}.eda.models"}
+WIRE_MODEL_MODULES = {
+    f"{CLIENT}.wdk.wdk_models",
+    f"{CLIENT}.eda.models",
+    f"{CLIENT}.jbrowse.models",
+}
 ALLOWED_WIRE_MODEL_IMPORTS = {"pydantic"}
 
 # One module per optional extra may name the distribution that extra installs.
@@ -103,9 +107,9 @@ def test_the_domain_opens_no_connection() -> None:
     assert reached == set()
 
 
-# Only these two subpackages open a connection, so a domain module that names
-# neither cannot reach httpx through another client module.
-CLIENT_SUBPACKAGES_WITH_IO = {f"{CLIENT}.wdk", f"{CLIENT}.eda"}
+# Only these subpackages open a connection, so a domain module that names
+# none of them cannot reach httpx through another client module.
+CLIENT_SUBPACKAGES_WITH_IO = {f"{CLIENT}.wdk", f"{CLIENT}.eda", f"{CLIENT}.jbrowse"}
 
 
 def test_the_domain_names_no_client_module_that_opens_a_connection() -> None:

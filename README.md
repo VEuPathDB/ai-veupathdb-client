@@ -28,8 +28,8 @@ Each published package declares what a consumer may read, and
 `veupathdb`, `veupathdb.auth_context`, `veupathdb.devtools`,
 `veupathdb.devtools.eda_schemas`, `veupathdb.devtools.fixtures`,
 `veupathdb.domain`, `veupathdb.domain.parameters`, `veupathdb.domain.strategy`,
-`veupathdb.eda`, `veupathdb.errors`, `veupathdb.guest_token`, `veupathdb.model`,
-`veupathdb.observability.otel`, `veupathdb.testing`,
+`veupathdb.eda`, `veupathdb.errors`, `veupathdb.guest_token`, `veupathdb.jbrowse`,
+`veupathdb.model`, `veupathdb.observability.otel`, `veupathdb.testing`,
 `veupathdb.testing.eda_fixtures`, `veupathdb.testing.wdk_fixtures`,
 `veupathdb.wdk`.
 
@@ -265,7 +265,8 @@ path of its own. `veupathdb.testing.eda_fixtures.recorded_distribution(name)` re
 one recorded `/distribution` body as an `EdaDistributionResponse`.
 
 Recorded bodies and vendored schemas are refreshed, never hand-edited. Every
-recorder (`fixtures record`, `eda_capture record`, `vdi_capture record`) puts
+recorder (`fixtures record`, `eda_capture record`, `vdi_capture record`,
+`jbrowse_capture record`) puts
 the QA site list in force before it sends a request, and `capture_wdk` keeps
 only exchanges with a QA host, so no recorder reaches a production or beta site
 and none takes a flag that would. Every body in the store is recorded on a QA

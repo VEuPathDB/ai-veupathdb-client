@@ -6,7 +6,7 @@ import httpx
 import pytest
 import respx
 
-from veupathdb.devtools import eda_capture, vdi_capture
+from veupathdb.devtools import eda_capture, jbrowse_capture, vdi_capture
 from veupathdb.devtools.fixtures import record_all, record_one
 from veupathdb.settings import VEuPathDBSettings, use_veupathdb_settings_source
 from veupathdb.testing import QA_SITES_FILE, wdk_fixtures
@@ -146,3 +146,12 @@ def test_a_vdi_recording_creates_the_store_it_writes_into(tmp_path: Path) -> Non
     assert vdi_capture.load_provenance(store)["probe_post_response"].url == (
         "https://qa.plasmodb.org/vdi/datasets"
     )
+
+
+@respx.mock
+async def test_a_jbrowse_recording_needs_the_test_account(tmp_path: Path) -> None:
+    with pytest.raises(RuntimeError, match="WDK_TEST_TOKEN"):
+        await jbrowse_capture.record(tmp_path)
+
+    assert not respx.calls
+    assert sorted(site.id for site in list_sites()) == QA_SITE_IDS
