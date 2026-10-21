@@ -266,7 +266,7 @@ one recorded `/distribution` body as an `EdaDistributionResponse`.
 
 Recorded bodies and vendored schemas are refreshed, never hand-edited. Every
 recorder (`fixtures record`, `eda_capture record`, `vdi_capture record`,
-`jbrowse_capture record`) puts
+`jbrowse_capture record`, `jbrowse_capture junctions`) puts
 the QA site list in force before it sends a request, and `capture_wdk` keeps
 only exchanges with a QA host, so no recorder reaches a production or beta site
 and none takes a flag that would. Every body in the store is recorded on a QA

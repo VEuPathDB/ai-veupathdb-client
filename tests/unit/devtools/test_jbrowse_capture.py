@@ -7,9 +7,14 @@ from pathlib import Path
 import httpx
 import pytest
 import respx
+from tests.unit.jbrowse._tabix_files import bgzf, gff, tbi, virtual
 
 from veupathdb.devtools import jbrowse_capture
-from veupathdb.devtools.jbrowse_capture import load_provenance, record
+from veupathdb.devtools.jbrowse_capture import (
+    load_provenance,
+    record,
+    record_junctions,
+)
 
 QA_JBROWSE = "https://qa.plasmodb.org/plasmo.qa/service/jbrowse"
 FASTA = "pfal3D7/genomeAndProteome/fasta/genome.fasta"
@@ -19,6 +24,23 @@ TRACKS = (
 )
 FAI = b"Pf3D7_07_v3\t403320\t13\t60\t61\n"
 EXON = b"ATGAAATTC"
+JUNCTIONS = "PcynomolgiM/genomeBrowser/gff/unifiedIntronJunction.gff.gz"
+JUNCTION_TRACKS = (
+    b'{"tracks": [{"label": "RNA-Seq Evidence for Introns", '
+    b'"storeClass": "JBrowse/Store/SeqFeature/GFF3Tabix", "urlTemplate": '
+    b'"/a/service/jbrowse/store?data=PcynomolgiM%2FgenomeBrowser%2Fgff%2F'
+    b'unifiedIntronJunction.gff.gz"}]}'
+)
+LINES = gff("PcyM_07", 1381746, 1381886, "a") + gff("PcyM_07", 1382045, 1382280, "b")
+JUNCTION_DATA, _ = bgzf(LINES)
+JUNCTION_INDEX = tbi(
+    {
+        "PcyM_07": (
+            {4765: [(virtual(0, 0), virtual(0, len(LINES)))]},
+            [0] * 85,
+        )
+    }
+)
 
 
 @pytest.fixture(autouse=True)
@@ -76,6 +98,60 @@ async def test_a_recording_keeps_where_each_body_came_from(tmp_path: Path) -> No
     )
 
 
+def junction_site() -> respx.MockRouter:
+    router = respx.mock(assert_all_called=True)
+    router.get(f"{QA_JBROWSE}/rnaseqJunctions/pcynM").mock(
+        return_value=httpx.Response(200, content=JUNCTION_TRACKS)
+    )
+    router.get(f"{QA_JBROWSE}/store", params={"data": f"{JUNCTIONS}.tbi"}).mock(
+        return_value=httpx.Response(200, content=JUNCTION_INDEX)
+    )
+    router.get(
+        f"{QA_JBROWSE}/store",
+        params={"data": JUNCTIONS},
+        headers={"Range": "bytes=0-65535"},
+    ).mock(return_value=httpx.Response(206, content=JUNCTION_DATA))
+    return router
+
+
+async def test_a_junction_recording_writes_the_list_the_index_and_the_blocks(
+    tmp_path: Path,
+) -> None:
+    with junction_site():
+        assert await record_junctions(tmp_path) == 0
+
+    assert (tmp_path / "pcynM_junction_tracks.json").read_bytes() == JUNCTION_TRACKS
+    assert (tmp_path / "pcynM_junctions.gff.gz.tbi").read_bytes() == JUNCTION_INDEX
+    assert (
+        tmp_path / "pcynM_junctions_PcyM_07_1380000_1384000.gff.gz"
+    ).read_bytes() == JUNCTION_DATA
+    blocks = load_provenance(tmp_path)["pcynM_junctions_PcyM_07_1380000_1384000.gff.gz"]
+    assert (blocks.status, blocks.reads) == (
+        206,
+        "PcyM_07:1380000-1384000, bytes=0-65535",
+    )
+
+
+async def test_a_junction_recording_keeps_the_genome_recording(
+    tmp_path: Path,
+) -> None:
+    with qa_site():
+        await record(tmp_path)
+    with junction_site():
+        await record_junctions(tmp_path)
+
+    assert sorted(load_provenance(tmp_path)) == [
+        "pcynM_junction_tracks.json",
+        "pcynM_junctions.gff.gz.tbi",
+        "pcynM_junctions_PcyM_07_1380000_1384000.gff.gz",
+        "pfal3D7_crt_exon1.fasta",
+        "pfal3D7_genome.fasta.fai",
+        "pfal3D7_organism_tracks.json",
+    ]
+
+
 def test_the_command_names_its_usage(capsys: pytest.CaptureFixture[str]) -> None:
     assert jbrowse_capture.main(["verify"]) == 2
-    assert "jbrowse_capture record" in capsys.readouterr().out
+    usage = capsys.readouterr().out
+    assert "jbrowse_capture record" in usage
+    assert "jbrowse_capture junctions" in usage

@@ -34,3 +34,33 @@ def test_a_track_list_keeps_every_track() -> None:
 def test_a_store_query_is_decoded_once() -> None:
     track = TrackConfig.model_validate({"urlTemplate": "/s?data=a%2525b"})
     assert track.data_path == "a%25b"
+
+
+def test_a_tabix_track_reads_its_index_beside_its_data() -> None:
+    track = TrackConfig.model_validate(
+        {
+            "storeClass": "JBrowse/Store/SeqFeature/GFF3Tabix",
+            "urlTemplate": "/a/service/jbrowse/store?data=PcynomolgiM%2FgenomeBrowser%2Fgff%2FunifiedIntronJunction.gff.gz",
+        }
+    )
+    assert track.index_path == (
+        "PcynomolgiM/genomeBrowser/gff/unifiedIntronJunction.gff.gz.tbi"
+    )
+    assert track.reads_with_tabix
+
+
+def test_a_tbi_url_template_names_the_index() -> None:
+    track = TrackConfig.model_validate(
+        {
+            "urlTemplate": "/a/service/jbrowse/store?data=org%2Fx.gff.gz",
+            "tbiUrlTemplate": "/a/service/jbrowse/store?data=org%2Findex%2Fx.tbi",
+        }
+    )
+    assert track.index_path == "org/index/x.tbi"
+
+
+def test_a_track_that_is_not_tabix_says_so() -> None:
+    track = TrackConfig.model_validate(
+        {"storeClass": "JBrowse/Store/SeqFeature/BigWig", "urlTemplate": "/s?data=a"}
+    )
+    assert not track.reads_with_tabix

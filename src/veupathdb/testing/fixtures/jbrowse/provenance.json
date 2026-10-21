@@ -1,4 +1,25 @@
 {
+  "pcynM_junction_tracks.json": {
+    "site": "plasmodb",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/jbrowse/rnaseqJunctions/pcynM",
+    "status": 200,
+    "recorded_at": "2026-10-21",
+    "reads": "the pcynM junction tracks"
+  },
+  "pcynM_junctions.gff.gz.tbi": {
+    "site": "plasmodb",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/jbrowse/store?data=PcynomolgiM%2FgenomeBrowser%2Fgff%2FunifiedIntronJunction.gff.gz.tbi",
+    "status": 200,
+    "recorded_at": "2026-10-21",
+    "reads": "the index of PcynomolgiM/genomeBrowser/gff/unifiedIntronJunction.gff.gz"
+  },
+  "pcynM_junctions_PcyM_07_1380000_1384000.gff.gz": {
+    "site": "plasmodb",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/jbrowse/store?data=PcynomolgiM%2FgenomeBrowser%2Fgff%2FunifiedIntronJunction.gff.gz",
+    "status": 206,
+    "recorded_at": "2026-10-21",
+    "reads": "PcyM_07:1380000-1384000, bytes=1021821-1100077"
+  },
   "pfal3D7_crt_exon1.fasta": {
     "site": "plasmodb",
     "url": "https://qa.plasmodb.org/plasmo.qa/service/jbrowse/store?data=Pfalciparum3D7%2FgenomeAndProteome%2Ffasta%2Fgenome.fasta",

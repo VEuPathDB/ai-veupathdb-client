@@ -1,5 +1,21 @@
 # Knowledge log
 
+## 2026-10-21 - The JBrowse reader reads a tabix track by range
+
+- 0.1.0b17: `TabixReader` reads the lines of a bgzipped, tabix-indexed track that overlap
+  a genome region, through one ranged read of the store, and `parse_gff_line` types each
+  line. `JBrowseClient.junction_tracks` lists an organism's RNA-seq junction tracks, and a
+  track reads its index path from `tbiUrlTemplate` or beside its data. A block cut short,
+  a block that fails its checksum and an index that is not a generic tabix index raise
+  `TrackReadError`. A sequence the index does not name raises `SequenceNotIndexedError`
+  (HTTP 404, "Sequence not in the track index", since the track itself reads),
+  and an indexed sequence with no feature in the window returns no line. A chunk starts
+  no earlier than the linear index offset, and chunks more than one read apart take
+  separate reads. GFF3 attribute values are tuples split on `,`.
+  `jbrowse_capture junctions` records the P. cynomolgi M junction track
+  list, its index and the blocks of `PcyM_07:1380000-1384000`. See
+  [the JBrowse surface](wdk/rest/jbrowse-surface.md).
+
 ## 2026-10-21 - A refused JBrowse answer is closed unread
 
 - 0.1.0b17: `JBrowseClient` sends each read as a stream and checks the status before it

@@ -155,3 +155,12 @@ async def test_a_jbrowse_recording_needs_the_test_account(tmp_path: Path) -> Non
 
     assert not respx.calls
     assert sorted(site.id for site in list_sites()) == QA_SITE_IDS
+
+
+@respx.mock
+async def test_a_junction_recording_needs_the_test_account(tmp_path: Path) -> None:
+    with pytest.raises(RuntimeError, match="WDK_TEST_TOKEN"):
+        await jbrowse_capture.record_junctions(tmp_path)
+
+    assert not respx.calls
+    assert sorted(site.id for site in list_sites()) == QA_SITE_IDS

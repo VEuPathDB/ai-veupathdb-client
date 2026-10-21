@@ -11,7 +11,7 @@ from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.errors import SiteNotFoundError, WDKLoginRequiredError
 from veupathdb.guest_token import Credential, guest_tokens
 from veupathdb.jbrowse.errors import JBrowseError
-from veupathdb.jbrowse.models import TrackList
+from veupathdb.jbrowse.models import TrackConfig, TrackList
 from veupathdb.settings import user_agent_header
 from veupathdb.wdk.factory import list_sites
 
@@ -117,6 +117,10 @@ class JBrowseClient:
             f"/service/jbrowse/{kind}/{abbrev}", None, {"Accept": "application/json"}
         )
         return TrackList.model_validate_json(body)
+
+    async def junction_tracks(self, abbrev: str) -> list[TrackConfig]:
+        listed = await self.track_list("rnaseqJunctions", abbrev)
+        return [track for track in listed.tracks if track.reads_with_tabix]
 
     async def store_bytes(
         self, data_path: str, byte_range: tuple[int, int] | None = None

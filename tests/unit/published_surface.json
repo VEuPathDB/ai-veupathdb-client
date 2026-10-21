@@ -309,15 +309,20 @@
     "GenomeIndexError",
     "GenomeReader",
     "GenomeWindow",
+    "GffFeature",
     "JBrowseClient",
     "JBrowseError",
+    "SequenceNotIndexedError",
+    "TabixReader",
     "TrackConfig",
     "TrackKind",
     "TrackList",
+    "TrackReadError",
     "close_all_jbrowse_clients",
     "data_prefix",
     "get_jbrowse_client",
-    "parse_fai"
+    "parse_fai",
+    "parse_gff_line"
   ],
   "veupathdb.model": [
     "CamelModel",

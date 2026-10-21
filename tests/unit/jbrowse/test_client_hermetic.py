@@ -59,6 +59,29 @@ async def test_a_track_list_is_read_from_the_organism_path() -> None:
     assert seen[0].headers["Cookie"] == "Authorization=token-hermetic"
 
 
+async def test_the_junction_tracks_are_the_tabix_tracks_of_the_junction_list() -> None:
+    seen: list[httpx.Request] = []
+
+    def answer(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return httpx.Response(
+            200,
+            json={
+                "tracks": [
+                    {
+                        "label": "RNA-Seq Evidence for Introns",
+                        "storeClass": "JBrowse/Store/SeqFeature/GFF3Tabix",
+                    },
+                    {"label": "other", "storeClass": "JBrowse/Store/SeqFeature/BigWig"},
+                ]
+            },
+        )
+
+    tracks = await client(httpx.MockTransport(answer)).junction_tracks("pcynM")
+    assert [t.label for t in tracks] == ["RNA-Seq Evidence for Introns"]
+    assert seen[0].url.path == "/plasmo.qa/service/jbrowse/rnaseqJunctions/pcynM"
+
+
 async def test_a_ranged_read_sends_the_range_and_needs_partial_content() -> None:
     def answer(request: httpx.Request) -> httpx.Response:
         assert request.headers["Range"] == "bytes=10-19"
