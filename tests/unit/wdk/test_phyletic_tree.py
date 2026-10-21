@@ -201,5 +201,18 @@ class TestOrthoMCLsTaxonomy:
             ("pfag", "Plasmodium falciparum 7G8", 3),
         ]
 
+    def test_a_root_taxons_row_is_a_clade_and_a_taxons_row_a_genome(self) -> None:
+        tree = ortho_taxonomy_of(
+            _taxon_answer({"RootTaxons": self._CLADES, "Taxons": self._SPECIES})
+        )
+
+        assert tree is not None
+        assert [(n.code, n.clade) for n in tree.nodes()] == [
+            ("EUKA", True),
+            ("HAEM", True),
+            ("pfal", False),
+            ("pfag", False),
+        ]
+
     def test_an_answer_without_the_tables_is_no_taxonomy(self) -> None:
         assert ortho_taxonomy_of(_taxon_answer({})) is None

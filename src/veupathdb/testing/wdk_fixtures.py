@@ -106,6 +106,24 @@ class RecordedWDKResponse(BaseModel):
         return json.dumps(self.body) if self.text is None else self.text
 
 
+_GROUP_REPORT = "/record-types/group/searches/GroupsByPhyleticPattern/reports/standard"
+_PANEL = (
+    "pfag+pfsg+pfac+pfad+pfga+pfgb+pfgn+pfhb+pfai+pfke+pfkh+pfkt+pfml+pfnc+pfng+pfnf"
+    "+pfsd+pfsn+pftg"
+)
+
+
+def _group_sample(expression: str, count: int) -> JSONObject:
+    return {
+        "searchConfig": {"parameters": {"phyletic_expression": expression}},
+        "reportConfig": {
+            "attributes": ["primary_key", "number_of_members"],
+            "tables": ["TaxonCounts"],
+            "pagination": {"offset": 0, "numRecords": count},
+        },
+    }
+
+
 FIXTURES: tuple[FixtureRequest, ...] = (
     FixtureRequest(
         name="record_types",
@@ -270,6 +288,107 @@ FIXTURES: tuple[FixtureRequest, ...] = (
             "contextParamValues": {"nope": "x"},
         },
         reads="WDK-VOCAB-006",
+    ),
+    FixtureRequest(
+        name="orthomcl_taxonomy",
+        site="orthomcl",
+        path="/record-types/helper/searches/ByDefault/reports/standard",
+        method="POST",
+        body={
+            "searchConfig": {"parameters": {}},
+            "reportConfig": {
+                "attributes": ["primary_key"],
+                "tables": ["RootTaxons", "Taxons"],
+            },
+        },
+        reads="WDK-SITE-008",
+    ),
+    FixtureRequest(
+        name="orthomcl_word_counts_by_abbreviation",
+        site="orthomcl",
+        path="/record-types/sequence/searches/ByAccession/reports/abbreviation-wordCloud",
+        method="POST",
+        body={
+            "searchConfig": {"parameters": {"accession": "OG8_0031041"}},
+            "reportConfig": {},
+        },
+        reads="WDK-ANS-011",
+    ),
+    FixtureRequest(
+        name="orthomcl_word_counts_by_taxon_name",
+        site="orthomcl",
+        path="/record-types/sequence/searches/ByAccession/reports/taxon_name-wordCloud",
+        method="POST",
+        body={
+            "searchConfig": {"parameters": {"accession": "OG8_0031041"}},
+            "reportConfig": {},
+        },
+        reads="WDK-ANS-011",
+    ),
+    FixtureRequest(
+        name="orthomcl_group_taxon_counts",
+        site="orthomcl",
+        path="/record-types/group/searches/GroupsByPhyleticPattern/reports/standard",
+        method="POST",
+        body={
+            "searchConfig": {
+                "parameters": {"phyletic_expression": "APIC=139T AND APIC=139"}
+            },
+            "reportConfig": {
+                "attributes": [
+                    "primary_key",
+                    "number_of_members",
+                    "number_of_core_members",
+                    "number_of_peripheral_members",
+                    "alveolata_apic_actual",
+                    "alveolata_apic_total",
+                    "alveolata_haem_actual",
+                    "alveolata_haem_total",
+                    "alveolata_cocc_actual",
+                    "alveolata_cocc_total",
+                    "alveolata_actual",
+                    "alveolata_total",
+                    "alveolata_percent",
+                ],
+                "tables": ["TaxonCounts"],
+                "pagination": {"offset": 0, "numRecords": 2},
+            },
+        },
+        reads="WDK-SITE-009",
+    ),
+    FixtureRequest(
+        name="orthomcl_groups_absent_from_a_panel",
+        site="orthomcl",
+        path=_GROUP_REPORT,
+        method="POST",
+        body=_group_sample(f"pfal>=1T AND {_PANEL}=0T", 20),
+        reads="WDK-SITE-009",
+    ),
+    FixtureRequest(
+        name="orthomcl_groups_of_a_grouped_expression",
+        site="orthomcl",
+        path=_GROUP_REPORT,
+        method="POST",
+        body=_group_sample(f"pfal>=1T AND ({_PANEL}<=17T OR {_PANEL}=0T)", 5),
+        reads="WDK-SITE-010",
+    ),
+    FixtureRequest(
+        name="orthomcl_groups_with_more_proteins_in_one_genome",
+        site="orthomcl",
+        path=_GROUP_REPORT,
+        method="POST",
+        body=_group_sample(
+            " OR ".join(f"(pfal={k} AND tgon>={k + 1})" for k in range(112)), 3
+        ),
+        reads="WDK-SITE-009, WDK-SITE-010",
+    ),
+    FixtureRequest(
+        name="orthomcl_group_with_equal_proteins_in_two_genomes",
+        site="orthomcl",
+        path=_GROUP_REPORT,
+        method="POST",
+        body=_group_sample("pfal=1 AND tgon=1", 1),
+        reads="WDK-SITE-009",
     ),
 )
 

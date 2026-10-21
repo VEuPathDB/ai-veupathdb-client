@@ -122,6 +122,7 @@ from veupathdb.wdk.vdi.rnaseqrc import (
     RnaSeqRcUpload,
 )
 from veupathdb.wdk.wdk_models import (
+    ColumnNotCountableError,
     CombinedStepSpec,
     NewStepSpec,
     PatchStepSpec,
@@ -153,6 +154,8 @@ from veupathdb.wdk.wdk_models import (
     WDKStrategyDetails,
     WDKStrategySummary,
     WDKUserInfo,
+    WDKWordCount,
+    WDKWordCounts,
     WDKWordEnrichmentRow,
     encode_wdk_params,
 )
@@ -180,6 +183,7 @@ __all__ = [
     "AiExpressionReport",
     "AiExpressionStatus",
     "AiExpressionSummary",
+    "ColumnNotCountableError",
     "CombinedStepSpec",
     "DocumentTypeFilter",
     "MissingWDKStepIdError",
@@ -256,6 +260,8 @@ __all__ = [
     "WDKStrategySummary",
     "WDKStringParam",
     "WDKUserInfo",
+    "WDKWordCount",
+    "WDKWordCounts",
     "WDKWordEnrichmentRow",
     "build_wdk_step_tree",
     "bundle_rows",

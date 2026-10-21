@@ -409,6 +409,73 @@ rows. `WDKSearchConfig` serializes `parameters` on every dump, so a caller that 
 `exclude_defaults=True` (the search report, step creation, the AI expression report) cannot
 drop it.
 
+### WDK-ANS-011 - The `wordCloud` attribute reporter counts words after three merges, so its counts are record counts only on a column whose every value is one token that no merge changes
+
+- class: SILENT
+- upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/reporter/WordCloudAttributeReporter.java#L19-L222
+- anchor: src/veupathdb/wdk/strategy_api/reports.py:get_step_word_counts
+- status: ENFORCED by tests/unit/wdk/test_step_word_counts.py::test_a_steps_word_counts_are_read_with_the_columns_reporter
+
+A column offers the reporter as a format of type `wordCloud`, named `<column>-wordCloud`
+(`WDKAttributeField.format_named("wordCloud")`). It answers `{"tags": [{"word", "count"}]}`
+and reads no configuration, so the request body is `{"reportConfig": {}}`. On a step the
+path is `POST /users/{userId}/steps/{stepId}/reports/<column>-wordCloud`.
+
+`loadTags` reads one value per record and skips a null value ([L66-L73](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/reporter/WordCloudAttributeReporter.java#L66-L73)). Three
+steps then merge values:
+
+1. **The split into pieces.** `splitWords` splits the value on the column's `split-pattern`
+   and drops each piece that is shorter than `min-word-length`, a number when
+   `exclude-numbers` is on, or a common word ([L126-L141](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/reporter/WordCloudAttributeReporter.java#L126-L141)). Each piece that
+   remains adds 1 to a tag. The defaults are `[^a-zA-Z0-9_:]+`, 3, on, and `and`, `are`,
+   `was`, `were`, `the`, `that` ([L30-L39](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/reporter/WordCloudAttributeReporter.java#L30-L39)); `resolveProperties` reads the four
+   properties `split-pattern`, `min-word-length`, `exclude-numbers` and `common-words` per
+   column ([L88-L120](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/reporter/WordCloudAttributeReporter.java#L88-L120)). A value of two kept pieces adds to two tags; a value
+   whose only kept piece is also another value's piece adds to that value's tag.
+2. **The case fold.** A tag is keyed by the lower-cased piece ([L131](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/reporter/WordCloudAttributeReporter.java#L131),
+   [L142-L157](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/reporter/WordCloudAttributeReporter.java#L142-L157)), and the reported `word` is the most frequent original
+   spelling ([L217-L221](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/reporter/WordCloudAttributeReporter.java#L217-L221)), not always one record's value.
+3. **The plural fold.** `processTags` adds the count of a tag ending in `s`, `es` or `ies` to
+   the tag of its singular when that singular is also a tag, and drops the plural tag
+   ([L162-L209](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/reporter/WordCloudAttributeReporter.java#L162-L209)).
+
+When more than 10,000 distinct words are seen, `loadTags` returns before `processTags` with
+one tag, `Too many words`, of count 1 ([L20-L21](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/reporter/WordCloudAttributeReporter.java#L20-L21), [L75-L76](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/reporter/WordCloudAttributeReporter.java#L75-L76)).
+`WDKWordCounts` refuses that answer, and `get_step_word_counts` raises a `DataParsingError`
+that names the cap, the reporter and the step.
+
+So a count is records per value only when each value is one token that none of the three
+merges changes: one piece under the split pattern, at least the minimum length, not a number
+and not a common word, and no two values equal after lower-casing or after removing a plural
+ending. **A sum equal to the step's record count is necessary and not sufficient.** Each of
+the merges keeps the sum: `PF3D7_0101.1` and `PF3D7_0101.2` become one tag `PF3D7_0101` of 2
+(the pieces `1` and `2` are too short), `kinase` and `kinases` become `kinase` of 2, and
+`PfEMP1` and `pfemp1` become one tag of 2. `WDKWordCounts.record_counts(record_count)`
+refuses a sum that differs with `ColumnNotCountableError`; a reader that needs exact counts also checks that every word is
+a value the column can hold, such as a known genome code.
+
+OrthoMCL's `sequence` columns, `abbreviation` among them, use the plain WDK class with no
+properties ([`sequenceRecord.xml` L126-L137](https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/lib/wdk/OrthoMCL/records/sequenceRecord.xml#L126-L137)), so the
+defaults apply. The word clouds on `group` columns use
+[`EbrcWordCloudAttributeReporter`](https://github.com/VEuPathDB/EbrcWebsiteCommon/blob/fb2b1daa514d91b92a84e1d1154c8616e0299437/Model/src/main/java/org/eupathdb/common/model/report/EbrcWordCloudAttributeReporter.java#L6-L16),
+which adds 12 common words, `orthomcl` among them, with `min-word-length` 1,
+`exclude-numbers` false and `split-pattern` `,`
+(`group_type` at [`groupRecord.xml` L113-L123](https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/lib/wdk/OrthoMCL/records/groupRecord.xml#L113-L123)). Every OrthoMCL genome code (a
+`Taxons` row of the taxonomy) is four lowercase letters and none is three letters, so a code is one kept piece, no two codes
+fold together, and `abbreviation` meets the condition. `taxon_name` holds several words per
+value and does not.
+
+Measured on qa.orthomcl.org on 2026-10-21: the anonymous search report
+`POST /record-types/sequence/searches/ByAccession/reports/abbreviation-wordCloud` on one
+ortholog group answered one tag of count 1 per protein, and the tags summed to the group's
+record count (the fixture `orthomcl_word_counts_by_abbreviation`). On the same group,
+`taxon_name-wordCloud` answered tags that sum to more than three times the record count, and
+a genus word carries one count for each record whose genome name holds it (the fixture
+`orthomcl_word_counts_by_taxon_name`). The `abbreviation` reporter on a transform step of
+several hundred thousand proteins answered in one request, and its tags summed to the step's
+record count. No OrthoMCL column offers `byValue`, so on that site a
+step's column is counted by value through this reporter.
+
 ### WDK-SEARCH-001 - A search belongs to exactly one record class, and asking for it under another is a 404
 
 - class: HARD

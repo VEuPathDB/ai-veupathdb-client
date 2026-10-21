@@ -1,0 +1,571 @@
+{
+  "provenance": {
+    "site": "orthomcl",
+    "method": "POST",
+    "url": "https://qa.orthomcl.org/orthomcl.qa/service/record-types/sequence/searches/ByAccession/reports/abbreviation-wordCloud",
+    "status": 200,
+    "content_type": "text/plain",
+    "recorded_at": "2026-10-21",
+    "reads": "WDK-ANS-011"
+  },
+  "body": {
+    "tags": [
+      {
+        "count": 1,
+        "word": "bbes"
+      },
+      {
+        "count": 1,
+        "word": "bbig"
+      },
+      {
+        "count": 1,
+        "word": "bbov"
+      },
+      {
+        "count": 1,
+        "word": "bcab"
+      },
+      {
+        "count": 1,
+        "word": "bdiv"
+      },
+      {
+        "count": 1,
+        "word": "bduw"
+      },
+      {
+        "count": 1,
+        "word": "bgib"
+      },
+      {
+        "count": 1,
+        "word": "bmic"
+      },
+      {
+        "count": 1,
+        "word": "bova"
+      },
+      {
+        "count": 1,
+        "word": "bovi"
+      },
+      {
+        "count": 1,
+        "word": "bspx"
+      },
+      {
+        "count": 1,
+        "word": "cand"
+      },
+      {
+        "count": 1,
+        "word": "cbov"
+      },
+      {
+        "count": 1,
+        "word": "ccay"
+      },
+      {
+        "count": 1,
+        "word": "ccnf"
+      },
+      {
+        "count": 1,
+        "word": "cfel"
+      },
+      {
+        "count": 1,
+        "word": "chod"
+      },
+      {
+        "count": 1,
+        "word": "choi"
+      },
+      {
+        "count": 1,
+        "word": "chom"
+      },
+      {
+        "count": 1,
+        "word": "chot"
+      },
+      {
+        "count": 1,
+        "word": "cmel"
+      },
+      {
+        "count": 1,
+        "word": "cmtu"
+      },
+      {
+        "count": 1,
+        "word": "cmur"
+      },
+      {
+        "count": 1,
+        "word": "cpar"
+      },
+      {
+        "count": 1,
+        "word": "cpia"
+      },
+      {
+        "count": 1,
+        "word": "cpib"
+      },
+      {
+        "count": 1,
+        "word": "crya"
+      },
+      {
+        "count": 1,
+        "word": "cscp"
+      },
+      {
+        "count": 1,
+        "word": "cser"
+      },
+      {
+        "count": 1,
+        "word": "cspi"
+      },
+      {
+        "count": 1,
+        "word": "csui"
+      },
+      {
+        "count": 1,
+        "word": "ctyz"
+      },
+      {
+        "count": 1,
+        "word": "cubi"
+      },
+      {
+        "count": 1,
+        "word": "eace"
+      },
+      {
+        "count": 1,
+        "word": "ebru"
+      },
+      {
+        "count": 1,
+        "word": "efal"
+      },
+      {
+        "count": 1,
+        "word": "efla"
+      },
+      {
+        "count": 1,
+        "word": "eipa"
+      },
+      {
+        "count": 1,
+        "word": "emag"
+      },
+      {
+        "count": 1,
+        "word": "emax"
+      },
+      {
+        "count": 1,
+        "word": "emed"
+      },
+      {
+        "count": 1,
+        "word": "emit"
+      },
+      {
+        "count": 1,
+        "word": "enec"
+      },
+      {
+        "count": 1,
+        "word": "epra"
+      },
+      {
+        "count": 1,
+        "word": "esti"
+      },
+      {
+        "count": 1,
+        "word": "eten"
+      },
+      {
+        "count": 1,
+        "word": "etht"
+      },
+      {
+        "count": 1,
+        "word": "gnip"
+      },
+      {
+        "count": 1,
+        "word": "hhhh"
+      },
+      {
+        "count": 1,
+        "word": "hpil"
+      },
+      {
+        "count": 1,
+        "word": "htar"
+      },
+      {
+        "count": 1,
+        "word": "ncan"
+      },
+      {
+        "count": 1,
+        "word": "nclv"
+      },
+      {
+        "count": 1,
+        "word": "padl"
+      },
+      {
+        "count": 1,
+        "word": "pbbi"
+      },
+      {
+        "count": 1,
+        "word": "pber"
+      },
+      {
+        "count": 1,
+        "word": "pbil"
+      },
+      {
+        "count": 1,
+        "word": "pblg"
+      },
+      {
+        "count": 1,
+        "word": "pccb"
+      },
+      {
+        "count": 1,
+        "word": "pcga"
+      },
+      {
+        "count": 1,
+        "word": "pcgb"
+      },
+      {
+        "count": 1,
+        "word": "pcha"
+      },
+      {
+        "count": 1,
+        "word": "pcoa"
+      },
+      {
+        "count": 1,
+        "word": "pcym"
+      },
+      {
+        "count": 1,
+        "word": "pcyn"
+      },
+      {
+        "count": 1,
+        "word": "pfac"
+      },
+      {
+        "count": 1,
+        "word": "pfad"
+      },
+      {
+        "count": 1,
+        "word": "pfag"
+      },
+      {
+        "count": 1,
+        "word": "pfai"
+      },
+      {
+        "count": 1,
+        "word": "pfal"
+      },
+      {
+        "count": 1,
+        "word": "pfga"
+      },
+      {
+        "count": 1,
+        "word": "pfgb"
+      },
+      {
+        "count": 1,
+        "word": "pfgn"
+      },
+      {
+        "count": 1,
+        "word": "pfhb"
+      },
+      {
+        "count": 1,
+        "word": "pfke"
+      },
+      {
+        "count": 1,
+        "word": "pfkh"
+      },
+      {
+        "count": 1,
+        "word": "pfkt"
+      },
+      {
+        "count": 1,
+        "word": "pfml"
+      },
+      {
+        "count": 1,
+        "word": "pfnc"
+      },
+      {
+        "count": 1,
+        "word": "pfnf"
+      },
+      {
+        "count": 1,
+        "word": "pfng"
+      },
+      {
+        "count": 1,
+        "word": "pfra"
+      },
+      {
+        "count": 1,
+        "word": "pfsd"
+      },
+      {
+        "count": 1,
+        "word": "pfsg"
+      },
+      {
+        "count": 1,
+        "word": "pfsn"
+      },
+      {
+        "count": 1,
+        "word": "pftg"
+      },
+      {
+        "count": 1,
+        "word": "pgab"
+      },
+      {
+        "count": 1,
+        "word": "pgal"
+      },
+      {
+        "count": 1,
+        "word": "pgas"
+      },
+      {
+        "count": 1,
+        "word": "pinu"
+      },
+      {
+        "count": 1,
+        "word": "pkah"
+      },
+      {
+        "count": 1,
+        "word": "pkno"
+      },
+      {
+        "count": 1,
+        "word": "pknp"
+      },
+      {
+        "count": 1,
+        "word": "pmal"
+      },
+      {
+        "count": 1,
+        "word": "pova"
+      },
+      {
+        "count": 1,
+        "word": "powp"
+      },
+      {
+        "count": 1,
+        "word": "ppra"
+      },
+      {
+        "count": 1,
+        "word": "preg"
+      },
+      {
+        "count": 1,
+        "word": "prei"
+      },
+      {
+        "count": 1,
+        "word": "prel"
+      },
+      {
+        "count": 1,
+        "word": "pvbd"
+      },
+      {
+        "count": 1,
+        "word": "pvce"
+      },
+      {
+        "count": 1,
+        "word": "pvcr"
+      },
+      {
+        "count": 1,
+        "word": "pvin"
+      },
+      {
+        "count": 1,
+        "word": "pvip"
+      },
+      {
+        "count": 1,
+        "word": "pviv"
+      },
+      {
+        "count": 1,
+        "word": "pvld"
+      },
+      {
+        "count": 1,
+        "word": "pvlk"
+      },
+      {
+        "count": 1,
+        "word": "pvpc"
+      },
+      {
+        "count": 1,
+        "word": "pvpv"
+      },
+      {
+        "count": 1,
+        "word": "pvpw"
+      },
+      {
+        "count": 1,
+        "word": "pvvc"
+      },
+      {
+        "count": 1,
+        "word": "pyoe"
+      },
+      {
+        "count": 1,
+        "word": "pyoy"
+      },
+      {
+        "count": 1,
+        "word": "pyxn"
+      },
+      {
+        "count": 1,
+        "word": "pyyx"
+      },
+      {
+        "count": 1,
+        "word": "sneu"
+      },
+      {
+        "count": 1,
+        "word": "snsn"
+      },
+      {
+        "count": 1,
+        "word": "tann"
+      },
+      {
+        "count": 1,
+        "word": "tequ"
+      },
+      {
+        "count": 1,
+        "word": "tgar"
+      },
+      {
+        "count": 1,
+        "word": "tgca"
+      },
+      {
+        "count": 1,
+        "word": "tgco"
+      },
+      {
+        "count": 1,
+        "word": "tgee"
+      },
+      {
+        "count": 1,
+        "word": "tgfo"
+      },
+      {
+        "count": 1,
+        "word": "tggd"
+      },
+      {
+        "count": 1,
+        "word": "tggt"
+      },
+      {
+        "count": 1,
+        "word": "tgma"
+      },
+      {
+        "count": 1,
+        "word": "tgon"
+      },
+      {
+        "count": 1,
+        "word": "tgop"
+      },
+      {
+        "count": 1,
+        "word": "tgru"
+      },
+      {
+        "count": 1,
+        "word": "tgta"
+      },
+      {
+        "count": 1,
+        "word": "tgtg"
+      },
+      {
+        "count": 1,
+        "word": "tgva"
+      },
+      {
+        "count": 1,
+        "word": "tgve"
+      },
+      {
+        "count": 1,
+        "word": "tofc"
+      },
+      {
+        "count": 1,
+        "word": "togn"
+      },
+      {
+        "count": 1,
+        "word": "tori"
+      },
+      {
+        "count": 1,
+        "word": "tpar"
+      }
+    ]
+  }
+}

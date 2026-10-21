@@ -47,16 +47,17 @@ _DEFAULT_DEPTH = 1
 
 
 class PhyleticNode(BaseModel):
-    """One clade or species of the tree, with its children below it."""
+    """One clade or genome of the tree, with its children below it."""
 
     code: str
     label: str
     depth: int
+    clade: bool
     children: list[PhyleticNode] = Field(default_factory=list)
 
 
 class TaxonEntry(BaseModel):
-    """One clade or species that names its parent by id."""
+    """One clade or genome that names its parent by id."""
 
     model_config = ConfigDict(frozen=True)
 
@@ -64,6 +65,25 @@ class TaxonEntry(BaseModel):
     parent_id: str | None
     code: str
     label: str
+    clade: bool
+
+
+_OPEN_NOMENCLATURE = frozenset({"sp.", "cf.", "aff."})
+
+
+def species_of(label: str) -> str:
+    words = label.split()
+    if words[:1] == ["Candidatus"]:
+        words = words[1:]
+    kept = 3 if words[1:2] and words[1] in _OPEN_NOMENCLATURE else 2
+    return " ".join(words[:kept])
+
+
+class SpeciesGroup(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    species: str
+    genomes: tuple[str, ...] = Field(min_length=1)
 
 
 class ResolvedTerms(BaseModel):
@@ -132,6 +152,7 @@ class PhyleticTree(BaseModel):
                 code=entry.term,
                 label=entry.display or entry.term,
                 depth=depth,
+                clade=False,
             )
             while stack and stack[-1].depth >= depth:
                 stack.pop()
@@ -143,6 +164,8 @@ class PhyleticTree(BaseModel):
                 parent.children.append(node)
             by_code[node.code] = node
             stack.append(node)
+        for node in by_code.values():
+            node.clade = bool(node.children)
         return cls(roots=roots)
 
     @classmethod
@@ -169,6 +192,7 @@ class PhyleticTree(BaseModel):
                         code=taxon.code,
                         label=taxon.label,
                         depth=depth,
+                        clade=taxon.clade,
                         children=grow(taxon.id, depth + 1),
                     )
                 )
@@ -180,15 +204,13 @@ class PhyleticTree(BaseModel):
         """The code of every selectable node."""
         return {node.code for node in self.nodes()}
 
-    def species_under(self, codes: Sequence[str]) -> set[str]:
-        """The species the codes stand for: a species itself, a clade its
-        species, and the root every species."""
+    def genomes_under(self, codes: Sequence[str]) -> set[str]:
         named = set(codes)
         found: set[str] = set()
 
         def walk(node: PhyleticNode, *, inside: bool) -> None:
             inside = inside or node.code in named
-            if not node.children:
+            if not node.clade:
                 if inside:
                     found.add(node.code)
                 return
@@ -198,6 +220,17 @@ class PhyleticTree(BaseModel):
         for root in self.roots:
             walk(root, inside=PHYLETIC_ROOT_CODE in named)
         return found
+
+    def species_groups(self, codes: Sequence[str]) -> list[SpeciesGroup]:
+        held = self.genomes_under(codes)
+        grouped: dict[str, list[str]] = {}
+        for node in self.nodes():
+            if node.code in held:
+                grouped.setdefault(species_of(node.label), []).append(node.code)
+        return [
+            SpeciesGroup(species=name, genomes=tuple(found))
+            for name, found in grouped.items()
+        ]
 
     def nodes(self) -> Iterator[PhyleticNode]:
         """Every selectable node, in tree order. The root is not one of them."""
@@ -246,10 +279,10 @@ class PhyleticTree(BaseModel):
         included: Sequence[str],
         excluded: Sequence[str],
     ) -> dict[str, TriState]:
-        """Push each selection down to the species the census holds.
+        """Push each selection down to the genomes the census holds.
 
-        A clade code never appears in the census, so it takes its state to its
-        leaves. An explicit leaf overrides the clade above it.
+        A clade code never appears in the census, so it takes its state to the
+        genomes under it. An explicit genome overrides the clade above it.
         """
         excluded_codes = set(excluded)
         included_codes = set(included)
@@ -261,7 +294,7 @@ class PhyleticTree(BaseModel):
                 own = "exclude"
             if node.code in included_codes:
                 own = "include"
-            if not node.children:
+            if not node.clade:
                 if own is not None:
                     states[node.code] = own
                 return

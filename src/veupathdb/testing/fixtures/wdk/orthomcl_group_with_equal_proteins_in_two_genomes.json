@@ -1,0 +1,575 @@
+{
+  "provenance": {
+    "site": "orthomcl",
+    "method": "POST",
+    "url": "https://qa.orthomcl.org/orthomcl.qa/service/record-types/group/searches/GroupsByPhyleticPattern/reports/standard",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-10-21",
+    "reads": "WDK-SITE-009"
+  },
+  "body": {
+    "records": [
+      {
+        "tables": {
+          "TaxonCounts": [
+            {
+              "count": "1",
+              "taxon_id": "4525711",
+              "abbrev": "pinu"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412584",
+              "abbrev": "pfgb"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412548",
+              "abbrev": "powp"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412550",
+              "abbrev": "pova"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412556",
+              "abbrev": "ppra"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412527",
+              "abbrev": "snsn"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412571",
+              "abbrev": "pgal"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412516",
+              "abbrev": "nclv"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412565",
+              "abbrev": "pvcr"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412520",
+              "abbrev": "eace"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412585",
+              "abbrev": "pfsg"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527772",
+              "abbrev": "tgee"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412577",
+              "abbrev": "pfnc"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4523466",
+              "abbrev": "pfad"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4523555",
+              "abbrev": "pfag"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412582",
+              "abbrev": "pfkh"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412569",
+              "abbrev": "pyyx"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412517",
+              "abbrev": "etht"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412586",
+              "abbrev": "pfai"
+            },
+            {
+              "count": "8",
+              "taxon_id": "4538775",
+              "abbrev": "ptet"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412580",
+              "abbrev": "pfke"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412560",
+              "abbrev": "pcoa"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412559",
+              "abbrev": "pvpc"
+            },
+            {
+              "count": "2",
+              "taxon_id": "5412840",
+              "abbrev": "rirc"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412581",
+              "abbrev": "pfgn"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527748",
+              "abbrev": "tgco"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412587",
+              "abbrev": "pfsd"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412546",
+              "abbrev": "hpil"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412903",
+              "abbrev": "efla"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527756",
+              "abbrev": "tgtg"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412555",
+              "abbrev": "pgab"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412573",
+              "abbrev": "prei"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412522",
+              "abbrev": "emax"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412514",
+              "abbrev": "ccay"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412583",
+              "abbrev": "pfkt"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412547",
+              "abbrev": "prel"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412518",
+              "abbrev": "efal"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412552",
+              "abbrev": "pgas"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4528181",
+              "abbrev": "ncan"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412558",
+              "abbrev": "pvbd"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412563",
+              "abbrev": "pfra"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412568",
+              "abbrev": "pvip"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527755",
+              "abbrev": "tgma"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412576",
+              "abbrev": "pfng"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412511",
+              "abbrev": "tfoe"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527741",
+              "abbrev": "tgve"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527729",
+              "abbrev": "tgop"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412519",
+              "abbrev": "ebru"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412562",
+              "abbrev": "pvin"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412895",
+              "abbrev": "pccb"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412900",
+              "abbrev": "esti"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4525697",
+              "abbrev": "pcyn"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527763",
+              "abbrev": "tggd"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412549",
+              "abbrev": "pmal"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412551",
+              "abbrev": "pbil"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527765",
+              "abbrev": "tgar"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412575",
+              "abbrev": "preg"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4523657",
+              "abbrev": "pber"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4301826",
+              "abbrev": "rirr"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4876016",
+              "abbrev": "mgen"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412592",
+              "abbrev": "pkah"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4525706",
+              "abbrev": "pviv"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527744",
+              "abbrev": "tgru"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4525720",
+              "abbrev": "pkno"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527760",
+              "abbrev": "tgfo"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527782",
+              "abbrev": "tgon"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4528263",
+              "abbrev": "cvel"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4523561",
+              "abbrev": "pfal"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412554",
+              "abbrev": "padl"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4523501",
+              "abbrev": "pfhb"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412512",
+              "abbrev": "bbes"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412544",
+              "abbrev": "htar"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412529",
+              "abbrev": "hhhh"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527787",
+              "abbrev": "tgva"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412591",
+              "abbrev": "pknp"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412513",
+              "abbrev": "csui"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527783",
+              "abbrev": "tgta"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412507",
+              "abbrev": "tvgg"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412545",
+              "abbrev": "pbbi"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412553",
+              "abbrev": "pblg"
+            },
+            {
+              "count": "2",
+              "taxon_id": "3035825",
+              "abbrev": "tvag"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4523663",
+              "abbrev": "pyxn"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412578",
+              "abbrev": "pfga"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412590",
+              "abbrev": "pftg"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412561",
+              "abbrev": "pvvc"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527751",
+              "abbrev": "tggt"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412515",
+              "abbrev": "ccnf"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4525692",
+              "abbrev": "pcym"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412557",
+              "abbrev": "pvce"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412566",
+              "abbrev": "pyoe"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4523668",
+              "abbrev": "pcha"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412564",
+              "abbrev": "pvld"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412574",
+              "abbrev": "pvpw"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412543",
+              "abbrev": "pvlk"
+            },
+            {
+              "count": "3",
+              "taxon_id": "4538945",
+              "abbrev": "tetr"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4523608",
+              "abbrev": "pfnf"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412897",
+              "abbrev": "emed"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412579",
+              "abbrev": "pfac"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412588",
+              "abbrev": "pfml"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412570",
+              "abbrev": "pvpv"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4527762",
+              "abbrev": "tgca"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412589",
+              "abbrev": "pfsn"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412567",
+              "abbrev": "pyoy"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4528271",
+              "abbrev": "vbra"
+            }
+          ]
+        },
+        "displayName": "OG8_0000001",
+        "recordClassName": "GroupRecordClasses.GroupRecordClass",
+        "attributes": {
+          "number_of_members": "115",
+          "primary_key": "OG8_0000001"
+        },
+        "id": [
+          {
+            "name": "group_name",
+            "value": "OG8_0000001"
+          }
+        ],
+        "tableErrors": []
+      }
+    ],
+    "meta": {
+      "displayViewTotalCount": 1818,
+      "tables": [
+        "TaxonCounts"
+      ],
+      "pagination": {
+        "offset": 0,
+        "numRecords": 1
+      },
+      "cachePreviouslyExisted": true,
+      "viewTotalCount": 1818,
+      "sorting": [],
+      "recordClassName": "group",
+      "responseCount": 1,
+      "attributes": [
+        "primary_key",
+        "number_of_members"
+      ],
+      "totalCount": 1818,
+      "displayTotalCount": 1818
+    }
+  }
+}

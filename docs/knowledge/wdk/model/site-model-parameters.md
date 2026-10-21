@@ -335,20 +335,31 @@ string in the grammar the search's own description states. Read on qa.orthomcl.o
 
 - A unit is a taxa specification, an operator and a count. The specification is one code,
   or codes joined by `+`, or `ALL`. The operators are `>`, `<`, `=`, `>=` and `<=`. A bare
-  count counts sequences; a count ending in `T` counts taxa.
-- `AND` and `OR` join units and parentheses group them. The description does not state
-  which of the two binds first, so `PhyleticExpression.parse` refuses the two side by side
-  without parentheses.
+  count counts sequences; a count ending in `T` counts taxa. A taxon here is one genome
+  and a sequence one protein, and `PhyleticExpression.describe` uses those two words.
+- A unit counts only the groups that hold a protein of its codes, so `<`, `<=` and `>=`
+  never match a group with none, and `=0T` (the same set as `=0`) is the only absence
+  ([WDK-SITE-009](../rules/site-model-params.md)). `PhyleticExpression.holds_for` reads a
+  group's `TaxonCounts` the same way.
+- `AND` and `OR` join units. The site drops parentheses and reads AND before OR
+  ([WDK-SITE-010](../rules/site-model-params.md)), so an expression is an OR of AND terms,
+  and `check_expression` refuses one whose meaning changes when its parentheses are dropped.
 - "Present in some but not all of a list" is `list>=1T AND list<NT`; "absent from at least
-  k of N" is `list<=(N-k)T`.
+  k of N" is `X AND list<=(N-k)T OR X AND list=0T`, since `list<=(N-k)T` alone leaves out
+  every group absent from all N.
 
 The codes are not on the search. They are on the helper record of `helper/ByDefault`, in
 two tables: `RootTaxons` holds the 48 clades (`taxon_abbrev`, uppercase, with `ALL` as the
-root) and `Taxons` holds the 857 species (`three_letter_abbrev`, four lowercase letters
-despite the name). Every row names its parent by `orthomcl_clade_id`, and a species row
+root) and `Taxons` holds the 857 genomes (`three_letter_abbrev`, four lowercase letters
+despite the name). Every row names its parent by `orthomcl_clade_id`, and a genome row
 repeats once for each clade above it, under `taxon_group`. `ortho_taxonomy_of` reads both
 into the same `PhyleticTree` the genomics-site maps produce, so a code lookup and a code
-check are one implementation for both searches.
+check are one implementation for both searches. A clade row can hold no genome, so a node
+is a genome because its row is a `Taxons` row, never because it has no children
+([WDK-SITE-008](../rules/site-model-params.md)). `species_of` reads a genome's species
+as the first two words of its name, after a leading `Candidatus`, and the first three when
+the second is `sp.`, `cf.` or `aff.`, so the strains of one species group together and two
+undescribed species of one genus stay apart.
 
 # What a converter has to get right
 

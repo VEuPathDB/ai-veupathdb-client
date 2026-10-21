@@ -1,0 +1,831 @@
+{
+  "provenance": {
+    "site": "orthomcl",
+    "method": "POST",
+    "url": "https://qa.orthomcl.org/orthomcl.qa/service/record-types/sequence/searches/ByAccession/reports/taxon_name-wordCloud",
+    "status": 200,
+    "content_type": "text/plain",
+    "recorded_at": "2026-10-21",
+    "reads": "WDK-ANS-011"
+  },
+  "body": {
+    "tags": [
+      {
+        "count": 61,
+        "word": "Plasmodium"
+      },
+      {
+        "count": 32,
+        "word": "strain"
+      },
+      {
+        "count": 20,
+        "word": "falciparum"
+      },
+      {
+        "count": 18,
+        "word": "Cryptosporidium"
+      },
+      {
+        "count": 15,
+        "word": "gondii"
+      },
+      {
+        "count": 15,
+        "word": "Toxoplasma"
+      },
+      {
+        "count": 14,
+        "word": "Eimeria"
+      },
+      {
+        "count": 10,
+        "word": "Babesia"
+      },
+      {
+        "count": 10,
+        "word": "vinckei"
+      },
+      {
+        "count": 8,
+        "word": "isolate"
+      },
+      {
+        "count": 8,
+        "word": "yoelii"
+      },
+      {
+        "count": 7,
+        "word": "Houghton"
+      },
+      {
+        "count": 6,
+        "word": "G01"
+      },
+      {
+        "count": 6,
+        "word": "Theileria"
+      },
+      {
+        "count": 5,
+        "word": "vivax"
+      },
+      {
+        "count": 4,
+        "word": "chabaudi"
+      },
+      {
+        "count": 4,
+        "word": "hominis"
+      },
+      {
+        "count": 3,
+        "word": "IOWA"
+      },
+      {
+        "count": 3,
+        "word": "knowlesi"
+      },
+      {
+        "count": 3,
+        "word": "orientalis"
+      },
+      {
+        "count": 3,
+        "word": "parvum"
+      },
+      {
+        "count": 2,
+        "word": "17XNL"
+      },
+      {
+        "count": 2,
+        "word": "43IA8"
+      },
+      {
+        "count": 2,
+        "word": "7G8"
+      },
+      {
+        "count": 2,
+        "word": "bovis"
+      },
+      {
+        "count": 2,
+        "word": "caninum"
+      },
+      {
+        "count": 2,
+        "word": "cayetanensis"
+      },
+      {
+        "count": 2,
+        "word": "Cyclospora"
+      },
+      {
+        "count": 2,
+        "word": "cynomolgi"
+      },
+      {
+        "count": 2,
+        "word": "gaboni"
+      },
+      {
+        "count": 2,
+        "word": "gigantea"
+      },
+      {
+        "count": 2,
+        "word": "like"
+      },
+      {
+        "count": 2,
+        "word": "Liverpool"
+      },
+      {
+        "count": 2,
+        "word": "meleagridis"
+      },
+      {
+        "count": 2,
+        "word": "Neospora"
+      },
+      {
+        "count": 2,
+        "word": "neurona"
+      },
+      {
+        "count": 2,
+        "word": "ovale"
+      },
+      {
+        "count": 2,
+        "word": "petteri"
+      },
+      {
+        "count": 2,
+        "word": "Porospora"
+      },
+      {
+        "count": 2,
+        "word": "reichenowi"
+      },
+      {
+        "count": 2,
+        "word": "Sarcocystis"
+      },
+      {
+        "count": 2,
+        "word": "tenella"
+      },
+      {
+        "count": 2,
+        "word": "Xinjiang"
+      },
+      {
+        "count": 1,
+        "word": "17X"
+      },
+      {
+        "count": 1,
+        "word": "1802A"
+      },
+      {
+        "count": 1,
+        "word": "3D7"
+      },
+      {
+        "count": 1,
+        "word": "8845_47"
+      },
+      {
+        "count": 1,
+        "word": "A19"
+      },
+      {
+        "count": 1,
+        "word": "A1H1"
+      },
+      {
+        "count": 1,
+        "word": "A23"
+      },
+      {
+        "count": 1,
+        "word": "A26"
+      },
+      {
+        "count": 1,
+        "word": "acervulina"
+      },
+      {
+        "count": 1,
+        "word": "adleri"
+      },
+      {
+        "count": 1,
+        "word": "andersoni"
+      },
+      {
+        "count": 1,
+        "word": "ANKA"
+      },
+      {
+        "count": 1,
+        "word": "Ankara"
+      },
+      {
+        "count": 1,
+        "word": "annulata"
+      },
+      {
+        "count": 1,
+        "word": "Antonio"
+      },
+      {
+        "count": 1,
+        "word": "ARI"
+      },
+      {
+        "count": 1,
+        "word": "ATCC"
+      },
+      {
+        "count": 1,
+        "word": "Azabu"
+      },
+      {
+        "count": 1,
+        "word": "Bayer"
+      },
+      {
+        "count": 1,
+        "word": "berghei"
+      },
+      {
+        "count": 1,
+        "word": "besnoiti"
+      },
+      {
+        "count": 1,
+        "word": "Besnoitia"
+      },
+      {
+        "count": 1,
+        "word": "BGF"
+      },
+      {
+        "count": 1,
+        "word": "bigemina"
+      },
+      {
+        "count": 1,
+        "word": "billcollinsi"
+      },
+      {
+        "count": 1,
+        "word": "blacklocki"
+      },
+      {
+        "count": 1,
+        "word": "Bolivian"
+      },
+      {
+        "count": 1,
+        "word": "BOND"
+      },
+      {
+        "count": 1,
+        "word": "brasilianum"
+      },
+      {
+        "count": 1,
+        "word": "brucechwatti"
+      },
+      {
+        "count": 1,
+        "word": "brunetti"
+      },
+      {
+        "count": 1,
+        "word": "C10"
+      },
+      {
+        "count": 1,
+        "word": "caballi"
+      },
+      {
+        "count": 1,
+        "word": "Cameroon"
+      },
+      {
+        "count": 1,
+        "word": "CAST"
+      },
+      {
+        "count": 1,
+        "word": "CD01"
+      },
+      {
+        "count": 1,
+        "word": "CDC"
+      },
+      {
+        "count": 1,
+        "word": "chipmunk"
+      },
+      {
+        "count": 1,
+        "word": "CHN_HEN01"
+      },
+      {
+        "count": 1,
+        "word": "coatneyi"
+      },
+      {
+        "count": 1,
+        "word": "COUG"
+      },
+      {
+        "count": 1,
+        "word": "Creek"
+      },
+      {
+        "count": 1,
+        "word": "curtisi"
+      },
+      {
+        "count": 1,
+        "word": "Cystoisospora"
+      },
+      {
+        "count": 1,
+        "word": "Cytauxzoon"
+      },
+      {
+        "count": 1,
+        "word": "D6B2"
+      },
+      {
+        "count": 1,
+        "word": "Dd2"
+      },
+      {
+        "count": 1,
+        "word": "divergens"
+      },
+      {
+        "count": 1,
+        "word": "DOM2"
+      },
+      {
+        "count": 1,
+        "word": "duncani"
+      },
+      {
+        "count": 1,
+        "word": "equi"
+      },
+      {
+        "count": 1,
+        "word": "falciformis"
+      },
+      {
+        "count": 1,
+        "word": "felis"
+      },
+      {
+        "count": 1,
+        "word": "Fish"
+      },
+      {
+        "count": 1,
+        "word": "flavescens"
+      },
+      {
+        "count": 1,
+        "word": "FOU"
+      },
+      {
+        "count": 1,
+        "word": "fragile"
+      },
+      {
+        "count": 1,
+        "word": "GA01"
+      },
+      {
+        "count": 1,
+        "word": "GAB2"
+      },
+      {
+        "count": 1,
+        "word": "GAL"
+      },
+      {
+        "count": 1,
+        "word": "gallinaceum"
+      },
+      {
+        "count": 1,
+        "word": "GB4"
+      },
+      {
+        "count": 1,
+        "word": "genotype"
+      },
+      {
+        "count": 1,
+        "word": "Ger1"
+      },
+      {
+        "count": 1,
+        "word": "GH01"
+      },
+      {
+        "count": 1,
+        "word": "gibsoni"
+      },
+      {
+        "count": 1,
+        "word": "GN01"
+      },
+      {
+        "count": 1,
+        "word": "Goon"
+      },
+      {
+        "count": 1,
+        "word": "Gregarina"
+      },
+      {
+        "count": 1,
+        "word": "GT1"
+      },
+      {
+        "count": 1,
+        "word": "Haberkorn"
+      },
+      {
+        "count": 1,
+        "word": "Hackeri"
+      },
+      {
+        "count": 1,
+        "word": "Haemoproteus"
+      },
+      {
+        "count": 1,
+        "word": "hammondi"
+      },
+      {
+        "count": 1,
+        "word": "Hammondia"
+      },
+      {
+        "count": 1,
+        "word": "HB3"
+      },
+      {
+        "count": 1,
+        "word": "Hepatocystis"
+      },
+      {
+        "count": 1,
+        "word": "intestinalis"
+      },
+      {
+        "count": 1,
+        "word": "inui"
+      },
+      {
+        "count": 1,
+        "word": "KE01"
+      },
+      {
+        "count": 1,
+        "word": "KH01"
+      },
+      {
+        "count": 1,
+        "word": "KH02"
+      },
+      {
+        "count": 1,
+        "word": "lentum"
+      },
+      {
+        "count": 1,
+        "word": "magna"
+      },
+      {
+        "count": 1,
+        "word": "malariae"
+      },
+      {
+        "count": 1,
+        "word": "Malayan"
+      },
+      {
+        "count": 1,
+        "word": "MAS"
+      },
+      {
+        "count": 1,
+        "word": "maxima"
+      },
+      {
+        "count": 1,
+        "word": "ME49"
+      },
+      {
+        "count": 1,
+        "word": "media"
+      },
+      {
+        "count": 1,
+        "word": "microti"
+      },
+      {
+        "count": 1,
+        "word": "mitis"
+      },
+      {
+        "count": 1,
+        "word": "Miyake"
+      },
+      {
+        "count": 1,
+        "word": "ML01"
+      },
+      {
+        "count": 1,
+        "word": "Muguga"
+      },
+      {
+        "count": 1,
+        "word": "muris"
+      },
+      {
+        "count": 1,
+        "word": "necatrix"
+      },
+      {
+        "count": 1,
+        "word": "NF135"
+      },
+      {
+        "count": 1,
+        "word": "NF166"
+      },
+      {
+        "count": 1,
+        "word": "NF1_C8"
+      },
+      {
+        "count": 1,
+        "word": "NF54"
+      },
+      {
+        "count": 1,
+        "word": "nilgiri"
+      },
+      {
+        "count": 1,
+        "word": "niphandrodes"
+      },
+      {
+        "count": 1,
+        "word": "Nure"
+      },
+      {
+        "count": 1,
+        "word": "ovata"
+      },
+      {
+        "count": 1,
+        "word": "ovis"
+      },
+      {
+        "count": 1,
+        "word": "P01"
+      },
+      {
+        "count": 1,
+        "word": "P0_A24"
+      },
+      {
+        "count": 1,
+        "word": "p89"
+      },
+      {
+        "count": 1,
+        "word": "PAM"
+      },
+      {
+        "count": 1,
+        "word": "parva"
+      },
+      {
+        "count": 1,
+        "word": "Piliocolobus"
+      },
+      {
+        "count": 1,
+        "word": "Pk1"
+      },
+      {
+        "count": 1,
+        "word": "PL19_A22"
+      },
+      {
+        "count": 1,
+        "word": "PowCR01"
+      },
+      {
+        "count": 1,
+        "word": "praecox"
+      },
+      {
+        "count": 1,
+        "word": "praefalciparum"
+      },
+      {
+        "count": 1,
+        "word": "Pvl01"
+      },
+      {
+        "count": 1,
+        "word": "PvW1"
+      },
+      {
+        "count": 1,
+        "word": "relictum"
+      },
+      {
+        "count": 1,
+        "word": "RN66"
+      },
+      {
+        "count": 1,
+        "word": "RUB"
+      },
+      {
+        "count": 1,
+        "word": "ryanae"
+      },
+      {
+        "count": 1,
+        "word": "Sal"
+      },
+      {
+        "count": 1,
+        "word": "San"
+      },
+      {
+        "count": 1,
+        "word": "SD01"
+      },
+      {
+        "count": 1,
+        "word": "Selcuk"
+      },
+      {
+        "count": 1,
+        "word": "serpentis"
+      },
+      {
+        "count": 1,
+        "word": "SGS1"
+      },
+      {
+        "count": 1,
+        "word": "Shintoku"
+      },
+      {
+        "count": 1,
+        "word": "SISKIN1"
+      },
+      {
+        "count": 1,
+        "word": "SN01"
+      },
+      {
+        "count": 1,
+        "word": "SN1"
+      },
+      {
+        "count": 1,
+        "word": "SN3"
+      },
+      {
+        "count": 1,
+        "word": "stiedai"
+      },
+      {
+        "count": 1,
+        "word": "suis"
+      },
+      {
+        "count": 1,
+        "word": "SY75"
+      },
+      {
+        "count": 1,
+        "word": "T2Bo"
+      },
+      {
+        "count": 1,
+        "word": "tartakovskyi"
+      },
+      {
+        "count": 1,
+        "word": "tephrosceles"
+      },
+      {
+        "count": 1,
+        "word": "TG01"
+      },
+      {
+        "count": 1,
+        "word": "TgCATBr9"
+      },
+      {
+        "count": 1,
+        "word": "TgCatPRC2"
+      },
+      {
+        "count": 1,
+        "word": "TU1867"
+      },
+      {
+        "count": 1,
+        "word": "TU502"
+      },
+      {
+        "count": 1,
+        "word": "TU502_2012"
+      },
+      {
+        "count": 1,
+        "word": "tyzzeri"
+      },
+      {
+        "count": 1,
+        "word": "ubiquitum"
+      },
+      {
+        "count": 1,
+        "word": "UdeA01"
+      },
+      {
+        "count": 1,
+        "word": "UG01"
+      },
+      {
+        "count": 1,
+        "word": "UGA55"
+      },
+      {
+        "count": 1,
+        "word": "UKMEL1"
+      },
+      {
+        "count": 1,
+        "word": "Unknown"
+      },
+      {
+        "count": 1,
+        "word": "USDA"
+      },
+      {
+        "count": 1,
+        "word": "VAND"
+      },
+      {
+        "count": 1,
+        "word": "VEG"
+      },
+      {
+        "count": 1,
+        "word": "WA1"
+      },
+      {
+        "count": 1,
+        "word": "wallikeri"
+      },
+      {
+        "count": 1,
+        "word": "Weybridge"
+      },
+      {
+        "count": 1,
+        "word": "Wien"
+      },
+      {
+        "count": 1,
+        "word": "Winnie"
+      }
+    ]
+  }
+}

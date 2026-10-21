@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+from pydantic import ValidationError as PydanticValidationError
 
 from veupathdb.domain.parameters.phyletic import (
     PHYLETIC_LIST_PARAMS,
@@ -11,11 +12,13 @@ from veupathdb.domain.parameters.phyletic import (
     PhyleticBinding,
     PhyleticTree,
     PhyleticUnresolved,
+    SpeciesGroup,
     TaxonEntry,
     census_states,
     derive_binding,
     encode_profile_pattern,
     species_lists,
+    species_of,
     validate_phyletic_codes,
 )
 from veupathdb.domain.parameters.wdk_vocab import WDKVocabTerm
@@ -99,6 +102,11 @@ class TestTheTree:
     def test_labels_carry_the_display_name(self) -> None:
         labels = {o.value: o.display for o in _tree().labels()}
         assert labels["pfal"] == "Plasmodium falciparum 3D7"
+
+
+def test_a_profile_vocabulary_node_with_children_is_a_clade() -> None:
+    tree = PhyleticTree.from_vocab(TERMS, INDENTS)
+    assert {n.code for n in tree.nodes() if n.clade} == {"EUKA", "MAMM", "BACT"}
 
 
 class TestResolvingTerms:
@@ -334,18 +342,43 @@ class TestATreeFromTaxa:
 
     def _taxa(self) -> list[TaxonEntry]:
         return [
-            TaxonEntry(id="7", parent_id="2", code="pfal", label="P. falciparum 3D7"),
-            TaxonEntry(id="1", parent_id=None, code="ALL", label="Root"),
-            TaxonEntry(id="2", parent_id="1", code="HAEM", label="Haemosporida"),
-            TaxonEntry(id="3", parent_id="1", code="BACT", label="Bacteria"),
-            TaxonEntry(id="8", parent_id="3", code="ecol", label="E. coli"),
-            TaxonEntry(id="9", parent_id="2", code="pfag", label="P. falciparum 7G8"),
+            TaxonEntry(
+                id="7",
+                parent_id="2",
+                code="pfal",
+                label="P. falciparum 3D7",
+                clade=False,
+            ),
+            TaxonEntry(id="1", parent_id=None, code="ALL", label="Root", clade=True),
+            TaxonEntry(
+                id="2", parent_id="1", code="HAEM", label="Haemosporida", clade=True
+            ),
+            TaxonEntry(
+                id="3", parent_id="1", code="BACT", label="Bacteria", clade=True
+            ),
+            TaxonEntry(
+                id="8", parent_id="3", code="ecol", label="E. coli", clade=False
+            ),
+            TaxonEntry(
+                id="9",
+                parent_id="2",
+                code="pfag",
+                label="P. falciparum 7G8",
+                clade=False,
+            ),
+            TaxonEntry(
+                id="4", parent_id="1", code="BACI", label="Bacillariophyta", clade=True
+            ),
         ]
 
     def test_the_root_is_dropped_and_each_row_hangs_under_its_parent(self) -> None:
         tree = PhyleticTree.from_taxa(self._taxa())
 
-        assert [(r.code, r.depth) for r in tree.roots] == [("HAEM", 1), ("BACT", 1)]
+        assert [(r.code, r.depth) for r in tree.roots] == [
+            ("HAEM", 1),
+            ("BACT", 1),
+            ("BACI", 1),
+        ]
         assert [(c.code, c.depth) for c in tree.roots[0].children] == [
             ("pfal", 2),
             ("pfag", 2),
@@ -362,7 +395,53 @@ class TestATreeFromTaxa:
     def test_codes_are_every_selectable_node(self) -> None:
         tree = PhyleticTree.from_taxa(self._taxa())
 
-        assert tree.codes() == {"HAEM", "BACT", "pfal", "pfag", "ecol"}
+        assert tree.codes() == {"HAEM", "BACT", "BACI", "pfal", "pfag", "ecol"}
+
+    def test_a_clade_with_no_genome_is_a_clade_and_counts_none(self) -> None:
+        tree = PhyleticTree.from_taxa(self._taxa())
+
+        assert {n.code for n in tree.nodes() if n.clade} == {"HAEM", "BACT", "BACI"}
+        assert tree.genomes_under(["BACI"]) == set()
+        assert tree.genomes_under(["ALL"]) == {"pfal", "pfag", "ecol"}
+
+    def test_a_clade_with_no_genome_puts_nothing_in_the_census(self) -> None:
+        tree = PhyleticTree.from_taxa(self._taxa())
+
+        assert tree.leaf_states(["BACI", "HAEM"], []) == {
+            "pfal": "include",
+            "pfag": "include",
+        }
+
+    def test_genomes_group_into_their_species_in_tree_order(
+        self,
+    ) -> None:
+        tree = PhyleticTree.from_taxa(self._taxa())
+
+        assert [(g.species, g.genomes) for g in tree.species_groups(["ALL"])] == [
+            ("P. falciparum", ("pfal", "pfag")),
+            ("E. coli", ("ecol",)),
+        ]
+
+
+@pytest.mark.parametrize(
+    ("label", "species"),
+    [
+        ("Plasmodium falciparum 3D7", "Plasmodium falciparum"),
+        ("Cryptosporidium sp. 43IA8 isolate 43IA8", "Cryptosporidium sp. 43IA8"),
+        ("Leishmania sp. Ghana MHOM/GH/2012/GH5", "Leishmania sp. Ghana"),
+        ("Porospora cf. gigantea A", "Porospora cf. gigantea"),
+        ("Eimeria aff. tenella X1", "Eimeria aff. tenella"),
+        ("Candidatus Korarchaeum cryptofilum OPF8", "Korarchaeum cryptofilum"),
+        ("Bacillus anthracis", "Bacillus anthracis"),
+    ],
+)
+def test_the_species_of_a_genome_label(label: str, species: str) -> None:
+    assert species_of(label) == species
+
+
+def test_a_species_group_holds_at_least_one_genome() -> None:
+    with pytest.raises(PydanticValidationError):
+        SpeciesGroup(species="Plasmodium falciparum", genomes=())
 
 
 def test_an_unknown_code_names_the_parameter_it_was_stated_in() -> None:

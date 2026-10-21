@@ -1,0 +1,396 @@
+{
+  "provenance": {
+    "site": "orthomcl",
+    "method": "POST",
+    "url": "https://qa.orthomcl.org/orthomcl.qa/service/record-types/group/searches/GroupsByPhyleticPattern/reports/standard",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-10-21",
+    "reads": "WDK-SITE-010"
+  },
+  "body": {
+    "records": [
+      {
+        "tables": {
+          "TaxonCounts": [
+            {
+              "count": "1",
+              "taxon_id": "2740446",
+              "abbrev": "ahos"
+            },
+            {
+              "count": "1",
+              "taxon_id": "2740529",
+              "abbrev": "cmaq"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4544158",
+              "abbrev": "ngru"
+            },
+            {
+              "count": "2",
+              "taxon_id": "2740417",
+              "abbrev": "ssol"
+            },
+            {
+              "count": "3",
+              "taxon_id": "2740329",
+              "abbrev": "saci"
+            },
+            {
+              "count": "2",
+              "taxon_id": "2740359",
+              "abbrev": "msed"
+            },
+            {
+              "count": "1",
+              "taxon_id": "2740553",
+              "abbrev": "paer"
+            }
+          ]
+        },
+        "displayName": "OG8_0000000",
+        "recordClassName": "GroupRecordClasses.GroupRecordClass",
+        "attributes": {
+          "number_of_members": "11",
+          "primary_key": "OG8_0000000"
+        },
+        "id": [
+          {
+            "name": "group_name",
+            "value": "OG8_0000000"
+          }
+        ],
+        "tableErrors": []
+      },
+      {
+        "tables": {
+          "TaxonCounts": [
+            {
+              "count": "1",
+              "taxon_id": "4430198",
+              "abbrev": "thth"
+            },
+            {
+              "count": "14",
+              "taxon_id": "2913660",
+              "abbrev": "atha"
+            },
+            {
+              "count": "3",
+              "taxon_id": "5412509",
+              "abbrev": "hmel"
+            },
+            {
+              "count": "11",
+              "taxon_id": "5412511",
+              "abbrev": "tfoe"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4584056",
+              "abbrev": "rbal"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412742",
+              "abbrev": "bgla"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412779",
+              "abbrev": "rmel"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412738",
+              "abbrev": "bglx"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412496",
+              "abbrev": "mdap"
+            },
+            {
+              "count": "3",
+              "taxon_id": "5412508",
+              "abbrev": "hmcx"
+            },
+            {
+              "count": "25",
+              "taxon_id": "2828032",
+              "abbrev": "osat"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412902",
+              "abbrev": "bpfe"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4304905",
+              "abbrev": "nbom"
+            },
+            {
+              "count": "14",
+              "taxon_id": "3035825",
+              "abbrev": "tvag"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412760",
+              "abbrev": "ssca"
+            },
+            {
+              "count": "2",
+              "taxon_id": "5412754",
+              "abbrev": "ldel"
+            },
+            {
+              "count": "10",
+              "taxon_id": "2886391",
+              "abbrev": "rcom"
+            },
+            {
+              "count": "25",
+              "taxon_id": "2827230",
+              "abbrev": "zmay"
+            },
+            {
+              "count": "13",
+              "taxon_id": "5412507",
+              "abbrev": "tvgg"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412611",
+              "abbrev": "baya"
+            }
+          ]
+        },
+        "displayName": "OG8_0000002",
+        "recordClassName": "GroupRecordClasses.GroupRecordClass",
+        "attributes": {
+          "number_of_members": "130",
+          "primary_key": "OG8_0000002"
+        },
+        "id": [
+          {
+            "name": "group_name",
+            "value": "OG8_0000002"
+          }
+        ],
+        "tableErrors": []
+      },
+      {
+        "tables": {
+          "TaxonCounts": [
+            {
+              "count": "1",
+              "taxon_id": "4544158",
+              "abbrev": "ngru"
+            },
+            {
+              "count": "5",
+              "taxon_id": "2754448",
+              "abbrev": "acas"
+            },
+            {
+              "count": "3",
+              "taxon_id": "4528271",
+              "abbrev": "vbra"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412424",
+              "abbrev": "nfty"
+            },
+            {
+              "count": "3",
+              "taxon_id": "5412439",
+              "abbrev": "nfoa"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4584056",
+              "abbrev": "rbal"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412420",
+              "abbrev": "nlov"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412411",
+              "abbrev": "mbal"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4508434",
+              "abbrev": "tpse"
+            },
+            {
+              "count": "2",
+              "taxon_id": "5412421",
+              "abbrev": "nfow"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4379119",
+              "abbrev": "dhan"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4528263",
+              "abbrev": "cvel"
+            }
+          ]
+        },
+        "displayName": "OG8_0000004",
+        "recordClassName": "GroupRecordClasses.GroupRecordClass",
+        "attributes": {
+          "number_of_members": "21",
+          "primary_key": "OG8_0000004"
+        },
+        "id": [
+          {
+            "name": "group_name",
+            "value": "OG8_0000004"
+          }
+        ],
+        "tableErrors": []
+      },
+      {
+        "tables": {
+          "TaxonCounts": [
+            {
+              "count": "1",
+              "taxon_id": "5412801",
+              "abbrev": "espi"
+            },
+            {
+              "count": "1",
+              "taxon_id": "2757255",
+              "abbrev": "gthe"
+            },
+            {
+              "count": "1",
+              "taxon_id": "2754448",
+              "abbrev": "acas"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5100324",
+              "abbrev": "syne"
+            }
+          ]
+        },
+        "displayName": "OG8_0000005",
+        "recordClassName": "GroupRecordClasses.GroupRecordClass",
+        "attributes": {
+          "number_of_members": "4",
+          "primary_key": "OG8_0000005"
+        },
+        "id": [
+          {
+            "name": "group_name",
+            "value": "OG8_0000005"
+          }
+        ],
+        "tableErrors": []
+      },
+      {
+        "tables": {
+          "TaxonCounts": [
+            {
+              "count": "1",
+              "taxon_id": "4680157",
+              "abbrev": "cbur"
+            },
+            {
+              "count": "3",
+              "taxon_id": "5412610",
+              "abbrev": "bsal"
+            },
+            {
+              "count": "1",
+              "taxon_id": "2739406",
+              "abbrev": "ckor"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4584056",
+              "abbrev": "rbal"
+            },
+            {
+              "count": "4",
+              "taxon_id": "4301826",
+              "abbrev": "rirr"
+            },
+            {
+              "count": "1",
+              "taxon_id": "5412411",
+              "abbrev": "mbal"
+            },
+            {
+              "count": "4",
+              "taxon_id": "5412840",
+              "abbrev": "rirc"
+            },
+            {
+              "count": "3",
+              "taxon_id": "5412843",
+              "abbrev": "rira"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4549125",
+              "abbrev": "aaeo"
+            },
+            {
+              "count": "1",
+              "taxon_id": "4837472",
+              "abbrev": "drad"
+            }
+          ]
+        },
+        "displayName": "OG8_0000006",
+        "recordClassName": "GroupRecordClasses.GroupRecordClass",
+        "attributes": {
+          "number_of_members": "20",
+          "primary_key": "OG8_0000006"
+        },
+        "id": [
+          {
+            "name": "group_name",
+            "value": "OG8_0000006"
+          }
+        ],
+        "tableErrors": []
+      }
+    ],
+    "meta": {
+      "displayViewTotalCount": 815746,
+      "tables": [
+        "TaxonCounts"
+      ],
+      "pagination": {
+        "offset": 0,
+        "numRecords": 5
+      },
+      "cachePreviouslyExisted": true,
+      "viewTotalCount": 815746,
+      "sorting": [],
+      "recordClassName": "group",
+      "responseCount": 5,
+      "attributes": [
+        "primary_key",
+        "number_of_members"
+      ],
+      "totalCount": 815746,
+      "displayTotalCount": 815746
+    }
+  }
+}

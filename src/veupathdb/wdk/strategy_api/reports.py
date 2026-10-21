@@ -8,9 +8,15 @@ from collections.abc import Sequence
 
 from pydantic import JsonValue
 
+from veupathdb.errors import validate_response
 from veupathdb.json_types import JSONObject
 from veupathdb.wdk.strategy_api.base import StrategyAPIBase
-from veupathdb.wdk.wdk_models import WDKAnswer, WDKFilterValue, WDKSortSpec
+from veupathdb.wdk.wdk_models import (
+    WDKAnswer,
+    WDKFilterValue,
+    WDKSortSpec,
+    WDKWordCounts,
+)
 
 
 class ReportsMixin(StrategyAPIBase):
@@ -29,6 +35,12 @@ class ReportsMixin(StrategyAPIBase):
         report_config: JsonValue = config or {}
         payload: JSONObject = {"reportConfig": report_config}
         return await self.client.run_step_report(uid, step_id, report_name, payload)
+
+    async def get_step_word_counts(self, step_id: int, reporter: str) -> WDKWordCounts:
+        raw = await self.run_step_report(step_id, reporter)
+        return validate_response(
+            WDKWordCounts, raw, f"{reporter} report for step {step_id}"
+        )
 
     async def get_step_answer(
         self,

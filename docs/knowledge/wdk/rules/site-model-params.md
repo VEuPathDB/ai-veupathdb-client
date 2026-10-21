@@ -1,7 +1,7 @@
 ---
 type: Rules
 title: Site-model parameter rules
-description: The parameters WDK executes but ApiCommonModel defines - the phyletic profile pattern's LIKE grammar, why a wrong pattern is never refused and returns whatever the ortholog-less branch yields, why this parameter's own published default is an expression from another site, and why a search that offers the same criterion twice unions the two halves.
+description: The parameters WDK executes but ApiCommonModel defines - the phyletic profile pattern's LIKE grammar, why a wrong pattern is never refused and returns whatever the ortholog-less branch yields, why this parameter's own published default is an expression from another site, why a search that offers the same criterion twice unions the two halves, why an OrthoMCL clade can hold no genome, why an OrthoMCL upper bound never matches a group with no protein of its list, and why OrthoMCL drops an expression's parentheses and reads AND before OR.
 tags: [wdk-alignment, rules, parameters, site-model, apicommonmodel, phyletic-profile, radio-params]
 generated: { by: claude-code/opus-5, at: 2026-08-14T00:00:00Z }
 verified: { by: claude-code/fable-5, at: 2026-08-17T00:00:00Z }
@@ -504,3 +504,124 @@ descriptions - every domain whose description mentions a word - has no equivalen
 in the typeahead vocabulary and is no longer expressible in FRAME. That is the
 accepted cost of a criterion that cannot silently gain 63 records from a half
 nobody read.
+
+### WDK-SITE-008 - An OrthoMCL clade row may hold no genome, and a genome is a `Taxons` row, never a childless clade
+
+- class: SILENT
+- upstream: https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/lib/wdk/OrthoMCL/records/helperRecordQueries.xml#L291-L366
+- anchor: src/veupathdb/domain/parameters/phyletic.py:genomes_under
+- status: ENFORCED by tests/unit/wdk/test_the_orthomcl_taxonomy.py::test_a_code_counts_the_genomes_the_site_holds_under_it
+
+OrthoMCL's taxonomy is two tables of the `helper` record, and the two queries filter
+`apidb.OrthomclClade` differently. `RootTaxons` takes every row with `is_species = 0`
+and nothing else
+([#L318-L322](https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/lib/wdk/OrthoMCL/records/helperRecordQueries.xml#L318-L322)).
+`Taxons` keeps a row only when its `core_peripheral` is `C` or `P` and `apidb.organism`
+holds an annotated genome under its code
+([#L156-L162](https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/lib/wdk/OrthoMCL/records/helperRecordQueries.xml#L156-L162)).
+So a clade whose genomes all fail that filter is still a `RootTaxons` row, with no
+`Taxons` row below it.
+
+Read on qa.orthomcl.org on 2026-10-21 (build 8.2), `RootTaxons` holds 48 rows with the
+root `ALL`, and `Taxons` holds 3,496 rows over 857 distinct genome codes. One clade is
+empty: `BACI` (Bacillariophyta), under `VIRI`. A tree that takes a node with no children
+for a genome counts `BACI` as one, so `VIRI` reads 15, `EUKA` 784 and `ALL` 858. The site
+holds 14, 783 and 857.
+
+The kind of a node is the table its row came from. `ortho_taxonomy_of` sets `clade` on
+each `TaxonEntry` from that table, and `PhyleticTree.genomes_under` counts only nodes that
+are not clades, so an expression's span, a lookup and a census never count an empty
+clade. A genomics-site tree carries no such table; `from_vocab` marks a node a clade
+when it has children, which is the reference client's own test
+([WDK-SITE-005](#wdk-site-005---only-lowercase-leaf-species-codes-appear-in-the-census-a-clade-code-is-case-sensitively-absent)).
+
+### WDK-SITE-009 - An OrthoMCL unit counts only the groups that hold a protein of its codes, so an upper bound never matches absence and `=0` is the only absence
+
+- class: SILENT
+- upstream: https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/src/main/java/org/orthomcl/service/core/phyletic/ExpressionParamHandler.java#L54-L102
+- anchor: src/veupathdb/domain/parameters/phyletic_expression.py:holds_for
+- status: ENFORCED by tests/unit/domain/parameters/test_phyletic_expression.py::test_at_most_n_including_none_is_an_or_of_two_and_terms
+
+A unit of `phyletic_expression` is codes joined by `+`, an operator and a count. The SQL
+sums one column of `apidb.orthologgrouptaxon` over the rows whose code is in the list:
+`number_of_taxa` when the count ends in `T`, `number_of_proteins` when it does not
+([#L22-L27](https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/src/main/java/org/orthomcl/service/core/phyletic/ExpressionParamHandler.java#L22-L27)).
+So a `T` count is the number of genomes of the list that hold at least one protein of the
+group, and a bare count is the sum of their proteins. Read on qa.orthomcl.org on
+2026-10-21, a group's `TaxonCounts` table holds one row per genome with a protein, and its
+`count` column sums to `number_of_members`: one recorded group has 736 rows that sum to
+1,068 proteins.
+
+The sum is `GROUP BY group_id`, then compared, so a group with no row for the list is not
+in the aggregate at all. Every operator therefore leaves out a group with no protein of
+the list. The one exception is `=0`, which the SQL writes as every group `EXCEPT` the
+groups whose sum is at least 1
+([#L79-L81](https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/src/main/java/org/orthomcl/service/core/phyletic/ExpressionParamHandler.java#L79-L81),
+[#L94-L95](https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/src/main/java/org/orthomcl/service/core/phyletic/ExpressionParamHandler.java#L94-L95)),
+so `=0` and `=0T` are the same set. Measured on qa.orthomcl.org on 2026-10-21 (build 8.2),
+with L a list of the 15 genomes of one species, g one genome, and P the 19 other genomes of
+g's species:
+
+| written form | count | status |
+|---|---|---|
+| `L<=0T` | 0 | measured |
+| `L<1T` | 0 | measured |
+| `L=0T` | 811,525 | measured |
+| `g>=1T AND P<=17T` | 297 | measured |
+| `g>=1T AND P<=17` | 285 | measured: a bare count shares the rule |
+| `g>=1T AND P=0T` | 7 | measured, and none of the 7 is among the 297 |
+| `g>=1T AND P=0` | 7 | measured |
+| `L<=0`, `L<1` | - | refused by extension from `L<=0T`, `L<1T` and `P<=17` |
+
+This is `SILENT` because "at most n" over a list returns 200 with a plausible count that
+quietly drops every group the list is absent from. `TaxaCount.holds_for` reads every unit
+as false on a group with no protein of its codes, except `=0` and `=0T`, which hold exactly
+then. `check_expression` refuses `<=0`, `<=0T`, `<1` and `<1T` and names `L=0T` as the
+form of absence; it refuses `>=0`, `L<=NT` and `L<kT` with k above N, over a list of N
+genomes, because each holds exactly the groups with a protein of the list. "At most n,
+none included" is written `X AND L<=n[T] OR X AND L=0T`
+([WDK-SITE-010](#wdk-site-010---orthomcl-drops-the-parentheses-of-an-expression-and-reads-and-before-or)).
+
+The table holds clade rows beside genome rows
+([#L18-L21](https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/src/main/java/org/orthomcl/service/core/phyletic/ExpressionParamHandler.java#L18-L21)),
+and the sum runs over every listed code, so the site's count for a unit that names a genome
+twice (directly and through a clade above it, or through two nested clades) is not measured.
+A code written twice in one unit is not measured either: the `IN` list reads as a set
+([#L69-L76](https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/src/main/java/org/orthomcl/service/core/phyletic/ExpressionParamHandler.java#L69-L76)),
+but no count shows it. `TaxaCount.repeated` names both forms; `check_expression` refuses
+the unit, and `holds_for` refuses to evaluate it rather than guess the site's count.
+
+### WDK-SITE-010 - OrthoMCL drops the parentheses of an expression and reads AND before OR
+
+- class: SILENT
+- upstream: https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/src/main/java/org/orthomcl/service/core/phyletic/ExpressionParamHandler.java#L54-L66
+- anchor: src/veupathdb/domain/parameters/phyletic_expression.py:check_expression
+- status: ENFORCED by tests/unit/domain/parameters/test_phyletic_expression.py::test_parentheses_the_site_drops_are_refused_with_its_reading
+
+`ExpressionParser` honours parentheses: it masks each top-level group, splits at the first
+`and` or `or`, and parses the two sides
+([#L50-L75](https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/src/main/java/org/orthomcl/service/core/phyletic/ExpressionParser.java#L50-L75)).
+`composeSql` then writes that tree as `left INTERSECT right` for `and` and `left UNION
+right` for `or`, with brackets around each unit and none around a boolean node
+([#L54-L66](https://github.com/VEuPathDB/OrthoMCLModel/blob/fcc9dea1b6839a928832ac92496ffec0f3dbb42d/Model/src/main/java/org/orthomcl/service/core/phyletic/ExpressionParamHandler.java#L54-L66)).
+The database reads the flat chain by its own precedence, where `INTERSECT` binds before
+`UNION`. So the parentheses have no effect, and the site reads AND before OR. Measured on
+qa.orthomcl.org on 2026-10-21 (build 8.2), with g and P as in
+[WDK-SITE-009](#wdk-site-009---an-orthomcl-unit-counts-only-the-groups-that-hold-a-protein-of-its-codes-so-an-upper-bound-never-matches-absence-and-0-is-the-only-absence):
+
+| expression | count | reading |
+|---|---|---|
+| `P=0T` | 815,449 | |
+| `(g>=1T AND P<=17T) OR P=0T` | 815,746 | 297 + 815,449 |
+| `P=0T OR (g>=1T AND P<=17T)` | 815,746 | the same; a left-to-right reading gives 297 |
+| `g>=1T AND (P<=17T OR P=0T)` | 815,746 | read as `(g>=1T AND P<=17T) OR P=0T`, not as written |
+
+This is `SILENT` because a grouped expression returns 200 with the count of another
+question. `PhyleticExpression.parse` reads AND before OR, so an OR of AND terms parses to
+one tree with or without parentheses around each term. `PhyleticExpression.site_reading`
+parses the expression again with its parentheses dropped, which is the tree the site
+answers. `holds_for` evaluates that tree, so a group the site returns meets the expression
+however it was grouped. `check_expression` refuses an expression whose two trees differ,
+naming the site's reading: a shared condition is repeated in each AND term, so
+`A AND (B OR C)` is written `A AND B OR A AND C`. The comparison is by structure, so it
+also refuses a regrouping that keeps the meaning.

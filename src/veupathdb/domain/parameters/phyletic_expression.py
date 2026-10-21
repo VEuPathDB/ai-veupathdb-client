@@ -3,7 +3,10 @@ its written form, the codes it names and a reading of it in words."""
 
 from __future__ import annotations
 
+import operator
 import re
+from collections import Counter
+from collections.abc import Callable, Mapping, Sequence
 from typing import Literal, NoReturn
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -31,7 +34,17 @@ _OP_WORDS: dict[ExpressionOp, str] = {
     "=": "exactly",
 }
 
-_UNITS = {True: ("taxon", "taxa"), False: ("sequence", "sequences")}
+_UNITS = {True: ("genome", "genomes"), False: ("protein", "proteins")}
+
+_COMPARED: dict[ExpressionOp, Callable[[int, int], bool]] = {
+    ">=": operator.ge,
+    "<=": operator.le,
+    ">": operator.gt,
+    "<": operator.lt,
+    "=": operator.eq,
+}
+
+_NO_PARENTHESES = str.maketrans("", "", "()")
 
 _TOKEN = re.compile(
     r"\s*(?:(?P<open>\()|(?P<close>\))|(?P<join>AND|OR)\b"
@@ -42,14 +55,16 @@ _TOKEN = re.compile(
 
 _GRAMMAR = (
     "A unit is codes joined by '+', an operator (>, <, =, >= or <=) and a count; "
-    "a count ending in T counts taxa, a bare count counts sequences. AND and OR "
-    "join units, and parentheses group them, for example "
-    "'pfal>=1T AND pfag+pfhb<=1T'."
+    "a count ending in T counts genomes, a bare count counts proteins. A unit "
+    "holds only for a group with a protein of its codes, except =0T or =0, "
+    "which is absence. AND binds before OR and the site drops parentheses, so "
+    "write an OR of AND terms, for example "
+    "'hsap>=1T AND mmus+rnor<=1T OR hsap>=1T AND mmus+rnor=0T'."
 )
 
 
 class TaxaCount(BaseModel):
-    """One unit: how many taxa or sequences of these codes a group holds."""
+    """One unit: how many genomes or proteins of these codes a group holds."""
 
     model_config = ConfigDict(frozen=True)
 
@@ -66,7 +81,33 @@ class TaxaCount(BaseModel):
         named = ", ".join(labels.get(code, code) for code in self.codes)
         unit = _UNITS[self.taxa][self.count != 1]
         listed = f"these {len(self.codes)}: " if len(self.codes) > 1 else ""
-        return f"{_OP_WORDS[self.op]} {self.count} {unit} of {listed}{named}"
+        spanned = _span(tree, self.codes)
+        return f"{_OP_WORDS[self.op]} {self.count} {unit} of {listed}{named}{spanned}"
+
+    def operands(self, join: Join) -> tuple[Term, ...]:
+        return (self,)
+
+    def repeated(self, tree: PhyleticTree) -> list[str]:
+        written = Counter(self.codes)
+        held = Counter(
+            genome for code in written for genome in tree.genomes_under([code])
+        )
+        return sorted(
+            {code for code, times in written.items() if times > 1}
+            | {genome for genome, times in held.items() if times > 1}
+        )
+
+    def holds_for(self, proteins: Mapping[str, int], tree: PhyleticTree) -> bool:
+        _refuse_repeats(self, tree)
+        held = [
+            proteins[genome]
+            for genome in tree.genomes_under(self.codes)
+            if genome in proteins and proteins[genome] > 0
+        ]
+        if not held:
+            return self.op == "=" and self.count == 0
+        value = len(held) if self.taxa else sum(held)
+        return _COMPARED[self.op](value, self.count)
 
 
 class Combination(BaseModel):
@@ -87,13 +128,41 @@ class Combination(BaseModel):
         )
         return f"({text})" if nested else text
 
+    def operands(self, join: Join) -> tuple[Term, ...]:
+        return self.terms if join == self.join else (self,)
+
+    def holds_for(self, proteins: Mapping[str, int], tree: PhyleticTree) -> bool:
+        met = (term.holds_for(proteins, tree) for term in self.terms)
+        return all(met) if self.join == "AND" else any(met)
+
 
 Term = TaxaCount | Combination
 
 
+def _joined(join: Join, terms: Sequence[Term]) -> Term:
+    flat = tuple(operand for term in terms for operand in term.operands(join))
+    return flat[0] if len(flat) == 1 else Combination(join=join, terms=flat)
+
+
+def _span(tree: PhyleticTree, codes: tuple[str, ...]) -> str:
+    groups = tree.species_groups(codes)
+    genomes = sum(len(group.genomes) for group in groups)
+    if genomes <= 1:
+        return ""
+    counted = f"{genomes} genomes of {len(groups)} species"
+    shared = sorted(
+        (group for group in groups if len(group.genomes) > 1),
+        key=lambda group: (-len(group.genomes), group.species),
+    )
+    if not shared:
+        return f" ({counted})"
+    named = ", ".join(f"{group.species} {len(group.genomes)}" for group in shared)
+    return f" ({counted}; {named})"
+
+
 class PhyleticExpression(BaseModel):
-    """A parsed ``phyletic_expression``. Mixed AND and OR need parentheses,
-    because the site does not state which one binds first."""
+    """A parsed ``phyletic_expression``. AND binds before OR, and parentheses
+    group terms; ``site_reading`` drops them, as the site does."""
 
     model_config = ConfigDict(frozen=True)
 
@@ -129,38 +198,95 @@ class PhyleticExpression(BaseModel):
     def codes(self) -> list[str]:
         return list(dict.fromkeys(code for unit in self.units() for code in unit.codes))
 
+    def site_reading(self) -> PhyleticExpression:
+        return PhyleticExpression.parse(self.render().translate(_NO_PARENTHESES))
+
+    def holds_for(self, proteins: Mapping[str, int], tree: PhyleticTree) -> bool:
+        return self.site_reading().root.holds_for(proteins, tree)
+
 
 def check_expression(expression: PhyleticExpression, tree: PhyleticTree) -> None:
-    """Refuse a code the taxonomy does not carry, and a unit every group meets or
-    none can, which states no constraint. ``ALL`` is the whole tree."""
+    """Refuse a code the taxonomy does not carry, parentheses the site drops, a
+    unit that names a genome twice, an upper bound of zero, and a unit that states
+    no constraint or none beyond presence. ``ALL`` is the whole tree."""
     validate_phyletic_codes(
         expression.codes(),
         tree.codes() | {PHYLETIC_ROOT_CODE},
         param_name=PHYLETIC_EXPRESSION_PARAM,
     )
+    read = expression.site_reading()
+    if read != expression:
+        _refuse(
+            f"{expression.render()} groups terms the site does not: it reads "
+            f"{read.render()}, because the site drops parentheses and reads AND "
+            "before OR; write an OR of AND terms, repeating shared units in each "
+            "term.",
+            title="phyletic_expression groups terms the site does not group",
+        )
     for unit in expression.units():
-        span = len(tree.species_under(unit.codes)) if unit.taxa else None
-        if _decides_nothing(unit, span):
-            spanned = f" over {span} taxa" if span is not None else ""
-            _refuse(
-                f"{unit.render()}{spanned} is true of every group or of none, so "
-                f"it states no constraint.",
-                title="phyletic_expression holds a unit that decides nothing",
-            )
+        _check_unit(unit, tree)
 
 
-def _decides_nothing(unit: TaxaCount, span: int | None) -> bool:
+def _refuse_repeats(unit: TaxaCount, tree: PhyleticTree) -> None:
+    repeated = unit.repeated(tree)
+    if repeated:
+        _refuse(
+            f"{unit.render()} names these codes more than once: "
+            f"{', '.join(repeated)}; name each genome once.",
+            title="phyletic_expression names a genome twice in one unit",
+        )
+
+
+def _check_unit(unit: TaxaCount, tree: PhyleticTree) -> None:
+    codes = "+".join(unit.codes)
+    _refuse_repeats(unit, tree)
+    genomes = len(tree.genomes_under(unit.codes))
+    if (unit.op, unit.count) in {("<=", 0), ("<", 1)}:
+        _refuse(
+            f"{unit.render()} matches no group, because the site counts a unit "
+            f"only in a group with a protein of its codes; write {codes}=0T for "
+            "absence.",
+            title="phyletic_expression writes absence as an upper bound",
+        )
+    spanned = f" over {genomes} {_UNITS[True][genomes != 1]}" if unit.taxa else ""
+    bound = genomes if unit.taxa else None
+    if genomes == 0 or _constant(unit, bound):
+        _refuse(
+            f"{unit.render()}{spanned} is true of every group or of none, so it "
+            "states no constraint.",
+            title="phyletic_expression holds a unit that decides nothing",
+        )
+    if _presence(unit, bound):
+        _refuse(
+            f"{unit.render()}{spanned} holds exactly the groups with a protein of "
+            f"its codes, so it states no constraint beyond "
+            f"{codes}>=1{'T' if unit.taxa else ''}.",
+            title="phyletic_expression holds a unit that decides nothing",
+        )
+
+
+def _constant(unit: TaxaCount, bound: int | None) -> bool:
+    match unit.op:
+        case "<":
+            return unit.count == 0
+        case ">" if bound is not None:
+            return unit.count >= bound
+        case "=" | ">=" if bound is not None:
+            return unit.count > bound
+        case _:
+            return False
+
+
+def _presence(unit: TaxaCount, bound: int | None) -> bool:
     match unit.op:
         case ">=":
-            return unit.count == 0 or (span is not None and unit.count > span)
-        case "<=":
-            return span is not None and unit.count >= span
-        case "<":
-            return unit.count == 0 or (span is not None and unit.count > span)
-        case ">":
-            return span is not None and unit.count >= span
-        case "=":
-            return span is not None and unit.count > span
+            return unit.count == 0
+        case "<=" if bound is not None:
+            return unit.count >= bound
+        case "<" if bound is not None:
+            return unit.count > bound
+        case _:
+            return False
 
 
 _Token = tuple[str, str | TaxaCount]
@@ -229,22 +355,15 @@ def _term(tokens: list[_Token], text: str) -> tuple[Term, list[_Token]]:
 
 def _expression(tokens: list[_Token], text: str) -> tuple[Term, list[_Token]]:
     first, rest = _term(tokens, text)
-    terms: list[Term] = [first]
-    join: str | None = None
+    products: list[list[Term]] = [[first]]
     while rest and rest[0][0] != "close":
         kind, value = rest[0]
         if kind != "join":
             _refuse(f"In {text!r}, AND or OR joins two units.")
-        if join is not None and value != join:
-            _refuse(
-                f"In {text!r}, AND and OR stand side by side. State which one "
-                "binds first with parentheses."
-            )
-        join = str(value)
         if len(rest) == 1:
-            _refuse(f"{text!r} ends after {join}.")
+            _refuse(f"{text!r} ends after {value}.")
+        if value == "OR":
+            products.append([])
         term, rest = _term(rest[1:], text)
-        terms.append(term)
-    if join is None:
-        return first, rest
-    return Combination(join="AND" if join == "AND" else "OR", terms=tuple(terms)), rest
+        products[-1].append(term)
+    return _joined("OR", [_joined("AND", product) for product in products]), rest

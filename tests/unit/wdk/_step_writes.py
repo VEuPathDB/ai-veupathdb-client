@@ -9,13 +9,14 @@ class Recorder:
     """Captures a request body instead of reaching WDK, and answers ``reply``."""
 
     def __init__(self, reply: Any = None) -> None:
+        self.paths: list[str] = []
         self.bodies: list[dict[str, Any]] = []
         self.reply = reply
 
     async def __call__(
         self, path: str, json: dict[str, Any] | None = None, **_: object
     ) -> Any:
-        del path
+        self.paths.append(path)
         self.bodies.append(json or {})
         return self.reply
 

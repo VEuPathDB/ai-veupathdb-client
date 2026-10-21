@@ -16,6 +16,7 @@ from pydantic import (
     SerializerFunctionWrapHandler,
     field_validator,
     model_serializer,
+    model_validator,
 )
 from pydantic.alias_generators import to_camel
 
@@ -28,6 +29,7 @@ from veupathdb.domain.wdk_values import (
     WDKRecordIdPart,
     WDKSortDirection,
 )
+from veupathdb.errors import VEuPathDBError, VEuPathDBErrorCode
 from veupathdb.json_types import JSONObject
 from veupathdb.model import CamelModel
 from veupathdb.wdk.value_decoding import encode_params
@@ -208,6 +210,9 @@ class WDKAttributeField(WDKModel):
     formats: list[WDKReporter] = Field(default_factory=list)
     properties: dict[str, list[str]] = Field(default_factory=dict)
     tools: WDKColumnTools = Field(default_factory=WDKColumnTools)
+
+    def format_named(self, kind: str) -> str | None:
+        return next((fmt.name for fmt in self.formats if fmt.type == kind), None)
 
 
 class WDKParameterGroup(WDKModel):
@@ -430,6 +435,50 @@ class WDKColumnDistribution(WDKModel):
 
     histogram: list[WDKHistogramBin] = Field(default_factory=list)
     statistics: WDKHistogramStatistics = Field(default_factory=WDKHistogramStatistics)
+
+
+class WDKWordCount(WDKModel):
+    word: str
+    count: int
+
+
+_WORD_CAP_SENTINEL = WDKWordCount(word="Too many words", count=1)
+
+
+class ColumnNotCountableError(VEuPathDBError[VEuPathDBErrorCode]):
+    def __init__(self, total: int, record_count: int) -> None:
+        super().__init__(
+            code=VEuPathDBErrorCode.VALIDATION_ERROR,
+            title="Column is not countable by its word cloud",
+            status=422,
+            detail=(
+                f"The word counts sum to {total} and the step holds {record_count} "
+                "records, so the counts are not records per value"
+            ),
+        )
+
+
+class WDKWordCounts(WDKModel):
+    tags: list[WDKWordCount]
+
+    @model_validator(mode="after")
+    def _not_the_cap_sentinel(self) -> WDKWordCounts:
+        if self.tags == [_WORD_CAP_SENTINEL]:
+            msg = (
+                "The word cloud reporter stopped at its cap of 10,000 distinct words "
+                "and returned no counts"
+            )
+            raise ValueError(msg)
+        return self
+
+    @property
+    def total(self) -> int:
+        return sum(tag.count for tag in self.tags)
+
+    def record_counts(self, record_count: int) -> dict[str, int]:
+        if self.total != record_count:
+            raise ColumnNotCountableError(self.total, record_count)
+        return {tag.word: tag.count for tag in self.tags}
 
 
 class WDKOntologyTermValueCount(WDKModel):

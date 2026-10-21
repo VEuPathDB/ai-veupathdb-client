@@ -20,10 +20,12 @@ from veupathdb.wdk.wdk_models import (
     CombinedStepSpec,
     WDKAnswer,
     WDKAnswerMeta,
+    WDKAttributeField,
     WDKSearch,
     WDKSearchResponse,
     WDKStep,
     WDKStepTree,
+    WDKWordCounts,
 )
 
 _BOOLEAN_OPERATOR_VALUES = [
@@ -299,6 +301,44 @@ class TestComparingAnAttributeToText:
 
         assert "molecular_weight" not in record.attributes
         assert record.attribute_text("molecular_weight") is None
+
+
+def test_a_column_names_its_word_cloud_reporter() -> None:
+    field = WDKAttributeField.model_validate(
+        {
+            "name": "abbreviation",
+            "displayName": "Taxon Code",
+            "formats": [
+                {
+                    "name": "abbreviation-wordCloud",
+                    "type": "wordCloud",
+                    "displayName": "Word Cloud",
+                    "isInReport": True,
+                    "scopes": [],
+                }
+            ],
+            "tools": {"reports": [], "filters": []},
+        }
+    )
+    assert field.format_named("wordCloud") == "abbreviation-wordCloud"
+    assert field.format_named("histogram") is None
+
+
+def test_word_counts_total_every_tag() -> None:
+    counts = WDKWordCounts.model_validate(
+        {
+            "tags": [
+                {"count": 18260, "word": "bpli"},
+                {"count": 9365, "word": "osat"},
+            ]
+        }
+    )
+
+    assert [(tag.word, tag.count) for tag in counts.tags] == [
+        ("bpli", 18260),
+        ("osat", 9365),
+    ]
+    assert counts.total == 27625
 
 
 class TestWdkStep001KindIsTheAnswerParameterCount:

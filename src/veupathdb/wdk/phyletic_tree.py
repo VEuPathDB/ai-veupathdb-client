@@ -1,6 +1,8 @@
 """Reads the phyletic clade tree off a WDK search definition, or off OrthoMCL's
 taxon tables."""
 
+from collections.abc import Sequence
+
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from veupathdb import JSONObject
@@ -72,20 +74,29 @@ class _TaxonTables(BaseModel):
 
 def ortho_taxonomy_of(answer: WDKAnswer) -> PhyleticTree | None:
     """The tree OrthoMCL's taxon tables hold, or ``None`` when the answer lacks
-    them. A species row repeats once per clade above it, so each code is kept once."""
+    them. A ``RootTaxons`` row is a clade and a ``Taxons`` row a genome. A genome row
+    repeats once per clade above it, so each code is kept once."""
     if not answer.records:
         return None
     try:
         tables = _TaxonTables.model_validate(answer.records[0].tables)
     except ValidationError:
         return None
-    listed: list[_CladeRow | _SpeciesRow] = [*tables.RootTaxons, *tables.Taxons]
-    rows: dict[str, _CladeRow | _SpeciesRow] = {}
-    for row in listed:
-        rows.setdefault(row.code, row)
-    return PhyleticTree.from_taxa(
-        [
-            TaxonEntry(id=row.id, parent_id=row.parent_id, code=code, label=row.name)
-            for code, row in rows.items()
-        ]
+    entries: dict[str, TaxonEntry] = {}
+    listed: tuple[tuple[Sequence[_CladeRow | _SpeciesRow], bool], ...] = (
+        (tables.RootTaxons, True),
+        (tables.Taxons, False),
     )
+    for rows, clade in listed:
+        for row in rows:
+            entries.setdefault(
+                row.code,
+                TaxonEntry(
+                    id=row.id,
+                    parent_id=row.parent_id,
+                    code=row.code,
+                    label=row.name,
+                    clade=clade,
+                ),
+            )
+    return PhyleticTree.from_taxa(list(entries.values()))

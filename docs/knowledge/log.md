@@ -1,5 +1,46 @@
 # Knowledge log
 
+## 2026-10-21 - An OrthoMCL expression is evaluated on one group, as the site reads it
+
+- 0.1.0b18: `PhyleticExpression.site_reading()` is the expression as the site reads it,
+  parentheses dropped and AND before OR ([WDK-SITE-010](wdk/rules/site-model-params.md)).
+  `PhyleticExpression.holds_for(proteins, tree)` evaluates that reading on one group's
+  genome-to-protein counts (`TaxonCounts`): a `T` count counts the genomes that hold a
+  protein, a bare count sums their proteins, and every unit is false on a group with no
+  protein of its codes except `=0`/`=0T` ([WDK-SITE-009](wdk/rules/site-model-params.md)).
+  `PhyleticExpression.parse` reads AND before OR and no longer refuses the two side by
+  side. `check_expression` refuses an expression whose site reading differs from its
+  written grouping, a unit that names a code or a genome twice (which `holds_for` also
+  refuses), `<=0`, `<=0T`, `<1` and `<1T` with `L=0T` as the form of absence, and a unit
+  that states nothing beyond presence. The recorded groups are the
+  `orthomcl_group_taxon_counts` fixture and four sampled answers, `orthomcl_groups_*` and
+  `orthomcl_group_with_equal_proteins_in_two_genomes`.
+
+## 2026-10-21 - A step's column is counted with its word-cloud reporter
+
+- 0.1.0b18: `get_step_word_counts` reads the counts of one column over a step's records
+  through the column's `wordCloud` attribute reporter, which answers on any step, a
+  transform included. The reporter counts words after three merges (the split into
+  pieces, the case fold, the plural fold), so its counts are record counts only on a
+  column whose every value is one token that no merge changes; a matching sum is
+  necessary, not sufficient. `WDKWordCounts` refuses the reporter's 10,000-word cap
+  answer, and `record_counts` refuses a sum that differs from the step's size. See
+  [WDK-ANS-011](wdk/rules/searches-and-answers.md).
+
+## 2026-10-21 - A genome is a Taxons row, and an OrthoMCL clade can hold none
+
+- 0.1.0b18: `TaxonEntry` and `PhyleticNode` carry `clade`. `ortho_taxonomy_of` sets it
+  from the table a row came from (`RootTaxons` a clade, `Taxons` a genome), and
+  `from_vocab` marks a node with children a clade. `PhyleticTree.species_under` is now
+  `genomes_under` and counts only genomes, so the empty clade `BACI` counts 0 and `VIRI`,
+  `EUKA` and `ALL` read 14, 783 and 857; `leaf_states` pushes a selection to genomes the
+  same way. `species_of` reads a genome's species as the first two words of its label,
+  after a leading `Candidatus`, and the first three when the second is `sp.`, `cf.` or
+  `aff.`; `SpeciesGroup` and `PhyleticTree.species_groups` group genomes by it.
+  `PhyleticExpression.describe` says genome and protein, and names how many genomes and
+  species a unit spans. The recorded taxonomy is the `orthomcl_taxonomy` fixture. See
+  [WDK-SITE-008](wdk/rules/site-model-params.md).
+
 ## 2026-10-21 - The JBrowse reader reads a tabix track by range
 
 - 0.1.0b17: `TabixReader` reads the lines of a bgzipped, tabix-indexed track that overlap
