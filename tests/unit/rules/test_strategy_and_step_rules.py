@@ -7,6 +7,7 @@ from typing import Any
 
 import pytest
 
+from veupathdb.domain.strategy.ast import COMBINE_SEARCH_NAME
 from veupathdb.domain.strategy.graph_model import (
     StepKind,
     StrategyStep,
@@ -108,8 +109,101 @@ def test_wdk_strat_004_the_strategy_takes_the_record_class_of_its_root() -> None
         ),
     }
 
-    assert record_class_of("transform", steps, fallback="transcript") == "organism"
-    assert record_class_of("leaf", steps, fallback="organism") == "transcript"
+    assert record_class_of("transform", steps) == "organism"
+    assert record_class_of("leaf", steps) == "transcript"
+
+
+def _sequences_to_groups(record_class: str | None) -> dict[str, StrategyStep]:
+    return {
+        "sequences": StrategyStep(
+            id="sequences",
+            kind=StepKind.SEARCH,
+            search_name="SequencesByTaxon",
+            record_class="sequence",
+        ),
+        "groups": StrategyStep(
+            id="groups",
+            kind=StepKind.TRANSFORM,
+            search_name="GroupsFromSequences",
+            record_class=record_class,
+            primary_input_id="sequences",
+        ),
+    }
+
+
+def test_wdk_strat_004_an_unlisted_transform_has_no_class() -> None:
+    """A search the catalog does not list never takes the class of its input."""
+    assert record_class_of("groups", _sequences_to_groups(None)) is None
+
+
+def test_wdk_strat_004_a_listed_transform_has_its_listed_class() -> None:
+    assert record_class_of("groups", _sequences_to_groups("group")) == "group"
+
+
+def test_wdk_strat_004_an_unlisted_search_has_no_class() -> None:
+    steps = {"leaf": _leaf("leaf").model_copy(update={"record_class": None})}
+
+    assert record_class_of("leaf", steps) is None
+
+
+def test_wdk_strat_004_a_combine_takes_the_class_of_its_inputs() -> None:
+    steps = {
+        "a": _leaf("a"),
+        "b": _leaf("b"),
+        "combine": StrategyStep(
+            id="combine",
+            kind=StepKind.COMBINE,
+            primary_input_id="a",
+            secondary_input_id="b",
+            operator=CombineOp.INTERSECT,
+        ),
+    }
+
+    assert record_class_of("combine", steps) == "transcript"
+
+
+def test_wdk_strat_004_a_combine_wdk_named_takes_the_class_of_its_inputs() -> None:
+    steps = {
+        "a": _leaf("a"),
+        "b": _leaf("b"),
+        "combine": StrategyStep(
+            id="combine",
+            kind=StepKind.COMBINE,
+            search_name="boolean_question_TranscriptRecordClasses",
+            primary_input_id="a",
+            secondary_input_id="b",
+            operator=CombineOp.UNION,
+        ),
+    }
+
+    assert record_class_of("combine", steps) == "transcript"
+
+
+def test_wdk_strat_004_a_combine_left_with_one_input_takes_its_class() -> None:
+    steps = {
+        "leaf": _leaf("leaf"),
+        "combine": StrategyStep(
+            id="combine",
+            kind=StepKind.TRANSFORM,
+            search_name=COMBINE_SEARCH_NAME,
+            primary_input_id="leaf",
+        ),
+    }
+
+    assert record_class_of("combine", steps) == "transcript"
+
+
+def test_wdk_strat_004_a_combine_over_unlisted_searches_has_no_class() -> None:
+    steps = {
+        "a": _leaf("a").model_copy(update={"record_class": None}),
+        "combine": _half_wired_combine("combine", "a"),
+    }
+
+    assert record_class_of("combine", steps) is None
+
+
+def test_wdk_strat_004_a_step_the_graph_does_not_hold_has_no_class() -> None:
+    assert record_class_of("absent", {"leaf": _leaf("leaf")}) is None
 
 
 async def test_wdk_strat_005_the_tree_write_is_followed_by_the_read_that_reports_validity(

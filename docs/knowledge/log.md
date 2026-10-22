@@ -1,5 +1,16 @@
 # Knowledge log
 
+## 2026-10-22 - A tabix read is counted before it is sent, and an unlisted search has no class
+
+- 0.1.0b20: `TabixReader.chunk_group_count(track, seqid, start, end)` returns the number
+  of ranged reads `lines` sends for that region, read from the index alone, so a caller
+  bounds its store reads without reading the track's private chunk functions. See
+  [the JBrowse surface](wdk/rest/jbrowse-surface.md).
+- `record_class_of(step_id, steps)` returns `str | None` and takes no `fallback`. A search
+  or a transform whose `record_class` is unset reads `None`, never the class of its input;
+  only a combine reads its class off its inputs, a WDK-named combine and a combine left
+  with one input included. See [WDK-STRAT-004](wdk/rules/strategies-and-steps.md).
+
 ## 2026-10-22 - A bigWig track is read within bounds, and every JBrowse read is observed
 
 - 0.1.0b19: `BigWigReader(client, data_path).depth(seqid, start, end)` reads per-base

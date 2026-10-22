@@ -142,3 +142,42 @@ async def test_a_sequence_not_indexed_keeps_the_index() -> None:
             await reader.lines(TRACK, "chrX", 1, 100)
     indexes = [r for r in served.requests if r.url.params["data"].endswith(".tbi")]
     assert len(indexes) == 1
+
+
+async def test_the_group_count_reads_the_index_and_no_track_data() -> None:
+    served, _ = far_apart()
+    reader = TabixReader(served.client())
+
+    assert await reader.chunk_group_count(TRACK, "chr1", 1, 1000) == 2
+    assert served.ranges() == []
+    assert [r.url.params["data"] for r in served.requests] == [f"{DATA}.tbi"]
+
+
+async def test_the_group_count_is_the_number_of_ranges_the_read_fetches() -> None:
+    served, _ = far_apart()
+    reader = TabixReader(served.client())
+
+    counted = await reader.chunk_group_count(TRACK, "chr1", 1, 1000)
+    await reader.lines(TRACK, "chr1", 1, 1000)
+
+    assert len(served.ranges()) == counted
+
+
+async def test_chunks_in_one_block_are_one_group() -> None:
+    reader = TabixReader(one_block().client())
+
+    assert await reader.chunk_group_count(TRACK, "chr1", 1, 1000) == 1
+
+
+async def test_a_window_with_no_feature_has_no_group() -> None:
+    reader = TabixReader(one_block().client())
+
+    assert await reader.chunk_group_count(TRACK, "chr1", 20000, 30000) == 0
+
+
+async def test_a_sequence_the_index_does_not_name_has_no_group_count() -> None:
+    reader = TabixReader(one_block().client())
+
+    with pytest.raises(SequenceNotIndexedError) as raised:
+        await reader.chunk_group_count(TRACK, "chr1_v1", 1, 100)
+    assert (raised.value.data_path, raised.value.seqid) == (DATA, "chr1_v1")

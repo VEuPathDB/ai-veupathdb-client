@@ -170,16 +170,15 @@ def rebuild_tree(root_id: str, steps: dict[str, StrategyStep]) -> StrategyStepNo
     return visit(root_id)
 
 
-def record_class_of(
-    step_id: str, steps: dict[str, StrategyStep], *, fallback: str
-) -> str:
-    """The record class this step is addressed under.
+def record_class_of(step_id: str, steps: dict[str, StrategyStep]) -> str | None:
+    """The record class this step is addressed under, or ``None`` when the
+    catalog lists none for its search.
 
     A combine states no search of its own, so it takes the class of the steps
     it consumes. The strategy's own class is the root's, which is what
     ``Strategy.getRecordClass`` returns.
     """
-    return _own_or_inherited(step_id, steps, set()) or fallback
+    return _own_or_inherited(step_id, steps, set())
 
 
 def _own_or_inherited(
@@ -191,6 +190,8 @@ def _own_or_inherited(
     seen.add(step_id)
     if step.record_class:
         return step.record_class
+    if step.kind is not StepKind.COMBINE and runs_a_wdk_search(step):
+        return None
     for input_id in step.input_ids():
         inherited = _own_or_inherited(input_id, steps, seen)
         if inherited:

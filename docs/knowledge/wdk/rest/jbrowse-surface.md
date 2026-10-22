@@ -58,6 +58,10 @@ reads only the `data` value and sends it to its own site's web base.
   largest BGZF block. A chunk past that span starts a new read. More than 16 MiB over all
   reads of a region is refused before any read. Over 6,960 regions of the P. cynomolgi M
   junction file this reads 605 MB in 7,340 reads, the largest 222,328 bytes.
+- `TabixReader.chunk_group_count(track, seqid, start, end)` is the number of ranged
+  reads `lines` sends for the same region, read from the index alone. A caller that
+  bounds its store reads checks it before it calls `lines`. It refuses a region and a
+  sequence the index does not name as `lines` does.
 - The store clamps a range that runs past the end of the file: `Range:
   bytes=2656000-2721534` on the 2,656,099-byte pcynM junction file answers 206 with
   `Content-Range: bytes 2656000-2656098/2656099` and 99 bytes. So the 65535-byte

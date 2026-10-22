@@ -352,15 +352,26 @@ class TabixReader:
             self._indexes[path] = parse_index(await self._client.store_bytes(path))
         return self._indexes[path]
 
+    async def _groups(
+        self, track: TrackConfig, region: GenomeRegion
+    ) -> tuple[TabixIndex, list[list[Chunk]]]:
+        index = await self.index(track)
+        ref = index.ref(region.seqid)
+        if ref is None:
+            raise SequenceNotIndexedError(track.data_path, region.seqid)
+        return index, read_groups(region_chunks(ref, region.start - 1, region.end))
+
+    async def chunk_group_count(
+        self, track: TrackConfig, seqid: str, start: int, end: int
+    ) -> int:
+        _, groups = await self._groups(track, genome_region(seqid, start, end))
+        return len(groups)
+
     async def lines(
         self, track: TrackConfig, seqid: str, start: int, end: int
     ) -> list[str]:
         region = genome_region(seqid, start, end)
-        index = await self.index(track)
-        ref = index.ref(seqid)
-        if ref is None:
-            raise SequenceNotIndexedError(track.data_path, seqid)
-        groups = read_groups(region_chunks(ref, start - 1, end))
+        index, groups = await self._groups(track, region)
         span = sum(_last_byte(group) - (group[0].begin >> 16) + 1 for group in groups)
         if span > MAX_COMPRESSED_SPAN:
             msg = f"{seqid}:{start}-{end} spans {span} compressed bytes"

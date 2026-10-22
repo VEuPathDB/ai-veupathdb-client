@@ -369,6 +369,13 @@ graph. `record_class_of` reads a step's class, taking a combine's from the steps
 consumes, and `sync_strategy_for_site` sets the strategy's class from the root through it. The
 former leaf-first read is deleted.
 
+**A search the catalog does not list has no class.** `record_class_of` returns `None` for
+a search or a transform whose `record_class` is unset, and never the class of its input:
+a transform crosses classes, so its input's class names the wrong search URL.
+`GroupsFromSequences` on OrthoMCL takes `sequence` steps and returns `group` records. Only
+a combine, which names no question of its own, reads its class off its inputs. The
+function takes no fallback; a caller that has a class for an unresolved step states it.
+
 The pin is `GenesByMolecularWeight` under a `GenesFromTranscripts` root on plasmodb.org
 on 2026-08-30: the leaf is listed under `transcript` and the transform under `gene`, and
 each 404s under the other record type - `There is no search "GenesByMolecularWeight"
