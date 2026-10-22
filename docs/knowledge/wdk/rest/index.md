@@ -7,4 +7,4 @@ These explain; they do not assert. Assertions live in [the rules](../rules/).
 - [Transport quirks](transport-quirks.md) - what a live site does, including two beliefs that did not reproduce
 - [VDI surface](vdi-surface.md) - the user-dataset service at `{site_origin}/vdi`: the endpoints this client calls, the credential forms, the rnaseqrc upload contract, the two-axis install predicate, and the measured install latencies
 - [Site-search contract](site-search-contract.md) - the separate service at the site origin, its paged form and its streaming form, and what each one costs
-- [JBrowse surface](jbrowse-surface.md) - the track list and the store under `{web_base_url}/service/jbrowse`, the ranged read a genome window takes, and what QA PlasmoDB answered
+- [JBrowse surface](jbrowse-surface.md) - the track list and the store under `{web_base_url}/service/jbrowse`, the ranged read a genome window takes, the tabix and bigWig reads, the observer hook, and what QA PlasmoDB and QA VectorBase answered

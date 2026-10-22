@@ -7,8 +7,17 @@ from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.errors import VEuPathDBError, VEuPathDBErrorCode
 from veupathdb.jbrowse.client import JBrowseClient
 from veupathdb.jbrowse.errors import JBrowseError
+from veupathdb.observer import MetricAttrs, NoObserver, get_observer, set_observer
 
 BASE = "https://qa.plasmodb.org/plasmo.qa"
+
+
+class RecordingObserver(NoObserver):
+    def __init__(self) -> None:
+        self.attrs: list[dict[str, str]] = []
+
+    def on_jbrowse_request(self, seconds: float, attrs: MetricAttrs, /) -> None:
+        self.attrs.append(dict(attrs))
 
 
 @pytest.fixture(autouse=True)
@@ -177,3 +186,52 @@ async def test_a_partial_answer_is_read_once_and_closed() -> None:
     read = await client(answering(206, body)).store_bytes("x/genome.fasta", (0, 9))
     assert read == b"ACGTACGTAC"
     assert (body.reads, body.closed) == (1, True)
+
+
+async def test_an_unconfigured_base_with_a_token_reads_and_reports_its_host() -> None:
+    sent: list[httpx.Request] = []
+    observer = RecordingObserver()
+
+    def answer(request: httpx.Request) -> httpx.Response:
+        sent.append(request)
+        return httpx.Response(200, json={"tracks": [{"label": "t"}]})
+
+    reader = JBrowseClient(
+        base_url="https://qa.example.org/x.qa", transport=httpx.MockTransport(answer)
+    )
+    previous = get_observer()
+    set_observer(observer)
+    try:
+        listed = await reader.track_list("rnaseq", "org1")
+    finally:
+        set_observer(previous)
+    assert [t.label for t in listed.tracks] == ["t"]
+    assert [r.url.path for r in sent] == ["/x.qa/service/jbrowse/rnaseq/org1"]
+    assert sent[0].headers["Cookie"] == "Authorization=token-hermetic"
+    assert observer.attrs == [
+        {"site_host": "qa.example.org", "kind": "track_list", "status": "200"}
+    ]
+
+
+async def test_the_coverage_tracks_are_the_bigwig_tracks_of_the_rnaseq_list() -> None:
+    seen: list[httpx.Request] = []
+
+    def answer(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return httpx.Response(
+            200,
+            json={
+                "tracks": [
+                    {"label": "a", "storeClass": "JBrowse/Store/SeqFeature/BigWig"},
+                    {"label": "b", "storeClass": "JBrowse/Store/SeqFeature/GFF3Tabix"},
+                    {
+                        "label": "c",
+                        "storeClass": "MultiBigWig/Store/SeqFeature/MultiBigWig",
+                    },
+                ]
+            },
+        )
+
+    tracks = await client(httpx.MockTransport(answer)).coverage_tracks("org1")
+    assert [t.label for t in tracks] == ["a", "c"]
+    assert seen[0].url.path == "/plasmo.qa/service/jbrowse/rnaseq/org1"

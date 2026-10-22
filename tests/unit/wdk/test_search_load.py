@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 import httpx
 import pytest
 
-from veupathdb.observer import MetricAttrs, get_observer, set_observer
+from veupathdb.observer import MetricAttrs, NoObserver, get_observer, set_observer
 from veupathdb.wdk import (
     HIGH_SPEED_SNP_SEARCHES,
     SearchRequest,
@@ -77,21 +77,9 @@ class _ClockedSite(httpx.AsyncBaseTransport):
         return httpx.Response(200, json={"id": 1})
 
 
-class _Waits:
+class _Waits(NoObserver):
     def __init__(self) -> None:
         self.waits: list[tuple[float, MetricAttrs]] = []
-
-    def on_wdk_request(self, _seconds: float, _attrs: MetricAttrs, /) -> None:
-        return None
-
-    def on_wdk_retry(self, _attrs: MetricAttrs, /) -> None:
-        return None
-
-    def on_site_search_request(self, _seconds: float, _attrs: MetricAttrs, /) -> None:
-        return None
-
-    def on_site_search_retry(self, _attrs: MetricAttrs, /) -> None:
-        return None
 
     def on_wdk_search_wait(self, seconds: float, attrs: MetricAttrs, /) -> None:
         self.waits.append((seconds, attrs))

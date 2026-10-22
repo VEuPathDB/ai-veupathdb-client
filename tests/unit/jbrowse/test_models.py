@@ -1,4 +1,4 @@
-from veupathdb.jbrowse.models import TrackConfig, TrackList
+from veupathdb.jbrowse.models import SubTrack, TrackConfig, TrackList
 
 
 def test_a_track_reads_its_data_path_from_the_store_query() -> None:
@@ -64,3 +64,74 @@ def test_a_track_that_is_not_tabix_says_so() -> None:
         {"storeClass": "JBrowse/Store/SeqFeature/BigWig", "urlTemplate": "/s?data=a"}
     )
     assert not track.reads_with_tabix
+
+
+def test_a_multi_track_lists_its_subtracks_from_its_url_templates() -> None:
+    track = TrackConfig.model_validate(
+        {
+            "key": "Example study coverage",
+            "storeClass": "MultiBigWig/Store/SeqFeature/MultiBigWig",
+            "urlTemplates": [
+                {
+                    "url": "/a/service/jbrowse/store?data=org1%2Fbigwig%2Fs1%2Fforward.bw",
+                    "name": "sample 1 (+)",
+                    "color": "blue",
+                },
+                {
+                    "url": "/a/service/jbrowse/store?data=org1%2Fbigwig%2Fs1%2Freverse.bw",
+                    "name": "sample 1 (-)",
+                },
+            ],
+        }
+    )
+    assert track.subtracks() == [
+        SubTrack(
+            url="/a/service/jbrowse/store?data=org1%2Fbigwig%2Fs1%2Fforward.bw",
+            name="sample 1 (+)",
+        ),
+        SubTrack(
+            url="/a/service/jbrowse/store?data=org1%2Fbigwig%2Fs1%2Freverse.bw",
+            name="sample 1 (-)",
+        ),
+    ]
+    assert [sub.data_path for sub in track.subtracks()] == [
+        "org1/bigwig/s1/forward.bw",
+        "org1/bigwig/s1/reverse.bw",
+    ]
+    assert track.reads_with_bigwig
+
+
+def test_a_single_track_is_its_own_one_subtrack() -> None:
+    track = TrackConfig.model_validate(
+        {
+            "label": "s2_unique",
+            "key": "Example sample 2",
+            "storeClass": "JBrowse/Store/SeqFeature/BigWig",
+            "urlTemplate": "/a/service/jbrowse/store?data=org1%2Fbigwig%2Fs2.bw",
+        }
+    )
+    assert track.subtracks() == [
+        SubTrack(
+            url="/a/service/jbrowse/store?data=org1%2Fbigwig%2Fs2.bw",
+            name="Example sample 2",
+        )
+    ]
+    assert track.reads_with_bigwig
+
+
+def test_a_track_without_a_key_names_its_subtrack_by_its_label() -> None:
+    track = TrackConfig.model_validate({"label": "s3", "urlTemplate": "/s?data=x.bw"})
+    assert [sub.name for sub in track.subtracks()] == ["s3"]
+
+
+def test_a_track_with_no_url_has_no_subtrack() -> None:
+    track = TrackConfig.model_validate({"label": "s4"})
+    assert track.subtracks() == []
+    assert not track.reads_with_bigwig
+
+
+def test_a_tabix_track_does_not_read_as_bigwig() -> None:
+    track = TrackConfig.model_validate(
+        {"storeClass": "JBrowse/Store/SeqFeature/GFF3Tabix"}
+    )
+    assert not track.reads_with_bigwig

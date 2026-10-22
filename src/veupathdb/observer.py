@@ -11,6 +11,8 @@ class Observer(Protocol):
 
     def on_wdk_request(self, seconds: float, attrs: MetricAttrs, /) -> None: ...
 
+    def on_jbrowse_request(self, seconds: float, attrs: MetricAttrs, /) -> None: ...
+
     def on_wdk_retry(self, attrs: MetricAttrs, /) -> None: ...
 
     def on_site_search_request(self, seconds: float, attrs: MetricAttrs, /) -> None: ...
@@ -24,6 +26,9 @@ class NoObserver:
     """Drops every number. A library records nothing the host did not ask for."""
 
     def on_wdk_request(self, _seconds: float, _attrs: MetricAttrs, /) -> None:
+        return None
+
+    def on_jbrowse_request(self, _seconds: float, _attrs: MetricAttrs, /) -> None:
         return None
 
     def on_wdk_retry(self, _attrs: MetricAttrs, /) -> None:

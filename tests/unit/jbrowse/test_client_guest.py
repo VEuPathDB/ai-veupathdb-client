@@ -11,6 +11,7 @@ from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.errors import WDKLoginRequiredError
 from veupathdb.guest_token import GuestTokens, guest_tokens, use_guest_tokens
 from veupathdb.jbrowse.client import JBrowseClient
+from veupathdb.observer import MetricAttrs, NoObserver, get_observer, set_observer
 
 PLASMO_WEB = "https://qa.plasmodb.org/plasmo.qa"
 PLASMO_SERVICE = "https://qa.plasmodb.org/plasmo.qa/service"
@@ -110,3 +111,37 @@ async def test_every_refused_guest_answer_is_closed_unread(
     with pytest.raises(WDKLoginRequiredError):
         await reader.store_bytes("x/genome.fasta", (0, 9))
     assert [(b.reads, b.closed) for b in bodies] == [(0, True), (0, True)]
+
+
+class RecordingObserver(NoObserver):
+    def __init__(self) -> None:
+        self.statuses: list[str] = []
+
+    def on_jbrowse_request(self, seconds: float, attrs: MetricAttrs, /) -> None:
+        self.statuses.append(attrs["status"])
+
+
+@pytest.fixture
+def observer() -> Iterator[RecordingObserver]:
+    recording = RecordingObserver()
+    previous = get_observer()
+    set_observer(recording)
+    try:
+        yield recording
+    finally:
+        set_observer(previous)
+
+
+async def test_a_renewed_guest_read_reports_each_request(
+    mints: list[str], observer: RecordingObserver
+) -> None:
+    await jbrowse([401, 200], []).track_list("organismSpecific", "pfal3D7")
+    assert observer.statuses == ["401", "200"]
+
+
+async def test_a_guest_refused_twice_reports_both_requests(
+    mints: list[str], observer: RecordingObserver
+) -> None:
+    with pytest.raises(WDKLoginRequiredError):
+        await jbrowse([401, 401], []).store_bytes("x/genome.fasta", (0, 9))
+    assert observer.statuses == ["401", "401"]

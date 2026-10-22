@@ -7,7 +7,7 @@ import httpx
 import pytest
 
 from veupathdb.errors import VEuPathDBError, VEuPathDBErrorCode, WDKError
-from veupathdb.observer import MetricAttrs, get_observer, set_observer
+from veupathdb.observer import MetricAttrs, NoObserver, get_observer, set_observer
 from veupathdb.wdk._http import HTTPClient
 from veupathdb.wdk._observability import (
     SiteSearchRequestTelemetry,
@@ -19,7 +19,7 @@ from veupathdb.wdk.site_search_client import (
 )
 
 
-class _RecordingObserver:
+class _RecordingObserver(NoObserver):
     """Keeps every call the client makes, so a test can read the labels back."""
 
     def __init__(self) -> None:

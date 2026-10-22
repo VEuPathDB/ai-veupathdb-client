@@ -9,7 +9,7 @@ repos:
         types_or: [python, markdown]
       - id: mypy
         name: mypy --strict
-        entry: bash -c "uv run mypy --strict src tests/unit/test_errors.py"
+        entry: bash -c "uv run mypy --strict src tests/unit/test_errors.py tests/unit/test_otel_observer.py tests/unit/wdk/test_observability.py tests/unit/wdk/test_search_load.py tests/unit/jbrowse/test_client_guest.py tests/unit/jbrowse/test_client_hermetic.py tests/unit/jbrowse/test_store_reads_are_observed.py"
         language: system
         pass_filenames: false
         types: [python]

@@ -38,7 +38,14 @@ jobs:
         run: uv run ruff format --check .
 
       - name: Run mypy
-        run: uv run mypy --strict src tests/unit/test_errors.py
+        run: >-
+          uv run mypy --strict src tests/unit/test_errors.py
+          tests/unit/test_otel_observer.py
+          tests/unit/wdk/test_observability.py
+          tests/unit/wdk/test_search_load.py
+          tests/unit/jbrowse/test_client_guest.py
+          tests/unit/jbrowse/test_client_hermetic.py
+          tests/unit/jbrowse/test_store_reads_are_observed.py
 
       - name: Run the hermetic suite
         run: uv run pytest tests/unit

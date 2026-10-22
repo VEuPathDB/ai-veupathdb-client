@@ -67,7 +67,7 @@ def _points(sink: InMemoryMetricReader, name: str) -> list[tuple[Any, dict[str, 
     return [
         (
             point.value if hasattr(point, "value") else point.count,
-            dict(point.attributes),
+            dict(point.attributes or {}),
         )
         for resource in data.resource_metrics
         for scope in resource.scope_metrics

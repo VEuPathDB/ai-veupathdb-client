@@ -307,6 +307,15 @@
     "use_guest_tokens"
   ],
   "veupathdb.jbrowse": [
+    "BIGWIG_BYTE_ORDER",
+    "BIGWIG_MAX_BLOCKS",
+    "BIGWIG_MAX_BLOCK_BYTES",
+    "BIGWIG_MAX_CHROM_TREE_BYTES",
+    "BIGWIG_MAX_NODE_ITEMS",
+    "BIGWIG_MAX_REGION",
+    "BIGWIG_MAX_RTREE_DEPTH",
+    "BIGWIG_MAX_ZOOM_LEVELS",
+    "BigWigReader",
     "FaiEntry",
     "GenomeIndexError",
     "GenomeReader",
@@ -315,6 +324,7 @@
     "JBrowseClient",
     "JBrowseError",
     "SequenceNotIndexedError",
+    "SubTrack",
     "TabixReader",
     "TrackConfig",
     "TrackKind",

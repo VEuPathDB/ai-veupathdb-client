@@ -1,5 +1,26 @@
 # Knowledge log
 
+## 2026-10-22 - A bigWig track is read within bounds, and every JBrowse read is observed
+
+- 0.1.0b19: `BigWigReader(client, data_path).depth(seqid, start, end)` reads per-base
+  RNA-seq depth over one region of a bigWig through the store: the header and the
+  chromosome tree once per reader, the R-tree root once, one read per level below it and
+  one per data block. `BIGWIG_MAX_REGION` (200,000 bases), `BIGWIG_MAX_RTREE_DEPTH` (4),
+  `BIGWIG_MAX_BLOCKS` (2), `BIGWIG_MAX_CHROM_TREE_BYTES` (1 MiB), `BIGWIG_MAX_BLOCK_BYTES`
+  (256 KiB), `BIGWIG_MAX_ZOOM_LEVELS` (10), `BIGWIG_MAX_NODE_ITEMS` (256) and
+  `BIGWIG_BYTE_ORDER` (little-endian) refuse a read past them with `TrackReadError`
+  before it is sent. `TrackConfig.url_templates` reads a
+  `MultiBigWig` track's `urlTemplates` as `SubTrack(url, name)`, `TrackConfig.subtracks()`
+  is that list or the one `urlTemplate`, and `JBrowseClient.coverage_tracks(abbrev)` keeps
+  the `rnaseq` tracks whose store class ends in `BigWig`. `Observer.on_jbrowse_request`
+  receives each JBrowse HTTP request with `site_host`, `kind` (`store`, `track_list`) and
+  `status`, `none` for a request that gets no answer; `OpenTelemetryObserver` records it as
+  `veupathdb.jbrowse.request_duration`. The mypy gate now covers the six test files that
+  install an observer, so a new `Observer` member fails a test observer that lacks it.
+  `jbrowse_capture coverage` stops at its budget of 9 requests and records the agamPEST
+  `rnaseq` track list and the six ranges one `depth` call over `AGAP003685` reads on QA
+  VectorBase. See [the JBrowse surface](wdk/rest/jbrowse-surface.md).
+
 ## 2026-10-21 - An OrthoMCL expression is evaluated on one group, as the site reads it
 
 - 0.1.0b18: `PhyleticExpression.site_reading()` is the expression as the site reads it,

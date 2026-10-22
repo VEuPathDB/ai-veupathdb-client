@@ -11,10 +11,10 @@ from typing import Self
 import pydantic
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from veupathdb.errors import ValidationError
 from veupathdb.jbrowse.client import JBrowseClient
 from veupathdb.jbrowse.errors import SequenceNotIndexedError, TrackReadError
 from veupathdb.jbrowse.models import TrackConfig
+from veupathdb.jbrowse.region import GenomeRegion, genome_region
 
 TABIX_MAGIC = b"TBI\x01"
 BGZF_MAX_BLOCK = 65536
@@ -293,30 +293,6 @@ def inflate_blocks(raw: bytes, base: int) -> BgzfText:
     return BgzfText(text=b"".join(texts), blocks=blocks)
 
 
-class _Region(BaseModel):
-    model_config = ConfigDict(frozen=True)
-
-    seqid: str
-    start: int = Field(ge=1)
-    end: int
-
-    @model_validator(mode="after")
-    def _ordered(self) -> Self:
-        if self.end < self.start:
-            msg = f"the region {self.start}-{self.end} ends before it starts"
-            raise ValueError(msg)
-        return self
-
-
-def _region(seqid: str, start: int, end: int) -> _Region:
-    try:
-        return _Region(seqid=seqid, start=start, end=end)
-    except pydantic.ValidationError as error:
-        raise ValidationError(
-            title="Genome region not valid", detail=f"{seqid}:{start}-{end}: {error}"
-        ) from error
-
-
 def _span(header: TabixHeader, columns: list[str]) -> tuple[str, int, int]:
     needed = max(header.col_seq, header.col_beg, header.col_end)
     if len(columns) < needed:
@@ -343,7 +319,7 @@ def _decoded(text: bytes) -> str:
         raise TrackReadError(msg) from error
 
 
-def _overlapping(header: TabixHeader, text: bytes, region: _Region) -> list[str]:
+def _overlapping(header: TabixHeader, text: bytes, region: GenomeRegion) -> list[str]:
     kept: list[str] = []
     for line in _decoded(text).split("\n"):
         if not line or ord(line[0]) == header.meta:
@@ -355,7 +331,7 @@ def _overlapping(header: TabixHeader, text: bytes, region: _Region) -> list[str]
 
 
 def _decode_group(
-    header: TabixHeader, raw: bytes, group: list[Chunk], region: _Region
+    header: TabixHeader, raw: bytes, group: list[Chunk], region: GenomeRegion
 ) -> list[str]:
     text = inflate_blocks(raw, group[0].begin >> 16)
     return [
@@ -379,7 +355,7 @@ class TabixReader:
     async def lines(
         self, track: TrackConfig, seqid: str, start: int, end: int
     ) -> list[str]:
-        region = _region(seqid, start, end)
+        region = genome_region(seqid, start, end)
         index = await self.index(track)
         ref = index.ref(seqid)
         if ref is None:
@@ -404,7 +380,7 @@ class TabixReader:
         track: TrackConfig,
         header: TabixHeader,
         group: list[Chunk],
-        region: _Region,
+        region: GenomeRegion,
     ) -> list[str]:
         byte_range = (group[0].begin >> 16, _last_byte(group))
         raw = await self._client.store_bytes(track.data_path, byte_range)

@@ -1,4 +1,53 @@
 {
+  "agamPEST_AGAP003685_bigwig_read1.bin": {
+    "site": "vectorbase",
+    "url": "https://qa.vectorbase.org/vectorbase.qa/service/jbrowse/store?data=AgambiaePEST%2Fbulkrnaseq%2Fbigwig%2FagamPEST_Ruiz_RNAeq_Agambiae_MGs_SGs_infected_Pfalciparum_2021_ebi_rnaSeq_RSRC%2F1_midguts_single-end%2Funique_results.secondstrand_unlogged.bw",
+    "status": 206,
+    "recorded_at": "2026-10-22",
+    "reads": "AGAP003685 AgamP4_2R:41950997-41954101 on Mosquito midguts (MGs) and salivary glands (SGs) infected with P. falciparum - 001.3 - midguts single-end (unique reverse) Coverage, read 1 of 6, the header and zoom headers, bytes=0-303"
+  },
+  "agamPEST_AGAP003685_bigwig_read2.bin": {
+    "site": "vectorbase",
+    "url": "https://qa.vectorbase.org/vectorbase.qa/service/jbrowse/store?data=AgambiaePEST%2Fbulkrnaseq%2Fbigwig%2FagamPEST_Ruiz_RNAeq_Agambiae_MGs_SGs_infected_Pfalciparum_2021_ebi_rnaSeq_RSRC%2F1_midguts_single-end%2Funique_results.secondstrand_unlogged.bw",
+    "status": 206,
+    "recorded_at": "2026-10-22",
+    "reads": "AGAP003685 AgamP4_2R:41950997-41954101 on Mosquito midguts (MGs) and salivary glands (SGs) infected with P. falciparum - 001.3 - midguts single-end (unique reverse) Coverage, read 2 of 6, the chromosome tree, bytes=344-4129"
+  },
+  "agamPEST_AGAP003685_bigwig_read3.bin": {
+    "site": "vectorbase",
+    "url": "https://qa.vectorbase.org/vectorbase.qa/service/jbrowse/store?data=AgambiaePEST%2Fbulkrnaseq%2Fbigwig%2FagamPEST_Ruiz_RNAeq_Agambiae_MGs_SGs_infected_Pfalciparum_2021_ebi_rnaSeq_RSRC%2F1_midguts_single-end%2Funique_results.secondstrand_unlogged.bw",
+    "status": 206,
+    "recorded_at": "2026-10-22",
+    "reads": "AGAP003685 AgamP4_2R:41950997-41954101 on Mosquito midguts (MGs) and salivary glands (SGs) infected with P. falciparum - 001.3 - midguts single-end (unique reverse) Coverage, read 3 of 6, the R-tree header and root, bytes=35018457-35026700"
+  },
+  "agamPEST_AGAP003685_bigwig_read4.bin": {
+    "site": "vectorbase",
+    "url": "https://qa.vectorbase.org/vectorbase.qa/service/jbrowse/store?data=AgambiaePEST%2Fbulkrnaseq%2Fbigwig%2FagamPEST_Ruiz_RNAeq_Agambiae_MGs_SGs_infected_Pfalciparum_2021_ebi_rnaSeq_RSRC%2F1_midguts_single-end%2Funique_results.secondstrand_unlogged.bw",
+    "status": 206,
+    "recorded_at": "2026-10-22",
+    "reads": "AGAP003685 AgamP4_2R:41950997-41954101 on Mosquito midguts (MGs) and salivary glands (SGs) infected with P. falciparum - 001.3 - midguts single-end (unique reverse) Coverage, read 4 of 6, an R-tree node, bytes=35123005-35131200"
+  },
+  "agamPEST_AGAP003685_bigwig_read5.bin": {
+    "site": "vectorbase",
+    "url": "https://qa.vectorbase.org/vectorbase.qa/service/jbrowse/store?data=AgambiaePEST%2Fbulkrnaseq%2Fbigwig%2FagamPEST_Ruiz_RNAeq_Agambiae_MGs_SGs_infected_Pfalciparum_2021_ebi_rnaSeq_RSRC%2F1_midguts_single-end%2Funique_results.secondstrand_unlogged.bw",
+    "status": 206,
+    "recorded_at": "2026-10-22",
+    "reads": "AGAP003685 AgamP4_2R:41950997-41954101 on Mosquito midguts (MGs) and salivary glands (SGs) infected with P. falciparum - 001.3 - midguts single-end (unique reverse) Coverage, read 5 of 6, a data block, bytes=15030068-15034605"
+  },
+  "agamPEST_AGAP003685_bigwig_read6.bin": {
+    "site": "vectorbase",
+    "url": "https://qa.vectorbase.org/vectorbase.qa/service/jbrowse/store?data=AgambiaePEST%2Fbulkrnaseq%2Fbigwig%2FagamPEST_Ruiz_RNAeq_Agambiae_MGs_SGs_infected_Pfalciparum_2021_ebi_rnaSeq_RSRC%2F1_midguts_single-end%2Funique_results.secondstrand_unlogged.bw",
+    "status": 206,
+    "recorded_at": "2026-10-22",
+    "reads": "AGAP003685 AgamP4_2R:41950997-41954101 on Mosquito midguts (MGs) and salivary glands (SGs) infected with P. falciparum - 001.3 - midguts single-end (unique reverse) Coverage, read 6 of 6, a data block, bytes=15034606-15038943"
+  },
+  "agamPEST_coverage_tracks.json": {
+    "site": "vectorbase",
+    "url": "https://qa.vectorbase.org/vectorbase.qa/service/jbrowse/rnaseq/agamPEST",
+    "status": 200,
+    "recorded_at": "2026-10-22",
+    "reads": "the agamPEST rnaseq tracks"
+  },
   "pcynM_junction_tracks.json": {
     "site": "plasmodb",
     "url": "https://qa.plasmodb.org/plasmo.qa/service/jbrowse/rnaseqJunctions/pcynM",

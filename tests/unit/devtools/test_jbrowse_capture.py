@@ -7,14 +7,21 @@ from pathlib import Path
 import httpx
 import pytest
 import respx
+from tests.unit.jbrowse._bigwig_files import bedgraph, bigwig
 from tests.unit.jbrowse._tabix_files import bgzf, gff, tbi, virtual
 
 from veupathdb.devtools import jbrowse_capture
 from veupathdb.devtools.jbrowse_capture import (
+    ExchangeRecorder,
+    coverage_subtrack,
     load_provenance,
     record,
+    record_coverage,
     record_junctions,
+    strand_of,
 )
+from veupathdb.jbrowse.errors import JBrowseError
+from veupathdb.jbrowse.models import SubTrack, TrackConfig
 
 QA_JBROWSE = "https://qa.plasmodb.org/plasmo.qa/service/jbrowse"
 FASTA = "pfal3D7/genomeAndProteome/fasta/genome.fasta"
@@ -155,3 +162,146 @@ def test_the_command_names_its_usage(capsys: pytest.CaptureFixture[str]) -> None
     usage = capsys.readouterr().out
     assert "jbrowse_capture record" in usage
     assert "jbrowse_capture junctions" in usage
+    assert "jbrowse_capture coverage" in usage
+
+
+VB_JBROWSE = "https://qa.vectorbase.org/vectorbase.qa/service/jbrowse"
+REVERSE = "AgambiaePEST/bigwig/s1/reverse.bw"
+COVERAGE_TRACKS = (
+    b'{"tracks": [{"key": "Example study", '
+    b'"storeClass": "MultiBigWig/Store/SeqFeature/MultiBigWig", "urlTemplates": ['
+    b'{"url": "/a/service/jbrowse/store?data=AgambiaePEST%2Fbigwig%2Fs1%2Fforward.bw",'
+    b' "name": "s1 forward"},'
+    b'{"url": "/a/service/jbrowse/store?data=AgambiaePEST%2Fbigwig%2Fs1%2Freverse.bw",'
+    b' "name": "s1 reverse"}]}]}'
+)
+COVERAGE_FILE = bigwig(["AgamP4_2R"], [bedgraph(0, [(41951000, 41951010, 3.0)])])
+
+
+def coverage_site() -> respx.MockRouter:
+    def ranged(request: httpx.Request) -> httpx.Response:
+        first, last = request.headers["Range"].removeprefix("bytes=").split("-")
+        return httpx.Response(206, content=COVERAGE_FILE[int(first) : int(last) + 1])
+
+    router = respx.mock(assert_all_called=True)
+    router.get(f"{VB_JBROWSE}/rnaseq/agamPEST").mock(
+        return_value=httpx.Response(200, content=COVERAGE_TRACKS)
+    )
+    router.get(f"{VB_JBROWSE}/store", params={"data": REVERSE}).mock(side_effect=ranged)
+    return router
+
+
+async def test_a_coverage_recording_keeps_the_list_and_each_read_in_order(
+    tmp_path: Path,
+) -> None:
+    with coverage_site() as router:
+        assert await record_coverage(tmp_path) == 0
+        ranges = [call.request.headers["Range"] for call in router.calls[1:]]
+
+    provenance = load_provenance(tmp_path)
+    assert (tmp_path / "agamPEST_coverage_tracks.json").read_bytes() == COVERAGE_TRACKS
+    names = [f"agamPEST_AGAP003685_bigwig_read{index}.bin" for index in (1, 2, 3, 4)]
+    assert sorted(provenance) == sorted([*names, "agamPEST_coverage_tracks.json"])
+    roles = [
+        "the header and zoom headers",
+        "the chromosome tree",
+        "the R-tree header and root",
+        "a data block",
+    ]
+    assert [provenance[name].reads for name in names] == [
+        f"AGAP003685 AgamP4_2R:41950997-41954101 on s1 reverse, read {index} of 4, "
+        f"{role}, {byte_range}"
+        for index, (role, byte_range) in enumerate(zip(roles, ranges, strict=True), 1)
+    ]
+    assert {provenance[name].site for name in names} == {"vectorbase"}
+    assert [provenance[name].status for name in names] == [206] * 4
+
+
+def sub(name: str) -> SubTrack:
+    return SubTrack(url=f"/a/service/jbrowse/store?data={name}.bw", name=name)
+
+
+def test_a_subtrack_reads_its_strand_from_its_name() -> None:
+    assert [
+        strand_of(sub(name))
+        for name in ("s1 forward", "s1 Plus", "s1 (+)", "s1 reverse", "s1 minus")
+    ] == ["+", "+", "+", "-", "-"]
+    assert strand_of(sub("s1 unique")) is None
+    assert strand_of(sub("s1 antisense")) == "unread"
+    assert strand_of(sub("s1 sense")) == "unread"
+
+
+def test_the_strand_subtrack_comes_before_a_unified_track() -> None:
+    unified = TrackConfig(key="Unified coverage", url_template="/s?data=u.bw")
+    stranded = TrackConfig(
+        key="Study", url_templates=[sub("x forward"), sub("x minus")]
+    )
+    assert coverage_subtrack([unified, stranded], "-") == sub("x minus")
+    assert coverage_subtrack([unified, stranded], "+") == sub("x forward")
+
+
+def test_without_a_strand_subtrack_the_unified_track_is_read() -> None:
+    plain = TrackConfig(key="Study", url_templates=[sub("y unique"), sub("y sense")])
+    unified = TrackConfig(label="unified_rnaseq", url_templates=[sub("u all")])
+    assert coverage_subtrack([plain, unified], "+") == sub("u all")
+
+
+def test_without_a_unified_track_the_first_unstranded_subtrack_is_read() -> None:
+    plain = TrackConfig(key="Study", url_templates=[sub("z antisense"), sub("z all")])
+    assert coverage_subtrack([plain], "-") == sub("z all")
+    assert coverage_subtrack([], "-") is None
+
+
+async def test_a_recorder_refuses_a_request_past_its_budget_unsent() -> None:
+    sent: list[httpx.Request] = []
+
+    def answer(request: httpx.Request) -> httpx.Response:
+        sent.append(request)
+        return httpx.Response(200)
+
+    recorder = ExchangeRecorder(httpx.MockTransport(answer), budget=1)
+    async with httpx.AsyncClient(transport=recorder) as client:
+        await client.get("https://qa.vectorbase.org/a")
+        with pytest.raises(RuntimeError, match="budget of 1 requests"):
+            await client.get("https://qa.vectorbase.org/b")
+    assert [str(r.url) for r in sent] == ["https://qa.vectorbase.org/a"]
+    assert len(recorder.exchanges) == 1
+
+
+def written(directory: Path) -> list[str]:
+    return sorted(path.name for path in directory.iterdir())
+
+
+async def test_a_coverage_recording_stops_at_its_budget_and_writes_nothing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(jbrowse_capture, "COVERAGE_BUDGET", 3)
+    with coverage_site() as router:
+        with pytest.raises(RuntimeError, match="budget of 3 requests"):
+            await record_coverage(tmp_path)
+        sent = len(router.calls)
+    assert sent == 3
+    assert written(tmp_path) == []
+
+
+def test_the_coverage_budget_is_the_track_list_and_the_bounded_reads() -> None:
+    assert jbrowse_capture.COVERAGE_BUDGET == 1 + 2 + 4 + 2
+
+
+async def test_a_coverage_recording_stops_at_a_refused_read_and_writes_nothing(
+    tmp_path: Path,
+) -> None:
+    router = respx.mock(assert_all_called=True)
+    router.get(f"{VB_JBROWSE}/rnaseq/agamPEST").mock(
+        return_value=httpx.Response(200, content=COVERAGE_TRACKS)
+    )
+    router.get(f"{VB_JBROWSE}/store", params={"data": REVERSE}).mock(
+        return_value=httpx.Response(500)
+    )
+    with router:
+        with pytest.raises(JBrowseError) as raised:
+            await record_coverage(tmp_path)
+        sent = len(router.calls)
+    assert raised.value.upstream_status == 500
+    assert sent == 2
+    assert written(tmp_path) == []

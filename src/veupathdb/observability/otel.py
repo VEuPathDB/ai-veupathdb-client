@@ -10,6 +10,7 @@ from veupathdb.observer import MetricAttrs
 
 _wdk_meter = metrics.get_meter("veupathdb.wdk")
 _site_search_meter = metrics.get_meter("veupathdb.site_search")
+_jbrowse_meter = metrics.get_meter("veupathdb.jbrowse")
 
 wdk_requests = _wdk_meter.create_counter(
     "veupathdb.wdk.requests",
@@ -35,6 +36,12 @@ wdk_search_wait_s = _wdk_meter.create_histogram(
     unit="s",
 )
 
+jbrowse_request_duration_s = _jbrowse_meter.create_histogram(
+    "veupathdb.jbrowse.request_duration",
+    description="JBrowse HTTP request duration by site, read kind and status",
+    unit="s",
+)
+
 site_search_requests = _site_search_meter.create_counter(
     "veupathdb.site_search.requests",
     description="Logical site-search requests by outcome",
@@ -55,11 +62,14 @@ site_search_request_duration_s = _site_search_meter.create_histogram(
 
 
 class OpenTelemetryObserver:
-    """Feeds the WDK and site-search instruments the client reports to."""
+    """Feeds the WDK, JBrowse and site-search instruments the client reports to."""
 
     def on_wdk_request(self, seconds: float, attrs: MetricAttrs, /) -> None:
         wdk_requests.add(1, attrs)
         wdk_request_duration_s.record(seconds, attrs)
+
+    def on_jbrowse_request(self, seconds: float, attrs: MetricAttrs, /) -> None:
+        jbrowse_request_duration_s.record(seconds, attrs)
 
     def on_wdk_retry(self, attrs: MetricAttrs, /) -> None:
         wdk_request_retries.add(1, attrs)
