@@ -248,7 +248,7 @@ def coverage_subtrack(tracks: list[TrackConfig], strand: str) -> SubTrack | None
 def _read_role(index: int, exchange: RecordedExchange, index_at: int) -> str:
     first = int(exchange.byte_range.removeprefix("bytes=").split("-")[0])
     if index == 1:
-        return "the header and zoom headers"
+        return "the header, zoom headers and total summary"
     if index == 2:
         return "the chromosome tree"
     if first == index_at:

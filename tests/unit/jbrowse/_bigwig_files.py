@@ -165,6 +165,8 @@ class Layout:
     zoom_levels: int = 0
     compressed: bool = True
     magic: int = BIGWIG_MAGIC
+    summary: tuple[int, float, float, float, float] | None = None
+    summary_at_end: bool = False
 
 
 DEFAULT_LAYOUT = Layout()
@@ -173,7 +175,10 @@ DEFAULT_LAYOUT = Layout()
 def bigwig(
     chroms: list[str], sections: list[Section], layout: Layout = DEFAULT_LAYOUT
 ) -> bytes:
-    chrom_at = HEADER_BYTES + layout.zoom_levels * ZOOM_HEADER_BYTES
+    summary = b"" if layout.summary is None else struct.pack("<Qdddd", *layout.summary)
+    front, tail = (b"", summary) if layout.summary_at_end else (summary, b"")
+    zooms_end = HEADER_BYTES + layout.zoom_levels * ZOOM_HEADER_BYTES
+    chrom_at = zooms_end + len(front)
     chrom_tree = b"".join(_chrom_tree(chroms, layout.chrom_block_size, chrom_at))
     data_at = chrom_at + len(chrom_tree)
     data = struct.pack("<I", len(sections))
@@ -189,6 +194,7 @@ def bigwig(
     ]
     index = _index(boxes, blocks, layout.block_size, index_at)
     buffer_size = max(len(s.payload) for s in sections) if layout.compressed else 0
+    summary_at = index_at + len(index) if tail else zooms_end if front else 0
     header = struct.pack(
         "<IHHQQQHHQQIQ",
         layout.magic,
@@ -200,9 +206,9 @@ def bigwig(
         0,
         0,
         0,
-        0,
+        summary_at,
         buffer_size,
         0,
     )
     zooms = bytes(layout.zoom_levels * ZOOM_HEADER_BYTES)
-    return header + zooms + chrom_tree + data + index
+    return header + zooms + front + chrom_tree + data + index + tail

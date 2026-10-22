@@ -316,6 +316,7 @@
     "BIGWIG_MAX_RTREE_DEPTH",
     "BIGWIG_MAX_ZOOM_LEVELS",
     "BigWigReader",
+    "BigWigSummary",
     "FaiEntry",
     "GenomeIndexError",
     "GenomeReader",

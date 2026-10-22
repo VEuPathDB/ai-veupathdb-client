@@ -27,6 +27,8 @@ _RTREE_MAGIC = 0x2468ACE0
 _HEADER = struct.Struct(BIGWIG_BYTE_ORDER + "IHHQQQHHQQIQ")
 _ZOOM_HEADER = struct.Struct(BIGWIG_BYTE_ORDER + "IIQQ")
 _HEADER_READ = _HEADER.size + _ZOOM_HEADER.size * BIGWIG_MAX_ZOOM_LEVELS
+_TOTAL_SUMMARY = struct.Struct(BIGWIG_BYTE_ORDER + "Qdddd")
+_HEADER_WINDOW = _HEADER_READ + _TOTAL_SUMMARY.size
 _CHROM_TREE_HEADER = struct.Struct(BIGWIG_BYTE_ORDER + "IIIIQQ")
 _CHROM_VALUE = struct.Struct(BIGWIG_BYTE_ORDER + "II")
 _CHILD_OFFSET = struct.Struct(BIGWIG_BYTE_ORDER + "Q")
@@ -51,7 +53,24 @@ class _Header(BaseModel):
     chrom_tree_offset: int
     full_data_offset: int
     full_index_offset: int
+    total_summary_offset: int
     uncompress_buf_size: int
+
+
+class BigWigSummary(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    bases_covered: int
+    min_value: float
+    max_value: float
+    sum_data: float
+    sum_squares: float
+
+    @property
+    def mean_depth(self) -> float:
+        if self.bases_covered == 0:
+            return 0.0
+        return self.sum_data / self.bases_covered
 
 
 class _DataBlock(BaseModel):
@@ -129,11 +148,29 @@ def _parse_header(raw: bytes) -> _Header:
     if zoom_end > len(raw):
         msg = f"the bigWig read ends early, at byte {len(raw)} of {zoom_end}"
         raise TrackReadError(msg)
+    if 0 < fields[9] < zoom_end:
+        msg = (
+            f"the bigWig header names totalSummaryOffset {fields[9]}, inside its "
+            f"header and zoom headers, which end at byte {zoom_end}"
+        )
+        raise TrackReadError(msg)
     return _Header(
         chrom_tree_offset=fields[3],
         full_data_offset=fields[4],
         full_index_offset=fields[5],
+        total_summary_offset=fields[9],
         uncompress_buf_size=fields[10],
+    )
+
+
+def _parse_summary(raw: bytes, at: int) -> BigWigSummary:
+    bases, low, high, total, squares = _unpack(_TOTAL_SUMMARY, raw, at)
+    return BigWigSummary(
+        bases_covered=bases,
+        min_value=low,
+        max_value=high,
+        sum_data=total,
+        sum_squares=squares,
     )
 
 
@@ -289,6 +326,7 @@ class BigWigReader:
         self._client = client
         self._data_path = data_path
         self._header: _Header | None = None
+        self._header_bytes = b""
         self._chroms: dict[str, int] | None = None
         self._root: _Root | None = None
         self.reads = 0
@@ -299,8 +337,17 @@ class BigWigReader:
 
     async def _read_header(self) -> _Header:
         if self._header is None:
-            self._header = _parse_header(await self._read(0, _HEADER_READ - 1))
+            self._header_bytes = await self._read(0, _HEADER_WINDOW - 1)
+            self._header = _parse_header(self._header_bytes)
         return self._header
+
+    async def summary(self) -> BigWigSummary | None:
+        at = (await self._read_header()).total_summary_offset
+        if at == 0:
+            return None
+        if at + _TOTAL_SUMMARY.size <= _HEADER_WINDOW:
+            return _parse_summary(self._header_bytes, at)
+        return _parse_summary(await self._read(at, at + _TOTAL_SUMMARY.size - 1), 0)
 
     async def _read_chroms(self, header: _Header) -> dict[str, int]:
         if self._chroms is None:

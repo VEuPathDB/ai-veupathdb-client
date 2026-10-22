@@ -203,7 +203,7 @@ async def test_a_coverage_recording_keeps_the_list_and_each_read_in_order(
     names = [f"agamPEST_AGAP003685_bigwig_read{index}.bin" for index in (1, 2, 3, 4)]
     assert sorted(provenance) == sorted([*names, "agamPEST_coverage_tracks.json"])
     roles = [
-        "the header and zoom headers",
+        "the header, zoom headers and total summary",
         "the chromosome tree",
         "the R-tree header and root",
         "a data block",

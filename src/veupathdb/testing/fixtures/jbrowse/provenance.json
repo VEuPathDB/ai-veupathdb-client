@@ -4,7 +4,7 @@
     "url": "https://qa.vectorbase.org/vectorbase.qa/service/jbrowse/store?data=AgambiaePEST%2Fbulkrnaseq%2Fbigwig%2FagamPEST_Ruiz_RNAeq_Agambiae_MGs_SGs_infected_Pfalciparum_2021_ebi_rnaSeq_RSRC%2F1_midguts_single-end%2Funique_results.secondstrand_unlogged.bw",
     "status": 206,
     "recorded_at": "2026-10-22",
-    "reads": "AGAP003685 AgamP4_2R:41950997-41954101 on Mosquito midguts (MGs) and salivary glands (SGs) infected with P. falciparum - 001.3 - midguts single-end (unique reverse) Coverage, read 1 of 6, the header and zoom headers, bytes=0-303"
+    "reads": "AGAP003685 AgamP4_2R:41950997-41954101 on Mosquito midguts (MGs) and salivary glands (SGs) infected with P. falciparum - 001.3 - midguts single-end (unique reverse) Coverage, read 1 of 6, the header, zoom headers and total summary, bytes=0-343"
   },
   "agamPEST_AGAP003685_bigwig_read2.bin": {
     "site": "vectorbase",

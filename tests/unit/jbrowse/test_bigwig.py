@@ -27,13 +27,14 @@ from veupathdb.jbrowse.bigwig import (
     BIGWIG_MAX_RTREE_DEPTH,
     BIGWIG_MAX_ZOOM_LEVELS,
     BigWigReader,
+    BigWigSummary,
 )
 from veupathdb.jbrowse.client import JBrowseClient
 from veupathdb.jbrowse.errors import SequenceNotIndexedError, TrackReadError
 from veupathdb.testing import FIXTURE_ROOT
 
 DATA = "org1/genomeBrowser/bigwig/sample1.bw"
-HEADER_READ = 64 + 24 * 10
+HEADER_READ = 64 + 24 * 10 + 40
 ROOT_READ = 48 + 4 + 256 * 32
 
 
@@ -347,7 +348,7 @@ def recorded_path() -> str:
     return httpx.URL(url).params["data"]
 
 
-async def recorded_depth() -> tuple[list[float], BigWigReader, list[str]]:
+def recorded_reader() -> tuple[BigWigReader, list[str]]:
     served_ranges = recorded_ranges()
     sent: list[str] = []
 
@@ -362,9 +363,28 @@ async def recorded_depth() -> tuple[list[float], BigWigReader, list[str]]:
         base_url="https://qa.vectorbase.org/vectorbase.qa",
         transport=httpx.MockTransport(answer),
     )
-    reader = BigWigReader(client, recorded_path())
+    return BigWigReader(client, recorded_path()), sent
+
+
+async def recorded_depth() -> tuple[list[float], BigWigReader, list[str]]:
+    reader, sent = recorded_reader()
     values = await reader.depth("AgamP4_2R", 41950997, 41954101)
     return values, reader, sent
+
+
+async def test_the_agap003685_summary_is_read_from_the_header_read() -> None:
+    reader, sent = recorded_reader()
+    summary = await reader.summary()
+    assert summary == BigWigSummary(
+        bases_covered=54489565,
+        min_value=0.41999998688697815,
+        max_value=371440.375,
+        sum_data=1003541387.8760892,
+        sum_squares=41678481556280.266,
+    )
+    assert summary.mean_depth == 18.417129736236454
+    assert sent == ["bytes=0-343"]
+    assert reader.reads == 1
 
 
 async def test_the_agap003685_region_reads_one_value_per_base_as_recorded() -> None:
@@ -383,7 +403,7 @@ async def test_the_agap003685_reads_are_the_recorded_ranges_in_order() -> None:
         for name in RECORDED_READS
     ]
     assert sent == [
-        "bytes=0-303",
+        "bytes=0-343",
         "bytes=344-4129",
         "bytes=35018457-35026700",
         "bytes=35123005-35131200",

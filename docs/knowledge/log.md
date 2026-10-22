@@ -1,5 +1,19 @@
 # Knowledge log
 
+## 2026-10-22 - A bigWig file's total summary is read with its header
+
+- 0.1.0b21: `BigWigReader.summary()` returns the file's total summary as a frozen
+  `BigWigSummary` (`bases_covered`, `min_value`, `max_value`, `sum_data`, `sum_squares`,
+  and `mean_depth`, `sum_data / bases_covered` or 0.0), or `None` when the header's
+  `totalSummaryOffset` is 0. The header read widens from bytes `0-303` to `0-343`, so a
+  summary after 10 or fewer zoom headers arrives in that one read; a summary past it takes
+  one more 40-byte read. `summary()` and `depth` share the header read. The read counts
+  of `depth` are unchanged. A `totalSummaryOffset` above 0 and inside the header and zoom
+  headers raises `TrackReadError`. The recorded AGAP003685 header read is now bytes
+  `0-343`, read again on QA VectorBase, so its summary decodes from the recording; the
+  recorder names read 1 "the header, zoom headers and total summary". See
+  [the JBrowse surface](wdk/rest/jbrowse-surface.md).
+
 ## 2026-10-22 - A tabix read is counted before it is sent, and an unlisted search has no class
 
 - 0.1.0b20: `TabixReader.chunk_group_count(track, seqid, start, end)` returns the number

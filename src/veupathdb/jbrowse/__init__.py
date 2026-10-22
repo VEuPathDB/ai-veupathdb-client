@@ -10,6 +10,7 @@ from veupathdb.jbrowse.bigwig import (
     BIGWIG_MAX_RTREE_DEPTH,
     BIGWIG_MAX_ZOOM_LEVELS,
     BigWigReader,
+    BigWigSummary,
 )
 from veupathdb.jbrowse.client import JBrowseClient, TrackKind
 from veupathdb.jbrowse.errors import (
@@ -40,6 +41,7 @@ __all__ = [
     "BIGWIG_MAX_RTREE_DEPTH",
     "BIGWIG_MAX_ZOOM_LEVELS",
     "BigWigReader",
+    "BigWigSummary",
     "FaiEntry",
     "GenomeIndexError",
     "GenomeReader",

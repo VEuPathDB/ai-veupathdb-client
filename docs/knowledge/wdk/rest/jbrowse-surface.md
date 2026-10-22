@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: The JBrowse endpoints this client calls
-description: The track list and the store a site's JBrowse service serves, the ranged read a genome window takes, the FASTA and index paths under the data prefix, the tabix range read of a junction track, the bounded bigWig read of a coverage track, the observer hook every read reports to, and what QA PlasmoDB and QA VectorBase answered.
+description: The track list and the store a site's JBrowse service serves, the ranged read a genome window takes, the FASTA and index paths under the data prefix, the tabix range read of a junction track, the bounded bigWig read of a coverage track and its total summary, the observer hook every read reports to, and what QA PlasmoDB and QA VectorBase answered.
 tags: [jbrowse, genome-sequence, tabix, bigwig, rna-seq-coverage, rna-seq-junctions, observability, rest, veupathdb]
 generated: { by: claude-code/opus-5, at: 2026-10-21T00:00:00Z }
 verified: { by: claude-code/opus-5, at: 2026-10-22T00:00:00Z }
@@ -109,7 +109,8 @@ reads only the `data` value and sends it to its own site's web base.
   the 1-based, inclusive region, `0.0` where no interval covers a base. It reads bedGraph,
   variable-step and fixed-step sections. Each read is one `store_bytes` range, counted in
   `reads`:
-  - the header with room for 10 zoom headers (bytes `0-303`), once per reader;
+  - the header with room for 10 zoom headers and the 40-byte total summary after them
+    (bytes `0-343`), once per reader;
   - the chromosome tree, the one range from its offset to the data section, once per
     reader;
   - the R-tree header with the root node (48 + 4 + 256 * 32 bytes), once per reader, then
@@ -139,6 +140,15 @@ reads only the `data` value and sends it to its own site's web base.
   raise `TrackReadError`.
 - A sequence the chromosome tree does not name raises `SequenceNotIndexedError`, as a
   tabix track does: a bigWig names only the sequences that hold a value.
+- `BigWigReader.summary()` returns the file's total summary as a `BigWigSummary`
+  (`bases_covered`, `min_value`, `max_value`, `sum_data`, `sum_squares`), or `None` when
+  the header's `totalSummaryOffset` is 0. `mean_depth` is `sum_data / bases_covered`, and
+  0.0 when no base is covered. The UCSC writer puts the summary right after the zoom
+  headers, so a file with at most 10 zoom levels has it inside the header read and
+  `summary()` reads one range. A summary past byte 343 takes one more 40-byte read. The
+  header read is shared with `depth`, so a reader that calls both reads the header once.
+  A `totalSummaryOffset` above 0 and inside the header and zoom headers raises
+  `TrackReadError` after the header read, for `summary()` and `depth` alike.
 
 # What the client refuses and renews
 
@@ -189,7 +199,7 @@ the first subtrack of the list whose name holds `reverse`, for `AGAP003685`
 | request | status |
 | --- | --- |
 | `GET /service/jbrowse/rnaseq/agamPEST` | 200, 730 tracks: 570 `BigWig` with one `urlTemplate` and 160 `MultiBigWig` with 1,710 `urlTemplates`; 252 subtrack names hold `forward` and 252 `reverse`; none holds `unified`, `antisense` or `(-)` |
-| the bigWig with `Range: bytes=0-303` | 206, the header |
+| the bigWig with `Range: bytes=0-343` | 206, the header, 10 zoom headers and the total summary at `totalSummaryOffset` 304 |
 | the same with `bytes=344-4129` | 206, the chromosome tree |
 | the same with `bytes=35018457-35026700` | 206, the R-tree header and root; the nodes hold 256 items |
 | the same with `bytes=35123005-35131200` | 206, the leaf node |
@@ -198,3 +208,8 @@ the first subtrack of the list whose name holds `reverse`, for `AGAP003685`
 The 3,105 values sum to 36103.99 with a maximum of 72.16, and 2,849 bases hold a value.
 A second decoder, one that reads the file in 64 KiB blocks, decodes a file made of only
 these six ranges to the same sum, maximum and count.
+
+The header range was read again with `bytes=0-343`, one request, after the header read
+grew to cover the total summary. Its first 304 bytes equal the first recording. The
+summary is 54,489,565 bases covered, a minimum of 0.42, a maximum of 371,440.375 and a
+sum of 1,003,541,387.876, so `mean_depth` is 18.417.
