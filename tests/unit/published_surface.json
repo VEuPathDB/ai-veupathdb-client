@@ -113,6 +113,7 @@
     "PHYLETIC_LIST_PARAMS",
     "PHYLETIC_MAP_PARAMS",
     "PHYLETIC_PARAM_NAMES",
+    "PHYLETIC_ROOT_CODE",
     "ParamKind",
     "ParamSpecNormalized",
     "ParamValue",

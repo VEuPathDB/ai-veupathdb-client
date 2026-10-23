@@ -1,5 +1,22 @@
 # Knowledge log
 
+## 2026-10-23 - A long phyletic expression is read in linear time
+
+- 0.1.0b23: `PhyleticExpression.parse` reads its tokens by position, so a parse is linear
+  in its units; it sliced the token list once per unit. `units()` walks a stack, for the
+  same reason. `check_expression`, `describe` and `holds_for` walk the tree once per call
+  and read every unit against that one index of labels, genomes per code and species per
+  genome, where each unit walked the tree again and rebuilt the label map. On the
+  recorded OrthoMCL taxonomy a 10,000-unit expression now parses, checks and reads in
+  about 0.2 s for a two-genome ladder and 0.35 s for units over every code (it took
+  9.7 s), and twice the units take under three times as long
+  (`tests/unit/domain/parameters/test_phyletic_expression_cost.py`, which asserts the
+  scaling, not a wall-clock bound).
+  Readings, refusals and verdicts are unchanged: `TaxaCount.describe`,
+  `TaxaCount.repeated`, and both `holds_for` keep their signatures.
+- `PHYLETIC_ROOT_CODE` (`ALL`, the whole tree) is on the `veupathdb.domain.parameters`
+  surface, so a host names every genome without importing the module that declares it.
+
 ## 2026-10-23 - A write that adds to a user's account is sent once
 
 - 0.1.0b22: `StrategyAPI.create_dataset` (`POST /users/{id}/datasets`),

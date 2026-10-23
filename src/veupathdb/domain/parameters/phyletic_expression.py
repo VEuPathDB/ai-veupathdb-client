@@ -13,8 +13,10 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from veupathdb.domain.parameters.phyletic import (
     PHYLETIC_ROOT_CODE,
+    PhyleticNode,
     PhyleticTree,
     refuse_phyletic_value,
+    species_of,
     validate_phyletic_codes,
 )
 
@@ -63,6 +65,51 @@ _GRAMMAR = (
 )
 
 
+class _TreeIndex:
+    def __init__(self, tree: PhyleticTree) -> None:
+        self.labels: dict[str, str] = {}
+        self.below: dict[str, frozenset[str]] = {}
+        self.position: dict[str, int] = {}
+        self.species: dict[str, str] = {}
+        for root in tree.roots:
+            self._walk(root)
+        self.below[PHYLETIC_ROOT_CODE] = frozenset(self.position)
+
+    def _walk(self, node: PhyleticNode) -> frozenset[str]:
+        self.labels[node.code] = node.label
+        if not node.clade:
+            self.position[node.code] = len(self.position)
+            self.species[node.code] = species_of(node.label)
+            held = frozenset({node.code})
+        else:
+            held = frozenset(
+                genome for child in node.children for genome in self._walk(child)
+            )
+        self.below[node.code] = held
+        return held
+
+    def genomes(self, codes: Sequence[str]) -> set[str]:
+        return {genome for code in codes for genome in self.below.get(code, ())}
+
+    def span(self, codes: Sequence[str]) -> str:
+        grouped: dict[str, int] = {}
+        for genome in sorted(self.genomes(codes), key=self.position.__getitem__):
+            name = self.species[genome]
+            grouped[name] = grouped.get(name, 0) + 1
+        genomes = sum(grouped.values())
+        if genomes <= 1:
+            return ""
+        counted = f"{genomes} genomes of {len(grouped)} species"
+        shared = sorted(
+            ((name, held) for name, held in grouped.items() if held > 1),
+            key=lambda pair: (-pair[1], pair[0]),
+        )
+        if not shared:
+            return f" ({counted})"
+        named = ", ".join(f"{name} {held}" for name, held in shared)
+        return f" ({counted}; {named})"
+
+
 class TaxaCount(BaseModel):
     """One unit: how many genomes or proteins of these codes a group holds."""
 
@@ -77,20 +124,25 @@ class TaxaCount(BaseModel):
         return f"{'+'.join(self.codes)}{self.op}{self.count}{'T' if self.taxa else ''}"
 
     def describe(self, tree: PhyleticTree, *, nested: bool = False) -> str:
-        labels = {node.code: node.label for node in tree.nodes()}
-        named = ", ".join(labels.get(code, code) for code in self.codes)
+        return self.read(_TreeIndex(tree), nested=nested)
+
+    def read(self, index: _TreeIndex, *, nested: bool = False) -> str:
+        named = ", ".join(index.labels.get(code, code) for code in self.codes)
         unit = _UNITS[self.taxa][self.count != 1]
         listed = f"these {len(self.codes)}: " if len(self.codes) > 1 else ""
-        spanned = _span(tree, self.codes)
+        spanned = index.span(self.codes)
         return f"{_OP_WORDS[self.op]} {self.count} {unit} of {listed}{named}{spanned}"
 
     def operands(self, join: Join) -> tuple[Term, ...]:
         return (self,)
 
     def repeated(self, tree: PhyleticTree) -> list[str]:
+        return self.repeated_in(_TreeIndex(tree))
+
+    def repeated_in(self, index: _TreeIndex) -> list[str]:
         written = Counter(self.codes)
         held = Counter(
-            genome for code in written for genome in tree.genomes_under([code])
+            genome for code in written for genome in index.below.get(code, ())
         )
         return sorted(
             {code for code, times in written.items() if times > 1}
@@ -98,10 +150,13 @@ class TaxaCount(BaseModel):
         )
 
     def holds_for(self, proteins: Mapping[str, int], tree: PhyleticTree) -> bool:
-        _refuse_repeats(self, tree)
+        return self.holds_in(proteins, _TreeIndex(tree))
+
+    def holds_in(self, proteins: Mapping[str, int], index: _TreeIndex) -> bool:
+        _refuse_repeats(self, index)
         held = [
             proteins[genome]
-            for genome in tree.genomes_under(self.codes)
+            for genome in index.genomes(self.codes)
             if genome in proteins and proteins[genome] > 0
         ]
         if not held:
@@ -123,8 +178,11 @@ class Combination(BaseModel):
         return f"({text})" if nested else text
 
     def describe(self, tree: PhyleticTree, *, nested: bool = False) -> str:
+        return self.read(_TreeIndex(tree), nested=nested)
+
+    def read(self, index: _TreeIndex, *, nested: bool = False) -> str:
         text = f" {self.join.lower()} ".join(
-            term.describe(tree, nested=True) for term in self.terms
+            term.read(index, nested=True) for term in self.terms
         )
         return f"({text})" if nested else text
 
@@ -132,7 +190,10 @@ class Combination(BaseModel):
         return self.terms if join == self.join else (self,)
 
     def holds_for(self, proteins: Mapping[str, int], tree: PhyleticTree) -> bool:
-        met = (term.holds_for(proteins, tree) for term in self.terms)
+        return self.holds_in(proteins, _TreeIndex(tree))
+
+    def holds_in(self, proteins: Mapping[str, int], index: _TreeIndex) -> bool:
+        met = (term.holds_in(proteins, index) for term in self.terms)
         return all(met) if self.join == "AND" else any(met)
 
 
@@ -142,22 +203,6 @@ Term = TaxaCount | Combination
 def _joined(join: Join, terms: Sequence[Term]) -> Term:
     flat = tuple(operand for term in terms for operand in term.operands(join))
     return flat[0] if len(flat) == 1 else Combination(join=join, terms=flat)
-
-
-def _span(tree: PhyleticTree, codes: tuple[str, ...]) -> str:
-    groups = tree.species_groups(codes)
-    genomes = sum(len(group.genomes) for group in groups)
-    if genomes <= 1:
-        return ""
-    counted = f"{genomes} genomes of {len(groups)} species"
-    shared = sorted(
-        (group for group in groups if len(group.genomes) > 1),
-        key=lambda group: (-len(group.genomes), group.species),
-    )
-    if not shared:
-        return f" ({counted})"
-    named = ", ".join(f"{group.species} {len(group.genomes)}" for group in shared)
-    return f" ({counted}; {named})"
 
 
 class PhyleticExpression(BaseModel):
@@ -173,8 +218,8 @@ class PhyleticExpression(BaseModel):
         if not text.strip():
             _refuse(f"{text!r} is empty.")
         tokens = _tokens(text)
-        root, rest = _expression(tokens, text)
-        if rest:
+        root, end = _expression(tokens, 0, text)
+        if end < len(tokens):
             _refuse(f"In {text!r}, a ')' closes nothing.")
         return cls(root=root)
 
@@ -182,17 +227,17 @@ class PhyleticExpression(BaseModel):
         return self.root.render()
 
     def describe(self, tree: PhyleticTree) -> str:
-        return self.root.describe(tree)
+        return self.root.read(_TreeIndex(tree))
 
     def units(self) -> list[TaxaCount]:
         found: list[TaxaCount] = []
         pending: list[Term] = [self.root]
         while pending:
-            term = pending.pop(0)
+            term = pending.pop()
             if isinstance(term, TaxaCount):
                 found.append(term)
             else:
-                pending[:0] = term.terms
+                pending.extend(reversed(term.terms))
         return found
 
     def codes(self) -> list[str]:
@@ -202,7 +247,7 @@ class PhyleticExpression(BaseModel):
         return PhyleticExpression.parse(self.render().translate(_NO_PARENTHESES))
 
     def holds_for(self, proteins: Mapping[str, int], tree: PhyleticTree) -> bool:
-        return self.site_reading().root.holds_for(proteins, tree)
+        return self.site_reading().root.holds_in(proteins, _TreeIndex(tree))
 
 
 def check_expression(expression: PhyleticExpression, tree: PhyleticTree) -> None:
@@ -223,12 +268,13 @@ def check_expression(expression: PhyleticExpression, tree: PhyleticTree) -> None
             "term.",
             title="phyletic_expression groups terms the site does not group",
         )
+    index = _TreeIndex(tree)
     for unit in expression.units():
-        _check_unit(unit, tree)
+        _check_unit(unit, index)
 
 
-def _refuse_repeats(unit: TaxaCount, tree: PhyleticTree) -> None:
-    repeated = unit.repeated(tree)
+def _refuse_repeats(unit: TaxaCount, index: _TreeIndex) -> None:
+    repeated = unit.repeated_in(index)
     if repeated:
         _refuse(
             f"{unit.render()} names these codes more than once: "
@@ -237,10 +283,10 @@ def _refuse_repeats(unit: TaxaCount, tree: PhyleticTree) -> None:
         )
 
 
-def _check_unit(unit: TaxaCount, tree: PhyleticTree) -> None:
+def _check_unit(unit: TaxaCount, index: _TreeIndex) -> None:
     codes = "+".join(unit.codes)
-    _refuse_repeats(unit, tree)
-    genomes = len(tree.genomes_under(unit.codes))
+    _refuse_repeats(unit, index)
+    genomes = len(index.genomes(unit.codes))
     if (unit.op, unit.count) in {("<=", 0), ("<", 1)}:
         _refuse(
             f"{unit.render()} matches no group, because the site counts a unit "
@@ -339,31 +385,31 @@ def _tokens(text: str) -> list[_Token]:
     return tokens
 
 
-def _term(tokens: list[_Token], text: str) -> tuple[Term, list[_Token]]:
-    if not tokens:
+def _term(tokens: list[_Token], at: int, text: str) -> tuple[Term, int]:
+    if at >= len(tokens):
         _refuse(f"{text!r} ends where a unit belongs.")
-    kind, value = tokens[0]
+    kind, value = tokens[at]
     if kind == "unit" and isinstance(value, TaxaCount):
-        return value, tokens[1:]
+        return value, at + 1
     if kind == "open":
-        inner, rest = _expression(tokens[1:], text)
-        if not rest or rest[0][0] != "close":
+        inner, end = _expression(tokens, at + 1, text)
+        if end >= len(tokens) or tokens[end][0] != "close":
             _refuse(f"In {text!r}, a '(' is never closed.")
-        return inner, rest[1:]
+        return inner, end + 1
     _refuse(f"In {text!r}, {value!r} stands where a unit belongs.")
 
 
-def _expression(tokens: list[_Token], text: str) -> tuple[Term, list[_Token]]:
-    first, rest = _term(tokens, text)
+def _expression(tokens: list[_Token], at: int, text: str) -> tuple[Term, int]:
+    first, at = _term(tokens, at, text)
     products: list[list[Term]] = [[first]]
-    while rest and rest[0][0] != "close":
-        kind, value = rest[0]
+    while at < len(tokens) and tokens[at][0] != "close":
+        kind, value = tokens[at]
         if kind != "join":
             _refuse(f"In {text!r}, AND or OR joins two units.")
-        if len(rest) == 1:
+        if at + 1 == len(tokens):
             _refuse(f"{text!r} ends after {value}.")
         if value == "OR":
             products.append([])
-        term, rest = _term(rest[1:], text)
+        term, at = _term(tokens, at + 1, text)
         products[-1].append(term)
-    return _joined("OR", [_joined("AND", product) for product in products]), rest
+    return _joined("OR", [_joined("AND", product) for product in products]), at
