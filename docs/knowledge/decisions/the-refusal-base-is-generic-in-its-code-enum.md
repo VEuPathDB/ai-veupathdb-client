@@ -34,6 +34,6 @@ a `StrEnum` that has members cannot be subclassed.
 
 `tests/unit/test_errors.py` constructs a subclass parametrized with an enum this
 package does not own, reads `.code` back, and asserts the static type with
-`assert_type`. That file is named in the mypy gate (`uv run mypy --strict src` plus the
-test files it lists) in `.pre-commit-config.yaml` and in CI, because a runtime
-assertion alone cannot see a type parameter.
+`assert_type`. The mypy gate (`uv run mypy --strict src tests`) in
+`.pre-commit-config.yaml` and in CI checks that file, because a runtime assertion alone
+cannot see a type parameter.

@@ -7,6 +7,7 @@ moved, which is what the lane exists to notice.
 from __future__ import annotations
 
 import pytest
+from tests.live._bodies import SearchDocument
 from tests.live.conftest import VERIFICATION_SITES, Probe
 
 from veupathdb.testing.summary import DriftLog
@@ -189,20 +190,18 @@ class TestWdkParam001TheTwoAxesAreIndependent:
             params={"expandParams": "true"},
         )
         assert result.status == 200
-        body = result.json_body()
-        assert isinstance(body, dict)
-        params = {p["name"]: p for p in body["searchData"]["parameters"]}
-        organism = params["organismSinglePick"]
+        search = SearchDocument.model_validate(result.json_body()).search_data
+        organism = search.by_name()["organismSinglePick"]
 
         drift_log.record(
             site=site,
             check="organismSinglePick-type",
             subject="GenesByLocation.organismSinglePick",
             expected="multi-pick-vocabulary/select",
-            observed=f"{organism['type']}/{organism.get('displayType')}",
+            observed=f"{organism.type}/{organism.display_type}",
         )
-        assert organism["type"] == "multi-pick-vocabulary"
-        assert organism["displayType"] == "select"
+        assert organism.type == "multi-pick-vocabulary"
+        assert organism.display_type == "select"
 
 
 @pytest.mark.parametrize("site", VERIFICATION_SITES)
@@ -214,9 +213,8 @@ class TestWdkStep006And008TheBooleanSearch:
             site, "GET", f"{_TRANSCRIPT}/{_BOOLEAN}", params={"expandParams": "true"}
         )
         assert result.status == 200
-        body = result.json_body()
-        assert isinstance(body, dict)
-        names = body["searchData"]["paramNames"]
+        search = SearchDocument.model_validate(result.json_body()).search_data
+        names = search.param_names
 
         drift_log.record(
             site=site,
@@ -242,9 +240,7 @@ class TestWdkStep006And008TheBooleanSearch:
             site, "GET", f"{_TRANSCRIPT}/{_BOOLEAN}", params={"expandParams": "true"}
         )
         assert result.status == 200
-        body = result.json_body()
-        assert isinstance(body, dict)
-        search = body["searchData"]
+        search = SearchDocument.model_validate(result.json_body()).search_data
 
         drift_log.record(
             site=site,
@@ -252,14 +248,14 @@ class TestWdkStep006And008TheBooleanSearch:
             subject=_BOOLEAN,
             expected="['transcript']/['transcript']/transcript",
             observed=(
-                f"{search['allowedPrimaryInputRecordClassNames']}/"
-                f"{search['allowedSecondaryInputRecordClassNames']}/"
-                f"{search['outputRecordClassName']}"
+                f"{search.allowed_primary_input_record_class_names}/"
+                f"{search.allowed_secondary_input_record_class_names}/"
+                f"{search.output_record_class_name}"
             ),
         )
-        assert search["allowedPrimaryInputRecordClassNames"] == ["transcript"]
-        assert search["allowedSecondaryInputRecordClassNames"] == ["transcript"]
-        assert search["outputRecordClassName"] == "transcript"
+        assert search.allowed_primary_input_record_class_names == ["transcript"]
+        assert search.allowed_secondary_input_record_class_names == ["transcript"]
+        assert search.output_record_class_name == "transcript"
 
 
 @pytest.mark.parametrize("site", VERIFICATION_SITES)
@@ -305,13 +301,8 @@ class TestWdkSite007TheRadioPairIsPublished:
             "plasmodb", "GET", f"{_TRANSCRIPT}/GenesByGoTerm?expandParams=true"
         )
         assert result.status == 200
-        body = result.json_body()
-        assert isinstance(body, dict)
-        search = body["searchData"]
-        assert isinstance(search, dict)
-        properties = search["properties"]
-        assert isinstance(properties, dict)
-        pair = properties["radio-params"]
+        search = SearchDocument.model_validate(result.json_body()).search_data
+        pair = search.properties["radio-params"]
 
         drift_log.record(
             site="plasmodb",

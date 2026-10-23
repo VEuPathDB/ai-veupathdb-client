@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import pytest
 from pydantic import JsonValue, TypeAdapter
+from tests.live._bodies import AnswerBody, PublishedParam, SearchDocument
 from tests.live.conftest import VERIFICATION_SITES, Probe
 
 from veupathdb.domain.parameters.wdk_vocab import WDKVocabulary, vocab_keys
@@ -45,9 +46,8 @@ _KINASE_TERM = "GO:0004672"
 _KINASE_BAND = (60, 200)
 
 
-def _params(body: JsonValue) -> dict[str, JsonValue]:
-    assert isinstance(body, dict)
-    return {p["name"]: p for p in body["searchData"]["parameters"]}
+def _params(body: JsonValue) -> dict[str, PublishedParam]:
+    return SearchDocument.model_validate(body).search_data.by_name()
 
 
 def _terms(vocabulary: JsonValue) -> set[str]:
@@ -86,7 +86,7 @@ class TestThePinnedVocabularyValuesAreStillThere:
             params={"expandParams": "true"},
         )
         assert result.status == 200
-        terms = _terms(_params(result.json_body())["organism"]["vocabulary"])
+        terms = _terms(_params(result.json_body())["organism"].vocabulary)
 
         drift_log.record(
             site=site,
@@ -107,7 +107,7 @@ class TestThePinnedVocabularyValuesAreStillThere:
             params={"expandParams": "true"},
         )
         assert result.status == 200
-        terms = sorted(_terms(_params(result.json_body())["scope"]["vocabulary"]))
+        terms = sorted(_terms(_params(result.json_body())["scope"].vocabulary))
 
         drift_log.record(
             site=site,
@@ -141,9 +141,7 @@ class TestTheSentinelCountsAreInBand:
             },
         )
         assert result.status == 200, result.text[:300]
-        body = result.json_body()
-        assert isinstance(body, dict)
-        count = int(body["meta"]["totalCount"])
+        count = AnswerBody.model_validate(result.json_body()).meta.total_count
 
         low, high = _KINASE_BAND
         drift_log.record(
@@ -174,9 +172,7 @@ class TestTheSentinelCountsAreInBand:
             },
         )
         assert result.status == 200, result.text[:300]
-        body = result.json_body()
-        assert isinstance(body, dict)
-        count = int(body["meta"]["totalCount"])
+        count = AnswerBody.model_validate(result.json_body()).meta.total_count
 
         drift_log.record(
             site="plasmodb",

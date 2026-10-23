@@ -117,7 +117,8 @@ plugins = ["pydantic.mypy"]
 warn_return_any = true
 warn_unused_ignores = true
 disable_error_code = ["import-untyped", "untyped-decorator"]
-exclude = ["tests/"]
+mypy_path = ["src", "."]
+explicit_package_bases = true
 
 [tool.pydantic-mypy]
 init_typed = false

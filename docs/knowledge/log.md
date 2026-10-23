@@ -1,5 +1,16 @@
 # Knowledge log
 
+## 2026-10-23 - The strict type check covers every test file
+
+- The mypy gate in CI and pre-commit is `uv run mypy --strict src tests`, in place of
+  `src` and a list of seven test files. `[tool.mypy]` no longer excludes `tests/`, and
+  reads `mypy_path = ["src", "."]` with `explicit_package_bases`, the roots pytest
+  imports from, so two test files of one name in two directories are two modules. The
+  131 errors the wider run found were in the tests: the live lane reads WDK bodies
+  through typed models in `tests/live/_bodies.py`, and the unit tests annotate their
+  `TypeAdapter`s and narrow the JSON they index. No source changed, and the hermetic
+  suite runs the same tests with the same outcomes.
+
 ## 2026-10-22 - A bigWig file's total summary is read with its header
 
 - 0.1.0b21: `BigWigReader.summary()` returns the file's total summary as a frozen

@@ -198,7 +198,7 @@ class TestWdkParam003SinglePickIsABareTerm:
     def test_wdk_param_003_two_terms_are_not_expressible(self) -> None:
         # Two elements is an unhandled WdkRuntimeException, so the type holds one.
         with pytest.raises(PydanticValidationError):
-            SinglePickValue(value=["Gene", "Transcript"])  # type: ignore[arg-type]
+            SinglePickValue(value=["Gene", "Transcript"])
 
     @pytest.mark.skipif(
         needs_qa_recording("wdk/search_genes_by_exon_count.json"),

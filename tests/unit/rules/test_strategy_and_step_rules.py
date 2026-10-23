@@ -259,4 +259,4 @@ async def test_wdk_step_007_an_already_deleted_step_is_not_a_failure(
     api = StrategyAPI(VEuPathDBClient("https://example.invalid/service"), "1")
     monkeypatch.setattr(api.client, "delete", gone)
 
-    assert await api.delete_step(9) is None
+    await api.delete_step(9)

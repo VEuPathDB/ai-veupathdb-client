@@ -31,7 +31,8 @@ def served(layout: Layout) -> tuple[BigWigReader, Store, bytes]:
 
 
 def summary_offset(body: bytes) -> int:
-    return struct.unpack_from("<Q", body, 44)[0]
+    offset: int = struct.unpack_from("<Q", body, 44)[0]
+    return offset
 
 
 EXPECTED = BigWigSummary(
@@ -115,7 +116,7 @@ def test_a_summary_that_covers_no_base_has_a_mean_depth_of_zero() -> None:
 
 def test_a_summary_is_frozen() -> None:
     with pytest.raises(ValidationError, match="frozen"):
-        EXPECTED.sum_data = 1.0
+        EXPECTED.__setattr__("sum_data", 1.0)
 
 
 def with_summary_offset(body: bytes, at: int) -> bytes:

@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
+from pydantic import TypeAdapter
 
 from veupathdb.domain.parameters.specs import (
     ParamSpecNormalized,
@@ -131,7 +132,7 @@ def test_wdk_vocab_003_the_order_of_dependent_params_carries_nothing() -> None:
     """A parent fills before its dependents, whatever order the list arrived in."""
     recorded = _recorded_parameters("search_genes_by_location")
     parent = recorded["organismSinglePick"]
-    dependents = list(parent["dependentParams"] or [])
+    dependents = TypeAdapter(list[str]).validate_python(parent["dependentParams"] or [])
 
     def specs(order: list[str]) -> dict[str, ParamSpecNormalized]:
         return {

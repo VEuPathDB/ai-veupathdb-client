@@ -20,6 +20,7 @@ from veupathdb.devtools.eda_schemas import (
     reload,
     vendor_raml,
 )
+from veupathdb.testing.eda_fixtures import UPSTREAM_DIR
 
 _INCLUDE = "hash-id.raml"
 
@@ -30,10 +31,10 @@ def vendored(
 ) -> Iterator[tuple[Path, Path, dict[str, bytes]]]:
     """A copy of the vendored RAML and its pin, plus the bytes upstream serves."""
     upstream_dir = tmp_path / "upstream"
-    shutil.copytree(eda_schemas.UPSTREAM_DIR, upstream_dir)
+    shutil.copytree(UPSTREAM_DIR, upstream_dir)
     pin_file = upstream_dir / "schema-pin.json"
     served = {
-        relative: (eda_schemas.UPSTREAM_DIR / relative).read_bytes()
+        relative: (UPSTREAM_DIR / relative).read_bytes()
         for relative in load_pin().files
     }
     monkeypatch.setattr(eda_schemas, "UPSTREAM_DIR", upstream_dir)

@@ -137,7 +137,8 @@ def test_the_patch_body_of_a_read_descriptor_is_the_stored_one() -> None:
     reason=NEEDS_QA_RECORDING,
 )
 def test_the_patch_body_of_the_recorded_analysis_is_the_stored_one() -> None:
-    recorded = TypeAdapter(JSONObject).validate_json(
+    adapter: TypeAdapter[JSONObject] = TypeAdapter(JSONObject)
+    recorded = adapter.validate_json(
         (FIXTURE_DIR / "analysis_detail_pass_and_de.json").read_text()
     )
     descriptor = EdaAnalysisDescriptor.model_validate(recorded["descriptor"])

@@ -97,6 +97,7 @@ async def test_two_strategy_apis_of_one_site_read_the_boolean_search_once(
     site: respx.MockRouter,
 ) -> None:
     details = load_recorded("search_boolean_transcript").json_body()
+    assert isinstance(details, dict)
     listed = site.get(f"{_SERVICE}/record-types/transcript/searches").mock(
         return_value=httpx.Response(200, json=[details["searchData"]])
     )
@@ -130,6 +131,7 @@ async def test_each_site_client_reads_its_own_boolean_search(
     site: respx.MockRouter,
 ) -> None:
     details = load_recorded("search_boolean_transcript").json_body()
+    assert isinstance(details, dict)
     listed = site.get(f"{_SERVICE}/record-types/transcript/searches").mock(
         return_value=httpx.Response(200, json=[details["searchData"]])
     )

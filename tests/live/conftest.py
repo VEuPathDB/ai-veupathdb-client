@@ -11,6 +11,7 @@ from collections.abc import AsyncGenerator, Awaitable, Callable, Generator
 
 import pytest
 from _pytest.reports import TestReport
+from pydantic import JsonValue
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.testing.summary import DriftLog, summary_path
@@ -101,7 +102,7 @@ def probe(wdk_identity: str) -> Probe:
         site: str,
         method: str,
         path: str,
-        params: dict[str, str] | None = None,
+        params: dict[str, JsonValue] | None = None,
         json: object = None,
     ) -> WDKProbe:
         return await get_wdk_client(site).probe(method, path, params=params, json=json)

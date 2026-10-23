@@ -34,9 +34,9 @@ from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
 
 PROVENANCE = "provenance.json"
-FILTER = TypeAdapter(EdaFilter)
+FILTER: TypeAdapter[EdaFilter] = TypeAdapter(EdaFilter)
 FILTERS = TypeAdapter(list[EdaFilter])
-VARIABLE = TypeAdapter(EdaVariable)
+VARIABLE: TypeAdapter[EdaVariable] = TypeAdapter(EdaVariable)
 
 READERS: dict[str, type[BaseModel]] = {
     "analysis_detail_pass_and_de.json": EdaAnalysisDetail,

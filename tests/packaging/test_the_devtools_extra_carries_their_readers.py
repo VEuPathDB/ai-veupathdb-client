@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from veupathdb.devtools.fixtures import FIXTURES
 from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
+from veupathdb.testing.wdk_fixtures import FIXTURES
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 

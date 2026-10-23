@@ -17,7 +17,7 @@ from veupathdb.eda.models import (
 )
 from veupathdb.json_types import JSONObject
 
-COMPUTE_CONFIG = TypeAdapter(EdaComputeConfig)
+COMPUTE_CONFIG: TypeAdapter[EdaComputeConfig] = TypeAdapter(EdaComputeConfig)
 _SPEC = {"entityId": "ENT_fd574cd6", "variableId": "VEUPATHDB_GENE_ID"}
 _CONFIG: JSONObject = {"variables": []}
 

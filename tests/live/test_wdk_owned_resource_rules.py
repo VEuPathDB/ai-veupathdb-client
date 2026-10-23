@@ -8,6 +8,7 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 
 import pytest
+from tests.live._bodies import CurrentUser, StepBody
 from tests.live.conftest import Probe
 
 from veupathdb.testing.summary import DriftLog
@@ -22,9 +23,7 @@ OwnedStrategy = Callable[[str], Awaitable[tuple[int, int]]]
 
 async def _user_id(probe: Probe) -> int:
     me = await probe(_SITE, "GET", "/users/current")
-    body = me.json_body()
-    assert isinstance(body, dict)
-    return int(body["id"])
+    return CurrentUser.model_validate(me.json_body()).id
 
 
 class TestWdkStep005ACountNeedsAStrategy:
@@ -155,9 +154,7 @@ class TestWdkValid007DisplayableIsASixthLevel:
             f"/users/{user}/steps/{step_id}",
             params={"validationLevel": "NOT_A_LEVEL"},
         )
-        body = result.json_body()
-        assert isinstance(body, dict)
-        level = body["validation"]["level"]
+        level = StepBody.model_validate(result.json_body()).validation.level
 
         drift_log.record(
             site=_SITE,

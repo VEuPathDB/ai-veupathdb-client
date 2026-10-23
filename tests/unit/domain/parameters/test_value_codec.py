@@ -156,7 +156,7 @@ class TestTheEmptyMultiPick:
 
     def test_values_must_still_be_strings(self) -> None:
         with pytest.raises(PydanticValidationError):
-            MultiPickValue(values=[{"nope": 1}])  # type: ignore[list-item]
+            MultiPickValue(values=[{"nope": 1}])
 
 
 class TestTheFilterValue:

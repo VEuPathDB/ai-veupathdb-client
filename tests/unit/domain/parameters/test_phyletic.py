@@ -247,32 +247,32 @@ class TestDeriveBinding:
 
 # The head of ``GenesByOrthologPattern``'s phyletic vocabularies, whose entries
 # carry a parent term in the third element.
-_PARENTED_TERMS: list[list[str | None]] = [
-    ["BACT", "Bacteria", None],
-    ["FIRM", "Firmicutes", "BACT"],
-    ["bant", "Bacillus anthracis", "FIRM"],
-    ["bsub", "Bacillus subtilis subsp. subtilis str. 168", "FIRM"],
-    ["EUKA", "Eukaryota", None],
-    ["MAMM", "Mammalia", "EUKA"],
-    ["hsap", "Homo sapiens REF", "MAMM"],
+_PARENTED_TERMS: list[tuple[str, str, str | None]] = [
+    ("BACT", "Bacteria", None),
+    ("FIRM", "Firmicutes", "BACT"),
+    ("bant", "Bacillus anthracis", "FIRM"),
+    ("bsub", "Bacillus subtilis subsp. subtilis str. 168", "FIRM"),
+    ("EUKA", "Eukaryota", None),
+    ("MAMM", "Mammalia", "EUKA"),
+    ("hsap", "Homo sapiens REF", "MAMM"),
 ]
 
-_PARENTED_INDENTS: list[list[str | None]] = [
-    ["BACT", "1", None],
-    ["FIRM", "2", "BACT"],
-    ["bant", "3", "FIRM"],
-    ["bsub", "3", "FIRM"],
-    ["EUKA", "1", None],
-    ["MAMM", "2", "EUKA"],
-    ["hsap", "3", "MAMM"],
+_PARENTED_INDENTS: list[tuple[str, str, str | None]] = [
+    ("BACT", "1", None),
+    ("FIRM", "2", "BACT"),
+    ("bant", "3", "FIRM"),
+    ("bsub", "3", "FIRM"),
+    ("EUKA", "1", None),
+    ("MAMM", "2", "EUKA"),
+    ("hsap", "3", "MAMM"),
 ]
 
 
 class TestTheTreeIsBuiltFromTheParentTerm:
     def _tree(self) -> PhyleticTree:
         return PhyleticTree.from_vocab(
-            [WDKVocabTerm(tuple(row)) for row in _PARENTED_TERMS],
-            [WDKVocabTerm(tuple(row)) for row in _PARENTED_INDENTS],
+            [WDKVocabTerm(row) for row in _PARENTED_TERMS],
+            [WDKVocabTerm(row) for row in _PARENTED_INDENTS],
         )
 
     def test_the_roots_are_the_entries_with_no_parent(self) -> None:
@@ -285,7 +285,7 @@ class TestTheTreeIsBuiltFromTheParentTerm:
 
     def test_an_absent_indent_map_keeps_the_parent_structure(self) -> None:
         tree = PhyleticTree.from_vocab(
-            [WDKVocabTerm(tuple(row)) for row in _PARENTED_TERMS], []
+            [WDKVocabTerm(row) for row in _PARENTED_TERMS], []
         )
 
         assert [node.code for node in tree.roots] == ["BACT", "EUKA"]

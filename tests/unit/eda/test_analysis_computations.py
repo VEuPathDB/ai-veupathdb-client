@@ -25,8 +25,10 @@ from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.eda_fixtures import FIXTURE_DIR
 
 FIXTURE = "analysis_detail_pass_and_de.json"
-COMPUTE = TypeAdapter(EdaComputeDescriptor)
-VISUALIZATION = TypeAdapter(EdaVisualizationDescriptor)
+COMPUTE: TypeAdapter[EdaComputeDescriptor] = TypeAdapter(EdaComputeDescriptor)
+VISUALIZATION: TypeAdapter[EdaVisualizationDescriptor] = TypeAdapter(
+    EdaVisualizationDescriptor
+)
 
 _DE_CONFIGURATION: JSONObject = {
     "identifierVariable": {

@@ -18,6 +18,7 @@ from veupathdb.devtools.fixtures import (
     schema_pin_drift,
     vendor_schemas,
 )
+from veupathdb.testing.wdk_fixtures import SCHEMA_DIR, SCHEMA_PIN_FILE
 
 _ASKED = "includes/string-array.json"
 
@@ -28,11 +29,11 @@ def vendored(
 ) -> tuple[Path, Path, dict[str, bytes]]:
     """A copy of the vendored tree and its pin, plus the bytes upstream serves."""
     schema_dir = tmp_path / "schema"
-    shutil.copytree(fixtures.SCHEMA_DIR, schema_dir)
+    shutil.copytree(SCHEMA_DIR, schema_dir)
     pin_file = tmp_path / "schema-pin.json"
-    pin_file.write_bytes(fixtures.SCHEMA_PIN_FILE.read_bytes())
+    pin_file.write_bytes(SCHEMA_PIN_FILE.read_bytes())
     upstream = {
-        relative: (fixtures.SCHEMA_DIR / relative).read_bytes()
+        relative: (SCHEMA_DIR / relative).read_bytes()
         for relative in load_schema_pin().files
     }
     monkeypatch.setattr(fixtures, "SCHEMA_DIR", schema_dir)

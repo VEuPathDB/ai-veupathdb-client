@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Generator
 
+import httpx
 import pytest
 
 from veupathdb.eda.client import EdaClient
@@ -62,5 +63,7 @@ async def test_a_client_holds_far_fewer_connections_than_before() -> None:
     client = VEuPathDBClient(base_url="https://example.invalid/service")
 
     pool = await client._get_client()
+    transport = pool._transport
 
-    assert pool._transport._pool._max_connections <= 100
+    assert isinstance(transport, httpx.AsyncHTTPTransport)
+    assert transport._pool._max_connections <= 100

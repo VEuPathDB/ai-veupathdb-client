@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+from typing import BinaryIO
 
 import pytest
 
@@ -20,7 +21,7 @@ def _count(name: str) -> RnaSeqCountFile:
     return RnaSeqCountFile(name=name, content=io.BytesIO(b"geneID\tS1\tS2\n"))
 
 
-def _named(files: list[tuple[str, object]]) -> dict[str, object]:
+def _named(files: list[tuple[str, BinaryIO | bytes]]) -> dict[str, BinaryIO | bytes]:
     return dict(files)
 
 

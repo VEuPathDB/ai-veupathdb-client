@@ -7,7 +7,6 @@ import asyncio
 import copy
 from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Any
 
 import httpx
 import pytest
@@ -15,6 +14,7 @@ import respx
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.errors import DataParsingError
+from veupathdb.json_types import JSONObject
 from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk import search_definitions_read_once
@@ -39,13 +39,17 @@ _PARAMS = {
 }
 
 
-def _recorded() -> dict[str, Any]:
-    return load_recorded("search_genes_by_molecular_weight").json_body()
+def _recorded() -> JSONObject:
+    body = load_recorded("search_genes_by_molecular_weight").json_body()
+    assert isinstance(body, dict)
+    return body
 
 
-def _shown_to(login: str) -> dict[str, Any]:
+def _shown_to(login: str) -> JSONObject:
     body = copy.deepcopy(_recorded())
-    body["searchData"]["displayName"] = f"seen by {login}"
+    search = body["searchData"]
+    assert isinstance(search, dict)
+    search["displayName"] = f"seen by {login}"
     return body
 
 

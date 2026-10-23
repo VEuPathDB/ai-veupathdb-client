@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+from pydantic import JsonValue
 
 from veupathdb.wdk.delayed_result import (
     DELAYED_RESULT_MESSAGE,
@@ -10,7 +11,10 @@ from veupathdb.wdk.delayed_result import (
     is_delayed_result,
 )
 
-_SENTINEL = {"status": "accepted", "message": DELAYED_RESULT_MESSAGE}
+_SENTINEL: dict[str, JsonValue] = {
+    "status": "accepted",
+    "message": DELAYED_RESULT_MESSAGE,
+}
 
 
 class TestRecognisedByShape:

@@ -17,7 +17,7 @@ _BLOCK = re.compile(r"```python\n(.*?)```", re.DOTALL)
 
 
 def _quickstart() -> str:
-    blocks = _BLOCK.findall(README.read_text())
+    blocks: list[str] = _BLOCK.findall(README.read_text())
     assert len(blocks) == 1
     return blocks[0]
 

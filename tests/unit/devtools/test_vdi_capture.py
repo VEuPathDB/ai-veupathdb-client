@@ -240,13 +240,25 @@ async def test_the_written_body_names_no_account(tmp_path: Path) -> None:
     reason=NEEDS_QA_RECORDING,
 )
 def test_every_label_names_the_axis_that_moved_last() -> None:
-    before_data = _body("rnaseqrc_data_running")
-    before_data["status"]["install"][0]["data"] = None
-    bodies = [
-        recorded("rnaseqrc_import_in_progress"),
+    running = VdiDatasetDetails.model_validate(recorded("rnaseqrc_data_running"))
+    install = running.status.install
+    before_data = running.model_copy(
+        update={
+            "status": running.status.model_copy(
+                update={
+                    "install": [
+                        install[0].model_copy(update={"data": None}),
+                        *install[1:],
+                    ]
+                }
+            )
+        }
+    )
+    details = [
+        VdiDatasetDetails.model_validate(recorded("rnaseqrc_import_in_progress")),
         before_data,
         *(
-            recorded(name)
+            VdiDatasetDetails.model_validate(recorded(name))
             for name in (
                 "rnaseqrc_data_running",
                 "rnaseqrc_installed",
@@ -255,10 +267,7 @@ def test_every_label_names_the_axis_that_moved_last() -> None:
             )
         ),
     ]
-    labels = [
-        status_label(VdiDatasetDetails.model_validate(body).status, "PlasmoDB")
-        for body in bodies
-    ]
+    labels = [status_label(detail.status, "PlasmoDB") for detail in details]
 
     assert labels == [
         "import_in_progress",

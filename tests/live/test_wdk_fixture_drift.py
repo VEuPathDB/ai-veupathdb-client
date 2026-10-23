@@ -23,8 +23,8 @@ pytestmark = [
 def _shape(body: JsonValue) -> str:
     """The keys a body carries, which is what a hermetic test reads."""
     match body:
-        case {**fields}:
-            return ",".join(sorted(fields))
+        case dict():
+            return ",".join(sorted(body))
         case [*items]:
             return f"list[{len(items)}]"
         case _:

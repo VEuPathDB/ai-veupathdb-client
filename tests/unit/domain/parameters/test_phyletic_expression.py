@@ -121,7 +121,7 @@ def test_a_malformed_expression_is_refused_on_its_parameter(
     with pytest.raises(ValidationError) as caught:
         PhyleticExpression.parse(text)
 
-    assert fault in caught.value.detail
+    assert fault in (caught.value.detail or "")
     assert PHYLETIC_EXPRESSION_PARAM in str(caught.value.errors)
 
 
@@ -171,10 +171,12 @@ def test_parentheses_the_site_drops_are_refused_with_its_reading() -> None:
             PhyleticExpression.parse(f"pfal>=1T AND ({_CEILING} OR {_NONE})"), _tree()
         )
 
-    assert f"it reads (pfal>=1T AND {_CEILING}) OR {_NONE}" in caught.value.detail
+    assert f"it reads (pfal>=1T AND {_CEILING}) OR {_NONE}" in (
+        caught.value.detail or ""
+    )
     assert (
         "the site drops parentheses and reads AND before OR; write an OR of AND "
-        "terms, repeating shared units in each term" in caught.value.detail
+        "terms, repeating shared units in each term" in (caught.value.detail or "")
     )
     assert PHYLETIC_EXPRESSION_PARAM in str(caught.value.errors)
 
@@ -186,8 +188,8 @@ def test_an_upper_bound_of_zero_is_refused_naming_the_form_for_absence(
     with pytest.raises(ValidationError) as caught:
         check_expression(PhyleticExpression.parse(f"pfal>=1T AND {unit}"), _tree())
 
-    assert f"{unit} matches no group" in caught.value.detail
-    assert "write TOXO=0T for absence" in caught.value.detail
+    assert f"{unit} matches no group" in (caught.value.detail or "")
+    assert "write TOXO=0T for absence" in (caught.value.detail or "")
 
 
 def test_an_upper_bound_is_false_on_a_group_with_no_protein_under_its_codes() -> None:
@@ -243,7 +245,7 @@ def test_a_code_the_taxonomy_lacks_is_refused_by_name() -> None:
     with pytest.raises(ValidationError) as caught:
         check_expression(PhyleticExpression.parse("pfal>=1T AND zzzz=0T"), _tree())
 
-    assert "zzzz" in caught.value.detail
+    assert "zzzz" in (caught.value.detail or "")
     assert PHYLETIC_EXPRESSION_PARAM in str(caught.value.errors)
 
 
@@ -302,7 +304,7 @@ def test_a_unit_every_group_meets_or_none_can_is_refused(unit: str) -> None:
     with pytest.raises(ValidationError) as caught:
         check_expression(PhyleticExpression.parse(f"pfal>=1T AND {unit}"), _tree())
 
-    assert "states no constraint" in caught.value.detail
+    assert "states no constraint" in (caught.value.detail or "")
     assert PHYLETIC_EXPRESSION_PARAM in str(caught.value.errors)
 
 
@@ -313,21 +315,21 @@ def test_a_ceiling_over_every_genome_it_spans_reads_as_presence() -> None:
     assert (
         "pfag+pfsg+pfac<=3T over 3 genomes holds exactly the groups with a protein "
         "of its codes, so it states no constraint beyond pfag+pfsg+pfac>=1T"
-    ) in caught.value.detail
+    ) in (caught.value.detail or "")
 
 
 def test_at_least_zero_proteins_reads_as_presence() -> None:
     with pytest.raises(ValidationError) as caught:
         check_expression(PhyleticExpression.parse("pfal>=0"), _tree())
 
-    assert "states no constraint beyond pfal>=1." in caught.value.detail
+    assert "states no constraint beyond pfal>=1." in (caught.value.detail or "")
 
 
 def test_the_refusal_names_one_genome_in_the_singular() -> None:
     with pytest.raises(ValidationError) as caught:
         check_expression(PhyleticExpression.parse("pfal>=2T"), _tree())
 
-    assert "pfal>=2T over 1 genome is true" in caught.value.detail
+    assert "pfal>=2T over 1 genome is true" in (caught.value.detail or "")
 
 
 @pytest.mark.parametrize(
@@ -386,8 +388,10 @@ def test_a_unit_naming_a_genome_twice_is_refused(unit: str, named: str) -> None:
     with pytest.raises(ValidationError) as caught:
         check_expression(PhyleticExpression.parse(unit), _tree())
 
-    assert f"{unit} names these codes more than once: {named}" in (caught.value.detail)
-    assert "name each genome once" in caught.value.detail
+    assert f"{unit} names these codes more than once: {named}" in (
+        caught.value.detail or ""
+    )
+    assert "name each genome once" in (caught.value.detail or "")
 
 
 @pytest.mark.parametrize("unit", ["pfal+HAEM=1T", "pfag+pfag>=1"])
@@ -397,4 +401,4 @@ def test_a_unit_naming_a_genome_twice_is_not_evaluated(unit: str) -> None:
             {"pfal": 1, "pfag": 1}, _tree()
         )
 
-    assert "name each genome once" in caught.value.detail
+    assert "name each genome once" in (caught.value.detail or "")

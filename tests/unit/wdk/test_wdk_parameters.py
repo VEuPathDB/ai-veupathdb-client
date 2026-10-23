@@ -107,7 +107,7 @@ def test_filter_param_parses_typed_ontology() -> None:
 
 
 def test_discriminated_union_routes_to_typed_subtypes() -> None:
-    adapter = TypeAdapter(WDKParameter)
+    adapter: TypeAdapter[WDKParameter] = TypeAdapter(WDKParameter)
     param = adapter.validate_python(
         {
             "name": "organism",

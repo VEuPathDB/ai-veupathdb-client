@@ -161,9 +161,8 @@ def test_a_unit_over_an_empty_clade_is_refused() -> None:
     with pytest.raises(ValidationError) as caught:
         check_expression(PhyleticExpression.parse("BACI>=1T"), _recorded_tree())
 
-    assert (
-        "BACI>=1T over 0 genomes is true of every group or of none"
-        in caught.value.detail
+    assert "BACI>=1T over 0 genomes is true of every group or of none" in (
+        caught.value.detail or ""
     )
 
 
@@ -171,7 +170,9 @@ def test_a_unit_over_an_empty_clade_with_a_count_of_zero_is_refused() -> None:
     with pytest.raises(ValidationError) as caught:
         check_expression(PhyleticExpression.parse("BACI=0T"), _recorded_tree())
 
-    assert "BACI=0T over 0 genomes is true of every group" in caught.value.detail
+    assert "BACI=0T over 0 genomes is true of every group" in (
+        caught.value.detail or ""
+    )
 
 
 def test_both_measured_groups_hold_one_protein_in_every_apicomplexan_genome() -> None:
