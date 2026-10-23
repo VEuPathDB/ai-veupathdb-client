@@ -48,6 +48,8 @@ class AnalysisEndpoints:
         path: str,
         json: object = None,
         params: JSONObject | None = None,
+        *,
+        idempotent: bool = True,
     ) -> JsonValue:
         """Provided by HTTPClient at runtime."""
         raise NotImplementedError  # pragma: no cover
@@ -127,7 +129,9 @@ class AnalysisEndpoints:
     ) -> WDKStepAnalysisConfig:
         """Create a new analysis instance for a step."""
         raw = await self.post(
-            f"/users/{user_id}/steps/{step_id}/analyses", json=payload
+            f"/users/{user_id}/steps/{step_id}/analyses",
+            json=payload,
+            idempotent=False,
         )
         return validate_response(
             WDKStepAnalysisConfig, raw, "WDK create analysis response"

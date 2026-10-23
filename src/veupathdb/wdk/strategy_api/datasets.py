@@ -34,7 +34,9 @@ class DatasetsMixin(StrategyAPIBase):
         """
         uid = await self._get_user_id(user_id)
         payload = config.model_dump(by_alias=True)
-        raw = await self.client.post(f"/users/{uid}/datasets", json=payload)
+        raw = await self.client.post(
+            f"/users/{uid}/datasets", json=payload, idempotent=False
+        )
         result = WDKIdentifier.model_validate(raw)
         logger.info(
             "Created WDK dataset",

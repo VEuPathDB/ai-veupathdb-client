@@ -1,9 +1,11 @@
 """Strategy CRUD methods for the Strategy API."""
 
+from http import HTTPStatus
+
 import pydantic
 from pydantic import TypeAdapter, ValidationError
 
-from veupathdb.errors import validate_response
+from veupathdb.errors import VEuPathDBError, validate_response
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
 from veupathdb.wdk._helpers import _validate_list
@@ -151,9 +153,14 @@ class StrategiesMixin(StrategyAPIBase):
     async def delete_strategy(
         self, strategy_id: int, user_id: str | None = None
     ) -> None:
-        """Delete a strategy."""
+        """Delete a strategy. A 404 means the strategy is already gone."""
         uid = await self._get_user_id(user_id)
-        await self.client.delete(f"/users/{uid}/strategies/{strategy_id}")
+        try:
+            await self.client.delete(f"/users/{uid}/strategies/{strategy_id}")
+        except VEuPathDBError as exc:
+            if exc.status == HTTPStatus.NOT_FOUND:
+                return
+            raise
 
     async def get_duplicated_step_tree(
         self, strategy_id: int, user_id: str | None = None
@@ -166,6 +173,7 @@ class StrategiesMixin(StrategyAPIBase):
         raw = await self.client.post(
             f"/users/{uid}/strategies/{strategy_id}/duplicated-step-tree",
             json={},
+            idempotent=False,
         )
         try:
             return _DuplicatedStepTreeResponse.model_validate(raw).step_tree

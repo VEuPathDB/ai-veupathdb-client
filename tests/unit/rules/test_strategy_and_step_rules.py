@@ -23,6 +23,8 @@ from veupathdb.wdk.wdk_models import WDKStepTree
 
 _IN_A_STRATEGY = "the step is part of a strategy"
 _ALREADY_GONE = "no such step"
+_STRATEGY_GONE = "Strategy 7 does not exist."
+_NOT_YOURS = "Not yours."
 
 _STRATEGY: dict[str, Any] = {
     "strategyId": 5,
@@ -260,3 +262,32 @@ async def test_wdk_step_007_an_already_deleted_step_is_not_a_failure(
     monkeypatch.setattr(api.client, "delete", gone)
 
     await api.delete_step(9)
+
+
+async def test_an_already_deleted_strategy_is_not_a_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def gone(path: str, **_: object) -> None:
+        del path
+        raise WDKError(_STRATEGY_GONE, status=HTTPStatus.NOT_FOUND)
+
+    api = StrategyAPI(VEuPathDBClient("https://example.invalid/service"), "1")
+    monkeypatch.setattr(api.client, "delete", gone)
+
+    await api.delete_strategy(7)
+
+
+async def test_a_refused_strategy_delete_still_raises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def forbidden(path: str, **_: object) -> None:
+        del path
+        raise WDKError(_NOT_YOURS, status=HTTPStatus.FORBIDDEN)
+
+    api = StrategyAPI(VEuPathDBClient("https://example.invalid/service"), "1")
+    monkeypatch.setattr(api.client, "delete", forbidden)
+
+    with pytest.raises(WDKError) as caught:
+        await api.delete_strategy(7)
+
+    assert caught.value.status == HTTPStatus.FORBIDDEN

@@ -890,7 +890,7 @@ wheels = [
 
 [[package]]
 name = "veupathdb-py"
-version = "0.1.0b21"
+version = "0.1.0b22"
 source = { editable = "." }
 dependencies = [
     { name = "httpx" },

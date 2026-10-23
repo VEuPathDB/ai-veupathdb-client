@@ -23,6 +23,7 @@ from veupathdb.wdk._http import HTTPClient, _inject_auth_cookie
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.delayed_result import DELAYED_RESULT_MESSAGE
 from veupathdb.wdk.strategy_api.api import StrategyAPI
+from veupathdb.wdk.wdk_models import WDKDatasetConfigIdList, WDKDatasetIdListContent
 
 CLIENT_TOKEN = "client.constructor.token"
 USER_TOKEN = "registered.user.token"
@@ -306,6 +307,42 @@ class TestACreateIsAttemptedOnce:
         assert await client.post("/users/1/steps", json={}, idempotent=False) == {
             "id": 1
         }
+
+
+@pytest.mark.usefixtures("wdk_request_token")
+class TestAnAccountWriteIsSentOnce:
+    async def test_a_dataset_upload_is_sent_once_on_a_proxy_error(self) -> None:
+        transport = _FlakyTransport(fail_times=2)
+        api = StrategyAPI(await _client(transport))
+
+        with pytest.raises(WDKError):
+            await api.create_dataset(
+                WDKDatasetConfigIdList(
+                    source_type="idList",
+                    source_content=WDKDatasetIdListContent(ids=["PF3D7_1133400"]),
+                ),
+                user_id="1",
+            )
+
+        assert transport.attempts == 1
+
+    async def test_a_duplicated_step_tree_is_sent_once_on_a_proxy_error(self) -> None:
+        transport = _FlakyTransport(fail_times=2)
+        api = StrategyAPI(await _client(transport))
+
+        with pytest.raises(WDKError):
+            await api.get_duplicated_step_tree(7, user_id="1")
+
+        assert transport.attempts == 1
+
+    async def test_a_step_analysis_create_is_sent_once_on_a_proxy_error(self) -> None:
+        transport = _FlakyTransport(fail_times=2)
+        client = await _client(transport)
+
+        with pytest.raises(WDKError):
+            await client.create_step_analysis("1", 9, {"analysisName": "go-enrichment"})
+
+        assert transport.attempts == 1
 
 
 @pytest.mark.usefixtures("wdk_request_token")

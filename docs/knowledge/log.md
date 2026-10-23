@@ -1,5 +1,20 @@
 # Knowledge log
 
+## 2026-10-23 - A write that adds to a user's account is sent once
+
+- 0.1.0b22: `StrategyAPI.create_dataset` (`POST /users/{id}/datasets`),
+  `StrategyAPI.get_duplicated_step_tree` (`POST /users/{id}/strategies/{id}/duplicated-step-tree`,
+  which adds a copy of each step) and `create_step_analysis`
+  (`POST /users/{id}/steps/{id}/analyses`) post with `idempotent=False`, so a proxy 502,
+  a timeout or a refused connection is not retried into a second object. WDK has no call
+  that deletes a dataset. The step and strategy creates already did so. A test sends each
+  of the three against a transport that answers 502 and counts one request
+  (`tests/unit/wdk/test_http.py`, `TestAnAccountWriteIsSentOnce`). The other POSTs stay
+  retried or were already single: `/login` and `/temporary-results` add nothing to the
+  account, and a search report is sent once already.
+- `StrategyAPI.delete_strategy` reads a 404 as a strategy already gone, as `delete_step`
+  does, so a retried delete whose first try went through does not raise.
+
 ## 2026-10-23 - The strict type check covers every test file
 
 - The mypy gate in CI and pre-commit is `uv run mypy --strict src tests`, in place of
