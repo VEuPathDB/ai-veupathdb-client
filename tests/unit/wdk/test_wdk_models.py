@@ -318,6 +318,7 @@ def test_a_column_names_its_word_cloud_reporter() -> None:
                 }
             ],
             "tools": {"reports": [], "filters": []},
+            "columnDataType": "STRING",
         }
     )
     assert field.format_named("wordCloud") == "abbreviation-wordCloud"

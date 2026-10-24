@@ -247,7 +247,7 @@ so absence is not zero and is not staleness - see
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/request/filter/ColumnFilterServiceFormat.java#L11-L37
 - anchor: src/veupathdb/wdk/wdk_models.py:WDKSearchConfig
-- status: ENFORCED by tests/unit/wdk/test_strategy_api_records.py::test_wdk_filter_006_a_refusal_is_not_treated_as_a_broken_request
+- status: ENFORCED by tests/unit/wdk/test_strategy_api_records.py::test_wdk_filter_006_a_refusal_raises_with_its_status
 
 The parse method's contract lists four rejection reasons and two of them are
 about the column: unknown, and not filterable.
@@ -285,8 +285,9 @@ half of this rule stronger rather than weaker. The nightly lane asserts a
 refusal and records the status, so the next move is dated.
 
 The operational consequence is that the record-type document cannot be used to
-decide what a step will take. Try it against the step, and treat a refusal here
-as "not on this search" rather than as a malformed request. One cost follows
-from the change: a 500 is retried three times before
-`get_column_distribution` returns an empty result, where the 400 was refused at
-once.
+decide what a step will take. Try it against the step. `get_column_distribution`
+raises the refusal as a `WDKError` with the status the site sent, and a body that
+does not parse as a `DataParsingError`; neither reads as an empty count, because
+an empty histogram is a real answer for a step of 0 records. The caller decides
+whether a refusal means "not on this search". A 500 is retried three times before
+it raises, where the 400 was refused at once.

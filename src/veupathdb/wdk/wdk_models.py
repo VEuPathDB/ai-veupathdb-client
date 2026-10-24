@@ -210,6 +210,7 @@ class WDKAttributeField(WDKModel):
     formats: list[WDKReporter] = Field(default_factory=list)
     properties: dict[str, list[str]] = Field(default_factory=dict)
     tools: WDKColumnTools = Field(default_factory=WDKColumnTools)
+    column_data_type: Literal["STRING", "NUMBER", "DATE", "OTHER"]
 
     def format_named(self, kind: str) -> str | None:
         return next((fmt.name for fmt in self.formats if fmt.type == kind), None)

@@ -4,18 +4,13 @@ Provides :class:`RecordsMixin` with methods for record type metadata,
 individual record retrieval, and column value distributions.
 """
 
-import pydantic
-
-from veupathdb.errors import WDKError, validate_response
-from veupathdb.logging import get_logger
+from veupathdb.errors import validate_response
 from veupathdb.wdk.strategy_api.base import StrategyAPIBase
 from veupathdb.wdk.wdk_models import (
     WDKColumnDistribution,
     WDKRecordInstance,
     WDKRecordType,
 )
-
-logger = get_logger(__name__)
 
 
 class RecordsMixin(StrategyAPIBase):
@@ -73,34 +68,27 @@ class RecordsMixin(StrategyAPIBase):
         )
 
     async def get_column_distribution(
-        self, step_id: int, column_name: str
+        self,
+        step_id: int,
+        column_name: str,
+        *,
+        budget_seconds: float | None = None,
     ) -> WDKColumnDistribution:
-        """Get distribution data for a column using the byValue column reporter.
+        """Counts the step's records by each value of one column, with the
+        site's ``byValue`` column reporter. A refused or unparseable report
+        raises; it never reads as an empty count.
 
-        Uses ``POST .../columns/{col}/reports/byValue`` which returns a
-        ``histogram`` array and ``statistics`` object.  This replaces the
-        deprecated ``filter-summary`` endpoint.
-
-        Not all columns support the byValue reporter (e.g. overview or
-        composite columns).  When WDK returns an error, an empty result
-        is returned so the frontend can show a friendly message.
-
-        :param step_id: WDK step ID (must be part of a strategy).
-        :param column_name: Attribute/column name.
-        :returns: Validated column distribution with histogram and statistics.
+        :param budget_seconds: How long the report may take once it is sent.
         """
         await self._ensure_session()
-        try:
-            result = await self.client.post(
-                f"/users/{self._resolved_user_id}/steps/{step_id}"
-                f"/columns/{column_name}/reports/byValue",
-                json={"reportConfig": {}},
-            )
-            return WDKColumnDistribution.model_validate(result)
-        except WDKError, pydantic.ValidationError:
-            logger.warning(
-                "Column reporter unavailable",
-                step_id=step_id,
-                column_name=column_name,
-            )
-            return WDKColumnDistribution()
+        result = await self.client.post(
+            f"/users/{self._resolved_user_id}/steps/{step_id}"
+            f"/columns/{column_name}/reports/byValue",
+            json={"reportConfig": {}},
+            budget_seconds=budget_seconds,
+        )
+        return validate_response(
+            WDKColumnDistribution,
+            result,
+            f"WDK column report for step {step_id}/{column_name}",
+        )

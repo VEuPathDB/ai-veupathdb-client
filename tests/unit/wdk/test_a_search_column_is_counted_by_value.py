@@ -98,8 +98,12 @@ def test_an_attribute_names_the_column_tools_the_site_offers() -> None:
             "name": "organism_prefix",
             "displayName": "Organism(s)",
             "tools": {"reports": ["byValue"], "filters": ["byValue"]},
+            "columnDataType": "STRING",
         }
     )
 
     assert (field.tools.reports, field.tools.filters) == (["byValue"], ["byValue"])
-    assert WDKAttributeField.model_validate({"name": "overview"}).tools.reports == []
+    overview = WDKAttributeField.model_validate(
+        {"name": "overview", "columnDataType": "OTHER"}
+    )
+    assert overview.tools.reports == []

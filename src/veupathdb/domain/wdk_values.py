@@ -44,9 +44,9 @@ class WDKHistogramStatistics(_WDKValue):
     """Statistics summary for a column distribution."""
 
     subset_size: int = 0
-    subset_min: float | None = None
-    subset_max: float | None = None
-    subset_mean: float | None = None
+    subset_min: float | str | None = None
+    subset_max: float | str | None = None
+    subset_mean: float | str | None = None
     num_var_values: int = 0
     num_distinct_values: int = 0
     num_distinct_entity_records: int = 0

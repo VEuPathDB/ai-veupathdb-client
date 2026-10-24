@@ -1,5 +1,24 @@
 # Knowledge log
 
+## 2026-10-24 - A column names its data type, and a failed column report raises
+
+- 0.1.0b24, **breaking for hosts**: `StrategyAPI.get_column_distribution` raises where it
+  returned an empty `WDKColumnDistribution`. A refusal raises the `WDKError` with the
+  status the site sent, and a body that does not parse raises `DataParsingError`, as
+  `run_search_column_report` does; an empty histogram now means a step of 0 records and
+  nothing else. A host that read the empty result as "this column has no report here"
+  catches the error instead. It takes `budget_seconds`, as the search form does. See
+  [WDK-FILTER-006](wdk/rules/filters.md).
+- **Breaking for hosts**: `WDKAttributeField.column_data_type` reads `columnDataType`,
+  `Literal["STRING", "NUMBER", "DATE", "OTHER"]`, and it is required. WDK writes it on
+  every expanded attribute and every recorded attribute carries it, so a host that builds
+  a `WDKAttributeField`, a `WDKSearch` with `dynamic_attributes` or a `WDKRecordType` with
+  `attributes` from a hand-written body adds the key. See
+  [searches and record classes](wdk/model/searches-and-record-classes.md).
+- `WDKHistogramStatistics.subset_min`, `subset_max` and `subset_mean` are
+  `float | str | None`: a `DATE` column's statistics are date strings, and the parse
+  refused them.
+
 ## 2026-10-23 - A long phyletic expression is read in linear time
 
 - 0.1.0b23: `PhyleticExpression.parse` reads its tokens by position, so a parse is linear

@@ -35,6 +35,23 @@ against a record type: `matched_result` and `wdk_weight` are real attributes of
 `GenesByMolecularWeight` and belong to no record class at all, confirmed live on
 plasmodb.org and toxodb.org on 2026-08-10.
 
+# An expanded attribute names its data type
+
+[`AttributeFieldFormatter.getAttributeJson`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/formatter/AttributeFieldFormatter.java)
+writes `columnDataType` on every expanded attribute: the record type's `attributes`, a
+table's `attributes` and a search's `dynamicAttributes`. The value is the enum name of
+`AttributeFieldDataType`: `STRING`, `NUMBER`, `DATE` or `OTHER`. It is never absent, because
+`AttributeField` starts at `OTHER`, a text attribute sets `STRING` and a column attribute
+refuses a null type. A list that is not expanded is a list of names, so it carries no type.
+`WDKAttributeField.column_data_type` requires the key, and the recorded record type and
+searches carry it on every attribute.
+
+The type picks the `byValue` reporter, and a `DATE` column's statistics are dates:
+[`DateBinDistribution`](https://github.com/VEuPathDB/FgpUtil/blob/030e49b5a19001eceb72bf130764501bffb9382c/Core/src/main/java/org/gusdb/fgputil/distribution/DateBinDistribution.java#L95-L118)
+writes `subsetMin`, `subsetMax` and `subsetMean` as formatted date strings, and the
+reporter's output schema allows a number or a string for each. So
+`WDKHistogramStatistics` reads them as `float | str | None`.
+
 # Two names, and only one of them is a URL
 
 [`QuestionFormatter`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/formatter/QuestionFormatter.java#L64-L96)
