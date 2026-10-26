@@ -424,7 +424,7 @@ drops from the seed any parameter named in `validation.errors.byKey`. A step who
 `included_species` is invalid therefore reopens with that parameter's default rather than
 its stored value, and the pattern is then regenerated from the reduced set.
 
-### WDK-SITE-007 - A `radio-params` pair is two required parameters ORed by one query, so filling both widens the search
+### WDK-SITE-007 - A `radio-params` pair is two required parameters ORed by one query, and each half has a declared off value, so each half is a reading of its own
 
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/ApiCommonModel/blob/53de242dfce4e2be81ad28ad8a608c87af3e0b7c/Model/lib/wdk/model/questions/queries/geneQueries.xml#L1807-L1814
@@ -437,12 +437,13 @@ from, once as free text with wildcards. ApiCommonModel declares the pair in a
 [the same comment and the typeahead first](https://github.com/VEuPathDB/ApiCommonModel/blob/28af02f5d613ab150f39350e25f462f39d75650c/Model/lib/wdk/model/questions/geneQuestions.xml#L2303-L2307),
 and the property is published on the wire: live on plasmodb.org on 2026-08-17,
 `GET /record-types/transcript/searches/GenesByGoTerm` carries
-`properties["radio-params"] = ["go_typeahead", "go_term"]`. Four transcript
-searches declare one at this sha - `GenesByGoTerm`, `GenesByInterproDomain`,
-`GenesByEcNumber` and `GenesByMetabolicPathway` - and other record types declare
-more. The citations in this rule are pinned to the current head of each file
-rather than to the sha the rules above use, because the line ranges moved
-between the two.
+`properties["radio-params"] = ["go_typeahead", "go_term"]`, and live on
+qa.plasmodb.org on 2026-10-27 `GenesByInterproDomain` carries
+`["domain_typeahead", "domain_accession"]`. Four transcript searches declare one at
+this sha - `GenesByGoTerm`, `GenesByInterproDomain`, `GenesByEcNumber` and
+`GenesByMetabolicPathway` - and other record types declare more. The citations in
+this rule are pinned to the current head of each file rather than to the sha the
+rules above use, because the line ranges moved between the two.
 
 **The two halves are `OR`, not `AND`.** The `GenesByGoTerm` SQL matches
 `go_id IN ($$go_typeahead$$)` **or** the `go_term` wildcard, and
@@ -453,19 +454,23 @@ are built the same way. So filling both does not narrow the search, which is the
 intuition a form suggests. It returns the union, and the extra records are
 whatever the free-text half happened to match.
 
-**There is no off position.** Both halves are `allowEmptyValue: false` on all
-three searches, live on plasmodb.org on 2026-08-17, and two of the published
-defaults are refused by the search that published them: `go_typeahead: "[]"` and
-`domain_typeahead: "[]"` both come back `Cannot be empty.`, and so does
-`domain_accession`, whose declared default is
-[the empty string](https://github.com/VEuPathDB/ApiCommonModel/blob/28af02f5d613ab150f39350e25f462f39d75650c/Model/lib/wdk/model/questions/params/geneParams.xml#L5593-L5595).
-The only way to switch a half off is a value that matches nothing.
+**Each half has an off value, and both are `N/A`.** Both halves are
+`allowEmptyValue: false`, and `go_typeahead: "[]"`, `domain_typeahead: "[]"` and
+`domain_accession: ""` all come back `Cannot be empty.`.
 [`go_term`](https://github.com/VEuPathDB/ApiCommonModel/blob/28af02f5d613ab150f39350e25f462f39d75650c/Model/lib/wdk/model/questions/params/geneParams.xml#L2085-L2089)
 and
 [`ec_wildcard`](https://github.com/VEuPathDB/ApiCommonModel/blob/28af02f5d613ab150f39350e25f462f39d75650c/Model/lib/wdk/model/questions/params/geneParams.xml#L966-L969)
-declare `N/A` for that purpose and the GO query tests for it explicitly; nothing
-declares one for `domain_accession`, where `N/A` works only because it matches no
-accession, family or description.
+declare `N/A` as their default, and `N/A` switches `domain_accession` off because it
+matches no accession, family or description. The vocabulary halves carry `N/A` as an
+entry: the vocabulary queries `GeneVQ.DomainAccession`, `GeneVQ.EcNumberList` and
+`GeneVQ.GoTermList` each end with `UNION SELECT 'N/A', 'N/A', 'N/A'`, and the model's
+own test values bind `go_typeahead` to `N/A` to run the free text alone. No InterPro
+or GO identifier is `N/A`, so that entry matches no gene. Live on qa.plasmodb.org on
+2026-10-27, under organism `Plasmodium falciparum 3D7` and `domain_database` INTERPRO,
+`domain_typeahead` has 4,718 entries, the last of them `N/A`, and
+`domain_typeahead: ["N/A"]` with `domain_accession: "*protein kinase*"` validates
+`isValid: true`. `GeneVQ.MetbPathwaysList` has no `N/A` row, and the EC wire was not
+measured.
 
 Measured on plasmodb.org on 2026-08-17, organism `Plasmodium falciparum 3D7`,
 counts as `totalCount / displayTotalCount`:
@@ -479,31 +484,39 @@ counts as `totalCount / displayTotalCount`:
 | `GenesByEcNumber` | `ec_number_pattern: 2.7.11.1` (its published default), `ec_wildcard: N/A` | 136 / 133 |
 | `GenesByEcNumber` | the same plus `ec_wildcard: *protease*` | **145 / 141** |
 
-The last pair is the sharpest form of the hazard. `ec_number_pattern` cannot be
-empty and its `initialDisplayValue` is a real EC number, so a search that asks
-only for proteases still carries 133 protein kinases, and no field of the
-response says so.
+The last pair is the sharpest form of the OR: a search that asks only for proteases
+still carries 133 protein kinases, and no field of the response says so.
 
-**The vocabulary half is the authoritative one.** It is the half listed first in
-`radio-params`, the half whose values are checked against a vocabulary, and on
-`GenesByEcNumber` the half that cannot be silenced at all, because its own
-default is a real EC number. So the vocabulary half carries the criterion and
-the free text is switched off, never the other way round.
+**A vocabulary label names one description of an entry, and the free text reads
+all of them.** `GeneVQ.DomainAccession` groups by the accession and its description,
+so an InterPro entry has one row per member-signature description, and WDK keeps one
+label per term. Live on qa.plasmodb.org on 2026-10-27, under 3D7 and INTERPRO, 1,166
+of the 4,717 named entries carry a name of one token past the accession, 321 of them
+`-`, and IPR000719 is labelled `IPR000719 : serkin_6`. No label lookup for "protein
+kinase" reaches it. The free-text half matches `interpro_desc` over every row.
+Anonymous report counts on the same parents, in transcripts:
 
-This is `SILENT` because every combination above returns 200 with a plausible
-count. `set_criterion` reads `radio-params` off the search definition and binds
-`N/A` into the free-text half of every declared pair, so a half nobody wrote
-into states nothing rather than opening a slot; a proposal that writes the
-criterion into the free text comes back as a retry naming the vocabulary entries
-nearest to it, and a wildcard is answered by a vocabulary read rather than by a
-typed value.
+| values | result |
+|---|---|
+| `domain_typeahead: ["IPR000719"]`, `domain_accession: N/A` | 98 / 97 |
+| `domain_typeahead: ["N/A"]`, `domain_accession: *protein kinase domain*` | 99 / 98, every IPR000719 gene but one |
+| `domain_typeahead: ["N/A"]`, `domain_accession: *protein kinase*` | 127 / 126, every IPR000719 gene |
 
-One capability is given up with it, knowingly: `domain_accession` matches an
-InterPro family name or a description as well as an accession, so a wildcard over
-descriptions - every domain whose description mentions a word - has no equivalent
-in the typeahead vocabulary and is no longer expressible in FRAME. That is the
-accepted cost of a criterion that cannot silently gain 63 records from a half
-nobody read.
+The `GenesByEcNumber` free text lower-cases the value and removes its spaces before it
+compares, so a phrase of two words matches no description there.
+
+**So each half is a reading of its own, and never both at once.** A binding by the
+vocabulary half sets the free text to `N/A`. A binding by the free text sets the
+vocabulary half to `N/A`, and it is offered only when that vocabulary holds `N/A`;
+otherwise the vocabulary half cannot be switched off and the free text can only be
+ORed in. The two readings are counted apart and shown apart, so a researcher sees the
+entry reading and the description reading side by side.
+
+This is `SILENT` because every combination above returns 200 with a plausible count.
+`veupathdb-mcp` reads the pairs off the search definition, binds `N/A` into the
+free-text half that states nothing, refuses a free-text value beside a vocabulary
+value, and offers the two readings of a term apart
+(`veupathdb-mcp: docs/knowledge/decisions/a-radio-pair-offers-a-term-as-two-readings.md`).
 
 ### WDK-SITE-008 - An OrthoMCL clade row may hold no genome, and a genome is a `Taxons` row, never a childless clade
 

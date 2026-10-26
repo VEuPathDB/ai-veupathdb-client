@@ -1,5 +1,15 @@
 # Knowledge log
 
+## 2026-10-27 - Each half of a radio pair is a reading of its own
+
+- 0.1.0b25: [WDK-SITE-007](wdk/rules/site-model-params.md) records that the vocabulary
+  half of a `radio-params` pair has a declared off entry, `N/A`, from the `UNION SELECT
+  'N/A'` row of its vocabulary query, so the free text runs alone; that an accession
+  label names one member description, 1,166 of 4,717 InterPro entries under 3D7 with a
+  one-token name and IPR000719 labelled `serkin_6`; and the measured counts of the two
+  readings. The free text is offered as its own reading and never ORed with a
+  vocabulary value. No code changes.
+
 ## 2026-10-24 - A column names its data type, and a failed column report raises
 
 - 0.1.0b24, **breaking for hosts**: `StrategyAPI.get_column_distribution` raises where it
