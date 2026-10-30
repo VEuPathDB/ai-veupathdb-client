@@ -45,7 +45,7 @@ and the WDK service base returns 404 for it; its two forms are in
 | POST | `/users/{userId}/strategies` | Create a strategy | `NewStrategySpec` | `{id}` | `strategy_api/strategies.py:create_strategy` |
 | PATCH | `/users/{userId}/strategies` | Batch delete by id | `DeleteStrategySpec[]` | - | unused; this client deletes one at a time |
 | GET | `/users/{userId}/strategies/{strategyId}` | Full strategy | - | `StrategyDetails` with `stepTree` and `steps` | `strategy_api/strategies.py:get_strategy` |
-| PATCH | `/users/{userId}/strategies/{strategyId}` | Rename, save, or overwrite | `StrategyProperties` subset | `{id}` | `strategy_api/strategies.py:update_strategy`, `set_saved` |
+| PATCH | `/users/{userId}/strategies/{strategyId}` | Rename, describe, save, or overwrite | `StrategyProperties` subset | `{id}` | `strategy_api/strategies.py:update_strategy`, `set_saved` |
 | DELETE | `/users/{userId}/strategies/{strategyId}` | Delete a strategy | - | - | `strategy_api/strategies.py:delete_strategy` |
 | PUT | `/users/{userId}/strategies/{strategyId}/step-tree` | Replace the whole tree at once | `{stepTree}` | - | `strategy_api/strategies.py:update_strategy` |
 | POST | `/users/{userId}/strategies/{strategyId}/duplicated-step-tree` | Copy a branch, returning a new tree of new step ids | `{}` | `{stepTree}` | `strategy_api/strategies.py:get_duplicated_step_tree` |

@@ -66,3 +66,61 @@ async def test_wdk_strat_007_reusing_a_branch_asks_for_new_ids(
     assert tree.step_id == 77
     assert tree.primary_input is not None
     assert tree.primary_input.step_id == 78
+
+
+_DETAILS: dict[str, Any] = {
+    "strategyId": 5,
+    "rootStepId": 3,
+    "name": "demo",
+    "stepTree": {"stepId": 3},
+    "steps": {},
+}
+
+
+def _patching_api(
+    monkeypatch: pytest.MonkeyPatch,
+) -> tuple[StrategyAPI, list[tuple[str, object]]]:
+    client = VEuPathDBClient("https://example.invalid/service")
+    patches: list[tuple[str, object]] = []
+
+    async def patch(path: str, **kwargs: object) -> None:
+        patches.append((path, kwargs["json"]))
+
+    async def get(path: str, **_: object) -> Any:
+        del path
+        return _DETAILS
+
+    monkeypatch.setattr(client, "patch", patch)
+    monkeypatch.setattr(client, "get", get)
+    return StrategyAPI(client, "1"), patches
+
+
+@pytest.mark.parametrize(
+    ("name", "description", "body"),
+    [
+        ("Kinases", None, {"name": "Kinases"}),
+        (None, "Kinase genes.", {"description": "Kinase genes."}),
+        ("Kinases", "", {"name": "Kinases", "description": ""}),
+    ],
+)
+async def test_an_update_patches_only_the_labels_it_is_given(
+    monkeypatch: pytest.MonkeyPatch,
+    name: str | None,
+    description: str | None,
+    body: dict[str, str],
+) -> None:
+    api, patches = _patching_api(monkeypatch)
+
+    await api.update_strategy(5, name=name, description=description)
+
+    assert patches == [("/users/1/strategies/5", body)]
+
+
+async def test_an_update_with_no_label_sends_no_patch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    api, patches = _patching_api(monkeypatch)
+
+    await api.update_strategy(5)
+
+    assert patches == []

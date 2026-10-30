@@ -1,5 +1,13 @@
 # Knowledge log
 
+## 2026-10-30 - An update sends the strategy's description
+
+- 0.1.0b26: `StrategyAPI.update_strategy` takes a keyword `description`. It goes in the
+  same `PATCH /users/{userId}/strategies/{strategyId}` body as the name, under the key
+  `StrategyService.applyStrategyChange` reads. A `None` description is not sent, so WDK
+  keeps the one it holds; an empty string clears it. A host could set a description only
+  when it created a strategy before this release.
+
 ## 2026-10-27 - Each half of a radio pair is a reading of its own
 
 - 0.1.0b25: [WDK-SITE-007](wdk/rules/site-model-params.md) records that the vocabulary

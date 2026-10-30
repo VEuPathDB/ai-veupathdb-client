@@ -118,6 +118,8 @@ class StrategiesMixin(StrategyAPIBase):
         step_tree: WDKStepTree | None = None,
         name: str | None = None,
         user_id: str | None = None,
+        *,
+        description: str | None = None,
     ) -> WDKStrategyDetails:
         """Update a strategy."""
         uid = await self._get_user_id(user_id)
@@ -132,10 +134,15 @@ class StrategiesMixin(StrategyAPIBase):
                 },
             )
 
+        labels: JSONObject = {}
         if name:
+            labels["name"] = name
+        if description is not None:
+            labels["description"] = description
+        if labels:
             await self.client.patch(
                 f"/users/{uid}/strategies/{strategy_id}",
-                json={"name": name},
+                json=labels,
             )
 
         return await self.get_strategy(strategy_id, user_id=user_id)
