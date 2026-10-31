@@ -110,6 +110,19 @@ class _TreeIndex:
         return f" ({counted}; {named})"
 
 
+class _Reading:
+    def __init__(self, tree: PhyleticTree) -> None:
+        self.index = _TreeIndex(tree)
+        self.described: set[frozenset[str]] = set()
+
+    def span(self, codes: Sequence[str]) -> str:
+        genomes = frozenset(self.index.genomes(codes))
+        if genomes in self.described:
+            return ""
+        self.described.add(genomes)
+        return self.index.span(codes)
+
+
 class TaxaCount(BaseModel):
     """One unit: how many genomes or proteins of these codes a group holds."""
 
@@ -124,13 +137,13 @@ class TaxaCount(BaseModel):
         return f"{'+'.join(self.codes)}{self.op}{self.count}{'T' if self.taxa else ''}"
 
     def describe(self, tree: PhyleticTree, *, nested: bool = False) -> str:
-        return self.read(_TreeIndex(tree), nested=nested)
+        return self.read(_Reading(tree), nested=nested)
 
-    def read(self, index: _TreeIndex, *, nested: bool = False) -> str:
-        named = ", ".join(index.labels.get(code, code) for code in self.codes)
+    def read(self, reading: _Reading, *, nested: bool = False) -> str:
+        named = ", ".join(reading.index.labels.get(code, code) for code in self.codes)
         unit = _UNITS[self.taxa][self.count != 1]
         listed = f"these {len(self.codes)}: " if len(self.codes) > 1 else ""
-        spanned = index.span(self.codes)
+        spanned = reading.span(self.codes)
         return f"{_OP_WORDS[self.op]} {self.count} {unit} of {listed}{named}{spanned}"
 
     def operands(self, join: Join) -> tuple[Term, ...]:
@@ -178,11 +191,11 @@ class Combination(BaseModel):
         return f"({text})" if nested else text
 
     def describe(self, tree: PhyleticTree, *, nested: bool = False) -> str:
-        return self.read(_TreeIndex(tree), nested=nested)
+        return self.read(_Reading(tree), nested=nested)
 
-    def read(self, index: _TreeIndex, *, nested: bool = False) -> str:
+    def read(self, reading: _Reading, *, nested: bool = False) -> str:
         text = f" {self.join.lower()} ".join(
-            term.read(index, nested=True) for term in self.terms
+            term.read(reading, nested=True) for term in self.terms
         )
         return f"({text})" if nested else text
 
@@ -227,7 +240,7 @@ class PhyleticExpression(BaseModel):
         return self.root.render()
 
     def describe(self, tree: PhyleticTree) -> str:
-        return self.root.read(_TreeIndex(tree))
+        return self.root.read(_Reading(tree))
 
     def units(self) -> list[TaxaCount]:
         found: list[TaxaCount] = []

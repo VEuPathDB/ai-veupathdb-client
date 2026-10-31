@@ -289,6 +289,30 @@ def test_a_clade_unit_names_its_species_of_two_or_more_genomes() -> None:
     )
 
 
+def test_units_over_one_set_name_its_breakdown_once_in_any_spelling() -> None:
+    parsed = PhyleticExpression.parse(
+        "HAEM>=2T AND pfal+pfag+pfsg+pfac+pfad+pfga<=5T OR HAEM=0T"
+    )
+
+    assert parsed.describe(_tree()) == (
+        "(at least 2 genomes of Haemosporida (6 genomes of 1 species; Plasmodium "
+        "falciparum 6) and at most 5 genomes of these 6: Plasmodium falciparum "
+        "3D7, Plasmodium falciparum pfag, Plasmodium falciparum pfsg, Plasmodium "
+        "falciparum pfac, Plasmodium falciparum pfad, Plasmodium falciparum pfga) "
+        "or exactly 0 genomes of Haemosporida"
+    )
+
+
+def test_units_over_different_sets_each_name_their_breakdown() -> None:
+    parsed = PhyleticExpression.parse("EUKA>=2T AND HAEM<=5T")
+
+    assert parsed.describe(_tree()) == (
+        "at least 2 genomes of Eukaryota (7 genomes of 2 species; Plasmodium "
+        "falciparum 6) and at most 5 genomes of Haemosporida (6 genomes of 1 "
+        "species; Plasmodium falciparum 6)"
+    )
+
+
 @pytest.mark.parametrize(
     "unit",
     [
