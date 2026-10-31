@@ -1,5 +1,12 @@
 # Knowledge log
 
+## 2026-10-31 - A phyletic set is described once
+
+- `PhyleticExpression.describe` names a set's genome and species breakdown on the first
+  unit over it only. A later unit over the same genomes, under the same codes or other
+  codes that cover them, reads without the breakdown, so "APIC>=139T AND APIC=139" names
+  the 139 genomes of 74 species once.
+
 ## 2026-10-30 - An update sends the strategy's description
 
 - 0.1.0b26: `StrategyAPI.update_strategy` takes a keyword `description`. It goes in the

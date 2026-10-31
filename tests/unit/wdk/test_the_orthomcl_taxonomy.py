@@ -157,6 +157,18 @@ def test_a_unit_over_strains_names_its_genomes_and_species() -> None:
     )
 
 
+def test_two_units_over_one_clade_name_its_breakdown_once() -> None:
+    tree = _recorded_tree()
+    text = PhyleticExpression.parse("APIC>=139T AND APIC=139").describe(tree)
+    alone = PhyleticExpression.parse("APIC>=139T").describe(tree)
+    breakdown = alone.removeprefix("at least 139 genomes of Apicomplexa")
+    assert breakdown.startswith(" (")
+    assert text == (
+        f"at least 139 genomes of Apicomplexa{breakdown} and exactly 139 "
+        "proteins of Apicomplexa"
+    )
+
+
 def test_a_unit_over_an_empty_clade_is_refused() -> None:
     with pytest.raises(ValidationError) as caught:
         check_expression(PhyleticExpression.parse("BACI>=1T"), _recorded_tree())
