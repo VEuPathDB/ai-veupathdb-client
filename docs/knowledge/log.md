@@ -6,6 +6,14 @@
   unit over it only. A later unit over the same genomes, under the same codes or other
   codes that cover them, reads without the breakdown, so "APIC>=139T AND APIC=139" names
   the 139 genomes of 74 species once.
+## 2026-10-31 - A request on a strategy waits in the host's line
+
+- [WDK-STRAT-008](wdk/rules/strategies-and-steps.md) records that WDK saves a strategy on
+  every read, `PATCH` and `DELETE`, with no version check, so a read beside a
+  `PUT .../step-tree` can restore the old tree. Every request the client sends on one
+  strategy passes `strategy_gate()` with the site and the strategy id; a host installs its
+  line with `use_strategy_gate`. See
+  [the decision](decisions/a-strategy-request-waits-in-the-hosts-strategy-line.md).
 
 ## 2026-10-30 - An update sends the strategy's description
 

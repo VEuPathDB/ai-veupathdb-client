@@ -465,4 +465,26 @@ tree of newly created step ids, which is the only supported way to graft one str
 branch into another. Note what that costs - the copies are independent, so a later edit to
 the source does not reach them.
 
+### WDK-STRAT-008 - A read of a strategy saves it, so a read beside a step-tree write can put the old tree back
+
+- class: SILENT
+- upstream: https://github.com/VEuPathDB/WDK/blob/599395d6aadaa1ff9ebaafdd55083f8148890f09/Service/src/main/java/org/gusdb/wdk/service/service/user/StrategyService.java#L149-L169
+- anchor: src/veupathdb/wdk/strategy_line.py:strategy_request
+- status: ENFORCED by tests/unit/wdk/test_strategy_line.py::test_a_read_waits_while_a_tree_write_on_its_strategy_is_in_flight
+
+`getStrategy` loads the strategy, updates the stale step sizes, sets the last view time and
+calls
+[`StepFactory.updateStrategy`](https://github.com/VEuPathDB/WDK/blob/599395d6aadaa1ff9ebaafdd55083f8148890f09/Model/src/main/java/org/gusdb/wdk/model/user/StepFactory.java#L731-L812),
+which writes `root_step_id` and every other column of the copy it loaded, and saves every
+step that copy holds. There is no version check. `PATCH` and `DELETE` on the strategy load
+it and save it the same way.
+
+So a read that loads the strategy before a `PUT .../step-tree` commits, and saves it after,
+restores the old root and gives the orphaned steps their strategy again. Both requests
+answer without an error, and a later `DELETE` of an orphaned step is a 409
+([WDK-STEP-007](#wdk-step-007---deleting-a-step-that-is-part-of-a-strategy-is-a-409-remove-it-from-the-tree-first)).
+Every request the client sends on one strategy passes a gate the host installs with the
+strategy's id (`use_strategy_gate`), so a host that runs more than one request at a time
+can send them one at a time per strategy.
+
 # WDK-STEP - the step
