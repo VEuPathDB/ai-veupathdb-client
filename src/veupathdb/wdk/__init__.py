@@ -82,6 +82,13 @@ from veupathdb.wdk.strategy_api.helpers import (
     tag_internal_wdk_strategy_name,
 )
 from veupathdb.wdk.strategy_api.steps import StepsMixin
+from veupathdb.wdk.strategy_line import (
+    StrategyGate,
+    StrategyRequest,
+    open_strategy_gate,
+    strategy_gate,
+    use_strategy_gate,
+)
 from veupathdb.wdk.temporary_results import TemporaryResultsAPI
 from veupathdb.wdk.value_decoding import (
     decode_params,
@@ -203,6 +210,8 @@ __all__ = [
     "SitesConfigNotSetError",
     "StepsMixin",
     "StrategyAPI",
+    "StrategyGate",
+    "StrategyRequest",
     "TemporaryResultsAPI",
     "VEuPathDBClaims",
     "VEuPathDBClient",
@@ -282,6 +291,7 @@ __all__ = [
     "list_sites",
     "load_sites_config",
     "open_search_gate",
+    "open_strategy_gate",
     "ortho_taxonomy_of",
     "password_login",
     "password_logout",
@@ -295,9 +305,11 @@ __all__ = [
     "search_definitions_read_once",
     "search_gate",
     "search_turn",
+    "strategy_gate",
     "strip_internal_wdk_strategy_name",
     "tag_internal_wdk_strategy_name",
     "use_search_gate",
+    "use_strategy_gate",
     "validate_oauth_token",
     "validation_bundle",
     "walk_wdk_step_tree",

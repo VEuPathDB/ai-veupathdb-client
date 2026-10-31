@@ -47,6 +47,7 @@ from veupathdb.wdk.search_load import (
     search_gate,
     waited_for,
 )
+from veupathdb.wdk.strategy_line import in_strategy_line
 
 logger = get_logger(__name__)
 
@@ -291,7 +292,29 @@ class HTTPClient:
         json: object = None,
         budget_seconds: float | None = None,
     ) -> JsonValue:
-        """Make one HTTP request attempt. Tenacity drives the retries."""
+        """Make one HTTP request attempt. Tenacity drives the retries.
+
+        A request on one strategy waits in the line the host installs for it.
+        """
+        async with in_strategy_line(self.site_id, path):
+            return await self._sent_once(
+                method,
+                path,
+                auth_token,
+                params=params,
+                json=json,
+                budget_seconds=budget_seconds,
+            )
+
+    async def _sent_once(
+        self,
+        method: str,
+        path: str,
+        auth_token: str,
+        params: JSONObject | None = None,
+        json: object = None,
+        budget_seconds: float | None = None,
+    ) -> JsonValue:
         client = await self._get_client()
 
         logger.debug(
