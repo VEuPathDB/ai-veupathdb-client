@@ -216,6 +216,18 @@ class WDKAttributeField(WDKModel):
         return next((fmt.name for fmt in self.formats if fmt.type == kind), None)
 
 
+class WDKTableField(WDKModel):
+    """WDK table field metadata, from expanded record-type responses."""
+
+    name: str
+    display_name: str = ""
+    description: str = ""
+    help: str | None = None
+    is_in_report: bool = False
+    is_displayable: bool = True
+    attributes: list[WDKAttributeField] = Field(default_factory=list)
+
+
 class WDKParameterGroup(WDKModel):
     """Parameter group metadata."""
 
@@ -289,6 +301,7 @@ class WDKRecordType(WDKModel):
     icon_name: str | None = None
     attributes: list[WDKAttributeField] | None = None
     attributes_map: dict[str, WDKAttributeField] | None = None
+    tables: list[WDKTableField] | None = None
 
 
 class WDKAnswerMeta(WDKModel):

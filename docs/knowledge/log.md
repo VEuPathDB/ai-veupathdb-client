@@ -1,5 +1,11 @@
 # Knowledge log
 
+## 2026-11-10 - A link names the page it shows
+
+- [Web app links](wdk/rest/web-app-links.md) records the web app routes the client reads a
+  link by, and that a link under no configured site's app root names nothing.
+- `WDKRecordType.tables` carries each table of an expanded record type and its columns.
+
 ## 2026-10-31 - A phyletic set is described once
 
 - `PhyleticExpression.describe` names a set's genome and species breakdown on the first
