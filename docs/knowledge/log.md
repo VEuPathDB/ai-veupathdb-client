@@ -1,5 +1,12 @@
 # Knowledge log
 
+## 2026-11-10 - A new analysis names its versions
+
+- `EdaNewAnalysis` writes `studyVersion` and `apiVersion` as empty strings, as the EDA
+  library's `makeNewAnalysis` does. The site's subset form type-checks the
+  `eda_analysis_spec` it revises against `NewAnalysis`, which requires both, and opens an
+  empty analysis for a value without them.
+
 ## 2026-11-10 - A link names the page it shows
 
 - [Web app links](wdk/rest/web-app-links.md) records the web app routes the client reads a

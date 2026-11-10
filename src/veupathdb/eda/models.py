@@ -575,8 +575,8 @@ class EdaNewAnalysis(EdaModel):
     display_name: AnalysisDisplayName
     description: AnalysisDescription = ""
     is_public: bool = False
-    study_version: str | None = None
-    api_version: str | None = None
+    study_version: str = ""
+    api_version: str = ""
     descriptor: EdaAnalysisDescriptor = Field(
         default_factory=EdaAnalysisDescriptor,
     )

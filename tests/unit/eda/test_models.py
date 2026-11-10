@@ -410,3 +410,10 @@ def test_an_unmodelled_extra_field_is_ignored() -> None:
         }
     )
     assert not hasattr(overview, "somethingUpstreamAddedLater")
+
+
+def test_a_new_analysis_carries_the_versions_the_site_form_requires() -> None:
+    analysis = EdaNewAnalysis(study_id="DS_x", display_name="x")
+    dumped = analysis.model_dump(by_alias=True, exclude_none=True)
+
+    assert (dumped["studyVersion"], dumped["apiVersion"]) == ("", "")
