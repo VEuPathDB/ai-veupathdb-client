@@ -13,3 +13,4 @@ Choices with a real alternative, each naming what was rejected and why.
 - [A rule is proven in this checkout, or it says so](a-rule-is-proven-in-this-checkout.md) - why no rule status names another repository's test
 - [A request on a strategy waits in the host's strategy line](a-strategy-request-waits-in-the-hosts-strategy-line.md) - every request on one strategy passes a host-installed gate keyed by site and strategy id, because WDK saves a strategy on every read
 - [A search waits in line, and the host owns the gate](a-search-waits-in-line-and-the-host-owns-the-gate.md) - the turn line, the host gate and the site slots, the High Speed SNP list, and why no limit refuses
+- [The organism scope of a combine folds both of its inputs](a-combine-scope-folds-both-inputs.md) - each operator's rule, why an INTERSECT takes the union, and the step organisms a host supplies

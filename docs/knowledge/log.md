@@ -1,5 +1,12 @@
 # Knowledge log
 
+## 2026-11-12 - A combine reads both of its inputs
+
+- `extract_output_organisms` folds the scope of a combine over both inputs by its
+  operator, and takes `leaf_organisms`, the organisms of a leaf whose search marks no
+  organism parameter, by step id. An `INTERSECT` holds the union of both scopes. See
+  [the decision](decisions/a-combine-scope-folds-both-inputs.md).
+
 ## 2026-11-10 - A new analysis names its versions
 
 - `EdaNewAnalysis` writes `studyVersion` and `apiVersion` as empty strings, as the EDA
