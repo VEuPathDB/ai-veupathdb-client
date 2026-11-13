@@ -11,5 +11,5 @@ when that evidence stops resolving.
 - [Rules](rules/) - the assertions, one file per ID family. Start here.
 - [Model](model/) - what WDK is
 - [REST](rest/) - the endpoint surface, and deployment behavior that is not in the docs
-- The consuming application's mapping (`pathfinder: docs/knowledge/wdk/pathfinder/`) - correspondence, ownership, and deliberate divergences
+- The consuming application's mapping (`pathfinder: docs/knowledge/wdk/strategist/`) - correspondence, ownership, and deliberate divergences
 - [sources.md](sources.md) - the oracle, pinned, and how to re-verify it

@@ -13,7 +13,7 @@ us aligned. `SILENT` is why this exists.
 - [Site-model parameters](site-model-params.md) - `WDK-SITE-001..010`
 - [Filters](filters.md) - `WDK-FILTER-001..006`
 - [Validation](validation.md) - `WDK-VALID-001..011`
-- The application's mapping rules (`pathfinder: docs/knowledge/wdk/pathfinder/rules/pathfinder-mapping.md`) - `WDK-MAP-001..008`
+- The application's mapping rules (`pathfinder: docs/knowledge/wdk/strategist/rules/strategist-mapping.md`) - `WDK-MAP-001..008`
 
 `WDK-SITE` is separated from `WDK-PARAM` by its falsifier rather than by its subject. A
 `WDK-PARAM` rule is refuted by the WDK repository; a `WDK-SITE` rule is refuted by

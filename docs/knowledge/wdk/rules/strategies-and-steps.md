@@ -304,7 +304,7 @@ subtrees. What keeps that off the wire is
 `rebuild_tree` on the single id it returns
 ([WDK-STEP-004](#wdk-step-004---a-step-inside-a-strategy-must-have-every-answer-parameter-filled-a-half-wired-combine-is-not-a-degraded-combine)).
 No test asserts that selection. This is the same gap
-WDK-MAP-003 (`pathfinder: docs/knowledge/wdk/pathfinder/rules/pathfinder-mapping.md`) names: the projection to WDK's shape is untested,
+WDK-MAP-003 (`pathfinder: docs/knowledge/wdk/strategist/rules/strategist-mapping.md`) names: the projection to WDK's shape is untested,
 and pure invertibility does not reach it.
 
 ### WDK-STRAT-003 - Every step a strategy holds is reachable from its root

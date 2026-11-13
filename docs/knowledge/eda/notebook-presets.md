@@ -367,7 +367,7 @@ parameters:
 
 ## The delayed result, measured
 
-`pathfinder: docs/knowledge/eda/pathfinder-integration-concept.md` flagged
+`pathfinder: docs/knowledge/eda/strategist-integration-concept.md` flagged
 as unverified what the WDK answer API returns while a compute is still running.
 Measured on 2026-08-27 against
 `POST /plasmo/service/record-types/transcript/searches/GenesByEdaVizWithCompute/reports/standard`.

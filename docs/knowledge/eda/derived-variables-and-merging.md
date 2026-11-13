@@ -534,7 +534,7 @@ So the persisted model is:
 For a consumer this means an EDA integration that never persists an analysis
 never needs the derived-variables store at all: it composes
 `DerivedVariableSpec[]` per request. See the integration concept
-(`pathfinder: docs/knowledge/eda/pathfinder-integration-concept.md`).
+(`pathfinder: docs/knowledge/eda/strategist-integration-concept.md`).
 
 ## Access control cuts between subsetting and merging
 
