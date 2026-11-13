@@ -174,6 +174,11 @@ Otherwise it writes and matches `__internal__:` from that moment, and every
 helper strategy already in a researcher's VEuPathDB account under the old value
 is permanently unmatched: no run recognises it, and no run removes it.
 
+A deployment that later changes its prefix lists the values it wrote before in
+`veupathdb_former_internal_strategy_name_prefixes` (environment variable
+`VEUPATHDB_FORMER_INTERNAL_STRATEGY_NAME_PREFIXES`, a JSON list): names under them are
+still recognised and stripped, and no new name takes them.
+
 ## Metrics
 
 `veupathdb.set_observer` installs an `Observer`. The client calls it

@@ -41,6 +41,10 @@ class VEuPathDBSettings(BaseSettings):
         default=DEFAULT_INTERNAL_STRATEGY_NAME_PREFIX,
         description="Prefix that tags a helper strategy this deployment created. It is written into a real VEuPathDB account, so a deployment states its own.",
     )
+    veupathdb_former_internal_strategy_name_prefixes: tuple[str, ...] = Field(
+        default=(),
+        description="Prefixes this deployment tagged its helper strategies with before. A name under one is still a helper; no new name takes one.",
+    )
     veupathdb_user_agent: str = Field(
         default_factory=lambda: f"veupathdb-py/{version('veupathdb-py')}",
         description="The User-Agent every request to a VEuPathDB service carries, so site operators can tell which application sent it.",

@@ -40,8 +40,20 @@ setting it writes and matches `__internal__:` from that moment, and every helper
 strategy already in a researcher's VEuPathDB account under the old value is
 permanently unmatched: no run recognises it, and no run removes it.
 
+# A deployment that changes its own prefix
+
+A product rename changes the prefix a deployment writes, while researchers' accounts
+still hold helpers under the old one. `veupathdb_former_internal_strategy_name_prefixes`
+(environment variable `VEUPATHDB_FORMER_INTERNAL_STRATEGY_NAME_PREFIXES`, a JSON list,
+default empty) lists the prefixes the deployment wrote before. A name under one of them
+is still internal and is stripped like the current one; a new helper takes only the
+current prefix. This is not the compatibility read rejected above: it serves a
+deployment that changed its own value, and the deployment, not the client, names the
+values it once wrote.
+
 # What holds it
 
 `tests/unit/wdk/test_internal_strategy_names.py`: the default carries no product
 name, a stated prefix tags and strips, a process that states no prefix tags with the
-default, and a name under a different prefix is not recognised as internal.
+default, a name under a different prefix is not recognised as internal, and a name under a
+former prefix is recognised and stripped while a new name takes only the current one.

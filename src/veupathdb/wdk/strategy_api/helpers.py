@@ -18,6 +18,15 @@ def _internal_prefix() -> str:
     return get_veupathdb_settings().veupathdb_internal_strategy_name_prefix
 
 
+def _recognised_prefix(name: str) -> str | None:
+    settings = get_veupathdb_settings()
+    prefixes = (
+        settings.veupathdb_internal_strategy_name_prefix,
+        *settings.veupathdb_former_internal_strategy_name_prefixes,
+    )
+    return next((prefix for prefix in prefixes if name.startswith(prefix)), None)
+
+
 def is_internal_wdk_strategy_name(name: str | None) -> bool:
     """Check if a WDK strategy name is an internal helper strategy.
 
@@ -26,17 +35,16 @@ def is_internal_wdk_strategy_name(name: str | None) -> bool:
     unsaved strategy is not internal by itself.
 
     :param name: WDK strategy name or None.
-    :returns: True if the name carries this deployment's internal prefix.
+    :returns: True if the name carries this deployment's current or a former prefix.
     """
-    return bool(name) and str(name).startswith(_internal_prefix())
+    return bool(name) and _recognised_prefix(str(name)) is not None
 
 
 def tag_internal_wdk_strategy_name(name: str) -> str:
     """Add the internal strategy name prefix if not already present."""
-    prefix = _internal_prefix()
-    if name.startswith(prefix):
+    if _recognised_prefix(name) is not None:
         return name
-    return f"{prefix}{name}"
+    return f"{_internal_prefix()}{name}"
 
 
 def strip_internal_wdk_strategy_name(name: str) -> str:
@@ -45,10 +53,8 @@ def strip_internal_wdk_strategy_name(name: str) -> str:
     :param name: WDK strategy name (may include the internal prefix).
     :returns: Display name without the prefix.
     """
-    prefix = _internal_prefix()
-    if name.startswith(prefix):
-        return name[len(prefix) :]
-    return name
+    prefix = _recognised_prefix(name)
+    return name if prefix is None else name[len(prefix) :]
 
 
 async def resolve_wdk_user_id(client: VEuPathDBClient) -> str | None:

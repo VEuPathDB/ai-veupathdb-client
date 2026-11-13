@@ -92,3 +92,50 @@ def test_no_name_is_not_internal(host_prefix: None) -> None:
 
     assert not is_internal_wdk_strategy_name(None)
     assert not is_internal_wdk_strategy_name("")
+
+
+_FORMER_PREFIX = "__old_host_internal__:"
+
+
+@pytest.fixture
+def renamed_host() -> Generator[None]:
+    previous = veupathdb_settings_source()
+    stated = VEuPathDBSettings(
+        veupathdb_internal_strategy_name_prefix=_HOST_PREFIX,
+        veupathdb_former_internal_strategy_name_prefixes=(_FORMER_PREFIX,),
+    )
+    use_veupathdb_settings_source(lambda: stated)
+    yield
+    use_veupathdb_settings_source(previous)
+
+
+def test_a_name_under_a_former_prefix_is_still_internal(renamed_host: None) -> None:
+    """A helper written before the deployment changed its prefix stays hidden."""
+    del renamed_host
+
+    assert is_internal_wdk_strategy_name(f"{_FORMER_PREFIX}control test")
+    assert strip_internal_wdk_strategy_name(f"{_FORMER_PREFIX}control test") == (
+        "control test"
+    )
+
+
+def test_a_new_name_takes_only_the_current_prefix(renamed_host: None) -> None:
+    del renamed_host
+
+    assert tag_internal_wdk_strategy_name("step counts") == f"{_HOST_PREFIX}step counts"
+    assert tag_internal_wdk_strategy_name(f"{_FORMER_PREFIX}x") == f"{_FORMER_PREFIX}x"
+
+
+def test_the_former_prefixes_are_read_from_the_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(
+        "VEUPATHDB_FORMER_INTERNAL_STRATEGY_NAME_PREFIXES", '["__a__:", "__b__:"]'
+    )
+
+    settings = VEuPathDBSettings()
+
+    assert settings.veupathdb_former_internal_strategy_name_prefixes == (
+        "__a__:",
+        "__b__:",
+    )
