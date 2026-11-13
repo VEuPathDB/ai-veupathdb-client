@@ -289,4 +289,4 @@ with `tests/unit/devtools/test_eda_raml_converter.py` for the RAML-to-draft-07
 rules, `tests/unit/devtools/test_eda_spec_defects.py` for how a defect bends a
 type, and `tests/unit/devtools/test_eda_schema_vendor.py` for what the vendor
 command writes. The recorded bodies are gated in the consuming application, at
-`pathfinder: apps/api/src/pathfinder/tests/unit/devtools/test_eda_fixture_schemas.py`.
+`pathfinder: apps/api/src/strategist/tests/unit/devtools/test_eda_fixture_schemas.py`.

@@ -574,7 +574,7 @@ can be held. The run reports
 
 The WDK and EDA trees state WDK and EDA, with the client as the actor. The application's
 mapping, its authority ranking and its two verification sites left for
-`pathfinder: docs/knowledge/wdk/pathfinder/`; `tests/unit/test_bundle_subject.py` fails on
+`pathfinder: docs/knowledge/wdk/strategist/`; `tests/unit/test_bundle_subject.py` fails on
 the application's name anywhere under `wdk/` or `eda/`. One paragraph was deleted rather
 than moved: it described `StepValidation` defaults the tree has not had since the field
 became `StepValidation | None`.

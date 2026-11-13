@@ -198,7 +198,7 @@ a 500. The parent must either be given a replacement input or be omitted too. Th
 call that removes one step and leaves WDK to work out the rest.
 
 The consuming application's own ordering is currently the wrong way round.
-`pathfinder: apps/api/src/pathfinder/services/strategies/commit.py` deletes the WDK steps
+`pathfinder: apps/api/src/strategist/services/strategies/commit.py` deletes the WDK steps
 for dropped nodes before `sync_strategy_for_site` pushes the new tree, so every such DELETE
 hits a step that is still referenced by the strategy in WDK. `delete_step` only swallows
 404, so the 409 propagates, `delete_orphaned_steps` catches it and logs `Failed to delete
@@ -295,11 +295,11 @@ root is a step no other step names as an input.
 the test sees came out of `flatten_tree` on a single node, so single-rootedness holds *by
 construction* - the test constrains `root_ids` against `flatten_tree`, not against
 anything WDK requires. The consuming application genuinely does build multi-root step
-maps: `pathfinder: apps/api/src/pathfinder/services/strategies/session_factory.py` loads
+maps: `pathfinder: apps/api/src/strategist/services/strategies/session_factory.py` loads
 `flatten_tree(payload.root)` and then merges `flatten_tree(detached)` for every entry in
 `payload.detached_roots`, which is a map with as many roots as the canvas has disconnected
 subtrees. What keeps that off the wire is
-`pathfinder: apps/api/src/pathfinder/services/strategies/sync.py`, which calls
+`pathfinder: apps/api/src/strategist/services/strategies/sync.py`, which calls
 `pushable_root_id` and then
 `rebuild_tree` on the single id it returns
 ([WDK-STEP-004](#wdk-step-004---a-step-inside-a-strategy-must-have-every-answer-parameter-filled-a-half-wired-combine-is-not-a-degraded-combine)).

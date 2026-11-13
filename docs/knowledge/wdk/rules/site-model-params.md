@@ -108,7 +108,7 @@ pattern the model states is otherwise accepted by the pre-flight and refused one
 later. Guarded by
 `tests/unit/wdk/test_strategy_api_base.py`,
 `veupathdb-mcp: tests/unit/catalog/test_param_validation_phyletic.py`
-and `pathfinder: apps/api/src/pathfinder/tests/unit/test_phyletic_conformance.py`.
+and `pathfinder: apps/api/src/strategist/tests/unit/test_phyletic_conformance.py`.
 
 That narrows the ways in rather than closing them. A pattern built from real codes in the
 right order and the wrong states is well formed, reaches WDK, and comes back as a count;

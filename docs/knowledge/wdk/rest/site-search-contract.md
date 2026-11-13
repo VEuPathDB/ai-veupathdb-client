@@ -80,7 +80,7 @@ WDK before showing it.
 
 The pinned response is `site_search_stream_genes.json`, recorded from QA PlasmoDB on
 2026-10-18: 352 records, the count production returned for the same request. Re-record it with the request in
-`pathfinder: apps/api/src/pathfinder/tests/live/test_site_search_stream_drift.py`, which
+`pathfinder: apps/api/src/strategist/tests/live/test_site_search_stream_drift.py`, which
 is also what checks it against the live service.
 
 # The 100,000 ceiling is in the source and not in the deployment
