@@ -32,7 +32,7 @@ def host_prefix() -> Generator[None]:
 
 def test_the_default_prefix_names_no_product() -> None:
     assert DEFAULT_INTERNAL_STRATEGY_NAME_PREFIX == "__internal__:"
-    assert "pathfinder" not in DEFAULT_INTERNAL_STRATEGY_NAME_PREFIX
+    assert "strategist" not in DEFAULT_INTERNAL_STRATEGY_NAME_PREFIX
 
 
 def test_a_process_that_states_no_prefix_tags_with_the_default(

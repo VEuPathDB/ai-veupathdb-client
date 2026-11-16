@@ -53,7 +53,7 @@ def _meta() -> VdiDatasetPostMeta:
         type=GENELIST,
         install_targets=["PlasmoDB"],
         name="Kinases with a signal peptide",
-        summary="Three genes from PathFinder.",
+        summary="Three genes from Strategist.",
         visibility=VdiVisibility.PRIVATE,
     )
 
@@ -160,7 +160,7 @@ class TestCreatingAGeneList:
             "type": {"name": "genelist", "version": "1.0"},
             "installTargets": ["PlasmoDB"],
             "name": "Kinases with a signal peptide",
-            "summary": "Three genes from PathFinder.",
+            "summary": "Three genes from Strategist.",
             "origin": "direct-upload",
             "visibility": "private",
             "dependencies": [],

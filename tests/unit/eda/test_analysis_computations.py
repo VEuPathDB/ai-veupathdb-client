@@ -289,7 +289,7 @@ def test_the_helper_on_the_recorded_analysis_returns_the_one_de_computation() ->
     reason=NEEDS_QA_RECORDING,
 )
 def test_a_read_descriptor_writes_back_every_key_the_site_stored() -> None:
-    """A PATCH after a read keeps the computations PathFinder does not drive."""
+    """A PATCH after a read keeps the computations Strategist does not drive."""
     recorded = _recorded()
 
     written = json.loads(

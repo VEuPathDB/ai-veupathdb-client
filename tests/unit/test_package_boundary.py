@@ -1,6 +1,6 @@
 """The boundary is an installation fact; this suite is the belt.
 
-The package declares no dependency on ``pathfinder``, ``assistant-core`` or a
+The package declares no dependency on ``strategist``, ``assistant-core`` or a
 database driver, so those imports cannot resolve in this environment. The walk
 below fails on the import statement instead, and names the module that added it.
 """
@@ -21,7 +21,7 @@ import veupathdb
 CLIENT = veupathdb.__name__
 
 FORBIDDEN_ROOTS = {
-    "pathfinder",
+    "strategist",
     "assistant_core",
     "veupathdb_mcp",
     "sqlalchemy",
@@ -148,7 +148,7 @@ def test_no_module_configures_the_hosts_logging() -> None:
 # A caller's own vocabulary: its layers, its agents and the models it drives.
 # The shapes here behave the same whoever calls them, so no docstring names one.
 HOST_VOCABULARY = (
-    "pathfinder",
+    "strategist",
     "catalog service",
     "ai tool",
     "agent tool",

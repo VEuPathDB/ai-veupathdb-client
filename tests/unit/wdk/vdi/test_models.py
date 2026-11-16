@@ -33,7 +33,7 @@ def _meta(visibility: VdiVisibility = VdiVisibility.PRIVATE) -> VdiDatasetPostMe
         type=GENELIST,
         install_targets=["PlasmoDB"],
         name="Kinases with a signal peptide",
-        summary="42 genes from PathFinder.",
+        summary="42 genes from Strategist.",
         visibility=visibility,
     )
 
@@ -46,7 +46,7 @@ class TestTheCreateBodyMatchesWhatTheServiceAccepted:
             "type": {"name": "genelist", "version": "1.0"},
             "installTargets": ["PlasmoDB"],
             "name": "Kinases with a signal peptide",
-            "summary": "42 genes from PathFinder.",
+            "summary": "42 genes from Strategist.",
             "origin": "direct-upload",
             "visibility": "private",
             "dependencies": [],
