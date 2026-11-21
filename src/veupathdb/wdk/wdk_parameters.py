@@ -2,7 +2,8 @@
 
 from typing import Annotated, Literal
 
-from pydantic import Discriminator, Field, JsonValue, field_validator
+from pydantic import BaseModel, Discriminator, Field, JsonValue, field_validator
+from pydantic.alias_generators import to_camel
 
 from veupathdb.domain.parameters.stated import Stated, stated_reading
 from veupathdb.domain.parameters.values import ParamKind
@@ -11,10 +12,15 @@ from veupathdb.domain.parameters.wdk_vocab import (
     WDKFilterOntologyTerm,
     WDKVocabulary,
 )
-from veupathdb.wdk.wdk_base import WDKModel
 
 
-class WDKBaseParameter(WDKModel):
+class WDKBaseParameter(
+    BaseModel,
+    frozen=True,
+    extra="ignore",
+    alias_generator=to_camel,
+    populate_by_name=True,
+):
     """Fields common to all WDK parameter types.
 
     Subtype fields also appear here, so a reader needs no type narrowing.
@@ -93,7 +99,7 @@ class WDKBaseParameter(WDKModel):
         return v
 
 
-class WDKStringParam(WDKBaseParameter):
+class WDKStringParam(WDKBaseParameter, frozen=True):
     """WDK string parameter."""
 
     type: Literal["string"] = "string"
@@ -102,7 +108,7 @@ class WDKStringParam(WDKBaseParameter):
     is_number: bool = False
 
 
-class WDKNumberParam(WDKBaseParameter):
+class WDKNumberParam(WDKBaseParameter, frozen=True):
     """WDK number parameter."""
 
     type: Literal["number"] = "number"
@@ -111,7 +117,7 @@ class WDKNumberParam(WDKBaseParameter):
     increment: float | None = None
 
 
-class WDKNumberRangeParam(WDKBaseParameter):
+class WDKNumberRangeParam(WDKBaseParameter, frozen=True):
     """WDK number range parameter."""
 
     type: Literal["number-range"] = "number-range"
@@ -120,7 +126,7 @@ class WDKNumberRangeParam(WDKBaseParameter):
     increment: float | None = None
 
 
-class WDKDateParam(WDKBaseParameter):
+class WDKDateParam(WDKBaseParameter, frozen=True):
     """WDK date parameter."""
 
     type: Literal["date"] = "date"
@@ -128,7 +134,7 @@ class WDKDateParam(WDKBaseParameter):
     max_date: str | None = None
 
 
-class WDKDateRangeParam(WDKBaseParameter):
+class WDKDateRangeParam(WDKBaseParameter, frozen=True):
     """WDK date range parameter."""
 
     type: Literal["date-range"] = "date-range"
@@ -136,19 +142,19 @@ class WDKDateRangeParam(WDKBaseParameter):
     max_date: str | None = None
 
 
-class WDKTimestampParam(WDKBaseParameter):
+class WDKTimestampParam(WDKBaseParameter, frozen=True):
     """WDK timestamp parameter."""
 
     type: Literal["timestamp"] = "timestamp"
 
 
-class WDKAnswerParam(WDKBaseParameter):
+class WDKAnswerParam(WDKBaseParameter, frozen=True):
     """WDK step-input parameter."""
 
     type: Literal["input-step"] = "input-step"
 
 
-class WDKDatasetParam(WDKBaseParameter):
+class WDKDatasetParam(WDKBaseParameter, frozen=True):
     """WDK dataset parameter."""
 
     type: Literal["input-dataset"] = "input-dataset"
@@ -157,7 +163,7 @@ class WDKDatasetParam(WDKBaseParameter):
     parsers: list[WDKDatasetParser] = Field(default_factory=list)
 
 
-class WDKEnumParam(WDKBaseParameter):
+class WDKEnumParam(WDKBaseParameter, frozen=True):
     """WDK enum parameter, single-pick or multi-pick.
 
     The display type is a second discriminator. It sets the vocabulary shape.
@@ -172,7 +178,7 @@ class WDKEnumParam(WDKBaseParameter):
     depth_expanded: int = 0
 
 
-class WDKFilterParam(WDKBaseParameter):
+class WDKFilterParam(WDKBaseParameter, frozen=True):
     """WDK filter parameter."""
 
     type: Literal["filter"] = "filter"
