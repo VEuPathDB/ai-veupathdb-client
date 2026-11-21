@@ -1,5 +1,14 @@
 # Knowledge log
 
+## 2026-11-22 - An empty value is read as its parameter allows it
+
+- [WDK-PARAM-019](wdk/rules/parameters-and-vocabularies.md) records that an empty value is
+  valid exactly where `allowEmptyValue` is true, for every kind. `read_stated` reads `""`
+  (and `[]` for a multi-pick) as the kind's empty value there and refuses it elsewhere.
+- An `input-dataset` and a `timestamp` value may hold `""`, WDK's empty stable value.
+- A filter facet shows `range` only when a read filled it.
+- `veupathdb-py` is 0.9.0b9.
+
 ## 2026-11-21 - A filter is read as stated clauses
 
 - A `filter` parameter reads a stated value as `FilterProposals`, a non-empty list of
