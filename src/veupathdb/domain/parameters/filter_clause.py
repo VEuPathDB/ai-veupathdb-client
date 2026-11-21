@@ -21,6 +21,7 @@ from pydantic import ValidationError as PydanticValidationError
 from pydantic.alias_generators import to_camel
 
 from veupathdb.domain.parameters.date_bounds import ISODate
+from veupathdb.domain.parameters.decimals import decimal_text
 from veupathdb.domain.parameters.wdk_vocab import WDKFilterOntologyTerm
 from veupathdb.errors import ValidationError
 from veupathdb.model import CamelModel
@@ -43,10 +44,17 @@ class NumberBounds(_Bounds):
     min: float | None = None
     max: float | None = None
 
+    def text(self) -> str:
+        stated = self.model_dump(exclude_none=True).items()
+        return "{" + ", ".join(f'"{k}": {decimal_text(v)}' for k, v in stated) + "}"
+
 
 class DateBounds(_Bounds):
     min: ISODate | None = None
     max: ISODate | None = None
+
+    def text(self) -> str:
+        return self.model_dump_json(exclude_none=True)
 
 
 class _Clause(
@@ -175,14 +183,14 @@ class _ValueCount(Protocol):
     @property
     def value(self) -> str | int | float | None: ...
     @property
-    def count(self) -> int: ...
+    def filtered_count(self) -> int: ...
 
 
 class _TermSummary(Protocol):
     @property
     def value_counts(self) -> Sequence[_ValueCount]: ...
     @property
-    def internals_count(self) -> int: ...
+    def internals_filtered_count(self) -> int: ...
 
 
 class _FilterDeclaration(Protocol):
@@ -211,7 +219,7 @@ class FacetRange(CamelModel):
             (
                 v.value
                 for v in summary.value_counts
-                if v.count > 0 and v.value is not None
+                if v.filtered_count > 0 and v.value is not None
             ),
             key=order,
         )
@@ -220,7 +228,7 @@ class FacetRange(CamelModel):
         return cls(
             min=counted[0],
             max=counted[-1],
-            records=summary.internals_count,
+            records=summary.internals_filtered_count,
             units=facet.units,
         )
 

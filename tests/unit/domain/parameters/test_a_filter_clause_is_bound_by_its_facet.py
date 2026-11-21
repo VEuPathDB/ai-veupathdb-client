@@ -7,6 +7,7 @@ from pydantic import BaseModel, JsonValue
 from pydantic import ValidationError as PydanticValidationError
 from pydantic.json_schema import JsonSchemaMode
 
+from veupathdb import wdk
 from veupathdb.domain.parameters import (
     DateBounds,
     DateRange,
@@ -372,3 +373,34 @@ def test_every_discriminator_maps_a_tag_to_a_schema_reference(
 
     assert mappings
     assert all(str(ref).startswith("#/components/schemas/") for ref in mappings)
+
+
+def test_a_range_is_read_under_the_other_clauses() -> None:
+    facet = _facet(_variant_stats(), "total_variants")
+
+    alone = FacetRange.of(_summary("ontology_term_summary_total_variants"), facet)
+    under = FacetRange.of(
+        _summary("ontology_term_summary_total_variants_under_high_impact"), facet
+    )
+
+    assert alone == FacetRange(min=1, max=4823, records=5643, units="variants")
+    assert under == FacetRange(min=2, max=4823, records=3207, units="variants")
+    assert under.selects(NumberBounds(min=None, max=1)) is False
+
+
+@pytest.mark.parametrize(
+    ("bounds", "text"),
+    [
+        (NumberBounds(min=4824, max=None), '{"min": 4824}'),
+        (NumberBounds(min=1e-8, max=0.5), '{"min": 0.00000001, "max": 0.5}'),
+        (DateBounds(min=None, max="2014-08-30"), '{"max":"2014-08-30"}'),
+    ],
+)
+def test_bounds_are_written_as_stated(
+    bounds: NumberBounds | DateBounds, text: str
+) -> None:
+    assert bounds.text() == text
+
+
+def test_the_turn_line_is_published_by_the_wdk_package() -> None:
+    assert "in_turn_line" in wdk.__all__

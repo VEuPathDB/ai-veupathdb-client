@@ -523,6 +523,15 @@ class WDKOntologyTermSummary(WDKModel):
     internals_filtered_count: int
 
 
+class WDKFilterSummaryCounts(WDKModel):
+    """Response from POST .../{paramName}/summary-counts."""
+
+    filtered: int
+    unfiltered: int
+    native_filtered: int
+    native_unfiltered: int
+
+
 class WDKTemporaryResult(WDKModel):
     """Response from POST /temporary-results."""
 

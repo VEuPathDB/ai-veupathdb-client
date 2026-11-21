@@ -23,6 +23,7 @@ from veupathdb.wdk.tree_leaves import holds_a_term_list, leaves_of_tree_values
 from veupathdb.wdk.wdk_models import (
     WDKAnswer,
     WDKColumnDistribution,
+    WDKFilterSummaryCounts,
     WDKFilterValue,
     WDKOntologyTermSummary,
     WDKRecordType,
@@ -74,6 +75,13 @@ def _named(params: Sequence[str], prefix: str, record_type: str) -> str:
         )
         raise DataParsingError(msg)
     return found
+
+
+def _clause_dumps(filters: Sequence[FilterClause]) -> list[JsonValue]:
+    return [
+        clause.model_dump(by_alias=True, mode="json", exclude_none=True)
+        for clause in filters
+    ]
 
 
 class SearchEndpoints:
@@ -268,9 +276,7 @@ class SearchEndpoints:
             f"/record-types/{record_type}/searches/{search_name}/{param_name}/ontology-term-summary",
             json={
                 "ontologyId": ontology_id,
-                "filters": [
-                    clause.model_dump(by_alias=True, mode="json") for clause in filters
-                ],
+                "filters": _clause_dumps(filters),
                 "contextParamValues": context,
             },
         )
@@ -278,6 +284,28 @@ class SearchEndpoints:
             WDKOntologyTermSummary,
             raw,
             f"WDK ontology term summary for {search_name}/{param_name}/{ontology_id}",
+        )
+
+    async def get_filter_summary_counts(
+        self,
+        record_type: str,
+        search_name: str,
+        param_name: str,
+        context: dict[str, str],
+        *,
+        filters: Sequence[FilterClause],
+    ) -> WDKFilterSummaryCounts:
+        """Returns the records a filter parameter selects under ``filters``.
+
+        Matches WDK's ``QuestionService.getFilterParamSummaryCounts``."""
+        raw = await self.post(
+            f"/record-types/{record_type}/searches/{search_name}/{param_name}/summary-counts",
+            json={"filters": _clause_dumps(filters), "contextParamValues": context},
+        )
+        return validate_response(
+            WDKFilterSummaryCounts,
+            raw,
+            f"WDK filter summary counts for {search_name}/{param_name}",
         )
 
     async def run_search_report(

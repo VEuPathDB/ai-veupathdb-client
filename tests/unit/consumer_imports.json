@@ -451,6 +451,7 @@
       "get_site_router",
       "get_strategy_api",
       "get_wdk_client",
+      "in_turn_line",
       "is_internal_wdk_strategy_name",
       "password_login",
       "phyletic_tree_of",

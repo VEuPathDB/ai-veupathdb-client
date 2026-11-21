@@ -19,6 +19,7 @@ from pydantic import (
 )
 
 from veupathdb.domain.parameters.date_bounds import ISODate
+from veupathdb.domain.parameters.decimals import decimal_text
 from veupathdb.domain.parameters.filter_clause import (
     FilterFacets,
     FilterProposal,
@@ -37,7 +38,6 @@ from veupathdb.domain.parameters.values import (
     SinglePickValue,
     StringValue,
     TimestampValue,
-    decimal_text,
 )
 from veupathdb.domain.parameters.wdk_vocab import (
     WDKFilterOntologyTerm,

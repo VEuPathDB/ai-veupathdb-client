@@ -300,6 +300,28 @@ FIXTURES: tuple[FixtureRequest, ...] = (
         reads="WDK-PARAM-018",
     ),
     FixtureRequest(
+        name="ontology_term_summary_total_variants_under_high_impact",
+        path=f"{_TRANSCRIPT}/GenesByVariantCharacteristics/gene_variant_stats/ontology-term-summary",
+        method="POST",
+        body={
+            "ontologyId": "total_variants",
+            "filters": [
+                {
+                    "field": "most_severe_impact",
+                    "type": "string",
+                    "isRange": False,
+                    "includeUnknown": False,
+                    "value": ["HIGH"],
+                }
+            ],
+            "contextParamValues": {
+                "organism_select_none": '["Plasmodium falciparum 3D7"]',
+                "gene_variant_stats": '{"filters":[]}',
+            },
+        },
+        reads="WDK-PARAM-018",
+    ),
+    FixtureRequest(
         name="ontology_term_summary_pi_per_site_cds",
         path=f"{_TRANSCRIPT}/GenesByVariantCharacteristics/gene_variant_stats/ontology-term-summary",
         method="POST",
@@ -309,6 +331,20 @@ FIXTURES: tuple[FixtureRequest, ...] = (
             "contextParamValues": {
                 "organism_select_none": '["Plasmodium falciparum 3D7"]',
                 "gene_variant_stats": '{"filters":[]}',
+            },
+        },
+        reads="WDK-PARAM-018",
+    ),
+    FixtureRequest(
+        name="filter_summary_counts_ngs_snps",
+        path=f"{_TRANSCRIPT}/GenesByNgsSnps/variation_sample_meta/summary-counts",
+        method="POST",
+        body={
+            "filters": [],
+            "contextParamValues": {
+                "organismSinglePick": '["Plasmodium falciparum 3D7"]',
+                "eda_sample_table_suffix": "s3be28bbe14_sample",
+                "variation_sample_meta": '{"filters": []}',
             },
         },
         reads="WDK-PARAM-018",

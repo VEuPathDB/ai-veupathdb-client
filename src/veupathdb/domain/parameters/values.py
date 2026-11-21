@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import json
-import math
-from decimal import Decimal
 from typing import Annotated, Literal
 
 from pydantic import Field, JsonValue, model_validator
 
 from veupathdb.domain.parameters.date_bounds import ISODate
+from veupathdb.domain.parameters.decimals import decimal_text
 from veupathdb.domain.parameters.filter_clause import FilterValue
 from veupathdb.model import CamelModel
 
@@ -24,13 +23,6 @@ ParamKind = Literal[
     "input-dataset",
     "input-step",
 ]
-
-
-def decimal_text(x: float) -> str:
-    if not math.isfinite(x):
-        msg = f"{x!r} has no decimal text"
-        raise ValueError(msg)
-    return format(Decimal(repr(x)).normalize(), "f")
 
 
 class StringValue(CamelModel):

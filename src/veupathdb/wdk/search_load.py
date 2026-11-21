@@ -125,6 +125,7 @@ __all__ = [
     "SearchLine",
     "SearchRequest",
     "SearchTurn",
+    "in_turn_line",
     "open_search_gate",
     "runs_an_expensive_search",
     "search_gate",

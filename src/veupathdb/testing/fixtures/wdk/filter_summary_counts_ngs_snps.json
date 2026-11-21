@@ -1,0 +1,17 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/record-types/transcript/searches/GenesByNgsSnps/variation_sample_meta/summary-counts",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-11-21",
+    "reads": "WDK-PARAM-018"
+  },
+  "body": {
+    "filtered": 538,
+    "nativeFiltered": 538,
+    "unfiltered": 538,
+    "nativeUnfiltered": 538
+  }
+}
