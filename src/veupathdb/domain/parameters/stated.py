@@ -258,14 +258,9 @@ def _timestamp(_: _Declared) -> _Shape:
     )
 
 
-def _single_pick(d: _Declared) -> _Shape:
+def _term(d: _Declared) -> tuple[Any, str]:
     if d.terms is None:
-        return _Shape(
-            Annotated[str, Field(min_length=1)],
-            lambda v: SinglePickValue(value=v),
-            "one vocabulary term",
-            d.first_term,
-        )
+        return Annotated[str, Field(min_length=1)], ""
     terms = d.terms
 
     def member(term: str) -> str:
@@ -274,21 +269,30 @@ def _single_pick(d: _Declared) -> _Shape:
             raise ValueError(msg)
         return term
 
-    return _Shape(
+    return (
         Annotated[
             str, Field(json_schema_extra={"enum": list(terms)}), AfterValidator(member)
         ],
+        ", ".join(repr(term) for term in terms),
+    )
+
+
+def _single_pick(d: _Declared) -> _Shape:
+    term, listed = _term(d)
+    return _Shape(
+        term,
         lambda v: SinglePickValue(value=v),
-        "one of " + ", ".join(repr(term) for term in terms),
+        f"one of {listed}" if listed else "one vocabulary term",
         d.first_term,
     )
 
 
 def _multi_pick(d: _Declared) -> _Shape:
+    term, listed = _term(d)
     return _Shape(
-        list[str],
+        list.__class_getitem__(term),
         lambda v: MultiPickValue(values=v),
-        "a list of vocabulary terms",
+        f"a list of terms from {listed}" if listed else "a list of vocabulary terms",
         [d.first_term],
     )
 

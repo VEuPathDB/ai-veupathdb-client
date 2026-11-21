@@ -25,7 +25,7 @@ from veupathdb.domain.parameters.values import (
     ParamValue,
     SinglePickValue,
 )
-from veupathdb.domain.parameters.wdk_vocab import WDKVocabTerm
+from veupathdb.domain.parameters.wdk_vocab import WDKVocabTerm, flatten_vocab
 from veupathdb.errors import ValidationError
 from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
@@ -34,6 +34,7 @@ from veupathdb.wdk.wdk_parameters import (
     WDKAnswerParam,
     WDKDatasetParam,
     WDKDateParam,
+    WDKEnumParam,
     WDKNumberParam,
     WDKNumberRangeParam,
     WDKParameter,
@@ -107,6 +108,56 @@ class TestANumberString:
 
 
 @pytest.mark.skipif(needs_qa_recording(_NGS_SNPS), reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(needs_qa_recording(_AWSTATS), reason=NEEDS_QA_RECORDING)
+class TestASmallMultiPick:
+    def test_its_items_are_the_enum_of_terms(self) -> None:
+        param = _param("search_metrics_awstats", "projectIdSelect")
+
+        assert param.stated_schema() == {
+            "items": {
+                "enum": [o.value for o in flatten_vocab(param.vocabulary)],
+                "type": "string",
+            },
+            "type": "array",
+        }
+
+    def test_a_term_outside_the_vocabulary_is_refused(self) -> None:
+        param = _param("search_metrics_awstats", "projectIdSelect")
+
+        assert "projectIdSelect takes" in _refused(param, ["PlasmoDB", "NotADB"])
+
+    def test_terms_read(self) -> None:
+        param = _param("search_metrics_awstats", "projectIdSelect")
+
+        assert param.read_stated(["PlasmoDB", "ToxoDB"]) == MultiPickValue(
+            values=["PlasmoDB", "ToxoDB"]
+        )
+
+
+def test_a_type_ahead_multi_pick_stays_a_list_of_strings() -> None:
+    param = WDKEnumParam(
+        name="m",
+        type="multi-pick-vocabulary",
+        display_type="typeAhead",
+        vocabulary=[WDKVocabTerm(("a", "a", None)), WDKVocabTerm(("b", "b", None))],
+    )
+
+    assert param.stated_schema() == {
+        "items": {"minLength": 1, "type": "string"},
+        "type": "array",
+    }
+
+
+@pytest.mark.skipif(needs_qa_recording(_NGS_SNPS), reason=NEEDS_QA_RECORDING)
+def test_a_tree_multi_pick_stays_a_list_of_strings() -> None:
+    param = _param("search_genes_by_ngs_snps", "organismSinglePick")
+
+    assert param.stated_schema() == {
+        "items": {"minLength": 1, "type": "string"},
+        "type": "array",
+    }
+
+
 class TestNgsSnpsVocabularies:
     def test_a_small_select_is_an_enum(self) -> None:
         param = _param("search_genes_by_ngs_snps", "ReadFrequencyPercent")
