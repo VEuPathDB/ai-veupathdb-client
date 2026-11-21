@@ -5,7 +5,7 @@ from typing import Annotated, Literal
 
 from pydantic import Field, JsonValue, RootModel, model_validator
 
-from veupathdb.domain.parameters.date_bounds import WDKDateBound
+from veupathdb.domain.parameters.date_bounds import ISODate
 from veupathdb.model import CamelModel
 
 ParamKind = Literal[
@@ -81,7 +81,7 @@ class NumberRangeValue(CamelModel):
 
 class DateValue(CamelModel):
     type: Literal["date"] = "date"
-    value: str = Field(min_length=1)
+    value: ISODate
 
     def to_wire(self) -> str:
         return self.value
@@ -92,8 +92,8 @@ class DateValue(CamelModel):
 
 class DateRangeValue(CamelModel):
     type: Literal["date-range"] = "date-range"
-    min: WDKDateBound | None = None
-    max: WDKDateBound | None = None
+    min: ISODate | None = None
+    max: ISODate | None = None
 
     @model_validator(mode="after")
     def _at_least_one_endpoint(self) -> DateRangeValue:

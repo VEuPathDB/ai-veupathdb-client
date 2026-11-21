@@ -103,6 +103,7 @@
     "FilterClauseKey",
     "FilterTermClause",
     "FilterValue",
+    "ISODate",
     "InputDatasetValue",
     "InputStepValue",
     "MAX_NEAREST_ENTRIES",

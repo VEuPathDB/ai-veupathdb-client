@@ -61,7 +61,7 @@ class TestScalarsRoundTrip:
         assert float(restored.value) == float(value)
 
     @settings(max_examples=100)
-    @given(_TEXT)
+    @given(_ISO_DATE)
     def test_date(self, value: str) -> None:
         assert _round_trip("p", DateValue(value=value), "date") == (
             DateValue(value=value)
@@ -173,7 +173,16 @@ class TestWdkParam006ABoundIsAnIsoDate:
 
     @pytest.mark.parametrize(
         "bound",
-        ["01/01/2025", "2025-1-1", "Jan 1 2025", "2025-13-01", "2025-01-32", ""],
+        [
+            "01/01/2025",
+            "2025-1-1",
+            "Jan 1 2025",
+            "2025-13-01",
+            "2025-01-32",
+            "",
+            "20250101",
+            "2025-W01-1",
+        ],
     )
     def test_wdk_param_006_a_bound_wdk_cannot_parse_is_refused(
         self, bound: str
@@ -192,7 +201,6 @@ class TestWdkParam006ABoundIsAnIsoDate:
 
         assert (value.min, value.max) == ("2026-01-01", None)
 
-    def test_wdk_param_006_a_single_date_is_not_constrained_here(self) -> None:
-        # DateParam catches its own parse failure, so the refusal is a 422 that
-        # names the parameter.
-        assert DateValue(value="01/01/2025").to_wire() == "01/01/2025"
+    def test_a_single_date_is_iso_local_too(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            DateValue(value="01/01/2025")

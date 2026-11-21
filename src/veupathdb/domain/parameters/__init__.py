@@ -1,6 +1,7 @@
 """Parameter specs, typed values, vocabularies and the wire codec between them."""
 
 from veupathdb.domain.parameters.canonicalize import ParameterCanonicalizer
+from veupathdb.domain.parameters.date_bounds import ISODate
 from veupathdb.domain.parameters.dependencies import DeclaredParam, ParamGraph
 from veupathdb.domain.parameters.phyletic import (
     NO_CONSTRAINT_PATTERN,
@@ -93,6 +94,7 @@ __all__ = [
     "FilterClauseKey",
     "FilterTermClause",
     "FilterValue",
+    "ISODate",
     "InputDatasetValue",
     "InputStepValue",
     "MultiPickValue",
