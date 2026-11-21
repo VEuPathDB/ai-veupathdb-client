@@ -318,6 +318,19 @@ def test_wdk_param_017_a_boolean_is_no_vocabulary_term() -> None:
 
 
 @pytest.mark.skipif(
+    needs_qa_recording("wdk/search_genes_by_ngs_snps.json"), reason=NEEDS_QA_RECORDING
+)
+def test_wdk_param_019_an_empty_value_reads_only_where_it_is_allowed() -> None:
+    """The upper bound that allows an empty value reads it; the lower bound refuses it."""
+    upper = _parameter("search_genes_by_ngs_snps", "occurrences_upper")
+    lower = _parameter("search_genes_by_ngs_snps", "occurrences_lower")
+
+    assert upper.read_stated("") == StringValue(value="")
+    with pytest.raises(StatedValuesError):
+        lower.read_stated("")
+
+
+@pytest.mark.skipif(
     needs_qa_recording("wdk/search_genes_by_variant_characteristics.json")
     or needs_qa_recording("wdk/search_genes_by_ngs_snps.json"),
     reason=NEEDS_QA_RECORDING,

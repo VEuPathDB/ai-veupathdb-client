@@ -238,7 +238,10 @@ class TestWdkParam009HandlesAreBareIssuedIds:
         with pytest.raises(PydanticValidationError):
             InputStepValue(step_id=step_id)
 
-    @pytest.mark.parametrize("dataset_id", ["", "0", "abc", "-3"])
+    def test_wdk_param_009_an_unwired_dataset_is_empty(self) -> None:
+        assert InputDatasetValue(dataset_id="").to_wire() == ""
+
+    @pytest.mark.parametrize("dataset_id", ["0", "abc", "-3"])
     def test_wdk_param_009_a_dataset_id_is_a_positive_integer(
         self, dataset_id: str
     ) -> None:

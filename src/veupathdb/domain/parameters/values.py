@@ -121,7 +121,7 @@ class DateRangeValue(CamelModel):
 
 class TimestampValue(CamelModel):
     type: Literal["timestamp"] = "timestamp"
-    value: str = Field(min_length=1)
+    value: str
 
     def to_wire(self) -> str:
         return self.value
@@ -158,7 +158,7 @@ class MultiPickValue(CamelModel):
 
 class InputDatasetValue(CamelModel):
     type: Literal["input-dataset"] = "input-dataset"
-    dataset_id: str = Field(pattern=r"^[1-9][0-9]*$")
+    dataset_id: str = Field(pattern=r"^([1-9][0-9]*)?$")
 
     def to_wire(self) -> str:
         return self.dataset_id

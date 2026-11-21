@@ -24,6 +24,8 @@ from veupathdb.domain.parameters.values import (
     NumberRangeValue,
     ParamValue,
     SinglePickValue,
+    StringValue,
+    TimestampValue,
 )
 from veupathdb.domain.parameters.wdk_vocab import WDKVocabTerm, flatten_vocab
 from veupathdb.errors import ValidationError
@@ -39,6 +41,7 @@ from veupathdb.wdk.wdk_parameters import (
     WDKNumberRangeParam,
     WDKParameter,
     WDKStringParam,
+    WDKTimestampParam,
 )
 
 _ORTHOLOGS = "wdk/search_genes_by_orthologs.json"
@@ -118,6 +121,7 @@ class TestASmallMultiPick:
                 "enum": [o.value for o in flatten_vocab(param.vocabulary)],
                 "type": "string",
             },
+            "minItems": 1,
             "type": "array",
         }
 
@@ -144,6 +148,7 @@ def test_a_type_ahead_multi_pick_stays_a_list_of_strings() -> None:
 
     assert param.stated_schema() == {
         "items": {"minLength": 1, "type": "string"},
+        "minItems": 1,
         "type": "array",
     }
 
@@ -154,6 +159,7 @@ def test_a_tree_multi_pick_stays_a_list_of_strings() -> None:
 
     assert param.stated_schema() == {
         "items": {"minLength": 1, "type": "string"},
+        "minItems": 1,
         "type": "array",
     }
 
@@ -397,18 +403,18 @@ class TestTheCanonicalizer:
         assert json.loads(closed["r"].to_wire()) == {"min": 0, "max": 4}
 
 
-def _id_pattern(model: type[InputDatasetValue | InputStepValue], key: str) -> JsonValue:
+def _id_pattern(model: type[InputStepValue], key: str) -> JsonValue:
     properties: dict[str, dict[str, JsonValue]] = model.model_json_schema()[
         "properties"
     ]
     return properties[key]["pattern"]
 
 
-def test_a_dataset_schema_carries_the_value_model_pattern() -> None:
+def test_a_dataset_schema_takes_a_positive_integer_id() -> None:
     assert WDKDatasetParam(name="ds").stated_schema() == {
         "anyOf": [
             {"type": "integer"},
-            {"pattern": _id_pattern(InputDatasetValue, "datasetId"), "type": "string"},
+            {"pattern": "^[1-9][0-9]*$", "type": "string"},
         ]
     }
 
@@ -421,3 +427,66 @@ def test_a_recorded_step_schema_carries_the_value_model_pattern() -> None:
         "pattern": _id_pattern(InputStepValue, "stepId"),
         "type": "string",
     }
+
+
+@pytest.mark.skipif(needs_qa_recording(_NGS_SNPS), reason=NEEDS_QA_RECORDING)
+class TestAnEmptyValueIsReadAsItsDeclarationAllows:
+    def test_a_number_string_that_allows_it_reads_the_empty_value(self) -> None:
+        param = _param("search_genes_by_ngs_snps", "occurrences_upper")
+
+        assert param.read_stated("") == StringValue(value="")
+
+    def test_its_schema_offers_the_empty_value(self) -> None:
+        param = _param("search_genes_by_ngs_snps", "occurrences_upper")
+        schema: dict[str, Any] = param.stated_schema()
+
+        assert {"const": "", "type": "string"} in schema["anyOf"]
+
+    def test_its_refusal_names_the_empty_value(self) -> None:
+        param = _param("search_genes_by_ngs_snps", "occurrences_upper")
+
+        assert 'or "" to leave it empty' in _refused(param, "x")
+
+    def test_a_number_string_that_does_not_allow_it_refuses_it(self) -> None:
+        param = _param("search_genes_by_ngs_snps", "occurrences_lower")
+
+        assert "occurrences_lower takes a number" in _refused(param, "")
+
+    def test_a_multi_pick_that_does_not_allow_it_refuses_no_terms(self) -> None:
+        param = _param("search_genes_by_ngs_snps", "organismSinglePick")
+
+        assert "organismSinglePick takes" in _refused(param, [])
+
+
+class TestAnEmptyValueOnEachKind:
+    def test_a_string_that_does_not_allow_it_refuses_it(self) -> None:
+        assert "s takes a non-empty string" in _refused(WDKStringParam(name="s"), "")
+
+    def test_a_string_that_allows_it_reads_it(self) -> None:
+        param = WDKStringParam(name="s", allow_empty_value=True)
+
+        assert param.read_stated("") == StringValue(value="")
+
+    @pytest.mark.parametrize("raw", ["", []])
+    def test_a_multi_pick_that_allows_it_reads_no_terms(self, raw: JsonValue) -> None:
+        param = WDKEnumParam(
+            name="m",
+            type="multi-pick-vocabulary",
+            allow_empty_value=True,
+            vocabulary=[WDKVocabTerm(("a", "a", None))],
+        )
+
+        assert _wire(param, raw) == "[]"
+
+    def test_a_dataset_that_allows_it_reads_it(self) -> None:
+        param = WDKDatasetParam(name="ds", allow_empty_value=True)
+
+        assert param.read_stated("") == InputDatasetValue(dataset_id="")
+
+    def test_a_dataset_that_does_not_allow_it_refuses_it(self) -> None:
+        assert "ds takes" in _refused(WDKDatasetParam(name="ds"), "")
+
+    def test_a_timestamp_that_allows_it_reads_it(self) -> None:
+        param = WDKTimestampParam(name="t", allow_empty_value=True)
+
+        assert param.read_stated("") == TimestampValue(value="")

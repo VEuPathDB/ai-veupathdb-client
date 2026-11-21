@@ -324,8 +324,10 @@ Live on both sites, `GeneByLocusTag.ds_gene_ids` (`input-dataset`) and
 wired, which is the same invariant `POST /users/{id}/steps` enforces from the
 other side ([WDK-STEP-002](strategies-and-steps.md)).
 
-A stated `input-dataset` id is a positive integer and a stated `input-step` id is
-`""` or an integer, the two forms the handlers parse. The named test asserts the
+A stated `input-dataset` id is a positive integer, or `""` where the parameter allows an
+empty value
+([WDK-PARAM-019](#wdk-param-019---an-empty-value-is-valid-exactly-where-the-parameter-allows-it-whatever-its-kind)),
+and a stated `input-step` id is `""` or an integer, the forms the handlers parse. The named test asserts the
 bare step id on the wire; owner-binding is the server's check alone.
 
 ### WDK-PARAM-010 - `initialDisplayValue` is whatever the spec happens to hold; the model default behind it is never validated and never promised to return rows
@@ -665,6 +667,31 @@ The bounds come only from
 contextParamValues}`, read under the values of every parent, hidden ones included
 ([WDK-PARAM-014](#wdk-param-014---a-filter-parameters-term-summary-counts-the-values-of-one-ontology-term-the-value-is-its-own-label-and-the-terms-label-is-the-ontologys-display)).
 The recorded summary of `total_variants` spans 1 to 4,823 variants over 5,643 records.
+
+### WDK-PARAM-019 - An empty value is valid exactly where the parameter allows it, whatever its kind
+
+- class: HARD
+- upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/Param.java#L581-L590
+- anchor: src/veupathdb/domain/parameters/stated.py:_with_empty
+- status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_019_an_empty_value_reads_only_where_it_is_allowed
+
+`Param.validate` decides emptiness before any kind reads the value. A value that is null
+or `""` (and, for an enum,
+[a JSON array with no element](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/AbstractEnumParam.java#L506-L508))
+is valid when `isAllowEmpty()` is true and is never passed to the kind's own check. When
+it is false, an empty value is filled from the default or refused. `wdk-client` draws
+every widget `required={!parameter.allowEmptyValue}`. The published flag is
+`allowEmptyValue`.
+
+The recorded `GenesByNgsSnps.occurrences_upper` is a `string` with `isNumber: true`,
+`allowEmptyValue: true` and `initialDisplayValue: ""`; its help says an empty value means
+no upper bound. `occurrences_lower` is the same kind with `allowEmptyValue: false`.
+
+`read_stated` reads `""` (and `[]` for a multi-pick) as the kind's empty value where the
+parameter allows it, and refuses it where it does not; the stated schema and the refusal
+offer `""` only where it is allowed. In the VEuPathDB models (ApiCommonModel,
+OrthoMCLModel, EbrcModelCommon) `allowEmpty` is declared on `string`, multi-pick,
+`input-dataset` and `timestamp` parameters only, and `AnswerParam` allows it always.
 
 # WDK-VOCAB - vocabularies, trees, and the parents they were read under
 

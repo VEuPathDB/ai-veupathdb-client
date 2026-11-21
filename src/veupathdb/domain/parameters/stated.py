@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Annotated, Any, Protocol
+from typing import Annotated, Any, Literal, Protocol
 
 import pydantic
 from pydantic import (
@@ -61,6 +61,8 @@ class StatedDeclaration(Protocol):
     @property
     def is_number(self) -> bool: ...
     @property
+    def allow_empty_value(self) -> bool: ...
+    @property
     def length(self) -> int: ...
     @property
     def min(self) -> float | None: ...
@@ -102,6 +104,7 @@ class _Declared:
     name: str
     kind: ParamKind
     is_number: bool
+    allow_empty: bool
     length: int
     low: float | None
     high: float | None
@@ -158,6 +161,14 @@ class _Shape:
     example: JsonValue
 
 
+_EMPTY: dict[ParamKind, Stated] = {
+    "string": StringValue(value=""),
+    "timestamp": TimestampValue(value=""),
+    "multi-pick-vocabulary": MultiPickValue(values=[]),
+    "input-dataset": InputDatasetValue(dataset_id=""),
+}
+
+
 def _number(d: _Declared) -> Any:
     return Annotated[float, Field(ge=d.low, le=d.high, allow_inf_nan=False)]
 
@@ -204,9 +215,9 @@ def _string(d: _Declared) -> _Shape:
         finite: Any = Annotated[float, Field(allow_inf_nan=False)]
         return _Shape(finite | decimal, _number_text(d.length), f"a number{limit}", 5)
     return _Shape(
-        Annotated[str, Field(max_length=d.length or None)],
+        Annotated[str, Field(min_length=1, max_length=d.length or None)],
         lambda v: StringValue(value=v),
-        f"a string{limit}",
+        f"a non-empty string{limit}",
         "text",
     )
 
@@ -291,7 +302,7 @@ def _multi_pick(d: _Declared) -> _Shape:
     term: Any
     term, listed = _term(d)
     return _Shape(
-        list[term],
+        Annotated[list[term], Field(min_length=0 if d.allow_empty else 1)],
         lambda v: MultiPickValue(values=v),
         f"a list of terms from {listed}" if listed else "a list of vocabulary terms",
         [d.first_term],
@@ -317,7 +328,7 @@ def _filter(d: _Declared) -> _Shape:
 
 def _input_dataset(_: _Declared) -> _Shape:
     return _Shape(
-        int | Annotated[str, *InputDatasetValue.model_fields["dataset_id"].metadata],
+        int | Annotated[str, Field(pattern=r"^[1-9][0-9]*$")],
         lambda v: InputDatasetValue(dataset_id=str(v)),
         "a positive integer dataset id",
         123,
@@ -348,9 +359,21 @@ _SHAPES: dict[ParamKind, Callable[[_Declared], _Shape]] = {
 }
 
 
+def _with_empty(d: _Declared, shape: _Shape) -> _Shape:
+    empty = _EMPTY.get(d.kind)
+    if not d.allow_empty or empty is None:
+        return shape
+    return _Shape(
+        shape.stated | Literal[""],
+        lambda v: empty if v == "" else shape.to_value(v),
+        f'{shape.text}, or "" to leave it empty',
+        shape.example,
+    )
+
+
 @lru_cache(maxsize=4096)
 def _reading(d: _Declared) -> StatedReading:
-    shape = _SHAPES[d.kind](d)
+    shape = _with_empty(d, _SHAPES[d.kind](d))
     config = None if d.kind in _MODEL_KINDS else _STRICT
     adapter: TypeAdapter[Stated] = TypeAdapter(
         Annotated[shape.stated, AfterValidator(shape.to_value)], config=config
@@ -377,6 +400,7 @@ def stated_reading(param: StatedDeclaration) -> StatedReading:
             name=param.name,
             kind=param.type,
             is_number=param.is_number,
+            allow_empty=param.allow_empty_value,
             length=param.length,
             low=param.min,
             high=param.max,
