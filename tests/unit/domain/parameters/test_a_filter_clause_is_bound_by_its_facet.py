@@ -255,3 +255,82 @@ def test_an_ontology_term_reads_its_units() -> None:
     assert {term.term: term.units for term in param.ontology}["variants_per_kb"] == (
         "variants/kb"
     )
+
+
+def test_a_member_facet_with_no_members_refuses_every_member() -> None:
+    text = _refusal(
+        _variant_stats(), [{"field": "most_severe_impact", "value": ["HIGH"]}]
+    )
+
+    assert "has no members under the current parameter values" in text
+
+
+@pytest.mark.parametrize(
+    "clause",
+    [
+        {
+            "field": "x",
+            "type": "string",
+            "isRange": False,
+            "includeUnknown": False,
+            "value": [None],
+        },
+        {
+            "field": "x",
+            "type": "number",
+            "isRange": False,
+            "includeUnknown": False,
+            "value": [None],
+        },
+        {
+            "field": "x",
+            "type": "date",
+            "isRange": False,
+            "includeUnknown": False,
+            "value": ["2015-01-01"],
+        },
+        {
+            "field": "x",
+            "type": "longitude",
+            "isRange": True,
+            "includeUnknown": False,
+            "value": {"min": 1},
+        },
+    ],
+)
+def test_a_clause_wdk_does_not_parse_is_refused(clause: object) -> None:
+    with pytest.raises(PydanticValidationError):
+        FilterValue.model_validate({"filters": [clause]})
+
+
+def test_a_held_clause_no_statement_can_state_is_refused() -> None:
+    stored = FilterValue.model_validate(
+        {
+            "filters": [
+                {
+                    "field": "VAR_68bb04bd",
+                    "type": "multiFilter",
+                    "isRange": False,
+                    "includeUnknown": False,
+                    "value": {"operation": "union", "filters": []},
+                }
+            ]
+        }
+    )
+
+    with pytest.raises(FilterStatementError):
+        _samples().held(stored)
+
+
+@pytest.mark.parametrize(
+    ("low", "high", "text"),
+    [
+        (0.0, 4120.5, "0 to 4,120.5 over 7 records"),
+        (1e-8, 0.5, "0.00000001 to 0.5 over 7 records"),
+        ("2001-11-22", "2014-08-30", "2001-11-22 to 2014-08-30 over 7 records"),
+    ],
+)
+def test_a_range_is_written_in_plain_decimals(
+    low: float | str, high: float | str, text: str
+) -> None:
+    assert FacetRange(min=low, max=high, records=7, units=None).text() == text

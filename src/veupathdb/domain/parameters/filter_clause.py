@@ -5,15 +5,15 @@ from __future__ import annotations
 import json
 from collections.abc import Sequence
 from decimal import Decimal
-from typing import Annotated, Any, Literal, Protocol, Self
+from typing import Annotated, Literal, Protocol, Self
 
 from pydantic import (
+    BaseModel,
     ConfigDict,
-    Discriminator,
     Field,
     JsonValue,
+    PlainSerializer,
     RootModel,
-    Tag,
     TypeAdapter,
     model_validator,
 )
@@ -49,10 +49,13 @@ class DateBounds(_Bounds):
     max: ISODate | None = None
 
 
-class _Clause(CamelModel):
-    model_config = ConfigDict(
-        alias_generator=to_camel, populate_by_name=True, frozen=True, extra="ignore"
-    )
+class _Clause(
+    BaseModel,
+    frozen=True,
+    extra="ignore",
+    alias_generator=to_camel,
+    populate_by_name=True,
+):
     field: str
     type: str
     is_range: bool
@@ -66,25 +69,25 @@ class _Clause(CamelModel):
         return (self.field, self.is_range, self.include_unknown, self._terms())
 
 
-class StringMembers(_Clause):
+class StringMembers(_Clause, frozen=True):
     type: Literal["string"]
     is_range: Literal[False]
-    value: list[str | None]
+    value: list[str]
 
     def _terms(self) -> frozenset[str]:
-        return frozenset(str(member) for member in self.value)
+        return frozenset(self.value)
 
 
-class NumberMembers(_Clause):
+class NumberMembers(_Clause, frozen=True):
     type: Literal["number"]
     is_range: Literal[False]
-    value: list[float | None]
+    value: list[float]
 
     def _terms(self) -> frozenset[str]:
-        return frozenset(str(member) for member in self.value)
+        return frozenset(map(str, self.value))
 
 
-class NumberRange(_Clause):
+class NumberRange(_Clause, frozen=True):
     type: Literal["number"]
     is_range: Literal[True]
     value: NumberBounds
@@ -93,7 +96,7 @@ class NumberRange(_Clause):
         return frozenset(f"{k}={v}" for k, v in self.value.model_dump().items())
 
 
-class DateRange(_Clause):
+class DateRange(_Clause, frozen=True):
     type: Literal["date"]
     is_range: Literal[True]
     value: DateBounds
@@ -108,7 +111,7 @@ class MultiFilterValue(CamelModel):
     filters: list[StringMembers]
 
 
-class MultiMembers(_Clause):
+class MultiMembers(_Clause, frozen=True):
     type: Literal["multiFilter"]
     is_range: Literal[False]
     value: MultiFilterValue
@@ -118,21 +121,11 @@ class MultiMembers(_Clause):
         return frozenset((self.value.operation, *leaves))
 
 
-def _clause_tag(raw: Any) -> str:
-    if isinstance(raw, _Clause):
-        return f"{raw.type}:{raw.is_range}"
-    if isinstance(raw, dict):
-        return f"{raw.get('type')}:{raw.get('isRange')}"
-    return ""
-
+_Number = Annotated[NumberMembers | NumberRange, Field(discriminator="is_range")]
 
 FilterClause = Annotated[
-    Annotated[StringMembers, Tag("string:False")]
-    | Annotated[NumberMembers, Tag("number:False")]
-    | Annotated[NumberRange, Tag("number:True")]
-    | Annotated[DateRange, Tag("date:True")]
-    | Annotated[MultiMembers, Tag("multiFilter:False")],
-    Discriminator(_clause_tag),
+    StringMembers | _Number | DateRange | MultiMembers,
+    Field(discriminator="type"),
 ]
 
 _CLAUSE: TypeAdapter[FilterClause] = TypeAdapter(FilterClause)
@@ -197,13 +190,15 @@ class _FilterDeclaration(Protocol):
     def values(self) -> dict[str, list[str]] | None: ...
 
 
-def _shown(bound: float | str) -> str:
-    return bound if isinstance(bound, str) else f"{Decimal(repr(bound)).normalize():,f}"
+_Shown = Annotated[
+    float,
+    PlainSerializer(lambda v: f"{Decimal(repr(v)).normalize():,f}", return_type=str),
+]
 
 
 class FacetRange(CamelModel):
-    min: float | str
-    max: float | str
+    min: _Shown | str
+    max: _Shown | str
     records: int
     units: str | None
 
@@ -238,7 +233,8 @@ class FacetRange(CamelModel):
 
     def text(self) -> str:
         units = f" {self.units}" if self.units else ""
-        return f"{_shown(self.min)} to {_shown(self.max)}{units} over {self.records:,} records"
+        span = self.model_dump()
+        return f"{span['min']} to {span['max']}{units} over {self.records:,} records"
 
 
 class FilterFacet(CamelModel):
@@ -280,8 +276,11 @@ class FilterFacet(CamelModel):
         except PydanticValidationError:
             read = json.dumps(proposal.value)
             raise FilterStatementError([f"{self.form()}; it read {read}."]) from None
+        if not self.members and not self.ranged:
+            text = f"{self.term} ({self.display}) has no members under the current parameter values."
+            raise FilterStatementError([text])
         unknown = sorted({str(v) for v in proposal.value} - set(self.members))
-        if self.members and not self.ranged and unknown:
+        if not self.ranged and unknown:
             text = (
                 f"{self.term} ({self.display}) has no member {', '.join(unknown)}; "
                 f"its members are {', '.join(self.members)}."
@@ -318,19 +317,21 @@ class FilterFacets(RootModel[list[FilterFacet]]):
         return self._bound(proposals.root)
 
     def held(self, value: FilterValue) -> FilterValue:
-        return self._bound(
-            [
+        try:
+            proposals = [
                 FilterProposal.model_validate(
                     clause.model_dump(
                         by_alias=True,
                         mode="json",
-                        exclude_none=True,
                         include={"field", "value", "include_unknown"},
                     )
                 )
                 for clause in value.filters
             ]
-        )
+        except PydanticValidationError:
+            text = f"{value.to_wire()} holds a clause no filter statement states."
+            raise FilterStatementError([text]) from None
+        return self._bound(proposals)
 
     def _bound(self, proposals: Sequence[FilterProposal]) -> FilterValue:
         clauses: list[FilterClause] = []
