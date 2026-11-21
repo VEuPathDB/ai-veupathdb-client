@@ -1,7 +1,7 @@
 ---
 type: Rules
 title: Parameter and vocabulary rules
-description: The eleven types and the exact string each takes, the mark that names a search's organism parameter, the shape a filter clause value takes per facet, what a filter term's summary counts and where its labels come from, why a hidden or read-only parameter is set by the site and follows its parents, the two encodings a vocabulary value can have and which one is silently wrong, why a dependent value is only meaningful under the parent it was read with, and why a search definition belongs to the user who read it.
+description: The eleven types and the exact string each takes, how a stated value is read by its parameter's kind, the mark that names a search's organism parameter, the shape a filter clause value takes per facet and where a range facet's bounds come from, what a filter term's summary counts and where its labels come from, why a hidden or read-only parameter is set by the site and follows its parents, the two encodings a vocabulary value can have and which one is silently wrong, why a dependent value is only meaningful under the parent it was read with, and why a search definition belongs to the user who read it.
 tags: [wdk-alignment, rules, parameters, vocabularies, dependent-params, wire-format]
 generated: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
 verified: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
@@ -66,6 +66,9 @@ This is the rule everything below depends on. A JSON object nested where a
 string belongs does not mean the same thing more conveniently; it means
 nothing.
 
+A caller states a value in the native shape of its kind, and the client writes the
+string ([WDK-PARAM-017](#wdk-param-017---a-value-is-read-by-its-parameters-kind-a-number-is-written-as-the-shortest-decimal-a-date-is-iso_local_date-and-a-boolean-is-no-vocabulary-term)).
+
 ### WDK-PARAM-003 - A single-pick value is a bare term, a one-element array means the same thing, and two elements is a 500
 
 - class: HARD
@@ -101,14 +104,12 @@ The last row matters for the next rule: **single-pick does not split on
 commas.** `2,-3` is a real term of `GenesByMultiBlast.MatchMismatchScore` on
 both sites and it survives intact.
 
-Nothing enforces this. `test_value_round_trip.py::test_single_pick` looks
-relevant and is not: it asserts only that `decode(encode(x)) == x`, never
-inspecting the encoded string, so it would pass just as well if
-`SinglePickValue.to_wire` wrapped the term in an array or in quotes. No test in
-the repository asserts the literal wire form of a single-pick value, and none
-covers the 500 or the comma behaviour. Compare
-[WDK-PARAM-004](#wdk-param-004---a-multi-pick-value-is-a-json-array-a-bare-string-is-accepted-and-split-on-commas),
-whose test does constrain the encoding.
+The `test_wdk_param_003_*` tests assert the literal wire form: the bare term, with no
+array and no quotes, a term that holds a comma kept whole, and no way to state two
+terms. A stated single-pick value is one
+string, so a list is refused before it can reach the 500, and a small vocabulary is
+an exact term of its `enum`
+([WDK-PARAM-017](#wdk-param-017---a-value-is-read-by-its-parameters-kind-a-number-is-written-as-the-shortest-decimal-a-date-is-iso_local_date-and-a-boolean-is-no-vocabulary-term)).
 
 ### WDK-PARAM-004 - A multi-pick value is a JSON array; a bare string is accepted and split on commas
 
@@ -144,12 +145,6 @@ rules here whose test constrains the **encoding** rather than merely its
 invertibility. The named test asserts `json.loads(to_wire()) == ["bant", "bsub"]`
 and, in the same file, `to_wire() == "[]"` for the empty selection - the wire
 form itself, up to JSON equivalence, so no separator-joined codec passes it.
-
-`test_value_round_trip.py::test_terms_made_of_the_separator` is the useful
-companion and was named here first. It round-trips terms made **only** of
-commas, which excludes exactly the encoding this rule warns about - but only
-that one: a pipe-joined codec would satisfy it. The literal assertion is the
-stronger evidence, so the status field points there.
 
 The tool surface has to carry the same shape. Making the agent hand-encode the
 array was its own bug, recorded in
@@ -192,7 +187,7 @@ above, and the same input through the canonicalizer becomes
 
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/DateRangeParam.java#L154-L207
-- anchor: src/veupathdb/domain/parameters/values.py:DateRangeValue
+- anchor: src/veupathdb/domain/parameters/date_bounds.py:ISODate
 - status: ENFORCED by tests/unit/domain/parameters/test_values.py::test_wdk_param_006_a_bound_wdk_cannot_parse_is_refused
 
 The `try` block does two different jobs and catches only one of their failures.
@@ -212,12 +207,16 @@ may simply be a date in the wrong format. `DateParam` is safe here -
 [it catches `DateTimeParseException` directly](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/DateParam.java#L135-L170)
 - so this is a defect of the range type alone.
 
+`ISODate` is the `ISO_LOCAL_DATE` form both types parse. A date and each bound of a
+date-range are `ISODate`, so `01/01/2025`, `20250101` and `2025-W01-1` are refused
+before a request is made.
+
 ### WDK-PARAM-007 - A numeric bound is usually a `string` parameter, and it rejects thousands separators
 
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/StringParam.java#L171-L203
 - anchor: src/veupathdb/wdk/wdk_parameters.py:is_number
-- status: PARTIAL by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_007_a_numeric_bound_is_a_string_parameter_flagged_is_number
+- status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_007_a_numeric_bound_is_a_string_parameter_flagged_is_number
 
 `StringParam.validateValue` parses the value as a double when `isNumber` is set,
 and `StringParamFormatter`
@@ -242,12 +241,10 @@ Treating these as free text rather than as numbers is what makes a client
 discard their curated defaults, recorded in
 `pathfinder: docs/knowledge/decisions/numeric-default-is-not-an-example.md`.
 
-The status is `PARTIAL` and the split is clean. The named test covers the first
-half: it builds `ParameterInfo(type="string", is_number=True)` for the five live
-`GenesBySnps` bounds and asserts each keeps its default, and it would fail if
-`is_number` stopped being honoured. **Nothing covers the second half** - no test
-asserts that a thousands separator is rejected, or exercises any value against
-the parameter's regex at all.
+The named test covers both halves over the recorded `GenesByMolecularWeight`:
+`min_molecular_weight` is `type: "string"` with `isNumber: true`, and its stated
+value `10,000` is refused. A stated number is written as its shortest decimal
+([WDK-PARAM-017](#wdk-param-017---a-value-is-read-by-its-parameters-kind-a-number-is-written-as-the-shortest-decimal-a-date-is-iso_local_date-and-a-boolean-is-no-vocabulary-term)).
 
 ### WDK-PARAM-008 - The revise endpoint echoes the values WDK would substitute, not the ones you sent
 
@@ -327,12 +324,9 @@ Live on both sites, `GeneByLocusTag.ds_gene_ids` (`input-dataset`) and
 wired, which is the same invariant `POST /users/{id}/steps` enforces from the
 other side ([WDK-STEP-002](strategies-and-steps.md)).
 
-This rule was briefly marked `ENFORCED by
-test_value_round_trip.py::test_input_step`, and that was wrong. That test is
-invertibility over arbitrary text - it would pass if `to_wire` JSON-quoted the
-step id - and it says nothing about `input-dataset` and nothing about
-owner-binding. It is recorded here rather than quietly deleted because a
-conformance column is worth exactly as much as its worst entry.
+A stated `input-dataset` id is a positive integer and a stated `input-step` id is
+`""` or an integer, the two forms the handlers parse. The named test asserts the
+bare step id on the wire; owner-binding is the server's check alone.
 
 ### WDK-PARAM-010 - `initialDisplayValue` is whatever the spec happens to hold; the model default behind it is never validated and never promised to return rows
 
@@ -473,8 +467,8 @@ defaulted on every later read of the same step.
 
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNewStableValue.java#L224-L248
-- anchor: veupathdb-mcp: src/veupathdb_mcp/catalog/_param_filters.py:_clause
-- status: ENFORCED by veupathdb-mcp: tests/unit/catalog/test_a_range_facet_takes_min_and_max.py::test_a_range_facet_is_written_as_min_and_max
+- anchor: src/veupathdb/domain/parameters/filter_clause.py:FilterClause
+- status: ENFORCED by tests/unit/domain/parameters/test_a_filter_clause_is_bound_by_its_facet.py::test_a_list_on_a_range_facet_is_refused_with_its_form
 
 `FilterParamNewStableValue` builds one filter per clause and reads `value` with the
 accessor its facet kind needs. A `date` clause is a `DateRangeFilter` read with
@@ -497,9 +491,12 @@ JSONObject (class org.json.JSONArray).` Fifteen of that parameter's sixteen face
 `type: number, isRange: true`, so a client that writes every clause as a member list
 cannot bind any of them.
 
-`FilterTermClause.value` is `JsonValue`, so this client carries both shapes. The shape
-is chosen where a clause is bound to its ontology term, which is the tool server's
-`_clause`.
+`FilterClause` is the clauses WDK parses, discriminated on `type` and then on
+`isRange`: `StringMembers`, `NumberMembers`, `NumberRange`, `DateRange` and
+`MultiMembers`. A clause that does not state `type` and `isRange` is refused, and so is
+one whose `value` does not take the shape its class reads. The shape is chosen where a
+stated clause is bound to its facet
+([WDK-PARAM-018](#wdk-param-018---a-filter-clause-states-type-and-isrange-from-its-facet-and-a-range-facets-bounds-come-only-from-its-term-summary)).
 
 ### WDK-PARAM-013 - The organism parameter of a search is the one WDK marks with `organismProperties`; a name is not the mark
 
@@ -534,7 +531,7 @@ and their leaves are experiments and samples under organism branches.
 
 - class: CONTRACT
 - upstream: https://github.com/VEuPathDB/WDK/blob/736013d6baf757d8d44709db962952ef512d400f/Service/src/main/java/org/gusdb/wdk/service/formatter/param/ParamContainerFormatter.java#L68-L90
-- anchor: src/veupathdb/wdk/_searches.py:get_ontology_term_summary
+- anchor: src/veupathdb/domain/parameters/filter_clause.py:FacetRange
 - status: ENFORCED by tests/unit/wdk/test_ontology_term_summary.py::test_each_value_of_the_term_is_read_with_its_two_counts
 
 [`QuestionService.getFilterParamOntologyTermSummary`](https://github.com/VEuPathDB/WDK/blob/736013d6baf757d8d44709db962952ef512d400f/Service/src/main/java/org/gusdb/wdk/service/service/QuestionService.java#L304-L359)
@@ -553,6 +550,11 @@ for it, and the filter form shows it as it is. The label of the term itself is t
 carries. Measured on plasmodb.org on 2026-09-28, `GenesByNgsSnps.variation_sample_meta`
 term `VAR_68bb04bd` (ontology `display` `sex`) under P. falciparum 3D7 answered `female`
 6 and `male` 6 of 12 samples.
+
+`FacetRange` reads a range facet's span from the same response: the least and the
+greatest value with a `count` above zero, and `internalsCount` as the records it spans.
+`wdk-client` computes a range the same way, as the minimum and the maximum over
+`valueCounts`.
 
 ### WDK-PARAM-015 - `isReadOnly` is presentation only
 
@@ -605,6 +607,64 @@ the caller bound, as for any dependent
 ([WDK-VOCAB-004](#wdk-vocab-004---a-dependent-value-is-only-meaningful-under-the-parent-it-was-read-with-and-wdk-accepts-it-under-any-parent-whose-vocabulary-happens-to-contain-it)).
 `ParamGraph` keeps the site-set parameter as a wire parent of its own dependents and as a
 wire child of its parents, so a refresh of a bound parent reaches it.
+
+### WDK-PARAM-017 - A value is read by its parameter's kind: a number is written as the shortest decimal, a date is `ISO_LOCAL_DATE`, and a boolean is no vocabulary term
+
+- class: HARD
+- upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/StringParam.java#L171-L203
+- anchor: src/veupathdb/domain/parameters/stated.py:read_stated_values
+- status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_017_a_number_is_written_as_the_shortest_decimal
+
+Every value WDK reads is a string
+([WDK-PARAM-002](#wdk-param-002---every-parameter-value-is-a-string-including-the-structured-ones)),
+and each kind parses its string in its own way. A `string` with `isNumber` is parsed with
+`Double.valueOf` and then matched against a site regex that the published parameter does
+not carry; `GenesByNgsSnps.MinPercentMinorAlleles` takes one or two digits. A `number` is
+parsed the same way and checked against `min` and `max`. A `date` and each bound of a
+`date-range` are parsed as `ISO_LOCAL_DATE`
+([WDK-PARAM-006](#wdk-param-006---a-date-range-whose-bounds-are-well-formed-json-but-badly-formatted-dates-is-a-500-not-a-validation-error)).
+An enum value is an exact, case-sensitive term of its vocabulary.
+
+So the text a client makes from a native value decides whether the value is valid. A
+float written by `str` is `5.0` or `1e-08`, and neither matches a digits-only regex. A
+boolean written as text is `true` or `True`, and a `yes`/`no` vocabulary such as
+`GenesByOrthologs.isSyntenic` holds neither.
+
+`read_stated_values` reads each stated value by its parameter's kind and gathers every
+fault of a search into one refusal. A number is written as its shortest decimal and never
+with an exponent: `5.0` is `5` and `1e-8` is `0.00000001`; `NaN`, infinity and a boolean
+are refused. A date that is not `ISO_LOCAL_DATE` is refused. A boolean is no vocabulary
+term and is refused with the terms named. The tests read the recorded
+`GenesByNgsSnps`, `metrics/Awstats` and `GenesByOrthologs` documents.
+
+### WDK-PARAM-018 - A filter clause states `type` and `isRange` from its facet, and a range facet's bounds come only from its term summary
+
+- class: SILENT
+- upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNewStableValue.java#L224-L248
+- anchor: src/veupathdb/domain/parameters/filter_clause.py:FilterFacets
+- status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_018_a_clause_states_type_and_is_range_from_its_facet
+
+`FilterParamNewStableValue` takes each clause's class from its `type` and then its
+`isRange`
+([WDK-PARAM-012](#wdk-param-012---a-filter-clauses-value-is-an-object-of-bounds-for-a-range-facet-and-a-list-for-a-member-facet-chosen-by-the-facets-type)).
+It does not compare them with the ontology term the clause names. A `string` clause over
+a numeric range term runs: `["0","0.05"]` becomes `IN ('0','0.05')`, which selects
+nothing the researcher meant. A range is inclusive, and a null bound is unbounded.
+`wdk-client` takes `type` and `isRange` from the parameter's `ontology`.
+
+`FilterFacets.bind` does the same. A stated clause names a facet by its term or its
+display, exactly; it gets its `type` and `isRange` from that facet, and a member is
+checked against the facet's members. A name that is no facet is refused with the facet
+terms named.
+
+The published `values` map leaves out every `isRange` term, so it holds no bound for a
+range facet. In the recorded `GenesByVariantCharacteristics.gene_variant_stats` the map
+is empty, and in `GenesByNgsSnps.variation_sample_meta` it holds only the member terms.
+The bounds come only from
+`POST .../{paramName}/ontology-term-summary` with `{ontologyId, filters,
+contextParamValues}`, read under the values of every parent, hidden ones included
+([WDK-PARAM-014](#wdk-param-014---a-filter-parameters-term-summary-counts-the-values-of-one-ontology-term-the-value-is-its-own-label-and-the-terms-label-is-the-ontologys-display)).
+The recorded summary of `total_variants` spans 1 to 4,823 variants over 5,643 records.
 
 # WDK-VOCAB - vocabularies, trees, and the parents they were read under
 

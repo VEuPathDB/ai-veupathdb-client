@@ -33,17 +33,32 @@ fourth is not in `searchConfig` at all - see the last section.
 `FilterParamNew` is an ordinary entry in `parameters` whose stable value is a
 JSON object holding faceted clauses. The class's own header comment
 [is the format specification](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNewStableValue.java#L29-L62):
-a `filters` array of `{field, value}` objects where `value` is either a
-`{min, max}` object or a list of strings, plus optional `includeUnknown`,
-`isRange` and `type`. Note that the comment's sample writes `includeUnknowns`
-while the constant beside it is `includeUnknown`; the constant is what is read.
+a `filters` array of clauses. The parser itself needs more than the comment shows: each
+clause states `field`, `type` and `isRange`, and `value` or `includeUnknown`, and its
+class comes from `type` and then `isRange`. A range clause's `value` is a `{min, max}`
+object, a member clause's is a list, and a `multiFilter` clause's is an object of
+`operation` and leaf clauses
+([WDK-PARAM-012](../rules/parameters-and-vocabularies.md)). Note that the comment's
+sample writes `includeUnknowns` while the constant beside it is `includeUnknown`; the
+constant is what is read.
 
 Its parameter document is the largest of any type.
 [`FilterParamNewFormatter`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/formatter/param/FilterParamNewFormatter.java#L20-L49)
 adds an `ontology` array - one entry per filterable field, with `term`,
 `parent`, `type`, `isRange`, `precision` and `units` - and a `values` map from
 field to the values seen. So the vocabulary of a filter parameter is
-two-dimensional: which field, and then which value within it.
+two-dimensional: which field, and then which value within it. The `values` map holds
+no `isRange` term; a range facet's bounds are read from its term summary
+([WDK-PARAM-018](../rules/parameters-and-vocabularies.md)).
+
+`minSelectedCount` on a filter parameter is checked by the reference client alone.
+[`isParamValueValid`](https://github.com/VEuPathDB/web-monorepo/blob/50c00301ea0cac997af6669f2f77243d63fff77d/packages/libs/wdk-client/src/Views/Question/Params/FilterParamNew/FilterParamUtils.ts#L35-L43)
+compares it with the filtered count, which
+[the state](https://github.com/VEuPathDB/web-monorepo/blob/50c00301ea0cac997af6669f2f77243d63fff77d/packages/libs/wdk-client/src/Views/Question/Params/FilterParamNew/State.ts#L101)
+takes from `nativeFiltered` of
+[`POST .../{paramName}/summary-counts`](https://github.com/VEuPathDB/web-monorepo/blob/50c00301ea0cac997af6669f2f77243d63fff77d/packages/libs/wdk-client/src/Service/Mixins/SearchesService.ts#L95-L115)
+with `{filters, contextParamValues}`. A count that is not known yet passes. WDK itself
+does not enforce it.
 
 Live on 2026-08-10, 26 filter parameters appear across plasmodb.org's transcript
 searches and 10 across toxodb.org's, all with `initialDisplayValue` of

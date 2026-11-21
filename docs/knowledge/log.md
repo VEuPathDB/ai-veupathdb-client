@@ -1,5 +1,23 @@
 # Knowledge log
 
+## 2026-11-21 - A filter is read as stated clauses
+
+- A `filter` parameter reads a stated value as `FilterProposals`, a non-empty list of
+  `{field, value, includeUnknown}`. Its stated schema names every facet by term and by
+  display in the `enum` of `field`, inline with no `$defs`. The shorthand is refused with
+  the clause form as its example.
+- [WDK-PARAM-017](wdk/rules/parameters-and-vocabularies.md) records that a value is read
+  by its parameter's kind, and
+  [WDK-PARAM-018](wdk/rules/parameters-and-vocabularies.md) that a clause takes `type`
+  and `isRange` from its facet and a range facet's bounds come only from its term
+  summary.
+- WDK-PARAM-006, -012 and -014 are anchored to `ISODate`, `FilterClause` and
+  `FacetRange`; WDK-PARAM-012 is anchored in this client and no longer in the tool
+  server. WDK-PARAM-007 is enforced: a stated `10,000` is refused.
+- [Filters](wdk/model/filters.md) records that `minSelectedCount` on a filter parameter is
+  checked only by `wdk-client`, against `nativeFiltered` of `summary-counts`.
+- `veupathdb-py` is 0.9.0b8.
+
 ## 2026-11-21 - A value is read by its parameter
 
 - Each parameter reads what a caller states in the native shape of its kind:
@@ -434,7 +452,7 @@ an `invalid` import names what is wrong with the data.
 
 `get_ontology_term_summary` calls
 `POST /record-types/{recordType}/searches/{searchName}/{paramName}/ontology-term-summary`
-with `ontologyId`, `filters` (each a `FilterTermClause` in its wire form) and
+with `ontologyId`, `filters` (each a filter clause in its wire form) and
 `contextParamValues`, and reads `WDKOntologyTermSummary`: `valueCounts` of
 `WDKOntologyTermValueCount` (`value`, `count`, `filteredCount`), `internalsCount` and
 `internalsFilteredCount`. [WDK-PARAM-014](wdk/rules/parameters-and-vocabularies.md)
@@ -465,8 +483,8 @@ search on both sites, no search carries two marked parameters. `ms_assay` and
 clause with `isRange: false` as a list. On plasmodb.org a member list on the range facet
 `variants_per_kb` of `GenesByVariantCharacteristics` is refused with
 `JSONObject["value"] is not a JSONObject`. The rule is anchored in `veupathdb-mcp`, where
-a clause is bound to its facet; this client needs no change, because
-`FilterTermClause.value` is `JsonValue`.
+a clause is bound to its facet; this client needed no change, because a clause's
+`value` was then any JSON value.
 
 ## 2026-09-24 - A search report takes view filters, and a gene-id distribution is recorded
 
