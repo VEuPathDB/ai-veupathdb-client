@@ -10,7 +10,7 @@ from pydantic import TypeAdapter
 from veupathdb.domain.parameters.dependencies import ParamGraph
 from veupathdb.domain.parameters.specs import (
     ParamSpecNormalized,
-    fill_hidden_required_defaults,
+    fill_site_set_defaults,
 )
 from veupathdb.domain.parameters.value_codec import to_wire
 from veupathdb.domain.parameters.wdk_vocab import (
@@ -105,7 +105,7 @@ def test_wdk_param_011_a_hidden_required_parameter_is_filled_from_its_default() 
         initial_display_value=str(hidden["initialDisplayValue"]),
     )
 
-    filled = fill_hidden_required_defaults({spec.name: spec}, {})
+    filled = fill_site_set_defaults({spec.name: spec}, {})
 
     assert hidden["isVisible"] is False
     assert to_wire(filled["eda_dataset_id"]) == hidden["initialDisplayValue"]

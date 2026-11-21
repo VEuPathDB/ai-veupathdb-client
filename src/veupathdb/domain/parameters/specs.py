@@ -62,7 +62,7 @@ def _is_site_set_required_fill(spec: ParamSpecNormalized) -> bool:
     return spec.site_set and spec.required and spec.initial_display_value is not None
 
 
-def filled_hidden_defaults(
+def filled_site_set_defaults(
     param_specs: dict[str, ParamSpecNormalized],
     parameters: Mapping[str, ParamValue],
 ) -> list[str]:
@@ -78,7 +78,7 @@ def filled_hidden_defaults(
     )
 
 
-def fill_hidden_required_defaults(
+def fill_site_set_defaults(
     param_specs: dict[str, ParamSpecNormalized],
     parameters: Mapping[str, ParamValue],
 ) -> dict[str, ParamValue]:

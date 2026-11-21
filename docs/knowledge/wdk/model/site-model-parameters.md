@@ -98,7 +98,7 @@ published `initialDisplayValue` of **every** hidden parameter the caller did not
 that has one to the context of a metadata read, by shape rather than by name and whether
 or not it allows empty
 (`veupathdb-mcp: src/veupathdb_mcp/catalog/search_context.py:context_for_metadata_read`).
-A run is a different case. There `fill_hidden_required_defaults` supplies each site-set
+A run is a different case. There `fill_site_set_defaults` supplies each site-set
 parameter (hidden or read-only, [WDK-PARAM-015](../rules/parameters-and-vocabularies.md))
 that is required and has a default, because its value reaches the step's `searchConfig`
 and chooses the science.

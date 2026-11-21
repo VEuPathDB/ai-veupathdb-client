@@ -31,8 +31,8 @@ from veupathdb.domain.parameters.phyletic_expression import (
 )
 from veupathdb.domain.parameters.specs import (
     ParamSpecNormalized,
-    fill_hidden_required_defaults,
-    filled_hidden_defaults,
+    fill_site_set_defaults,
+    filled_site_set_defaults,
     find_input_step_param,
 )
 from veupathdb.domain.parameters.unbound import UnboundParameter
@@ -129,8 +129,8 @@ __all__ = [
     "collect_leaf_terms",
     "dedupe_options",
     "derive_binding",
-    "fill_hidden_required_defaults",
-    "filled_hidden_defaults",
+    "fill_site_set_defaults",
+    "filled_site_set_defaults",
     "find_input_step_param",
     "flatten_vocab",
     "from_wire",

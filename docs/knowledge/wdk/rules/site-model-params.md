@@ -190,7 +190,7 @@ cannot.
 
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/ApiCommonModel/blob/301b2be012af713411e9b0e216ed93c51d04c239/Model/lib/wdk/model/questions/params/geneParams.xml#L4873-L4879
-- anchor: src/veupathdb/domain/parameters/specs.py:fill_hidden_required_defaults
+- anchor: src/veupathdb/domain/parameters/specs.py:fill_site_set_defaults
 - status: ENFORCED by tests/unit/domain/parameters/test_specs.py::TestTheFillIsNamed::test_a_hidden_default_is_reported
 The declaration is six lines and it contains the same string twice:
 
@@ -232,7 +232,7 @@ and not a claim that no explanation exists.
 The general lesson is
 [WDK-PARAM-010](parameters-and-vocabularies.md): `initialDisplayValue` is what the spec
 holds, the spec was filled from an unvalidated model default, and nothing anywhere promises
-a default returns rows. The anchor is this client's `fill_hidden_required_defaults`, which
+a default returns rows. The anchor is this client's `fill_site_set_defaults`, which
 does the reasonable thing for a site-set required parameter and, on this one parameter,
 chooses the science.
 

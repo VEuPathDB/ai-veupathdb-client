@@ -4,8 +4,8 @@ import pytest
 
 from veupathdb.domain.parameters.specs import (
     ParamSpecNormalized,
-    fill_hidden_required_defaults,
-    filled_hidden_defaults,
+    fill_site_set_defaults,
+    filled_site_set_defaults,
 )
 from veupathdb.domain.parameters.values import StringValue
 from veupathdb.wdk.wdk_parameters import WDKBaseParameter
@@ -68,7 +68,5 @@ def test_a_visible_read_only_required_parameter_is_filled() -> None:
         )
     }
 
-    assert filled_hidden_defaults(specs, {}) == ["fixed"]
-    assert fill_hidden_required_defaults(specs, {}) == {
-        "fixed": StringValue(value="gene")
-    }
+    assert filled_site_set_defaults(specs, {}) == ["fixed"]
+    assert fill_site_set_defaults(specs, {}) == {"fixed": StringValue(value="gene")}

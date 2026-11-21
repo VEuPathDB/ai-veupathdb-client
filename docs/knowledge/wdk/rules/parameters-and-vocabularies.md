@@ -456,7 +456,7 @@ refused for being absent, by name, which is the whole rule in one response.
 whose default is `NO_FILL`, so WDK fills nothing on a run and a parameter the caller left
 out is refused by name. A parameter is `site_set` when it is hidden or read-only
 ([WDK-PARAM-015](#wdk-param-015---isreadonly-is-presentation-only)), and
-`fill_hidden_required_defaults` supplies every one that is `site_set`, `required`, absent
+`fill_site_set_defaults` supplies every one that is `site_set`, `required`, absent
 from the caller's values, and has an `initialDisplayValue`. That is the correct shape of
 the fix and it inherits the hazard of
 [WDK-PARAM-010](#wdk-param-010---initialdisplayvalue-is-whatever-the-spec-happens-to-hold-the-model-default-behind-it-is-never-validated-and-never-promised-to-return-rows)
