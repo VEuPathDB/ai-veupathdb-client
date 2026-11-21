@@ -142,7 +142,12 @@ def test_wdk_param_016_a_site_set_dependent_follows_its_parents() -> None:
     assert published[suffix]["initialDisplayValue"] == "s3be28bbe14_sample"
     assert under_vivax[suffix]["initialDisplayValue"] == "sba1cd4a562_sample"
     assert refreshed_by_name[suffix]["initialDisplayValue"] == "sba1cd4a562_sample"
+    assert published["organismSinglePick"]["initialDisplayValue"] == (
+        '["Plasmodium falciparum 3D7"]'
+    )
     assert graph.wire_parents[suffix] == ("organismSinglePick",)
+    assert suffix in graph.wire_parents["variation_sample_meta"]
+    assert graph.stated_parents["variation_sample_meta"] == ("organismSinglePick",)
 
 
 def test_wdk_vocab_001_the_synthetic_root_is_not_a_selectable_term() -> None:

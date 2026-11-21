@@ -590,7 +590,8 @@ its value is right only for those parents. `getQuestionChange` builds its spec w
 build chose.
 
 Measured on qa.plasmodb.org (the contextual reads on 2026-11-21, the published view on
-2026-10-17), `GenesByNgsSnps.eda_sample_table_suffix` is a hidden `single-pick-vocabulary` with `organismSinglePick` as its parent:
+2026-10-17), `GenesByNgsSnps.eda_sample_table_suffix` is a hidden `single-pick-vocabulary`
+with `organismSinglePick` as its parent:
 
 | Read | `organismSinglePick` | `eda_sample_table_suffix` |
 |---|---|---|
