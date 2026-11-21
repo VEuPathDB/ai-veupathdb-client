@@ -191,6 +191,27 @@ FIXTURES: tuple[FixtureRequest, ...] = (
         reads="WDK-PARAM-013",
     ),
     FixtureRequest(
+        name="search_genes_by_ngs_snps_under_another_organism",
+        path=f"{_TRANSCRIPT}/GenesByNgsSnps",
+        method="POST",
+        params={"expandParams": "true"},
+        body={"contextParamValues": {"organismSinglePick": '["Plasmodium vivax P01"]'}},
+        reads="WDK-PARAM-016",
+    ),
+    FixtureRequest(
+        name="refresh_ngs_snps_on_organism",
+        path=f"{_TRANSCRIPT}/GenesByNgsSnps/refreshed-dependent-params",
+        method="POST",
+        body={
+            "changedParam": {
+                "name": "organismSinglePick",
+                "value": '["Plasmodium vivax P01"]',
+            },
+            "contextParamValues": {"organismSinglePick": '["Plasmodium vivax P01"]'},
+        },
+        reads="WDK-PARAM-016",
+    ),
+    FixtureRequest(
         name="search_genes_by_gene_model_chars",
         path=f"{_TRANSCRIPT}/GenesByGeneModelChars",
         site="vectorbase",
