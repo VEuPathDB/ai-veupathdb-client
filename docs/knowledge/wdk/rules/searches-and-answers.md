@@ -476,6 +476,29 @@ several hundred thousand proteins answered in one request, and its tags summed t
 record count. No OrthoMCL column offers `byValue`, so on that site a
 step's column is counted by value through this reporter.
 
+### WDK-ANS-012 - The `histogram` attribute reporter counts the step's rows per value of one column, and only the view filters make those rows genes
+
+- class: SILENT
+- upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/report/reporter/HistogramAttributeReporter.java#L80-L117
+- anchor: src/veupathdb/wdk/strategy_api/reports.py:get_step_histogram
+- status: ENFORCED by tests/unit/wdk/test_step_histogram.py::test_wdk_ans_012_a_steps_weights_are_counted_by_the_columns_histogram
+
+A column offers the reporter as a format of type `histogram`, named `<column>-histogram`.
+`wdk_weight` offers it and no `byValue` tool. On a step the path is
+`POST /users/{userId}/steps/{stepId}/reports/<column>-histogram`, the body is
+`{"reportConfig": {}}`, and the answer is `{"data": {value: count}, "type", "attrLabel",
+"recordCountLabel"}`. The counts come from one `GROUP BY` over the answer's rows, and a null
+value is skipped. `type` is `int`, `float` or `category`.
+
+On a transcript step the rows are transcripts, so a gene with two transcripts counts twice.
+The `representativeTranscriptOnly` view filter, sent beside `reportConfig`, makes each row a
+gene. The `recordCountLabel` says "Genes" with or without the filter.
+
+Measured on qa.plasmodb.org on 2026-11-21: on a weighted union of four searches, the report
+answered 2,043, 1,062 and 234 rows for weights 1, 2 and 3, and 2,030, 1,055 and 231 with the
+view filter, which sum to the 3,316 genes of the step (the fixture
+`weight_histogram_by_molecular_weight` is one search with weight 5).
+
 ### WDK-SEARCH-001 - A search belongs to exactly one record class, and asking for it under another is a 404
 
 - class: HARD

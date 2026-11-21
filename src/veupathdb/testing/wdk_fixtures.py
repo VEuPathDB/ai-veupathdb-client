@@ -304,6 +304,24 @@ FIXTURES: tuple[FixtureRequest, ...] = (
         reads="WDK-SITE-008",
     ),
     FixtureRequest(
+        name="weight_histogram_by_molecular_weight",
+        path=f"{_TRANSCRIPT}/GenesByMolecularWeight/reports/wdk_weight-histogram",
+        method="POST",
+        body={
+            "searchConfig": {
+                "parameters": {
+                    "min_molecular_weight": "50000",
+                    "max_molecular_weight": "52000",
+                    "organism": '["Plasmodium falciparum 3D7"]',
+                },
+                "wdkWeight": 5,
+            },
+            "reportConfig": {},
+            "viewFilters": [{"name": "representativeTranscriptOnly", "value": {}}],
+        },
+        reads="WDK-ANS-012",
+    ),
+    FixtureRequest(
         name="orthomcl_word_counts_by_abbreviation",
         site="orthomcl",
         path="/record-types/sequence/searches/ByAccession/reports/abbreviation-wordCloud",

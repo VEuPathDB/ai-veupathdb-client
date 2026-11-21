@@ -1,0 +1,19 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/record-types/transcript/searches/GenesByMolecularWeight/reports/wdk_weight-histogram",
+    "status": 200,
+    "content_type": "text/plain",
+    "recorded_at": "2026-11-21",
+    "reads": "WDK-ANS-012"
+  },
+  "body": {
+    "recordCountLabel": "# of Genes",
+    "data": {
+      "5": 84
+    },
+    "type": "int",
+    "attrLabel": "Search Weight"
+  }
+}

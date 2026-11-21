@@ -450,6 +450,7 @@
     "WDKAnswer",
     "WDKAnswerMeta",
     "WDKAttributeField",
+    "WDKAttributeHistogram",
     "WDKBaseParameter",
     "WDKColumnDistribution",
     "WDKDatasetConfigIdList",

@@ -13,6 +13,7 @@ from veupathdb.json_types import JSONObject
 from veupathdb.wdk.strategy_api.base import StrategyAPIBase
 from veupathdb.wdk.wdk_models import (
     WDKAnswer,
+    WDKAttributeHistogram,
     WDKFilterValue,
     WDKSortSpec,
     WDKWordCounts,
@@ -40,6 +41,24 @@ class ReportsMixin(StrategyAPIBase):
         raw = await self.run_step_report(step_id, reporter)
         return validate_response(
             WDKWordCounts, raw, f"{reporter} report for step {step_id}"
+        )
+
+    async def get_step_histogram(
+        self,
+        step_id: int,
+        column: str,
+        *,
+        view_filters: Sequence[WDKFilterValue] | None = None,
+    ) -> WDKAttributeHistogram:
+        uid = await self._get_user_id(None)
+        body: dict[str, object] = {"reportConfig": {}}
+        if view_filters is not None:
+            body["viewFilters"] = [f.model_dump(by_alias=True) for f in view_filters]
+        raw = await self.client.post(
+            f"/users/{uid}/steps/{step_id}/reports/{column}-histogram", json=body
+        )
+        return validate_response(
+            WDKAttributeHistogram, raw, f"{column}-histogram report for step {step_id}"
         )
 
     async def get_step_answer(

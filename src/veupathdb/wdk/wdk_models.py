@@ -451,6 +451,13 @@ class WDKColumnDistribution(WDKModel):
     statistics: WDKHistogramStatistics = Field(default_factory=WDKHistogramStatistics)
 
 
+class WDKAttributeHistogram(WDKModel):
+    data: dict[str, int]
+    type: Literal["category", "int", "float"]
+    attr_label: str
+    record_count_label: str
+
+
 class WDKWordCount(WDKModel):
     word: str
     count: int

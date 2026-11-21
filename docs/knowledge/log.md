@@ -1,5 +1,10 @@
 # Knowledge log
 
+## 2026-11-21 - A step's weights are counted by their histogram
+
+- `get_step_histogram` reads a column's `histogram` reporter with the step's view filters,
+  [WDK-ANS-012](wdk/rules/searches-and-answers.md).
+
 ## 2026-11-12 - A combine reads both of its inputs
 
 - `extract_output_organisms` folds the scope of a combine over both inputs by its
