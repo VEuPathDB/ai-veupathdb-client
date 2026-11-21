@@ -285,7 +285,7 @@ def _filter(_: _Declared) -> _Shape:
 
 def _input_dataset(_: _Declared) -> _Shape:
     return _Shape(
-        int | str,
+        int | Annotated[str, *InputDatasetValue.model_fields["dataset_id"].metadata],
         lambda v: InputDatasetValue(dataset_id=str(v)),
         "a positive integer dataset id",
         123,
@@ -294,7 +294,7 @@ def _input_dataset(_: _Declared) -> _Shape:
 
 def _input_step(_: _Declared) -> _Shape:
     return _Shape(
-        str,
+        Annotated[str, *InputStepValue.model_fields["step_id"].metadata],
         lambda v: InputStepValue(step_id=v),
         '"" or an integer step id',
         "",

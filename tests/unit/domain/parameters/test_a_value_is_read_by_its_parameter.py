@@ -305,3 +305,29 @@ class TestTheCanonicalizer:
         )
 
         assert json.loads(closed["r"].to_wire()) == {"min": 0, "max": 4}
+
+
+def _id_pattern(model: type[InputDatasetValue | InputStepValue], key: str) -> JsonValue:
+    properties: dict[str, dict[str, JsonValue]] = model.model_json_schema()[
+        "properties"
+    ]
+    return properties[key]["pattern"]
+
+
+def test_a_dataset_schema_carries_the_value_model_pattern() -> None:
+    assert WDKDatasetParam(name="ds").stated_schema() == {
+        "anyOf": [
+            {"type": "integer"},
+            {"pattern": _id_pattern(InputDatasetValue, "datasetId"), "type": "string"},
+        ]
+    }
+
+
+@pytest.mark.skipif(needs_qa_recording(_ORTHOLOGS), reason=NEEDS_QA_RECORDING)
+def test_a_recorded_step_schema_carries_the_value_model_pattern() -> None:
+    param = _param("search_genes_by_orthologs", "gene_result")
+
+    assert param.stated_schema() == {
+        "pattern": _id_pattern(InputStepValue, "stepId"),
+        "type": "string",
+    }
