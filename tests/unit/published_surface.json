@@ -98,6 +98,7 @@
   ],
   "veupathdb.domain.parameters": [
     "Combination",
+    "DeclaredParam",
     "FAKE_ALL_SENTINEL",
     "FilterClauseKey",
     "FilterTermClause",
@@ -114,6 +115,7 @@
     "PHYLETIC_MAP_PARAMS",
     "PHYLETIC_PARAM_NAMES",
     "PHYLETIC_ROOT_CODE",
+    "ParamGraph",
     "ParamKind",
     "ParamSpecNormalized",
     "ParamValue",
@@ -158,7 +160,6 @@
     "species_of",
     "to_decoded_map",
     "to_wire",
-    "topological_fill_order",
     "validate_phyletic_codes",
     "vocab_keys",
     "wire_map"

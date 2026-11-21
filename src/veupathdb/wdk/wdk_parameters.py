@@ -60,6 +60,18 @@ class WDKBaseParameter(WDKModel):
         """True when WDK marks this parameter as the search's organism parameter."""
         return "organismProperties" in self.properties
 
+    @property
+    def required(self) -> bool:
+        return not self.allow_empty_value or self.min_selected_count >= 1
+
+    @property
+    def site_set(self) -> bool:
+        return not self.is_visible or self.is_read_only
+
+    @property
+    def bindable(self) -> bool:
+        return not self.site_set
+
     @field_validator("max_selected_count", mode="before")
     @classmethod
     def _normalize_unlimited(cls, v: object) -> object:

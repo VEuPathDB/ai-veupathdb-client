@@ -30,10 +30,25 @@ class ParamSpecNormalized:
     max_length: int | None = None
     display_type: str = ""
     is_visible: bool = True
+    is_read_only: bool = False
     group: str = ""
     dependent_params: tuple[str, ...] = ()
     help: str | None = None
     initial_display_value: str | None = None
+
+    @property
+    def required(self) -> bool:
+        return not self.allow_empty_value or (
+            self.min_selected_count is not None and self.min_selected_count >= 1
+        )
+
+    @property
+    def site_set(self) -> bool:
+        return not self.is_visible or self.is_read_only
+
+    @property
+    def bindable(self) -> bool:
+        return not self.site_set
 
 
 def find_input_step_param(specs: dict[str, ParamSpecNormalized]) -> str | None:
@@ -43,46 +58,15 @@ def find_input_step_param(specs: dict[str, ParamSpecNormalized]) -> str | None:
     return None
 
 
-def topological_fill_order(specs: dict[str, ParamSpecNormalized]) -> list[str]:
-    """Sort param names so that a parent comes before the params it controls.
-
-    A cycle falls back to lexical order.
-    """
-    depends_on: dict[str, list[str]] = {}
-    controls: dict[str, list[str]] = {name: [] for name in specs}
-    for name, spec in specs.items():
-        for dep in spec.dependent_params:
-            controls.setdefault(name, []).append(dep)
-            depends_on.setdefault(dep, []).append(name)
-    in_degree = {name: len(depends_on.get(name, [])) for name in specs}
-    queue = [n for n in specs if in_degree[n] == 0]
-    fill: list[str] = []
-    while queue:
-        node = queue.pop(0)
-        fill.append(node)
-        for child in controls.get(node, []):
-            if child in in_degree:
-                in_degree[child] -= 1
-                if in_degree[child] == 0:
-                    queue.append(child)
-    fill.extend(n for n in specs if n not in fill)
-    return fill
-
-
-def _is_hidden_required_fill(spec: ParamSpecNormalized) -> bool:
-    """Whether this parameter is one the client supplies on the caller's behalf."""
-    return (
-        not spec.is_visible
-        and not spec.allow_empty_value
-        and spec.initial_display_value is not None
-    )
+def _is_site_set_required_fill(spec: ParamSpecNormalized) -> bool:
+    return spec.site_set and spec.required and spec.initial_display_value is not None
 
 
 def filled_hidden_defaults(
     param_specs: dict[str, ParamSpecNormalized],
     parameters: Mapping[str, ParamValue],
 ) -> list[str]:
-    """The hidden parameters a fill would supply, so the caller can report them.
+    """The site-set parameters a fill would supply, so the caller can report them.
 
     A filled default is otherwise indistinguishable from a value someone chose,
     and a default carries no promise of returning rows.
@@ -90,7 +74,7 @@ def filled_hidden_defaults(
     return sorted(
         name
         for name, spec in param_specs.items()
-        if name not in parameters and _is_hidden_required_fill(spec)
+        if name not in parameters and _is_site_set_required_fill(spec)
     )
 
 
@@ -98,14 +82,14 @@ def fill_hidden_required_defaults(
     param_specs: dict[str, ParamSpecNormalized],
     parameters: Mapping[str, ParamValue],
 ) -> dict[str, ParamValue]:
-    """Fill hidden required params from their fixed ``initial_display_value``.
+    """Fill site-set required params from their fixed ``initial_display_value``.
 
-    WDK rejects a search without these params, but the model cannot set them.
-    Visible required params are never auto-filled.
+    WDK rejects a search without these params, but the caller cannot set them.
+    Bindable required params are never auto-filled.
     """
     filled: dict[str, ParamValue] = dict(parameters)
     for name, spec in param_specs.items():
-        if name not in filled and _is_hidden_required_fill(spec):
+        if name not in filled and _is_site_set_required_fill(spec):
             filled[name] = from_decoded(
                 as_param_kind(spec.param_type), spec.initial_display_value
             )

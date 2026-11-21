@@ -352,7 +352,6 @@
       "param_value_from_raw",
       "to_decoded_map",
       "to_wire",
-      "topological_fill_order",
       "validate_phyletic_codes",
       "vocab_keys"
     ],

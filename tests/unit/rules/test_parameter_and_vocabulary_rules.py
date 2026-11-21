@@ -7,10 +7,10 @@ from typing import Any
 import pytest
 from pydantic import TypeAdapter
 
+from veupathdb.domain.parameters.dependencies import ParamGraph
 from veupathdb.domain.parameters.specs import (
     ParamSpecNormalized,
     fill_hidden_required_defaults,
-    topological_fill_order,
 )
 from veupathdb.domain.parameters.value_codec import to_wire
 from veupathdb.domain.parameters.wdk_vocab import (
@@ -134,21 +134,22 @@ def test_wdk_vocab_003_the_order_of_dependent_params_carries_nothing() -> None:
     parent = recorded["organismSinglePick"]
     dependents = TypeAdapter(list[str]).validate_python(parent["dependentParams"] or [])
 
-    def specs(order: list[str]) -> dict[str, ParamSpecNormalized]:
-        return {
-            "organismSinglePick": ParamSpecNormalized(
+    def specs(order: list[str]) -> list[ParamSpecNormalized]:
+        return [
+            ParamSpecNormalized(
                 name="organismSinglePick",
                 param_type="single-pick-vocabulary",
                 dependent_params=tuple(order),
             ),
-            "chromosomeOptional": ParamSpecNormalized(
+            ParamSpecNormalized(
                 name="chromosomeOptional", param_type="single-pick-vocabulary"
             ),
-        }
+        ]
 
     assert dependents == ["chromosomeOptional"]
-    assert topological_fill_order(specs(dependents)) == topological_fill_order(
-        specs(list(reversed(dependents)))
+    assert (
+        ParamGraph.of(specs(dependents)).fill_order
+        == ParamGraph.of(specs(list(reversed(dependents)))).fill_order
     )
 
 

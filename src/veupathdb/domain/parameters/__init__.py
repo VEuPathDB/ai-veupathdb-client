@@ -1,6 +1,7 @@
 """Parameter specs, typed values, vocabularies and the wire codec between them."""
 
 from veupathdb.domain.parameters.canonicalize import ParameterCanonicalizer
+from veupathdb.domain.parameters.dependencies import DeclaredParam, ParamGraph
 from veupathdb.domain.parameters.phyletic import (
     NO_CONSTRAINT_PATTERN,
     PHYLETIC_LIST_PARAMS,
@@ -33,7 +34,6 @@ from veupathdb.domain.parameters.specs import (
     fill_hidden_required_defaults,
     filled_hidden_defaults,
     find_input_step_param,
-    topological_fill_order,
 )
 from veupathdb.domain.parameters.unbound import UnboundParameter
 from veupathdb.domain.parameters.value_codec import (
@@ -89,6 +89,7 @@ __all__ = [
     "PHYLETIC_PARAM_NAMES",
     "PHYLETIC_ROOT_CODE",
     "Combination",
+    "DeclaredParam",
     "FilterClauseKey",
     "FilterTermClause",
     "FilterValue",
@@ -96,6 +97,7 @@ __all__ = [
     "InputStepValue",
     "MultiPickValue",
     "NumberValue",
+    "ParamGraph",
     "ParamKind",
     "ParamSpecNormalized",
     "ParamValue",
@@ -140,7 +142,6 @@ __all__ = [
     "species_of",
     "to_decoded_map",
     "to_wire",
-    "topological_fill_order",
     "validate_phyletic_codes",
     "vocab_keys",
     "wire_map",
