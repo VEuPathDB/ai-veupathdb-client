@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from typing import Annotated, Any, Protocol
 
+import pydantic
 from pydantic import (
     AfterValidator,
     ConfigDict,
@@ -15,7 +16,6 @@ from pydantic import (
     TypeAdapter,
     create_model,
 )
-from pydantic import ValidationError as PydanticValidationError
 
 from veupathdb.domain.parameters.date_bounds import ISODate
 from veupathdb.domain.parameters.filter_clause import FilterValue
@@ -108,7 +108,7 @@ class StatedReading:
     def read(self, raw: JsonValue) -> Stated:
         try:
             return self.adapter.validate_python(raw)
-        except PydanticValidationError:
+        except pydantic.ValidationError:
             text = f"{self.name} takes {self.shape}, for example {self.example!r}; it read {raw!r}."
             raise StatedValuesError([StatedFault(self.name, raw, text)]) from None
 
@@ -172,17 +172,23 @@ def _first_day(d: _Declared) -> str:
     return d.low_date or d.high_date or "2020-01-01"
 
 
+def _number_text(length: int) -> Callable[[float | str], StringValue]:
+    def text(v: float | str) -> StringValue:
+        written = decimal_text(float(v))
+        if length and len(written) > length:
+            msg = f"{written} is longer than {length} characters"
+            raise ValueError(msg)
+        return StringValue(value=written)
+
+    return text
+
+
 def _string(d: _Declared) -> _Shape:
+    limit = f" of at most {d.length} characters" if d.length else ""
     if d.is_number:
         decimal = Annotated[str, Field(pattern=r"^-?([0-9]+\.?[0-9]*|\.[0-9]+)$")]
         finite = Annotated[float, Field(allow_inf_nan=False)]
-        return _Shape(
-            finite | decimal,
-            lambda v: StringValue(value=decimal_text(float(v))),
-            "a number",
-            5,
-        )
-    limit = f" of at most {d.length} characters" if d.length else ""
+        return _Shape(finite | decimal, _number_text(d.length), f"a number{limit}", 5)
     return _Shape(
         Annotated[str, Field(max_length=d.length or None)],
         lambda v: StringValue(value=v),
@@ -279,7 +285,7 @@ def _filter(_: _Declared) -> _Shape:
 
 def _input_dataset(_: _Declared) -> _Shape:
     return _Shape(
-        Annotated[int, Field(gt=0)] | Annotated[str, Field(pattern=r"^[1-9][0-9]*$")],
+        int | str,
         lambda v: InputDatasetValue(dataset_id=str(v)),
         "a positive integer dataset id",
         123,
@@ -288,7 +294,7 @@ def _input_dataset(_: _Declared) -> _Shape:
 
 def _input_step(_: _Declared) -> _Shape:
     return _Shape(
-        Annotated[str, Field(pattern=r"^[0-9]*$")],
+        str,
         lambda v: InputStepValue(step_id=v),
         '"" or an integer step id',
         "",

@@ -34,6 +34,7 @@ from veupathdb.wdk.wdk_parameters import (
     WDKNumberParam,
     WDKNumberRangeParam,
     WDKParameter,
+    WDKStringParam,
 )
 
 _ORTHOLOGS = "wdk/search_genes_by_orthologs.json"
@@ -210,7 +211,7 @@ class TestADatasetAndAStep:
             dataset_id="123"
         )
 
-    @pytest.mark.parametrize("raw", ["abc", "0"])
+    @pytest.mark.parametrize("raw", ["abc", "0", 0, -4, True])
     def test_a_dataset_id_is_a_positive_integer(self, raw: JsonValue) -> None:
         assert "ds takes" in _refused(WDKDatasetParam(name="ds"), raw)
 
@@ -220,8 +221,19 @@ class TestADatasetAndAStep:
             step_id=raw
         )
 
-    def test_a_step_id_is_an_integer(self) -> None:
-        assert "step takes" in _refused(WDKAnswerParam(name="step"), "abc")
+    @pytest.mark.parametrize("raw", ["abc", 12, True])
+    def test_a_step_id_is_an_integer_string(self, raw: JsonValue) -> None:
+        assert "step takes" in _refused(WDKAnswerParam(name="step"), raw)
+
+
+class TestANumberStringWithALength:
+    _PARAM = WDKStringParam(name="s", is_number=True, length=3)
+
+    def test_a_short_number_reads(self) -> None:
+        assert self._PARAM.read_stated(5.0).to_wire() == "5"
+
+    def test_a_number_longer_than_the_length_names_it(self) -> None:
+        assert "at most 3 characters" in _refused(self._PARAM, 1e-8)
 
 
 class TestDecimalText:
