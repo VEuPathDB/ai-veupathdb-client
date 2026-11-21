@@ -288,9 +288,10 @@ def _single_pick(d: _Declared) -> _Shape:
 
 
 def _multi_pick(d: _Declared) -> _Shape:
+    term: Any
     term, listed = _term(d)
     return _Shape(
-        list.__class_getitem__(term),
+        list[term],
         lambda v: MultiPickValue(values=v),
         f"a list of terms from {listed}" if listed else "a list of vocabulary terms",
         [d.first_term],
