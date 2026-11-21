@@ -257,7 +257,7 @@ class FilterFacet(CamelModel):
     units: str | None
     precision: int
     members: list[str]
-    range: FacetRange | None = None
+    range: FacetRange | None = Field(default=None, exclude_if=lambda span: span is None)
 
     @property
     def ranged(self) -> bool:

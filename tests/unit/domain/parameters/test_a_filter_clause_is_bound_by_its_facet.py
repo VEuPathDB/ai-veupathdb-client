@@ -438,3 +438,25 @@ def test_bounds_are_written_as_stated(
 
 def test_the_turn_line_is_published_by_the_wdk_package() -> None:
     assert "in_turn_line" in wdk.__all__
+
+
+class TestAFacetShowsARangeOnlyWhenRead:
+    def test_an_unread_range_is_left_out(self) -> None:
+        facet = _facet(_variant_stats(), "total_variants")
+
+        assert "range" not in facet.model_dump(by_alias=True, mode="json")
+
+    def test_a_read_range_is_shown(self) -> None:
+        facet = _facet(_variant_stats(), "total_variants")
+        span = FacetRange.of(_summary("ontology_term_summary_total_variants"), facet)
+
+        shown = facet.model_copy(update={"range": span}).model_dump(
+            by_alias=True, mode="json"
+        )
+
+        assert shown["range"] == {
+            "min": "1",
+            "max": "4,823",
+            "records": 5643,
+            "units": "variants",
+        }
