@@ -13,19 +13,13 @@ from dataclasses import dataclass
 from pydantic import JsonValue
 
 from veupathdb.domain.parameters.specs import ParamSpecNormalized
-from veupathdb.domain.parameters.value_codec import (
-    as_param_kind,
-    from_decoded,
-    to_decoded,
-)
-from veupathdb.domain.parameters.value_utils import (
-    decode_single_value,
-    decode_values,
-)
+from veupathdb.domain.parameters.value_codec import to_decoded
 from veupathdb.domain.parameters.values import (
     DateRangeValue,
+    MultiPickValue,
     NumberRangeValue,
     ParamValue,
+    SinglePickValue,
 )
 from veupathdb.domain.parameters.vocab_utils import match_vocab_value
 from veupathdb.domain.parameters.wdk_vocab import (
@@ -35,21 +29,6 @@ from veupathdb.domain.parameters.wdk_vocab import (
     find_vocab_node,
 )
 from veupathdb.errors import ValidationError
-from veupathdb.json_types import JSONObject
-
-_MULTI_PICK = "multi-pick-vocabulary"
-_SINGLE_PICK = "single-pick-vocabulary"
-_RANGE_TYPES = frozenset({"number-range", "date-range"})
-_SCALAR_TYPES = frozenset({"number", "date", "timestamp", "string"})
-_RANGE_PAIR_LENGTH = 2
-
-
-def _stringify(value: JsonValue) -> str:
-    if value is None:
-        return ""
-    if isinstance(value, bool):
-        return "true" if value else "false"
-    return str(value)
 
 
 def _refuse(
@@ -85,38 +64,6 @@ def close_open_range(
     return DateRangeValue(min=low_date, max=high_date)
 
 
-def _range_object(spec: ParamSpecNormalized, value: JsonValue) -> JSONObject:
-    """A range as the ``{min, max}`` object WDK reads.
-
-    WDK refuses a two-element array with the same message it gives a scalar,
-    naming neither end, so the pair becomes the object here.
-    """
-    if isinstance(value, dict):
-        return value
-    if isinstance(value, (list, tuple)) and len(value) == _RANGE_PAIR_LENGTH:
-        return {"min": value[0], "max": value[1]}
-    raise _refuse(spec, "must be a range", value)
-
-
-def _scalar(spec: ParamSpecNormalized, value: JsonValue) -> str:
-    """A scalar as its string form.
-
-    A container has no scalar form: stringifying it would send WDK a value that
-    reads as a Python repr, which a parameter with no regex accepts.
-    """
-    if isinstance(value, (list, dict, tuple, set)):
-        raise _refuse(spec, "must be a scalar value", value)
-    return _stringify(value)
-
-
-def _input_dataset(spec: ParamSpecNormalized, value: JsonValue) -> str:
-    if isinstance(value, list):
-        if len(value) != 1:
-            raise _refuse(spec, "must be a single value", value)
-        return _stringify(value[0])
-    return _stringify(value)
-
-
 @dataclass(frozen=True)
 class ParameterCanonicalizer:
     """Canonicalize ``ParamValue`` parameters using canonical parameter specs."""
@@ -144,58 +91,36 @@ class ParameterCanonicalizer:
                 )
             if spec.param_type == "input-step":
                 continue
-            decoded_value = self._canonicalize_value(spec, to_decoded(value))
-            built = from_decoded(as_param_kind(spec.param_type), decoded_value)
-            # WDK reads both ends of a range, so an open end takes the
-            # parameter's own declared limit.
-            canonical[name] = (
-                close_open_range(built, spec)
-                if isinstance(built, (NumberRangeValue, DateRangeValue))
-                else built
-            )
+            if value.type != spec.param_type:
+                raise _refuse(
+                    spec,
+                    f"takes a {spec.param_type} value, not a {value.type} value",
+                    to_decoded(value),
+                )
+            canonical[name] = self._canonicalize_value(spec, value)
         return canonical
 
     def _canonicalize_value(
-        self, spec: ParamSpecNormalized, value: JsonValue
-    ) -> JsonValue:
-        if value == FAKE_ALL_SENTINEL or (
-            isinstance(value, (list, tuple, set))
-            and any(v == FAKE_ALL_SENTINEL for v in value)
-        ):
-            raise ValidationError(
-                title="Invalid parameter value",
-                detail=f"Parameter '{spec.name}' does not accept '{FAKE_ALL_SENTINEL}'.",
-                errors=[{"param": spec.name, "value": value}],
-            )
-        if spec.param_type == _MULTI_PICK:
-            matched = [
-                self._match(spec, _stringify(v))
-                for v in decode_values(value, spec.name)
-            ]
-            return list(self._enforce_leaf_values(spec, matched))
-        if spec.param_type == _SINGLE_PICK:
-            return self._single_pick(spec, value)
-        if spec.param_type in _RANGE_TYPES:
-            return _range_object(spec, value)
-        if spec.param_type in _SCALAR_TYPES:
-            return _scalar(spec, value)
-        if spec.param_type == "input-dataset":
-            return _input_dataset(spec, value)
-        return value
+        self, spec: ParamSpecNormalized, value: ParamValue
+    ) -> ParamValue:
+        match value:
+            case MultiPickValue(values=values):
+                terms = [self._match(spec, v) for v in values]
+                return MultiPickValue(values=self._enforce_leaf_values(spec, terms))
+            case SinglePickValue(value=selected):
+                term = self._match(spec, selected)
+                return SinglePickValue(value=self._enforce_leaf_value(spec, term))
+            case NumberRangeValue() | DateRangeValue():
+                return close_open_range(value, spec)
+            case _:
+                return value
 
     def _match(self, spec: ParamSpecNormalized, value: str) -> str:
+        if value == FAKE_ALL_SENTINEL:
+            raise _refuse(spec, f"does not accept '{FAKE_ALL_SENTINEL}'", value)
         return match_vocab_value(
             vocab=spec.vocabulary, param_name=spec.name, value=value
         )
-
-    def _single_pick(self, spec: ParamSpecNormalized, value: JsonValue) -> str:
-        decoded = decode_single_value(value, spec.name)
-        if len(decoded) > 1:
-            raise _refuse(spec, "allows only one value", value)
-        selected = _stringify(decoded[0]) if decoded else ""
-        if not selected:
-            return ""
-        return self._enforce_leaf_value(spec, self._match(spec, selected))
 
     # -- leaf enforcement (canonicalizer-only) --------------------------------
 

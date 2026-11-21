@@ -2,8 +2,10 @@
 
 from typing import Annotated, Literal
 
-from pydantic import Discriminator, Field, field_validator
+from pydantic import Discriminator, Field, JsonValue, field_validator
 
+from veupathdb.domain.parameters.stated import Stated, stated_reading
+from veupathdb.domain.parameters.values import ParamKind
 from veupathdb.domain.parameters.wdk_vocab import (
     WDKDatasetParser,
     WDKFilterOntologyTerm,
@@ -20,6 +22,7 @@ class WDKBaseParameter(WDKModel):
     """
 
     name: str
+    type: ParamKind
     display_name: str = ""
     help: str | None = None
     is_visible: bool = True
@@ -71,6 +74,15 @@ class WDKBaseParameter(WDKModel):
     @property
     def bindable(self) -> bool:
         return not self.site_set
+
+    def stated_schema(self) -> dict[str, JsonValue]:
+        return stated_reading(self).adapter.json_schema()
+
+    def read_stated(self, raw: JsonValue) -> Stated:
+        return stated_reading(self).read(raw)
+
+    def stated_example(self) -> JsonValue:
+        return stated_reading(self).example
 
     @field_validator("max_selected_count", mode="before")
     @classmethod

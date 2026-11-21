@@ -60,6 +60,15 @@ class TestScalarsRoundTrip:
         assert isinstance(restored, NumberValue)
         assert float(restored.value) == float(value)
 
+    @pytest.mark.parametrize(
+        ("value", "wire"),
+        [(5.0, "5"), (1e-8, "0.00000001"), (2.5e21, "2500000000000000000000")],
+    )
+    def test_a_number_is_written_as_its_shortest_decimal(
+        self, value: float, wire: str
+    ) -> None:
+        assert NumberValue(value=value).to_wire() == wire
+
     @settings(max_examples=100)
     @given(_ISO_DATE)
     def test_date(self, value: str) -> None:
@@ -143,14 +152,14 @@ class TestRangesRoundTrip:
 
 class TestReferencesRoundTrip:
     @settings(max_examples=100)
-    @given(_TERM)
+    @given(st.integers(min_value=1).map(str))
     def test_input_dataset(self, dataset_id: str) -> None:
         assert _round_trip(
             "p", InputDatasetValue(dataset_id=dataset_id), "input-dataset"
         ) == InputDatasetValue(dataset_id=dataset_id)
 
     @settings(max_examples=100)
-    @given(_TERM)
+    @given(st.integers(min_value=0).map(str))
     def test_input_step(self, step_id: str) -> None:
         assert _round_trip(
             "p", InputStepValue(step_id=step_id), "input-step"

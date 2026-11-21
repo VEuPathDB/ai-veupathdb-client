@@ -745,7 +745,7 @@ readable from that document, and five of the 325 return 500.
 
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/AbstractEnumParam.java#L401-L455
-- anchor: src/veupathdb/domain/parameters/value_codec.py:coerce_context_values
+- anchor: src/veupathdb/wdk/_searches.py:get_refreshed_dependent_params
 - status: PARTIAL by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_vocab_004_a_dependent_value_travels_with_the_parent_it_was_read_under
 
 Validation of an enum value is set membership against the vocabulary generated

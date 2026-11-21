@@ -12,7 +12,7 @@ from veupathdb.wdk.wdk_parameters import WDKBaseParameter
 
 
 def _wire(**fields: object) -> WDKBaseParameter:
-    return WDKBaseParameter.model_validate({"name": "p", **fields})
+    return WDKBaseParameter.model_validate({"name": "p", "type": "string", **fields})
 
 
 def test_a_hidden_parameter_is_set_by_the_site() -> None:

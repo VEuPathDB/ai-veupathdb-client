@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import math
+from decimal import Decimal
 from typing import Annotated, Literal
 
 from pydantic import Field, JsonValue, RootModel, model_validator
@@ -23,6 +25,13 @@ ParamKind = Literal[
 ]
 
 
+def decimal_text(x: float) -> str:
+    if not math.isfinite(x):
+        msg = f"{x!r} has no decimal text"
+        raise ValueError(msg)
+    return format(Decimal(repr(x)).normalize(), "f")
+
+
 class StringValue(CamelModel):
     type: Literal["string"] = "string"
     value: str
@@ -39,9 +48,7 @@ class NumberValue(CamelModel):
     value: float
 
     def to_wire(self) -> str:
-        if self.value.is_integer():
-            return str(int(self.value))
-        return str(self.value)
+        return decimal_text(self.value)
 
     def to_decoded(self) -> JsonValue:
         return self.value
@@ -229,7 +236,7 @@ class FilterValue(CamelModel):
 
 class InputDatasetValue(CamelModel):
     type: Literal["input-dataset"] = "input-dataset"
-    dataset_id: str = Field(min_length=1)
+    dataset_id: str = Field(pattern=r"^[1-9][0-9]*$")
 
     def to_wire(self) -> str:
         return self.dataset_id
@@ -240,7 +247,7 @@ class InputDatasetValue(CamelModel):
 
 class InputStepValue(CamelModel):
     type: Literal["input-step"] = "input-step"
-    step_id: str = Field(min_length=1)
+    step_id: str = Field(pattern=r"^[0-9]*$")
 
     def to_wire(self) -> str:
         return self.step_id

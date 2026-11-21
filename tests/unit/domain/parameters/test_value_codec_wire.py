@@ -14,9 +14,6 @@ import pytest
 from pydantic import ValidationError as PydanticValidationError
 
 from veupathdb.domain.parameters.value_codec import (
-    _SCALAR_KINDS,
-    _SCALAR_VALUE_BY_KIND,
-    _WIRE_BUILDERS,
     as_param_kind,
     from_wire,
     wire_map,
@@ -125,15 +122,6 @@ class TestWdkMap001DriftIsNoticedInBothDirections:
         with pytest.raises(PydanticValidationError):
             from_wire("gene-list", "anything")  # type: ignore[arg-type]
 
-    def test_wdk_map_001_every_kind_has_a_way_to_build_a_value(self) -> None:
-        # Removing a member is caught by mypy over these three maps; adding one
-        # is caught here.
-        covered = (
-            frozenset(_WIRE_BUILDERS) | _SCALAR_KINDS | frozenset(_SCALAR_VALUE_BY_KIND)
-        )
-
-        assert covered == _THE_ELEVEN
-
     def test_wdk_map_001_every_kind_round_trips_from_a_wire_string(self) -> None:
         wire_by_kind: dict[str, str] = {
             "string": "kinase",
@@ -233,9 +221,17 @@ class TestWdkParam009HandlesAreBareIssuedIds:
         assert InputStepValue(step_id="7").to_wire() == "7"
         assert InputDatasetValue(dataset_id="7").to_wire() == "7"
 
-    def test_wdk_param_009_an_empty_handle_is_not_expressible(self) -> None:
-        # Empty is what WDK reports before a wiring, and it is WDK's to write.
+    def test_wdk_param_009_an_unwired_step_is_empty(self) -> None:
+        assert InputStepValue(step_id="").to_wire() == ""
+
+    @pytest.mark.parametrize("step_id", ["abc", "1.5", " 7"])
+    def test_wdk_param_009_a_step_id_is_digits(self, step_id: str) -> None:
         with pytest.raises(PydanticValidationError):
-            InputStepValue(step_id="")
+            InputStepValue(step_id=step_id)
+
+    @pytest.mark.parametrize("dataset_id", ["", "0", "abc", "-3"])
+    def test_wdk_param_009_a_dataset_id_is_a_positive_integer(
+        self, dataset_id: str
+    ) -> None:
         with pytest.raises(PydanticValidationError):
-            InputDatasetValue(dataset_id="")
+            InputDatasetValue(dataset_id=dataset_id)

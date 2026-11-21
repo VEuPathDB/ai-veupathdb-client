@@ -1,5 +1,21 @@
 # Knowledge log
 
+## 2026-11-21 - A value is read by its parameter
+
+- Each parameter reads what a caller states in the native shape of its kind:
+  `read_stated`, `stated_schema` and `stated_example` share one adapter per parameter.
+  A refusal names the shape and an example, and `read_stated_values` gathers every fault
+  of a search into one `StatedValuesError`.
+- A date and both bounds of a date-range are `ISODate`, the `ISO_LOCAL_DATE` form
+  [WDK-PARAM-006](wdk/rules/parameters-and-vocabularies.md) reads, so `20200101` and
+  `2020-W01-1` are refused here.
+- A number goes out as its shortest decimal, never an exponent. An `input-dataset` id is a
+  positive integer and an `input-step` id is empty or digits
+  ([WDK-PARAM-009](wdk/rules/parameters-and-vocabularies.md)).
+- `param_value_from_raw`, `coerce_param_value`, `coerce_context_values`, `from_decoded`
+  and `decode_single_value` are gone; the canonicalizer takes typed values and refuses a
+  value of another kind.
+
 ## 2026-11-21 - A parameter states who sets it
 
 - A parameter is `site_set` when it is hidden or read-only, and `bindable` otherwise.

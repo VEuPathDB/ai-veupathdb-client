@@ -36,12 +36,15 @@ from veupathdb.domain.parameters.specs import (
     filled_site_set_defaults,
     find_input_step_param,
 )
+from veupathdb.domain.parameters.stated import (
+    Stated,
+    StatedValuesError,
+    read_stated_values,
+)
 from veupathdb.domain.parameters.unbound import UnboundParameter
 from veupathdb.domain.parameters.value_codec import (
     as_param_kind,
-    coerce_context_values,
     from_wire,
-    param_value_from_raw,
     to_decoded_map,
     to_wire,
     wire_map,
@@ -58,6 +61,7 @@ from veupathdb.domain.parameters.values import (
     ParamValue,
     SinglePickValue,
     StringValue,
+    decimal_text,
 )
 from veupathdb.domain.parameters.wdk_vocab import (
     FAKE_ALL_SENTINEL,
@@ -111,6 +115,8 @@ __all__ = [
     "PhyleticUnresolved",
     "SinglePickValue",
     "SpeciesGroup",
+    "Stated",
+    "StatedValuesError",
     "StringValue",
     "TaxaCount",
     "TaxonEntry",
@@ -127,8 +133,8 @@ __all__ = [
     "as_param_kind",
     "census_states",
     "check_expression",
-    "coerce_context_values",
     "collect_leaf_terms",
+    "decimal_text",
     "dedupe_options",
     "derive_binding",
     "fill_site_set_defaults",
@@ -139,8 +145,8 @@ __all__ = [
     "leading_accession_token",
     "match_exact_option",
     "nearest_entries",
-    "param_value_from_raw",
     "read_census",
+    "read_stated_values",
     "species_of",
     "to_decoded_map",
     "to_wire",

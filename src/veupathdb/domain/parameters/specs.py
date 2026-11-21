@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from veupathdb.domain.parameters.value_codec import as_param_kind, from_decoded
+from veupathdb.domain.parameters.value_codec import as_param_kind, from_wire
 from veupathdb.domain.parameters.values import ParamValue
 from veupathdb.domain.parameters.wdk_vocab import WDKVocabulary
 
@@ -58,8 +58,8 @@ def find_input_step_param(specs: dict[str, ParamSpecNormalized]) -> str | None:
     return None
 
 
-def _is_site_set_required_fill(spec: ParamSpecNormalized) -> bool:
-    return spec.site_set and spec.required and spec.initial_display_value is not None
+def _site_set_default(spec: ParamSpecNormalized) -> str | None:
+    return spec.initial_display_value if spec.site_set and spec.required else None
 
 
 def filled_site_set_defaults(
@@ -74,7 +74,7 @@ def filled_site_set_defaults(
     return sorted(
         name
         for name, spec in param_specs.items()
-        if name not in parameters and _is_site_set_required_fill(spec)
+        if name not in parameters and _site_set_default(spec) is not None
     )
 
 
@@ -89,8 +89,7 @@ def fill_site_set_defaults(
     """
     filled: dict[str, ParamValue] = dict(parameters)
     for name, spec in param_specs.items():
-        if name not in filled and _is_site_set_required_fill(spec):
-            filled[name] = from_decoded(
-                as_param_kind(spec.param_type), spec.initial_display_value
-            )
+        default = _site_set_default(spec)
+        if name not in filled and default is not None:
+            filled[name] = from_wire(as_param_kind(spec.param_type), default)
     return filled
