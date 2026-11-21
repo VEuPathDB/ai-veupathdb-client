@@ -14,11 +14,16 @@ from pydantic import (
     Field,
     JsonValue,
     TypeAdapter,
+    WithJsonSchema,
     create_model,
 )
 
 from veupathdb.domain.parameters.date_bounds import ISODate
-from veupathdb.domain.parameters.filter_clause import FilterValue
+from veupathdb.domain.parameters.filter_clause import (
+    FilterFacets,
+    FilterProposal,
+    FilterProposals,
+)
 from veupathdb.domain.parameters.values import (
     DateRangeValue,
     DateValue,
@@ -34,10 +39,14 @@ from veupathdb.domain.parameters.values import (
     TimestampValue,
     decimal_text,
 )
-from veupathdb.domain.parameters.wdk_vocab import WDKVocabulary, flatten_vocab
+from veupathdb.domain.parameters.wdk_vocab import (
+    WDKFilterOntologyTerm,
+    WDKVocabulary,
+    flatten_vocab,
+)
 from veupathdb.errors import ValidationError
 
-Stated = ParamValue
+Stated = ParamValue | FilterProposals
 
 _MAX_ENUM_TERMS = 50
 _MODEL_KINDS = frozenset({"number-range", "date-range", "filter"})
@@ -65,6 +74,10 @@ class StatedDeclaration(Protocol):
     def vocabulary(self) -> WDKVocabulary | None: ...
     @property
     def display_type(self) -> str: ...
+    @property
+    def ontology(self) -> Sequence[WDKFilterOntologyTerm]: ...
+    @property
+    def values(self) -> dict[str, list[str]] | None: ...
 
 
 @dataclass(frozen=True)
@@ -96,12 +109,13 @@ class _Declared:
     high_date: str | None
     terms: tuple[str, ...] | None
     first_term: str
+    facets: tuple[str, ...]
 
 
 @dataclass(frozen=True)
 class StatedReading:
     name: str
-    adapter: TypeAdapter[ParamValue]
+    adapter: TypeAdapter[Stated]
     shape: str
     example: JsonValue
 
@@ -139,7 +153,7 @@ def _within_dates(low: str | None, high: str | None) -> Callable[[str], str]:
 @dataclass(frozen=True)
 class _Shape:
     stated: Any
-    to_value: Callable[[Any], ParamValue]
+    to_value: Callable[[Any], Stated]
     text: str
     example: JsonValue
 
@@ -186,8 +200,8 @@ def _number_text(length: int) -> Callable[[float | str], StringValue]:
 def _string(d: _Declared) -> _Shape:
     limit = f" of at most {d.length} characters" if d.length else ""
     if d.is_number:
-        decimal = Annotated[str, Field(pattern=r"^-?([0-9]+\.?[0-9]*|\.[0-9]+)$")]
-        finite = Annotated[float, Field(allow_inf_nan=False)]
+        decimal: Any = Annotated[str, Field(pattern=r"^-?([0-9]+\.?[0-9]*|\.[0-9]+)$")]
+        finite: Any = Annotated[float, Field(allow_inf_nan=False)]
         return _Shape(finite | decimal, _number_text(d.length), f"a number{limit}", 5)
     return _Shape(
         Annotated[str, Field(max_length=d.length or None)],
@@ -279,8 +293,21 @@ def _multi_pick(d: _Declared) -> _Shape:
     )
 
 
-def _filter(_: _Declared) -> _Shape:
-    return _Shape(FilterValue, lambda v: v, '{"filters": [...]}', {"filters": []})
+def _listed(item: Any) -> Any:
+    return Annotated[list[item], *FilterProposals.model_fields["root"].metadata]
+
+
+def _filter(d: _Declared) -> _Shape:
+    facet = Annotated[str, Field(json_schema_extra={"enum": list(d.facets)})]
+    item = create_model(d.name, __base__=FilterProposal, field=(facet, ...))
+    inline = Annotated[item, WithJsonSchema(item.model_json_schema())]
+    schema = TypeAdapter(_listed(inline)).json_schema()
+    return _Shape(
+        Annotated[FilterProposals, WithJsonSchema(schema)],
+        lambda v: v,
+        'a list of {"field": <facet>, "value": <members or {"min", "max"}>}',
+        [{"field": "<facet>", "value": ["<member>"]}],
+    )
 
 
 def _input_dataset(_: _Declared) -> _Shape:
@@ -320,7 +347,7 @@ _SHAPES: dict[ParamKind, Callable[[_Declared], _Shape]] = {
 def _reading(d: _Declared) -> StatedReading:
     shape = _SHAPES[d.kind](d)
     config = None if d.kind in _MODEL_KINDS else _STRICT
-    adapter: TypeAdapter[ParamValue] = TypeAdapter(
+    adapter: TypeAdapter[Stated] = TypeAdapter(
         Annotated[shape.stated, AfterValidator(shape.to_value)], config=config
     )
     return StatedReading(d.name, adapter, shape.text, shape.example)
@@ -352,6 +379,13 @@ def stated_reading(param: StatedDeclaration) -> StatedReading:
             high_date=param.max_date,
             terms=_enum_terms(param),
             first_term=options[0].value if options else "term",
+            facets=tuple(
+                dict.fromkeys(
+                    name
+                    for facet in FilterFacets.of(param).root
+                    for name in (facet.term, facet.display)
+                )
+            ),
         )
     )
 

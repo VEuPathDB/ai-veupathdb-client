@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import json
+from typing import Any
 
 import pytest
-from pydantic import JsonValue
+from pydantic import JsonValue, TypeAdapter
 
 from veupathdb.domain.parameters import (
+    FilterProposals,
     ParameterCanonicalizer,
     StatedValuesError,
     decimal_text,
@@ -20,6 +22,7 @@ from veupathdb.domain.parameters.values import (
     InputStepValue,
     MultiPickValue,
     NumberRangeValue,
+    ParamValue,
     SinglePickValue,
 )
 from veupathdb.domain.parameters.wdk_vocab import WDKVocabTerm
@@ -51,6 +54,10 @@ def _params(fixture: str) -> list[WDKParameter]:
 
 def _param(fixture: str, name: str) -> WDKParameter:
     return next(p for p in _params(fixture) if p.name == name)
+
+
+def _wire(param: WDKParameter, raw: JsonValue) -> str:
+    return TypeAdapter(ParamValue).validate_python(param.read_stated(raw)).to_wire()
 
 
 def _refused(param: WDKParameter, raw: JsonValue) -> str:
@@ -90,7 +97,7 @@ class TestANumberString:
     ) -> None:
         param = _param("search_genes_by_ngs_snps", "MinPercentMinorAlleles")
 
-        assert param.read_stated(raw).to_wire() == wire
+        assert _wire(param, raw) == wire
 
     @pytest.mark.parametrize("raw", [float("nan"), float("inf"), True, "5,000"])
     def test_a_value_that_is_not_a_number_is_refused(self, raw: JsonValue) -> None:
@@ -137,17 +144,49 @@ class TestNgsSnpsVocabularies:
             {"MinPercentMinorAlleles": 5.0, "ReadFrequencyPercent": "80%"},
         )
 
-        assert {name: value.to_wire() for name, value in read.items()} == {
+        assert {
+            name: TypeAdapter(ParamValue).validate_python(value).to_wire()
+            for name, value in read.items()
+        } == {
             "MinPercentMinorAlleles": "5",
             "ReadFrequencyPercent": "80%",
         }
+
+
+@pytest.mark.skipif(needs_qa_recording(_NGS_SNPS), reason=NEEDS_QA_RECORDING)
+class TestAFilter:
+    def test_a_list_of_clauses_reads_as_proposals(self) -> None:
+        param = _param("search_genes_by_ngs_snps", "variation_sample_meta")
+        stated: JsonValue = [{"field": "sex", "value": ["female"]}]
+
+        assert param.read_stated(stated) == FilterProposals.model_validate(stated)
+
+    def test_the_schema_names_each_facet_by_term_and_display(self) -> None:
+        param = _param("search_genes_by_ngs_snps", "variation_sample_meta")
+        schema: dict[str, Any] = param.stated_schema()
+
+        assert {"VAR_68bb04bd", "sex"} <= set(
+            schema["items"]["properties"]["field"]["enum"]
+        )
+
+    def test_the_shorthand_is_refused_with_the_clause_form(self) -> None:
+        param = _param("search_genes_by_ngs_snps", "variation_sample_meta")
+
+        assert "for example [{'field': '<facet>', 'value': ['<member>']}]" in _refused(
+            param, "sex=female"
+        )
+
+    def test_an_empty_list_is_refused(self) -> None:
+        param = _param("search_genes_by_ngs_snps", "variation_sample_meta")
+
+        assert "variation_sample_meta takes" in _refused(param, [])
 
 
 class TestANumber:
     _PARAM = WDKNumberParam(name="n", min=0, max=100)
 
     def test_a_float_goes_out_without_a_point(self) -> None:
-        assert self._PARAM.read_stated(5.0).to_wire() == "5"
+        assert _wire(self._PARAM, 5.0) == "5"
 
     def test_a_value_above_the_maximum_names_it(self) -> None:
         assert "100" in _refused(self._PARAM, 101)
@@ -160,7 +199,7 @@ class TestANumberRange:
     def test_an_open_end_closes_from_the_declared_limit(self) -> None:
         param = WDKNumberRangeParam(name="r", min=0, max=10)
 
-        assert param.read_stated({"min": 2}).to_wire() == '{"min": 2.0, "max": 10.0}'
+        assert _wire(param, {"min": 2}) == '{"min": 2.0, "max": 10.0}'
 
     def test_an_end_that_cannot_close_is_refused(self) -> None:
         assert "r takes" in _refused(WDKNumberRangeParam(name="r", min=0), {"min": 2})
@@ -230,7 +269,7 @@ class TestANumberStringWithALength:
     _PARAM = WDKStringParam(name="s", is_number=True, length=3)
 
     def test_a_short_number_reads(self) -> None:
-        assert self._PARAM.read_stated(5.0).to_wire() == "5"
+        assert _wire(self._PARAM, 5.0) == "5"
 
     def test_a_number_longer_than_the_length_names_it(self) -> None:
         assert "at most 3 characters" in _refused(self._PARAM, 1e-8)

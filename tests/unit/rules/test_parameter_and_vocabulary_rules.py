@@ -7,6 +7,16 @@ from typing import Any
 import pytest
 from pydantic import TypeAdapter
 
+from veupathdb.domain.parameters import (
+    FacetRange,
+    FilterFacets,
+    FilterProposals,
+    NumberBounds,
+    NumberRange,
+    StatedValuesError,
+    StringMembers,
+    StringValue,
+)
 from veupathdb.domain.parameters.dependencies import ParamGraph
 from veupathdb.domain.parameters.specs import (
     ParamSpecNormalized,
@@ -21,6 +31,7 @@ from veupathdb.domain.parameters.wdk_vocab import (
 from veupathdb.json_types import JSONObject
 from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
+from veupathdb.wdk import WDKOntologyTermSummary, WDKParameter
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.wdk_models import WDKSearchResponse
 
@@ -33,6 +44,11 @@ def _recorded_parameters(name: str) -> dict[str, JSONObject]:
     listed = search["parameters"]
     assert isinstance(listed, list)
     return {str(param["name"]): param for param in listed if isinstance(param, dict)}
+
+
+def _parameter(fixture: str, name: str) -> WDKParameter:
+    search = WDKSearchResponse.model_validate(load_recorded(fixture).json_body())
+    return next(p for p in search.search_data.parameters or [] if p.name == name)
 
 
 class _Echo:
@@ -63,6 +79,10 @@ def test_wdk_param_007_a_numeric_bound_is_a_string_parameter_flagged_is_number()
 
     assert bound["type"] == "string"
     assert bound["isNumber"] is True
+    with pytest.raises(StatedValuesError):
+        _parameter(
+            "search_genes_by_molecular_weight", "min_molecular_weight"
+        ).read_stated("10,000")
 
 
 @pytest.mark.skipif(
@@ -262,3 +282,105 @@ def test_wdk_param_013_an_organisms_property_is_not_the_mark() -> None:
 
     assert all("organisms" in p.properties for p in parameters)
     assert [p.name for p in parameters if p.is_organism] == ["organismSinglePick"]
+
+
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/search_genes_by_ngs_snps.json"), reason=NEEDS_QA_RECORDING
+)
+def test_wdk_param_017_a_number_is_written_as_the_shortest_decimal() -> None:
+    """An `isNumber` string takes `5` for `5.0` and never an exponent."""
+    param = _parameter("search_genes_by_ngs_snps", "MinPercentMinorAlleles")
+
+    assert param.read_stated(5.0) == StringValue(value="5")
+    assert param.read_stated(1e-8) == StringValue(value="0.00000001")
+
+
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/search_metrics_awstats.json"), reason=NEEDS_QA_RECORDING
+)
+def test_wdk_param_017_a_date_is_an_iso_local_date() -> None:
+    """A date-range bound in the basic ISO form is refused before WDK parses it."""
+    param = _parameter("search_metrics_awstats", "date")
+
+    with pytest.raises(StatedValuesError):
+        param.read_stated({"min": "20250101"})
+
+
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/search_genes_by_orthologs.json"), reason=NEEDS_QA_RECORDING
+)
+def test_wdk_param_017_a_boolean_is_no_vocabulary_term() -> None:
+    """A `yes`/`no` vocabulary refuses `true` and names its terms."""
+    param = _parameter("search_genes_by_orthologs", "isSyntenic")
+
+    with pytest.raises(StatedValuesError, match="'yes', 'no'"):
+        param.read_stated(True)
+
+
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/search_genes_by_variant_characteristics.json")
+    or needs_qa_recording("wdk/search_genes_by_ngs_snps.json"),
+    reason=NEEDS_QA_RECORDING,
+)
+def test_wdk_param_018_a_clause_states_type_and_is_range_from_its_facet() -> None:
+    """The same statement shape binds a range clause and a member clause."""
+    stats = FilterFacets.of(
+        _parameter("search_genes_by_variant_characteristics", "gene_variant_stats")
+    )
+    samples = FilterFacets.of(
+        _parameter("search_genes_by_ngs_snps", "variation_sample_meta")
+    )
+
+    ranged = stats.bind(
+        FilterProposals.model_validate(
+            [{"field": "total_variants", "value": {"min": 6}}]
+        )
+    )
+    members = samples.bind(
+        FilterProposals.model_validate([{"field": "sex", "value": ["female"]}])
+    )
+
+    assert ranged.filters == [
+        NumberRange(
+            field="total_variants",
+            type="number",
+            is_range=True,
+            include_unknown=False,
+            value=NumberBounds(min=6),
+        )
+    ]
+    assert members.filters == [
+        StringMembers(
+            field="VAR_68bb04bd",
+            type="string",
+            is_range=False,
+            include_unknown=False,
+            value=["female"],
+        )
+    ]
+
+
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/search_genes_by_variant_characteristics.json")
+    or needs_qa_recording("wdk/search_genes_by_ngs_snps.json")
+    or needs_qa_recording("wdk/ontology_term_summary_total_variants.json"),
+    reason=NEEDS_QA_RECORDING,
+)
+def test_wdk_param_018_a_range_facets_bounds_come_only_from_its_term_summary() -> None:
+    """The published `values` holds no range term; the term summary holds its range."""
+    stats = _parameter("search_genes_by_variant_characteristics", "gene_variant_stats")
+    samples = _parameter("search_genes_by_ngs_snps", "variation_sample_meta")
+    facet = FilterFacets.of(stats).find("total_variants")
+    summary = WDKOntologyTermSummary.model_validate(
+        load_recorded("ontology_term_summary_total_variants").json_body()
+    )
+
+    for param in (stats, samples):
+        ranged = {term.term for term in param.ontology if term.is_range}
+        assert ranged
+        assert ranged.isdisjoint(param.values or {})
+    assert facet is not None
+    assert facet.members == []
+    assert FacetRange.of(summary, facet) == FacetRange(
+        min=1, max=4823, records=5643, units="variants"
+    )
