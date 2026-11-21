@@ -375,6 +375,40 @@ def test_every_discriminator_maps_a_tag_to_a_schema_reference(
     assert all(str(ref).startswith("#/components/schemas/") for ref in mappings)
 
 
+def _tags(schema: JsonValue) -> list[tuple[str, str, str]]:
+    match schema:
+        case {
+            "discriminator": {
+                "propertyName": str() as name,
+                "mapping": dict() as mapping,
+            }
+        }:
+            found = [(name, tag, str(ref)) for tag, ref in mapping.items()]
+        case _:
+            found = []
+    match schema:
+        case dict():
+            return found + [t for part in schema.values() for t in _tags(part)]
+        case list():
+            return [t for part in schema for t in _tags(part)]
+        case _:
+            return found
+
+
+def test_every_discriminator_tag_is_the_value_its_member_states() -> None:
+    """A generated client reads a mapping tag as the literal the member holds."""
+    schema = _Holder.model_json_schema(ref_template="#/$defs/{model}")
+    defs = schema["$defs"]
+
+    stated = {
+        (tag, defs[ref.rsplit("/", 1)[1]]["properties"][name]["const"])
+        for name, tag, ref in _tags(schema)
+    }
+
+    assert stated
+    assert all(tag == const for tag, const in stated)
+
+
 def test_a_range_is_read_under_the_other_clauses() -> None:
     facet = _facet(_variant_stats(), "total_variants")
 
