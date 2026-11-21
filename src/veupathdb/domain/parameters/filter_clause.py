@@ -145,11 +145,21 @@ _CLAUSE: TypeAdapter[FilterClause] = TypeAdapter(FilterClause)
 class FilterValue(CamelModel):
     type: Literal["filter"] = "filter"
     filters: list[FilterClause] = Field(default_factory=list)
+    empty: bool = Field(default=False, exclude_if=lambda empty: not empty)
+
+    @model_validator(mode="after")
+    def _empty_holds_no_clause(self) -> FilterValue:
+        if self.empty and self.filters:
+            msg = "the empty filter value holds no clause"
+            raise ValueError(msg)
+        return self
 
     def to_wire(self) -> str:
-        return json.dumps(self.to_decoded())
+        return "" if self.empty else json.dumps(self.to_decoded())
 
     def to_decoded(self) -> JsonValue:
+        if self.empty:
+            return ""
         dumped = self.model_dump(by_alias=True, mode="json", exclude_none=True)
         return {"filters": dumped["filters"]}
 

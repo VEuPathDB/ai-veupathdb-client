@@ -10,6 +10,9 @@
 - Every kind has one empty value (`empty_value`); a number, a date and both ranges hold it
   as no value, a single pick as `""`. `accepts_empty` is the one predicate for the reader
   and `required`. A multi-pick reads `minSelectedCount` and `maxSelectedCount`.
+- A filter's empty value goes out as `""`; `{"filters": []}` stays the value with no
+  clauses. The canonicalizer refuses an empty value its parameter does not accept, in
+  the reader's words.
 - `veupathdb-py` is 0.9.0b9.
 
 ## 2026-11-21 - A filter is read as stated clauses

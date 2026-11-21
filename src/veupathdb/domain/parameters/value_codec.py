@@ -42,7 +42,9 @@ def _date_range_payload(w: str) -> dict[str, JsonValue]:
 
 
 def _filter_payload(w: str) -> dict[str, JsonValue]:
-    body = _decoded_object(w or '{"filters": []}', "filter")
+    if not w:
+        return {"type": "filter", "empty": True}
+    body = _decoded_object(w, "filter")
     return {"type": "filter", "filters": body.get("filters", [])}
 
 

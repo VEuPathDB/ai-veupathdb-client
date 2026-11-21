@@ -5,9 +5,11 @@ from typing import Any, get_args
 
 import pytest
 from pydantic import JsonValue, TypeAdapter
+from pydantic import ValidationError as PydanticValidationError
 
 from veupathdb.domain.parameters import (
     FilterProposals,
+    FilterValue,
     ParameterCanonicalizer,
     StatedValuesError,
     decimal_text,
@@ -510,7 +512,7 @@ class TestAnEmptyValueOnEachKind:
             ("timestamp", ""),
             ("single-pick-vocabulary", ""),
             ("multi-pick-vocabulary", "[]"),
-            ("filter", '{"filters": []}'),
+            ("filter", ""),
             ("input-dataset", ""),
             ("input-step", ""),
         ],
@@ -559,3 +561,75 @@ class TestTheSelectedCount:
         schema: dict[str, Any] = param.stated_schema()
 
         assert (schema["minItems"], schema["maxItems"]) == (1, 1)
+
+
+class TestAnEmptyFilterIsNotAFilterWithNoClauses:
+    def test_the_two_are_distinct_values(self) -> None:
+        assert empty_value("filter") != FilterValue()
+
+    def test_no_clauses_goes_out_as_an_empty_clause_list(self) -> None:
+        assert FilterValue().to_wire() == '{"filters": []}'
+
+    def test_each_wire_reads_back_as_its_own_value(self) -> None:
+        assert from_wire("filter", "") == empty_value("filter")
+        assert from_wire("filter", '{"filters": []}') == FilterValue()
+
+    def test_an_empty_value_holds_no_clause(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            FilterValue.model_validate(
+                {
+                    "empty": True,
+                    "filters": [
+                        {
+                            "field": "sex",
+                            "type": "string",
+                            "isRange": False,
+                            "includeUnknown": False,
+                            "value": ["female"],
+                        }
+                    ],
+                }
+            )
+
+
+def _spec(param: WDKParameter) -> ParamSpecNormalized:
+    return ParamSpecNormalized(
+        name=param.name,
+        param_type=param.type,
+        allow_empty_value=param.allow_empty_value,
+        min_selected_count=param.min_selected_count,
+        max_selected_count=param.max_selected_count,
+        vocabulary=param.vocabulary,
+        is_number=param.is_number,
+        min=param.min,
+        max=param.max,
+        min_date=param.min_date,
+        max_date=param.max_date,
+        max_length=param.length or None,
+        display_type=param.display_type,
+    )
+
+
+@pytest.mark.skipif(needs_qa_recording(_NGS_SNPS), reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(needs_qa_recording(_AWSTATS), reason=NEEDS_QA_RECORDING)
+class TestTheCanonicalizerRefusesAnEmptyValueItsParameterRefuses:
+    @pytest.mark.parametrize("index", range(10))
+    def test_with_the_readers_words(self, index: int) -> None:
+        param = _each_kind()[index]
+        empty = empty_value(param.type)
+
+        with pytest.raises(StatedValuesError) as canonical:
+            ParameterCanonicalizer({param.name: _spec(param)}).canonicalize(
+                {param.name: empty}
+            )
+
+        assert str(canonical.value) == _refused(param, empty.to_decoded())
+
+    @pytest.mark.parametrize("index", range(10))
+    def test_and_keeps_it_where_its_parameter_allows_it(self, index: int) -> None:
+        param = _each_kind()[index].model_copy(update={"allow_empty_value": True})
+        empty = empty_value(param.type)
+
+        assert ParameterCanonicalizer({param.name: _spec(param)}).canonicalize(
+            {param.name: empty}
+        ) == {param.name: empty}

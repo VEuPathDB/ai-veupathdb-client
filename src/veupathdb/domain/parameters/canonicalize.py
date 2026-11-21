@@ -12,7 +12,8 @@ from dataclasses import dataclass
 
 from pydantic import JsonValue
 
-from veupathdb.domain.parameters.specs import ParamSpecNormalized
+from veupathdb.domain.parameters.specs import ParamSpecNormalized, accepts_empty
+from veupathdb.domain.parameters.stated import stated_reading
 from veupathdb.domain.parameters.value_codec import to_decoded
 from veupathdb.domain.parameters.values import (
     DateRangeValue,
@@ -20,6 +21,7 @@ from veupathdb.domain.parameters.values import (
     NumberRangeValue,
     ParamValue,
     SinglePickValue,
+    empty_value,
 )
 from veupathdb.domain.parameters.vocab_utils import match_vocab_value
 from veupathdb.domain.parameters.wdk_vocab import (
@@ -99,6 +101,8 @@ class ParameterCanonicalizer:
                     f"takes a {spec.param_type} value, not a {value.type} value",
                     to_decoded(value),
                 )
+            if value == empty_value(value.type) and not accepts_empty(spec):
+                stated_reading(spec).read(to_decoded(value))
             canonical[name] = self._canonicalize_value(spec, value)
         return canonical
 

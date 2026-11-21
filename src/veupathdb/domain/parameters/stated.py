@@ -65,7 +65,7 @@ class StatedDeclaration(Protocol):
     @property
     def allow_empty_value(self) -> bool: ...
     @property
-    def min_selected_count(self) -> int: ...
+    def min_selected_count(self) -> int | None: ...
     @property
     def max_selected_count(self) -> int | None: ...
     @property
@@ -416,7 +416,7 @@ def stated_reading(param: StatedDeclaration) -> StatedReading:
             kind=param.type,
             is_number=param.is_number,
             allow_empty=accepts_empty(param),
-            fewest=max(param.min_selected_count, 1),
+            fewest=max(param.min_selected_count or 0, 1),
             most=param.max_selected_count,
             length=param.length,
             low=param.min,

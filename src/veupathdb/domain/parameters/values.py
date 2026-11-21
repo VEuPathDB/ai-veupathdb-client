@@ -209,7 +209,7 @@ _EMPTY_VALUES: dict[ParamKind, ParamValue] = {
     "timestamp": TimestampValue(value=""),
     "single-pick-vocabulary": SinglePickValue(value=""),
     "multi-pick-vocabulary": MultiPickValue(values=[]),
-    "filter": FilterValue(),
+    "filter": FilterValue(empty=True),
     "input-dataset": InputDatasetValue(dataset_id=""),
     "input-step": InputStepValue(step_id=""),
 }

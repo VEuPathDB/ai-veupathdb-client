@@ -7,8 +7,8 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from veupathdb.domain.parameters.value_codec import as_param_kind, from_wire
-from veupathdb.domain.parameters.values import ParamValue
-from veupathdb.domain.parameters.wdk_vocab import WDKVocabulary
+from veupathdb.domain.parameters.values import ParamKind, ParamValue
+from veupathdb.domain.parameters.wdk_vocab import WDKFilterOntologyTerm, WDKVocabulary
 
 
 class _EmptyFlag(Protocol):
@@ -49,6 +49,22 @@ class ParamSpecNormalized:
     @property
     def required(self) -> bool:
         return not accepts_empty(self)
+
+    @property
+    def type(self) -> ParamKind:
+        return as_param_kind(self.param_type)
+
+    @property
+    def length(self) -> int:
+        return self.max_length or 0
+
+    @property
+    def ontology(self) -> list[WDKFilterOntologyTerm]:
+        return []
+
+    @property
+    def values(self) -> dict[str, list[str]] | None:
+        return None
 
     @property
     def site_set(self) -> bool:
