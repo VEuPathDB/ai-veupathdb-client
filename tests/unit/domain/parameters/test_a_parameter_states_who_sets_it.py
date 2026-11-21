@@ -41,9 +41,9 @@ def test_a_visible_editable_parameter_is_bindable() -> None:
 
 @pytest.mark.parametrize(
     ("allow_empty", "min_selected", "required"),
-    [(False, 0, True), (False, 1, True), (True, 0, False), (True, 1, True)],
+    [(False, 0, True), (False, 1, True), (True, 0, False), (True, 1, False)],
 )
-def test_required_reads_allow_empty_and_the_selected_count(
+def test_required_is_whether_the_empty_value_is_refused(
     allow_empty: bool, min_selected: int, required: bool
 ) -> None:
     wire = _wire(allowEmptyValue=allow_empty, minSelectedCount=min_selected)

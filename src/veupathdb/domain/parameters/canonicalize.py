@@ -49,8 +49,10 @@ def close_open_range(
 
     WDK reads both ends and refuses an object missing one. A limit the
     parameter declares is not a guess; without one the value is left as it is
-    so WDK refuses it by name.
+    so WDK refuses it by name. The empty value stays empty.
     """
+    if value.empty:
+        return value
     if isinstance(value, NumberRangeValue):
         low = value.min if value.min is not None else spec.min
         high = value.max if value.max is not None else spec.max
@@ -107,6 +109,8 @@ class ParameterCanonicalizer:
             case MultiPickValue(values=values):
                 terms = [self._match(spec, v) for v in values]
                 return MultiPickValue(values=self._enforce_leaf_values(spec, terms))
+            case SinglePickValue(value=""):
+                return value
             case SinglePickValue(value=selected):
                 term = self._match(spec, selected)
                 return SinglePickValue(value=self._enforce_leaf_value(spec, term))

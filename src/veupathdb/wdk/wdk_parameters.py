@@ -5,6 +5,7 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, Discriminator, Field, JsonValue, field_validator
 from pydantic.alias_generators import to_camel
 
+from veupathdb.domain.parameters.specs import accepts_empty
 from veupathdb.domain.parameters.stated import Stated, stated_reading
 from veupathdb.domain.parameters.values import ParamKind
 from veupathdb.domain.parameters.wdk_vocab import (
@@ -71,7 +72,7 @@ class WDKBaseParameter(
 
     @property
     def required(self) -> bool:
-        return not self.allow_empty_value or self.min_selected_count >= 1
+        return not accepts_empty(self)
 
     @property
     def site_set(self) -> bool:
@@ -152,6 +153,7 @@ class WDKAnswerParam(WDKBaseParameter, frozen=True):
     """WDK step-input parameter."""
 
     type: Literal["input-step"] = "input-step"
+    allow_empty_value: bool = True
 
 
 class WDKDatasetParam(WDKBaseParameter, frozen=True):

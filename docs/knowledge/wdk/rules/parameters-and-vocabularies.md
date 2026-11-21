@@ -689,9 +689,17 @@ no upper bound. `occurrences_lower` is the same kind with `allowEmptyValue: fals
 
 `read_stated` reads `""` (and `[]` for a multi-pick) as the kind's empty value where the
 parameter allows it, and refuses it where it does not; the stated schema and the refusal
-offer `""` only where it is allowed. In the VEuPathDB models (ApiCommonModel,
-OrthoMCLModel, EbrcModelCommon) `allowEmpty` is declared on `string`, multi-pick,
-`input-dataset` and `timestamp` parameters only, and `AnswerParam` allows it always.
+offer `""` only where it is allowed. Every kind has one empty value (`empty_value`), whose
+wire is `""`, `[]` for a multi-pick and `{"filters": []}` for a filter, and `from_wire`
+reads that wire back to it. `accepts_empty` is the one predicate: the reader and both
+`required` properties read it. `AnswerParam.isAllowEmpty` is always true, so a step
+input declares it. A multi-pick that is not empty takes from
+`max(minSelectedCount, 1)` to `maxSelectedCount` terms, the counts `getMinSelectedCount`
+and `getMaxSelectedCount` publish; the recorded `GenesByLocation.organismSinglePick`
+takes exactly one.
+
+In the VEuPathDB models (ApiCommonModel, OrthoMCLModel, EbrcModelCommon) `allowEmpty` is
+declared on `string`, multi-pick, `input-dataset` and `timestamp` parameters only.
 
 # WDK-VOCAB - vocabularies, trees, and the parents they were read under
 

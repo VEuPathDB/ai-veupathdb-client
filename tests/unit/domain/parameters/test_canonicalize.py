@@ -71,9 +71,8 @@ class TestWithoutADeclaredLimit:
 
 
 class TestTheValueStillRefusesNonsense:
-    def test_no_endpoint_at_all_is_refused(self) -> None:
-        with pytest.raises(ValueError, match="at least one"):
-            NumberRangeValue()
+    def test_no_endpoint_at_all_is_the_empty_value(self) -> None:
+        assert NumberRangeValue().to_wire() == ""
 
     def test_an_inverted_range_is_refused(self) -> None:
         with pytest.raises(ValueError, match="min"):

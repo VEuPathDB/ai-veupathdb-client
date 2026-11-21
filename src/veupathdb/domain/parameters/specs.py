@@ -4,10 +4,20 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from typing import Protocol
 
 from veupathdb.domain.parameters.value_codec import as_param_kind, from_wire
 from veupathdb.domain.parameters.values import ParamValue
 from veupathdb.domain.parameters.wdk_vocab import WDKVocabulary
+
+
+class _EmptyFlag(Protocol):
+    @property
+    def allow_empty_value(self) -> bool: ...
+
+
+def accepts_empty(declaration: _EmptyFlag) -> bool:
+    return declaration.allow_empty_value
 
 
 @dataclass(frozen=True)
@@ -38,9 +48,7 @@ class ParamSpecNormalized:
 
     @property
     def required(self) -> bool:
-        return not self.allow_empty_value or (
-            self.min_selected_count is not None and self.min_selected_count >= 1
-        )
+        return not accepts_empty(self)
 
     @property
     def site_set(self) -> bool:

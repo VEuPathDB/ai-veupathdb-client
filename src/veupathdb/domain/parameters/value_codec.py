@@ -47,7 +47,11 @@ def _filter_payload(w: str) -> dict[str, JsonValue]:
 
 
 def _number_payload(w: str) -> dict[str, JsonValue]:
-    return {"type": "number", "value": float(w)}
+    return {"type": "number", "value": float(w) if w else None}
+
+
+def _date_payload(w: str) -> dict[str, JsonValue]:
+    return {"type": "date", "value": w or None}
 
 
 def _input_dataset_payload(w: str) -> dict[str, JsonValue]:
@@ -64,6 +68,7 @@ _WIRE_BUILDERS: dict[ParamKind, Callable[[str], dict[str, JsonValue]]] = {
     "date-range": _date_range_payload,
     "filter": _filter_payload,
     "number": _number_payload,
+    "date": _date_payload,
     "input-dataset": _input_dataset_payload,
     "input-step": _input_step_payload,
 }

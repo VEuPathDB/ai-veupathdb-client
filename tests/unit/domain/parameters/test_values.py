@@ -57,8 +57,7 @@ class TestScalarsRoundTrip:
     @given(st.integers(min_value=-(10**9), max_value=10**9))
     def test_number(self, value: int) -> None:
         restored = _round_trip("p", NumberValue(value=value), "number")
-        assert isinstance(restored, NumberValue)
-        assert float(restored.value) == float(value)
+        assert restored == NumberValue(value=value)
 
     @pytest.mark.parametrize(
         ("value", "wire"),

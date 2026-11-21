@@ -78,6 +78,7 @@ from veupathdb.domain.parameters.values import (
     ParamValue,
     SinglePickValue,
     StringValue,
+    empty_value,
 )
 from veupathdb.domain.parameters.wdk_vocab import (
     FAKE_ALL_SENTINEL,
@@ -167,6 +168,7 @@ __all__ = [
     "decimal_text",
     "dedupe_options",
     "derive_binding",
+    "empty_value",
     "fill_site_set_defaults",
     "filled_site_set_defaults",
     "find_input_step_param",

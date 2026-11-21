@@ -25,6 +25,7 @@ from veupathdb.domain.parameters.filter_clause import (
     FilterProposal,
     FilterProposals,
 )
+from veupathdb.domain.parameters.specs import accepts_empty
 from veupathdb.domain.parameters.values import (
     DateRangeValue,
     DateValue,
@@ -38,6 +39,7 @@ from veupathdb.domain.parameters.values import (
     SinglePickValue,
     StringValue,
     TimestampValue,
+    empty_value,
 )
 from veupathdb.domain.parameters.wdk_vocab import (
     WDKFilterOntologyTerm,
@@ -62,6 +64,10 @@ class StatedDeclaration(Protocol):
     def is_number(self) -> bool: ...
     @property
     def allow_empty_value(self) -> bool: ...
+    @property
+    def min_selected_count(self) -> int: ...
+    @property
+    def max_selected_count(self) -> int | None: ...
     @property
     def length(self) -> int: ...
     @property
@@ -105,6 +111,8 @@ class _Declared:
     kind: ParamKind
     is_number: bool
     allow_empty: bool
+    fewest: int
+    most: int | None
     length: int
     low: float | None
     high: float | None
@@ -159,14 +167,6 @@ class _Shape:
     to_value: Callable[[Any], Stated]
     text: str
     example: JsonValue
-
-
-_EMPTY: dict[ParamKind, Stated] = {
-    "string": StringValue(value=""),
-    "timestamp": TimestampValue(value=""),
-    "multi-pick-vocabulary": MultiPickValue(values=[]),
-    "input-dataset": InputDatasetValue(dataset_id=""),
-}
 
 
 def _number(d: _Declared) -> Any:
@@ -298,13 +298,22 @@ def _single_pick(d: _Declared) -> _Shape:
     )
 
 
+def _how_many(fewest: int, most: int | None) -> str:
+    if most == fewest:
+        return f" (exactly {fewest})"
+    if most is not None:
+        return f" ({fewest} to {most})"
+    return f" (at least {fewest})" if fewest > 1 else ""
+
+
 def _multi_pick(d: _Declared) -> _Shape:
     term: Any
     term, listed = _term(d)
+    terms = f"a list of terms from {listed}" if listed else "a list of vocabulary terms"
     return _Shape(
-        Annotated[list[term], Field(min_length=0 if d.allow_empty else 1)],
+        Annotated[list[term], Field(min_length=d.fewest, max_length=d.most)],
         lambda v: MultiPickValue(values=v),
-        f"a list of terms from {listed}" if listed else "a list of vocabulary terms",
+        f"{terms}{_how_many(d.fewest, d.most)}",
         [d.first_term],
     )
 
@@ -337,10 +346,10 @@ def _input_dataset(_: _Declared) -> _Shape:
 
 def _input_step(_: _Declared) -> _Shape:
     return _Shape(
-        Annotated[str, *InputStepValue.model_fields["step_id"].metadata],
+        Annotated[str, Field(pattern=r"^[0-9]+$")],
         lambda v: InputStepValue(step_id=v),
-        '"" or an integer step id',
-        "",
+        "an integer step id",
+        "12",
     )
 
 
@@ -359,13 +368,19 @@ _SHAPES: dict[ParamKind, Callable[[_Declared], _Shape]] = {
 }
 
 
+_NO_TERMS = Annotated[list[str], Field(max_length=0)]
+
+
 def _with_empty(d: _Declared, shape: _Shape) -> _Shape:
-    empty = _EMPTY.get(d.kind)
-    if not d.allow_empty or empty is None:
+    if not d.allow_empty:
         return shape
+    empty = empty_value(d.kind)
+    unset: Any = (
+        Literal[""] | _NO_TERMS if d.kind == "multi-pick-vocabulary" else Literal[""]
+    )
     return _Shape(
-        shape.stated | Literal[""],
-        lambda v: empty if v == "" else shape.to_value(v),
+        shape.stated | unset,
+        lambda v: empty if v in ("", []) else shape.to_value(v),
         f'{shape.text}, or "" to leave it empty',
         shape.example,
     )
@@ -400,7 +415,9 @@ def stated_reading(param: StatedDeclaration) -> StatedReading:
             name=param.name,
             kind=param.type,
             is_number=param.is_number,
-            allow_empty=param.allow_empty_value,
+            allow_empty=accepts_empty(param),
+            fewest=max(param.min_selected_count, 1),
+            most=param.max_selected_count,
             length=param.length,
             low=param.min,
             high=param.max,

@@ -38,13 +38,13 @@ class StringValue(CamelModel):
 
 class NumberValue(CamelModel):
     type: Literal["number"] = "number"
-    value: float
+    value: float | None
 
     def to_wire(self) -> str:
-        return decimal_text(self.value)
+        return "" if self.value is None else decimal_text(self.value)
 
     def to_decoded(self) -> JsonValue:
-        return self.value
+        return "" if self.value is None else self.value
 
 
 class NumberRangeValue(CamelModel):
@@ -53,16 +53,19 @@ class NumberRangeValue(CamelModel):
     max: float | None = None
 
     @model_validator(mode="after")
-    def _at_least_one_endpoint(self) -> NumberRangeValue:
-        if self.min is None and self.max is None:
-            msg = "number-range requires at least one of min/max"
-            raise ValueError(msg)
+    def _ordered(self) -> NumberRangeValue:
         if self.min is not None and self.max is not None and self.min > self.max:
             msg = f"number-range min ({self.min}) > max ({self.max})"
             raise ValueError(msg)
         return self
 
+    @property
+    def empty(self) -> bool:
+        return self.min is None and self.max is None
+
     def to_wire(self) -> str:
+        if self.empty:
+            return ""
         payload: dict[str, float] = {}
         if self.min is not None:
             payload["min"] = self.min
@@ -71,6 +74,8 @@ class NumberRangeValue(CamelModel):
         return json.dumps(payload)
 
     def to_decoded(self) -> JsonValue:
+        if self.empty:
+            return ""
         payload: dict[str, JsonValue] = {}
         if self.min is not None:
             payload["min"] = self.min
@@ -81,13 +86,13 @@ class NumberRangeValue(CamelModel):
 
 class DateValue(CamelModel):
     type: Literal["date"] = "date"
-    value: ISODate
+    value: ISODate | None
 
     def to_wire(self) -> str:
-        return self.value
+        return self.value or ""
 
     def to_decoded(self) -> JsonValue:
-        return self.value
+        return self.value or ""
 
 
 class DateRangeValue(CamelModel):
@@ -95,14 +100,13 @@ class DateRangeValue(CamelModel):
     min: ISODate | None = None
     max: ISODate | None = None
 
-    @model_validator(mode="after")
-    def _at_least_one_endpoint(self) -> DateRangeValue:
-        if self.min is None and self.max is None:
-            msg = "date-range requires at least one of min/max"
-            raise ValueError(msg)
-        return self
+    @property
+    def empty(self) -> bool:
+        return self.min is None and self.max is None
 
     def to_wire(self) -> str:
+        if self.empty:
+            return ""
         payload: dict[str, str] = {}
         if self.min is not None:
             payload["min"] = self.min
@@ -111,6 +115,8 @@ class DateRangeValue(CamelModel):
         return json.dumps(payload)
 
     def to_decoded(self) -> JsonValue:
+        if self.empty:
+            return ""
         payload: dict[str, JsonValue] = {}
         if self.min is not None:
             payload["min"] = self.min
@@ -132,7 +138,7 @@ class TimestampValue(CamelModel):
 
 class SinglePickValue(CamelModel):
     type: Literal["single-pick-vocabulary"] = "single-pick-vocabulary"
-    value: str = Field(min_length=1)
+    value: str
 
     def to_wire(self) -> str:
         return self.value
@@ -192,3 +198,22 @@ ParamValue = Annotated[
     | InputStepValue,
     Field(discriminator="type"),
 ]
+
+
+_EMPTY_VALUES: dict[ParamKind, ParamValue] = {
+    "string": StringValue(value=""),
+    "number": NumberValue(value=None),
+    "number-range": NumberRangeValue(),
+    "date": DateValue(value=None),
+    "date-range": DateRangeValue(),
+    "timestamp": TimestampValue(value=""),
+    "single-pick-vocabulary": SinglePickValue(value=""),
+    "multi-pick-vocabulary": MultiPickValue(values=[]),
+    "filter": FilterValue(),
+    "input-dataset": InputDatasetValue(dataset_id=""),
+    "input-step": InputStepValue(step_id=""),
+}
+
+
+def empty_value(kind: ParamKind) -> ParamValue:
+    return _EMPTY_VALUES[kind]

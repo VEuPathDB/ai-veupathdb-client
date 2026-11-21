@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import Any, get_args
 
 import pytest
 from pydantic import JsonValue, TypeAdapter
@@ -15,6 +15,7 @@ from veupathdb.domain.parameters import (
     read_stated_values,
 )
 from veupathdb.domain.parameters.specs import ParamSpecNormalized
+from veupathdb.domain.parameters.value_codec import from_wire
 from veupathdb.domain.parameters.values import (
     DateRangeValue,
     DateValue,
@@ -22,10 +23,11 @@ from veupathdb.domain.parameters.values import (
     InputStepValue,
     MultiPickValue,
     NumberRangeValue,
+    ParamKind,
     ParamValue,
     SinglePickValue,
     StringValue,
-    TimestampValue,
+    empty_value,
 )
 from veupathdb.domain.parameters.wdk_vocab import WDKVocabTerm, flatten_vocab
 from veupathdb.errors import ValidationError
@@ -159,6 +161,7 @@ def test_a_tree_multi_pick_stays_a_list_of_strings() -> None:
 
     assert param.stated_schema() == {
         "items": {"minLength": 1, "type": "string"},
+        "maxItems": 1,
         "minItems": 1,
         "type": "array",
     }
@@ -403,13 +406,6 @@ class TestTheCanonicalizer:
         assert json.loads(closed["r"].to_wire()) == {"min": 0, "max": 4}
 
 
-def _id_pattern(model: type[InputStepValue], key: str) -> JsonValue:
-    properties: dict[str, dict[str, JsonValue]] = model.model_json_schema()[
-        "properties"
-    ]
-    return properties[key]["pattern"]
-
-
 def test_a_dataset_schema_takes_a_positive_integer_id() -> None:
     assert WDKDatasetParam(name="ds").stated_schema() == {
         "anyOf": [
@@ -420,12 +416,14 @@ def test_a_dataset_schema_takes_a_positive_integer_id() -> None:
 
 
 @pytest.mark.skipif(needs_qa_recording(_ORTHOLOGS), reason=NEEDS_QA_RECORDING)
-def test_a_recorded_step_schema_carries_the_value_model_pattern() -> None:
+def test_a_recorded_step_schema_takes_an_id_or_the_empty_value() -> None:
     param = _param("search_genes_by_orthologs", "gene_result")
 
     assert param.stated_schema() == {
-        "pattern": _id_pattern(InputStepValue, "stepId"),
-        "type": "string",
+        "anyOf": [
+            {"pattern": "^[0-9]+$", "type": "string"},
+            {"const": "", "type": "string"},
+        ]
     }
 
 
@@ -458,35 +456,106 @@ class TestAnEmptyValueIsReadAsItsDeclarationAllows:
         assert "organismSinglePick takes" in _refused(param, [])
 
 
+_VARIANTS = "wdk/search_genes_by_variant_characteristics.json"
+_LOCATION = "wdk/search_genes_by_location.json"
+
+
+def _each_kind() -> list[WDKParameter]:
+    """One declaration of every kind that refuses an empty value."""
+    return [
+        _param("search_genes_by_ngs_snps", "occurrences_lower"),
+        WDKNumberParam(name="n", min=0, max=10),
+        WDKNumberRangeParam(name="nr", min=0, max=10),
+        WDKDateParam(name="d"),
+        _param("search_metrics_awstats", "date"),
+        WDKTimestampParam(name="t"),
+        _param("search_genes_by_ngs_snps", "ReadFrequencyPercent"),
+        _param("search_genes_by_ngs_snps", "organismSinglePick"),
+        _param("search_genes_by_ngs_snps", "variation_sample_meta"),
+        WDKDatasetParam(name="ds"),
+    ]
+
+
+@pytest.mark.skipif(needs_qa_recording(_NGS_SNPS), reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(needs_qa_recording(_AWSTATS), reason=NEEDS_QA_RECORDING)
 class TestAnEmptyValueOnEachKind:
-    def test_a_string_that_does_not_allow_it_refuses_it(self) -> None:
-        assert "s takes a non-empty string" in _refused(WDKStringParam(name="s"), "")
+    def test_every_kind_is_covered(self) -> None:
+        assert {p.type for p in _each_kind()} == set(get_args(ParamKind)) - {
+            "input-step"
+        }
 
-    def test_a_string_that_allows_it_reads_it(self) -> None:
-        param = WDKStringParam(name="s", allow_empty_value=True)
+    @pytest.mark.parametrize("index", range(10))
+    def test_a_declaration_that_does_not_allow_it_refuses_it(self, index: int) -> None:
+        param = _each_kind()[index]
 
-        assert param.read_stated("") == StringValue(value="")
+        assert not param.allow_empty_value
+        assert f"{param.name} takes" in _refused(param, "")
 
-    @pytest.mark.parametrize("raw", ["", []])
-    def test_a_multi_pick_that_allows_it_reads_no_terms(self, raw: JsonValue) -> None:
-        param = WDKEnumParam(
-            name="m",
-            type="multi-pick-vocabulary",
-            allow_empty_value=True,
-            vocabulary=[WDKVocabTerm(("a", "a", None))],
+    @pytest.mark.parametrize("index", range(10))
+    def test_the_same_declaration_allowing_it_reads_its_empty_value(
+        self, index: int
+    ) -> None:
+        param = _each_kind()[index].model_copy(update={"allow_empty_value": True})
+
+        assert param.read_stated("") == empty_value(param.type)
+
+    @pytest.mark.parametrize(
+        ("kind", "wire"),
+        [
+            ("string", ""),
+            ("number", ""),
+            ("number-range", ""),
+            ("date", ""),
+            ("date-range", ""),
+            ("timestamp", ""),
+            ("single-pick-vocabulary", ""),
+            ("multi-pick-vocabulary", "[]"),
+            ("filter", '{"filters": []}'),
+            ("input-dataset", ""),
+            ("input-step", ""),
+        ],
+    )
+    def test_an_empty_value_goes_out_as_the_empty_wire_value(
+        self, kind: ParamKind, wire: str
+    ) -> None:
+        assert empty_value(kind).to_wire() == wire
+
+    @pytest.mark.parametrize("kind", get_args(ParamKind))
+    def test_the_empty_wire_value_reads_back_as_the_empty_value(
+        self, kind: ParamKind
+    ) -> None:
+        assert from_wire(kind, empty_value(kind).to_wire()) == empty_value(kind)
+
+
+@pytest.mark.skipif(needs_qa_recording(_VARIANTS), reason=NEEDS_QA_RECORDING)
+@pytest.mark.parametrize("raw", ["", []])
+def test_a_recorded_multi_pick_that_allows_it_reads_no_terms(raw: JsonValue) -> None:
+    param = _param("search_genes_by_variant_characteristics", "organism_select_none")
+
+    assert param.allow_empty_value
+    assert _wire(param, raw) == "[]"
+
+
+@pytest.mark.skipif(needs_qa_recording(_LOCATION), reason=NEEDS_QA_RECORDING)
+class TestTheSelectedCount:
+    def test_two_terms_past_the_maximum_of_one_are_refused(self) -> None:
+        param = _param("search_genes_by_location", "organismSinglePick")
+        terms: list[JsonValue] = [o.value for o in flatten_vocab(param.vocabulary)[:2]]
+
+        refusal = _refused(param, terms)
+
+        assert "organismSinglePick takes a list of terms from" in refusal
+        assert "(exactly 1)" in refusal
+
+    def test_one_term_reads(self) -> None:
+        param = _param("search_genes_by_location", "organismSinglePick")
+
+        assert param.read_stated(["Plasmodium falciparum 3D7"]) == MultiPickValue(
+            values=["Plasmodium falciparum 3D7"]
         )
 
-        assert _wire(param, raw) == "[]"
+    def test_the_schema_states_both_counts(self) -> None:
+        param = _param("search_genes_by_location", "organismSinglePick")
+        schema: dict[str, Any] = param.stated_schema()
 
-    def test_a_dataset_that_allows_it_reads_it(self) -> None:
-        param = WDKDatasetParam(name="ds", allow_empty_value=True)
-
-        assert param.read_stated("") == InputDatasetValue(dataset_id="")
-
-    def test_a_dataset_that_does_not_allow_it_refuses_it(self) -> None:
-        assert "ds takes" in _refused(WDKDatasetParam(name="ds"), "")
-
-    def test_a_timestamp_that_allows_it_reads_it(self) -> None:
-        param = WDKTimestampParam(name="t", allow_empty_value=True)
-
-        assert param.read_stated("") == TimestampValue(value="")
+        assert (schema["minItems"], schema["maxItems"]) == (1, 1)

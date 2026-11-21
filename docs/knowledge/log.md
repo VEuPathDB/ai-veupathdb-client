@@ -7,6 +7,9 @@
   (and `[]` for a multi-pick) as the kind's empty value there and refuses it elsewhere.
 - An `input-dataset` and a `timestamp` value may hold `""`, WDK's empty stable value.
 - A filter facet shows `range` only when a read filled it.
+- Every kind has one empty value (`empty_value`); a number, a date and both ranges hold it
+  as no value, a single pick as `""`. `accepts_empty` is the one predicate for the reader
+  and `required`. A multi-pick reads `minSelectedCount` and `maxSelectedCount`.
 - `veupathdb-py` is 0.9.0b9.
 
 ## 2026-11-21 - A filter is read as stated clauses
