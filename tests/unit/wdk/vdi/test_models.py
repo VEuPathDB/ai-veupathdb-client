@@ -217,7 +217,7 @@ class TestTheRecordedListing:
             and entry.status.import_.status is VdiImportStatus.INVALID
         ]
 
-        assert [entry.dataset_id for entry in invalid] == ["gp184tltg90x4"]
+        assert [entry.dataset_id for entry in invalid] == ["Fh88oF9Uh005V"]
         assert invalid[0].status.failure_messages("PlasmoDB") == []
 
 

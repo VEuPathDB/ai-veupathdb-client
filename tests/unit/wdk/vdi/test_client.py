@@ -369,9 +369,9 @@ class TestListingAndPlugins:
         assert [entry.status.disposition("PlasmoDB") for entry in entries] == [
             installed,
             installed,
+            installed,
+            installed,
             failed,
-            installed,
-            installed,
             installed,
         ]
 

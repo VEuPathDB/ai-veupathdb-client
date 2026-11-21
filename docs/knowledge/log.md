@@ -4,6 +4,8 @@
 
 - `get_step_histogram` reads a column's `histogram` reporter with the step's view filters,
   [WDK-ANS-012](wdk/rules/searches-and-answers.md).
+- The VDI recording `datasets_owned` is recorded again from the test account's uploads,
+  which now carry `strategist` names.
 
 ## 2026-11-12 - A combine reads both of its inputs
 
