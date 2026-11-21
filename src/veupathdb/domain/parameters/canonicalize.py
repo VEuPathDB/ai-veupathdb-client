@@ -8,13 +8,15 @@ leaf set, and an open range takes the parameter's own limit. Whether a value
 WDK can read is one WDK accepts is WDK's verdict, not this module's.
 """
 
-from dataclasses import dataclass
+from collections.abc import Mapping
+from dataclasses import dataclass, field
 
 from pydantic import JsonValue
+from pydantic import ValidationError as PydanticValidationError
 
 from veupathdb.domain.parameters.specs import ParamSpecNormalized, accepts_empty
-from veupathdb.domain.parameters.stated import stated_reading
-from veupathdb.domain.parameters.value_codec import to_decoded
+from veupathdb.domain.parameters.stated import empty_refusal
+from veupathdb.domain.parameters.value_codec import as_param_kind, from_wire, to_decoded
 from veupathdb.domain.parameters.values import (
     DateRangeValue,
     MultiPickValue,
@@ -69,6 +71,12 @@ def close_open_range(
 
 
 @dataclass(frozen=True)
+class HeldValues:
+    values: dict[str, ParamValue] = field(default_factory=dict)
+    unread: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class ParameterCanonicalizer:
     """Canonicalize ``ParamValue`` parameters using canonical parameter specs."""
 
@@ -102,9 +110,31 @@ class ParameterCanonicalizer:
                     to_decoded(value),
                 )
             if value == empty_value(value.type) and not accepts_empty(spec):
-                stated_reading(spec).read(to_decoded(value))
+                raise empty_refusal(name, to_decoded(value))
             canonical[name] = self._canonicalize_value(spec, value)
         return canonical
+
+    def held(self, wire: Mapping[str, str]) -> HeldValues:
+        """Each value WDK holds, read as its kind and never refused.
+
+        A value no kind reads is kept in its wire form, and a value the spec
+        does not canonicalize is kept as read.
+        """
+        held = HeldValues()
+        for name, raw in wire.items():
+            spec = self.specs.get(name)
+            if spec is None or spec.param_type == "input-step":
+                continue
+            try:
+                value = from_wire(as_param_kind(spec.param_type), raw)
+            except PydanticValidationError, ValueError, TypeError:
+                held.unread[name] = raw
+                continue
+            try:
+                held.values[name] = self._canonicalize_value(spec, value)
+            except ValidationError:
+                held.values[name] = value
+        return held
 
     def _canonicalize_value(
         self, spec: ParamSpecNormalized, value: ParamValue

@@ -16,6 +16,7 @@ from veupathdb.domain.parameters import (
     fill_site_set_defaults,
     read_stated_values,
 )
+from veupathdb.domain.parameters.canonicalize import HeldValues
 from veupathdb.domain.parameters.specs import ParamSpecNormalized
 from veupathdb.domain.parameters.value_codec import from_wire
 from veupathdb.domain.parameters.values import (
@@ -450,7 +451,9 @@ class TestAnEmptyValueIsReadAsItsDeclarationAllows:
     def test_a_number_string_that_does_not_allow_it_refuses_it(self) -> None:
         param = _param("search_genes_by_ngs_snps", "occurrences_lower")
 
-        assert "occurrences_lower takes a number" in _refused(param, "")
+        assert "occurrences_lower takes a value, not the empty value ''" in (
+            _refused(param, "")
+        )
 
     def test_a_multi_pick_that_does_not_allow_it_refuses_no_terms(self) -> None:
         param = _param("search_genes_by_ngs_snps", "organismSinglePick")
@@ -633,3 +636,53 @@ class TestTheCanonicalizerRefusesAnEmptyValueItsParameterRefuses:
         assert ParameterCanonicalizer({param.name: _spec(param)}).canonicalize(
             {param.name: empty}
         ) == {param.name: empty}
+
+
+@pytest.mark.skipif(needs_qa_recording(_NGS_SNPS), reason=NEEDS_QA_RECORDING)
+@pytest.mark.skipif(needs_qa_recording(_AWSTATS), reason=NEEDS_QA_RECORDING)
+class TestAHeldValueIsReadAsWdkHoldsIt:
+    def test_a_recorded_empty_number_string_reads_its_empty_value(self) -> None:
+        param = _param("search_genes_by_ngs_snps", "occurrences_lower")
+
+        held = ParameterCanonicalizer({param.name: _spec(param)}).held({param.name: ""})
+
+        assert held == HeldValues(values={param.name: StringValue(value="")})
+
+    @pytest.mark.parametrize("index", range(10))
+    def test_every_kind_reads_its_empty_wire_form(self, index: int) -> None:
+        param = _each_kind()[index]
+        empty = empty_value(param.type)
+
+        held = ParameterCanonicalizer({param.name: _spec(param)}).held(
+            {param.name: empty.to_wire()}
+        )
+
+        assert held.values == {param.name: empty}
+
+    def test_a_wire_form_no_kind_reads_is_kept_as_wdk_holds_it(self) -> None:
+        param = WDKNumberParam(name="n", min=0, max=10)
+
+        held = ParameterCanonicalizer({"n": _spec(param)}).held({"n": "abc"})
+
+        assert held == HeldValues(values={}, unread={"n": "abc"})
+
+    def test_a_term_the_vocabulary_lost_is_kept_as_decoded(self) -> None:
+        param = _param("search_genes_by_ngs_snps", "ReadFrequencyPercent")
+
+        held = ParameterCanonicalizer({param.name: _spec(param)}).held(
+            {param.name: "10%"}
+        )
+
+        assert held.values == {param.name: SinglePickValue(value="10%")}
+
+
+def test_one_text_refuses_an_empty_value_on_both_paths() -> None:
+    param = WDKNumberParam(name="n", min=0, max=10)
+
+    with pytest.raises(StatedValuesError) as canonical:
+        ParameterCanonicalizer({"n": _spec(param)}).canonicalize(
+            {"n": empty_value("number")}
+        )
+
+    assert str(canonical.value) == _refused(param, "")
+    assert "n takes a value, not the empty value ''" in str(canonical.value)

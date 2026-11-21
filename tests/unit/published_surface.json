@@ -111,6 +111,7 @@
     "FilterProposals",
     "FilterStatementError",
     "FilterValue",
+    "HeldValues",
     "ISODate",
     "InputDatasetValue",
     "InputStepValue",

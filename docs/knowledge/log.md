@@ -13,6 +13,9 @@
 - A filter's empty value goes out as `""`; `{"filters": []}` stays the value with no
   clauses. The canonicalizer refuses an empty value its parameter does not accept, in
   the reader's words.
+- `ParameterCanonicalizer.held` reads what WDK holds and never refuses (`HeldValues`);
+  `empty_refusal` is the one text the reader and the canonicalizer refuse an empty value
+  with.
 - `veupathdb-py` is 0.9.0b9.
 
 ## 2026-11-21 - A filter is read as stated clauses

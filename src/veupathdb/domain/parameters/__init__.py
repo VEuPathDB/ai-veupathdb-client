@@ -1,6 +1,6 @@
 """Parameter specs, typed values, vocabularies and the wire codec between them."""
 
-from veupathdb.domain.parameters.canonicalize import ParameterCanonicalizer
+from veupathdb.domain.parameters.canonicalize import HeldValues, ParameterCanonicalizer
 from veupathdb.domain.parameters.date_bounds import ISODate
 from veupathdb.domain.parameters.decimals import decimal_text
 from veupathdb.domain.parameters.dependencies import DeclaredParam, ParamGraph
@@ -123,6 +123,7 @@ __all__ = [
     "FilterProposals",
     "FilterStatementError",
     "FilterValue",
+    "HeldValues",
     "ISODate",
     "InputDatasetValue",
     "InputStepValue",

@@ -65,7 +65,7 @@ class StatedDeclaration(Protocol):
     @property
     def allow_empty_value(self) -> bool: ...
     @property
-    def min_selected_count(self) -> int | None: ...
+    def min_selected_count(self) -> int: ...
     @property
     def max_selected_count(self) -> int | None: ...
     @property
@@ -129,13 +129,21 @@ class StatedReading:
     adapter: TypeAdapter[Stated]
     shape: str
     example: JsonValue
+    refused_empties: tuple[JsonValue, ...]
 
     def read(self, raw: JsonValue) -> Stated:
+        if raw in self.refused_empties:
+            raise empty_refusal(self.name, raw)
         try:
             return self.adapter.validate_python(raw)
         except pydantic.ValidationError:
             text = f"{self.name} takes {self.shape}, for example {self.example!r}; it read {raw!r}."
             raise StatedValuesError([StatedFault(self.name, raw, text)]) from None
+
+
+def empty_refusal(name: str, raw: JsonValue) -> StatedValuesError:
+    text = f"{name} takes a value, not the empty value {raw!r}."
+    return StatedValuesError([StatedFault(name, raw, text)])
 
 
 def _limits(low: str | None, high: str | None) -> str:
@@ -393,7 +401,14 @@ def _reading(d: _Declared) -> StatedReading:
     adapter: TypeAdapter[Stated] = TypeAdapter(
         Annotated[shape.stated, AfterValidator(shape.to_value)], config=config
     )
-    return StatedReading(d.name, adapter, shape.text, shape.example)
+    empties: tuple[JsonValue, ...] = (
+        ()
+        if d.allow_empty
+        else ("", [])
+        if d.kind == "multi-pick-vocabulary"
+        else ("",)
+    )
+    return StatedReading(d.name, adapter, shape.text, shape.example, empties)
 
 
 def _enum_terms(param: StatedDeclaration) -> tuple[str, ...] | None:
@@ -416,7 +431,7 @@ def stated_reading(param: StatedDeclaration) -> StatedReading:
             kind=param.type,
             is_number=param.is_number,
             allow_empty=accepts_empty(param),
-            fewest=max(param.min_selected_count or 0, 1),
+            fewest=max(param.min_selected_count, 1),
             most=param.max_selected_count,
             length=param.length,
             low=param.min,

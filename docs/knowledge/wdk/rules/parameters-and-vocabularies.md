@@ -694,8 +694,11 @@ wire is `""`, or `[]` for a multi-pick, and `from_wire` reads that wire back to 
 `FilterParamNew` does not override `isEmptyValue`, so `{"filters": []}` is not WDK's
 empty value: it passes the filter's own check as a value with no clauses. The empty
 filter value (`FilterValue(empty=True)`) goes out as `""`, and `FilterValue()` keeps
-meaning no clauses. `ParameterCanonicalizer` refuses an empty value on a parameter that
-does not accept it, with the reader's own refusal. `accepts_empty` is the one predicate: the reader and both
+meaning no clauses. `ParameterCanonicalizer.canonicalize`, the entry for a value a caller
+states, refuses an empty value on a parameter that does not accept it with the same text
+as the reader (`empty_refusal`). `ParameterCanonicalizer.held`, the entry for a value WDK
+holds, never refuses: it reads each wire form as its kind, keeps a value its spec does not
+canonicalize as read, and keeps a wire form no kind reads as WDK holds it. `accepts_empty` is the one predicate: the reader and both
 `required` properties read it. `AnswerParam.isAllowEmpty` is always true, so a step
 input declares it. A multi-pick that is not empty takes from
 `max(minSelectedCount, 1)` to `maxSelectedCount` terms, the counts `getMinSelectedCount`
