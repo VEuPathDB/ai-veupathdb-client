@@ -121,10 +121,12 @@ class MultiMembers(_Clause, frozen=True):
         return frozenset((self.value.operation, *leaves))
 
 
-_Number = Annotated[NumberMembers | NumberRange, Field(discriminator="is_range")]
+type NumberClause = Annotated[
+    NumberMembers | NumberRange, Field(discriminator="is_range")
+]
 
 FilterClause = Annotated[
-    StringMembers | _Number | DateRange | MultiMembers,
+    StringMembers | NumberClause | DateRange | MultiMembers,
     Field(discriminator="type"),
 ]
 

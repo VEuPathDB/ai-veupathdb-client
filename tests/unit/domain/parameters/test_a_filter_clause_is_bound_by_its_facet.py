@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import pytest
+from pydantic import BaseModel, JsonValue
 from pydantic import ValidationError as PydanticValidationError
+from pydantic.json_schema import JsonSchemaMode
 
 from veupathdb.domain.parameters import (
     DateBounds,
@@ -16,6 +18,7 @@ from veupathdb.domain.parameters import (
     FilterValue,
     NumberBounds,
     NumberRange,
+    ParamValue,
     StringMembers,
 )
 from veupathdb.testing.wdk_fixtures import load_recorded
@@ -334,3 +337,38 @@ def test_a_range_is_written_in_plain_decimals(
     low: float | str, high: float | str, text: str
 ) -> None:
     assert FacetRange(min=low, max=high, records=7, units=None).text() == text
+
+
+def _mappings(schema: JsonValue) -> list[object]:
+    match schema:
+        case {"discriminator": {"mapping": dict() as mapping}}:
+            found: list[object] = list(mapping.values())
+        case _:
+            found = []
+    match schema:
+        case dict():
+            return found + [m for part in schema.values() for m in _mappings(part)]
+        case list():
+            return [m for part in schema for m in _mappings(part)]
+        case _:
+            return found
+
+
+class _Holder(BaseModel):
+    value: FilterValue
+    any: ParamValue
+
+
+@pytest.mark.parametrize("mode", ["validation", "serialization"])
+def test_every_discriminator_maps_a_tag_to_a_schema_reference(
+    mode: JsonSchemaMode,
+) -> None:
+    """OpenAPI reads a discriminator mapping as tag to reference string."""
+    schema = _Holder.model_json_schema(
+        ref_template="#/components/schemas/{model}", mode=mode
+    )
+
+    mappings = _mappings(schema)
+
+    assert mappings
+    assert all(str(ref).startswith("#/components/schemas/") for ref in mappings)
