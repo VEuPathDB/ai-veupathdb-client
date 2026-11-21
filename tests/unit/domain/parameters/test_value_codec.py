@@ -7,10 +7,9 @@ import json
 import pytest
 from pydantic import ValidationError as PydanticValidationError
 
+from veupathdb.domain.parameters.filter_clause import FilterValue, StringMembers
 from veupathdb.domain.parameters.value_codec import _PARAM_VALUE_ADAPTER, from_wire
 from veupathdb.domain.parameters.values import (
-    FilterTermClause,
-    FilterValue,
     MultiPickValue,
 )
 
@@ -55,10 +54,11 @@ class TestTheFilterValue:
         assert json.loads(FilterValue().to_wire()) == {"filters": []}
 
     def test_clause_emits_authoritative_basefilter_keys(self) -> None:
-        clause = FilterTermClause(
+        clause = StringMembers(
             field="Sample type",
             type="string",
             is_range=False,
+            include_unknown=False,
             value=["culture", "blood"],
         )
 
@@ -92,7 +92,7 @@ class TestTheFilterValue:
 
         assert parsed == FilterValue(
             filters=[
-                FilterTermClause(
+                StringMembers(
                     field="Country",
                     type="string",
                     is_range=False,

@@ -13,6 +13,7 @@ from typing import get_args
 import pytest
 from pydantic import ValidationError as PydanticValidationError
 
+from veupathdb.domain.parameters.filter_clause import FilterValue, StringMembers
 from veupathdb.domain.parameters.value_codec import (
     as_param_kind,
     from_wire,
@@ -21,8 +22,6 @@ from veupathdb.domain.parameters.value_codec import (
 from veupathdb.domain.parameters.values import (
     DateRangeValue,
     DateValue,
-    FilterTermClause,
-    FilterValue,
     InputDatasetValue,
     InputStepValue,
     MultiPickValue,
@@ -64,7 +63,17 @@ _ONE_OF_EVERY_KIND: dict[str, ParamValue] = {
     "a_timestamp": TimestampValue(value="1766000000000"),
     "a_single_pick": SinglePickValue(value="Gene"),
     "a_multi_pick": MultiPickValue(values=["product", "name"]),
-    "a_filter": FilterValue(filters=[FilterTermClause(field="organism")]),
+    "a_filter": FilterValue(
+        filters=[
+            StringMembers(
+                field="organism",
+                type="string",
+                is_range=False,
+                include_unknown=False,
+                value=[],
+            )
+        ]
+    ),
     "an_input_dataset": InputDatasetValue(dataset_id="558341"),
     "an_input_step": InputStepValue(step_id="900000001"),
 }

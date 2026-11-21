@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from tests.unit.wdk._step_writes import Recorder
 
-from veupathdb.domain.parameters.values import FilterTermClause
+from veupathdb.domain.parameters import StringMembers
 from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import fixture_request, load_recorded
 from veupathdb.wdk.client import VEuPathDBClient
@@ -50,7 +50,13 @@ async def test_the_filters_travel_in_the_wire_form_of_a_clause(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     client, post = _client(monkeypatch)
-    country = FilterTermClause(field="VAR_8e68b3e5", value=["Cambodia"])
+    country = StringMembers(
+        field="VAR_8e68b3e5",
+        type="string",
+        is_range=False,
+        include_unknown=False,
+        value=["Cambodia"],
+    )
 
     await client.get_ontology_term_summary(
         "transcript",

@@ -5,9 +5,10 @@ import math
 from decimal import Decimal
 from typing import Annotated, Literal
 
-from pydantic import Field, JsonValue, RootModel, model_validator
+from pydantic import Field, JsonValue, model_validator
 
 from veupathdb.domain.parameters.date_bounds import ISODate
+from veupathdb.domain.parameters.filter_clause import FilterValue
 from veupathdb.model import CamelModel
 
 ParamKind = Literal[
@@ -161,77 +162,6 @@ class MultiPickValue(CamelModel):
 
     def to_decoded(self) -> JsonValue:
         return list(self.values)
-
-
-class FilterClauseTerms(RootModel[frozenset[str]]):
-    """The values one filter clause states, as a set.
-
-    A membership clause carries a list of terms and a range clause carries an
-    object with its bounds. Neither states an order.
-    """
-
-    @model_validator(mode="before")
-    @classmethod
-    def _as_terms(cls, raw: JsonValue) -> JsonValue:
-        if isinstance(raw, dict):
-            return [f"{key}={value}" for key, value in raw.items()]
-        if isinstance(raw, list):
-            return [str(item) for item in raw]
-        return [] if raw is None else [str(raw)]
-
-
-FilterClauseKey = tuple[str, bool, bool, frozenset[str]]
-"""One clause by what it states: its field, its two flags, and its values."""
-
-
-class FilterTermClause(CamelModel):
-    """One faceted clause of a WDK filter value. Keys mirror wdk-client's
-    authoritative ``BaseFilter`` (field/type/isRange/includeUnknown/value);
-    parsing ignores extra keys (e.g. ``fieldDisplayName``) and emits only these."""
-
-    field: str
-    type: str = "string"
-    is_range: bool = False
-    include_unknown: bool = False
-    value: JsonValue = Field(default_factory=list)
-
-    @property
-    def comparable(self) -> FilterClauseKey:
-        """The clause by what it states, not by how it was serialized.
-
-        ``type`` is a property of the field rather than of the selection, so
-        it is left out.
-        """
-        return (
-            self.field,
-            self.is_range,
-            self.include_unknown,
-            FilterClauseTerms.model_validate(self.value).root,
-        )
-
-
-class FilterValue(CamelModel):
-    type: Literal["filter"] = "filter"
-    filters: list[FilterTermClause] = Field(default_factory=list)
-
-    def to_wire(self) -> str:
-        return json.dumps(
-            {
-                "filters": [
-                    c.model_dump(by_alias=True, mode="json") for c in self.filters
-                ]
-            },
-        )
-
-    def to_decoded(self) -> JsonValue:
-        return {
-            "filters": [c.model_dump(by_alias=True, mode="json") for c in self.filters],
-        }
-
-    @property
-    def clause_set(self) -> frozenset[FilterClauseKey]:
-        """The clauses this value states. Their order is not part of it."""
-        return frozenset(clause.comparable for clause in self.filters)
 
 
 class InputDatasetValue(CamelModel):

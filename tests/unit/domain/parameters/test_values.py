@@ -13,10 +13,10 @@ from hypothesis import assume, given, settings
 from hypothesis import strategies as st
 from pydantic import ValidationError as PydanticValidationError
 
+from veupathdb.domain.parameters.filter_clause import FilterValue
 from veupathdb.domain.parameters.values import (
     DateRangeValue,
     DateValue,
-    FilterValue,
     InputDatasetValue,
     InputStepValue,
     MultiPickValue,

@@ -60,6 +60,7 @@ class WDKFilterOntologyTerm(CamelModel):
     type: Literal["date", "string", "number", "multiFilter"] | None = None
     precision: int = 1
     is_range: bool = False
+    units: str | None = None
 
 
 class WDKDatasetParser(CamelModel):

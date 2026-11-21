@@ -9,7 +9,7 @@ import pydantic
 from pydantic import JsonValue, TypeAdapter
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
-from veupathdb.domain.parameters.values import FilterTermClause
+from veupathdb.domain.parameters.filter_clause import FilterClause
 from veupathdb.errors import DataParsingError, VEuPathDBError, validate_response
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
@@ -256,7 +256,7 @@ class SearchEndpoints:
         ontology_id: str,
         context: dict[str, str],
         *,
-        filters: Sequence[FilterTermClause] = (),
+        filters: Sequence[FilterClause] = (),
     ) -> WDKOntologyTermSummary:
         """Returns the count of each value of one ontology term of a filter parameter.
 
