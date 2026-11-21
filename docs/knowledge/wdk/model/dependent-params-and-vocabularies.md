@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: Dependent parameters and vocabularies
-description: What a vocabulary is, why a tree vocabulary has a fake root and counts only leaves, and why a dependent parameter's value is meaningless without the parent it was read under.
+description: What a vocabulary is, why a tree vocabulary has a fake root and counts only leaves, how wire parents differ from stated parents, and why a dependent parameter's value is meaningless without the parent it was read under.
 tags: [wdk-alignment, parameters, vocabularies, dependent-params, model]
 generated: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
 verified: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
@@ -102,6 +102,24 @@ returns `false` by default and is overridden per class: an enum parameter
 while a `FilterParamNew` goes stale
 [only when the changed parameter feeds its ontology or background query](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNew.java#L1012-L1030).
 `getStaleDependentParams` walks that transitively.
+
+# Wire parents and stated parents
+
+A parameter's **wire parents** are every parameter whose `dependentParams` names it, the
+inverted map above. They decide which parameters go stale on a change and the order a
+client fills values in, so `ParamGraph.fill_order` and every refresh read them.
+
+A bindable parameter's **stated parents** are the bindable parameters it depends on, read
+through any site-set parameter between them
+([WDK-PARAM-015](../rules/parameters-and-vocabularies.md)). They are the parents a caller
+can state, so they decide what a caller must bind first. A site-set parameter has no stated
+parents and is never a stated parent.
+
+On `GenesByNgsSnps`, `variation_sample_meta` has the wire parents `organismSinglePick` and
+the hidden `eda_sample_table_suffix`, which itself depends on `organismSinglePick`. Its only
+stated parent is `organismSinglePick`. The hidden parameter is still on the wire path, and
+its value follows the organism
+([WDK-PARAM-016](../rules/parameters-and-vocabularies.md)).
 
 # The refresh endpoint, and what it does not return
 

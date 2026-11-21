@@ -94,12 +94,14 @@ content. Both maps are needed; either alone still fails.
 A client that omits them loses WDK's verdict on every phyletic binding: the read falls
 back to the static `GET`, whose echoed values are the published defaults
 ([WDK-PARAM-008](../rules/parameters-and-vocabularies.md)). A client therefore adds the
-published `initialDisplayValue` of **every** hidden parameter that allows empty to the
-context of a metadata read, by shape rather than by name
+published `initialDisplayValue` of **every** hidden parameter the caller did not set and
+that has one to the context of a metadata read, by shape rather than by name and whether
+or not it allows empty
 (`veupathdb-mcp: src/veupathdb_mcp/catalog/search_context.py:context_for_metadata_read`).
-A hidden parameter that forbids empty is a different case and is decided by
-`fill_hidden_required_defaults`, because its value reaches the step's `searchConfig` and
-chooses the science.
+A run is a different case. There `fill_hidden_required_defaults` supplies each site-set
+parameter (hidden or read-only, [WDK-PARAM-015](../rules/parameters-and-vocabularies.md))
+that is required and has a default, because its value reaches the step's `searchConfig`
+and chooses the science.
 
 # The grammar: `profile_pattern` is a SQL `LIKE` pattern
 

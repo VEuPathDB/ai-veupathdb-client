@@ -111,6 +111,40 @@ def test_wdk_param_011_a_hidden_required_parameter_is_filled_from_its_default() 
     assert to_wire(filled["eda_dataset_id"]) == hidden["initialDisplayValue"]
 
 
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/search_genes_by_ngs_snps.json")
+    or needs_qa_recording("wdk/search_genes_by_ngs_snps_under_another_organism.json")
+    or needs_qa_recording("wdk/refresh_ngs_snps_on_organism.json"),
+    reason=NEEDS_QA_RECORDING,
+)
+def test_wdk_param_016_a_site_set_dependent_follows_its_parents() -> None:
+    """A hidden dependent takes the value its parents choose, not the published one."""
+    published = _recorded_parameters("search_genes_by_ngs_snps")
+    under_vivax = _recorded_parameters(
+        "search_genes_by_ngs_snps_under_another_organism"
+    )
+    refreshed = TypeAdapter(list[JSONObject]).validate_python(
+        load_recorded("refresh_ngs_snps_on_organism").json_body()
+    )
+    refreshed_by_name = {str(param["name"]): param for param in refreshed}
+    graph = ParamGraph.of(
+        WDKSearchResponse.model_validate(
+            load_recorded("search_genes_by_ngs_snps").json_body()
+        ).search_data.parameters
+        or []
+    )
+
+    suffix = "eda_sample_table_suffix"
+    assert published[suffix]["isVisible"] is False
+    assert under_vivax["organismSinglePick"]["initialDisplayValue"] == (
+        '["Plasmodium vivax P01"]'
+    )
+    assert published[suffix]["initialDisplayValue"] == "s3be28bbe14_sample"
+    assert under_vivax[suffix]["initialDisplayValue"] == "sba1cd4a562_sample"
+    assert refreshed_by_name[suffix]["initialDisplayValue"] == "sba1cd4a562_sample"
+    assert graph.wire_parents[suffix] == ("organismSinglePick",)
+
+
 def test_wdk_vocab_001_the_synthetic_root_is_not_a_selectable_term() -> None:
     """A tree whose root is `@@fake@@` offers its children and not the root."""
     tree = WDKTreeBoxVocabNode.model_validate(

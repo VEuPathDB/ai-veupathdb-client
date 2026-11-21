@@ -233,7 +233,7 @@ The general lesson is
 [WDK-PARAM-010](parameters-and-vocabularies.md): `initialDisplayValue` is what the spec
 holds, the spec was filled from an unvalidated model default, and nothing anywhere promises
 a default returns rows. The anchor is this client's `fill_hidden_required_defaults`, which
-does the reasonable thing for a hidden required parameter and, on this one parameter,
+does the reasonable thing for a site-set required parameter and, on this one parameter,
 chooses the science.
 
 ### WDK-SITE-004 - The tokens of a `profile_pattern` must be in ascending code order or the pattern matches nothing

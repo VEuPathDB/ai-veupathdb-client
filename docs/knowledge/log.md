@@ -1,5 +1,18 @@
 # Knowledge log
 
+## 2026-11-21 - A parameter states who sets it
+
+- A parameter is `site_set` when it is hidden or read-only, and `bindable` otherwise.
+  [WDK-PARAM-015](wdk/rules/parameters-and-vocabularies.md) records that `isReadOnly` is
+  presentation only, and [WDK-PARAM-011](wdk/rules/parameters-and-vocabularies.md) that a
+  run fills nothing, so the client fills a site-set required parameter from its default.
+- [WDK-PARAM-016](wdk/rules/parameters-and-vocabularies.md) records that a site-set
+  dependent's value follows its parents: on qa.plasmodb.org `eda_sample_table_suffix` is
+  `sba1cd4a562_sample` under P. vivax P01 and `s3be28bbe14_sample` in the published view.
+- `ParamGraph` names each parameter's wire parents and stated parents
+  ([dependent parameters](wdk/model/dependent-params-and-vocabularies.md)) and replaces
+  `topological_fill_order`.
+
 ## 2026-11-21 - A step's weights are counted by their histogram
 
 - `get_step_histogram` reads a column's `histogram` reporter with the step's view filters,

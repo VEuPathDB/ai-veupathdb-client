@@ -1,7 +1,7 @@
 ---
 type: Rules
 title: Parameter and vocabulary rules
-description: The eleven types and the exact string each takes, the mark that names a search's organism parameter, the shape a filter clause value takes per facet, what a filter term's summary counts and where its labels come from, the two encodings a vocabulary value can have and which one is silently wrong, why a dependent value is only meaningful under the parent it was read with, and why a search definition belongs to the user who read it.
+description: The eleven types and the exact string each takes, the mark that names a search's organism parameter, the shape a filter clause value takes per facet, what a filter term's summary counts and where its labels come from, why a hidden or read-only parameter is set by the site and follows its parents, the two encodings a vocabulary value can have and which one is silently wrong, why a dependent value is only meaningful under the parent it was read with, and why a search definition belongs to the user who read it.
 tags: [wdk-alignment, rules, parameters, vocabularies, dependent-params, wire-format]
 generated: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
 verified: { by: claude-code/opus-5, at: 2026-08-10T00:00:00Z }
@@ -417,11 +417,11 @@ answered 500. The 219 the visible refusal blocks stay unmeasured on purpose:
 the sweep stops at published defaults
 (`pathfinder: docs/knowledge/decisions/hidden-default-sweep-stops-at-published-defaults.md`).
 
-### WDK-PARAM-011 - `isVisible: false` is presentation only; a hidden parameter is still required, still validated, and still default-filled
+### WDK-PARAM-011 - `isVisible: false` is presentation only; a hidden parameter is still required and still validated, and a run sends it
 
 - class: CONTRACT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/ParameterContainer.java#L18-L26
-- anchor: src/veupathdb/domain/parameters/specs.py:fill_hidden_required_defaults
+- anchor: src/veupathdb/wdk/wdk_parameters.py:site_set
 - status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_011_a_hidden_required_parameter_is_filled_from_its_default
 
 `getRequiredParams()` returns `getParamMap()` - every parameter is a required parameter -
@@ -451,10 +451,14 @@ with `isVisible: false` and `allowEmptyValue: false`, and sending it as `""` is 
 carrying `byKey: {"profile_pattern": ["Cannot be empty."]}`. A parameter no form draws is
 refused for being absent, by name, which is the whole rule in one response.
 
-**So a client must supply hidden required parameters, and this is why this client fills
-them.** `fill_hidden_required_defaults` supplies any parameter that is not visible, not
-`allowEmptyValue`, absent from the caller's values, and has an `initialDisplayValue`. That
-is the correct shape of the fix and it inherits the hazard of
+**So a client must send hidden required parameters itself.** A run builds its spec with
+[`AnswerSpecBuilder.build`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/answer/spec/AnswerSpecBuilder.java#L72-L94),
+whose default is `NO_FILL`, so WDK fills nothing on a run and a parameter the caller left
+out is refused by name. A parameter is `site_set` when it is hidden or read-only
+([WDK-PARAM-015](#wdk-param-015---isreadonly-is-presentation-only)), and
+`fill_hidden_required_defaults` supplies every one that is `site_set`, `required`, absent
+from the caller's values, and has an `initialDisplayValue`. That is the correct shape of
+the fix and it inherits the hazard of
 [WDK-PARAM-010](#wdk-param-010---initialdisplayvalue-is-whatever-the-spec-happens-to-hold-the-model-default-behind-it-is-never-validated-and-never-promised-to-return-rows)
 whole: what gets filled is an unvalidated example.
 
@@ -549,6 +553,57 @@ for it, and the filter form shows it as it is. The label of the term itself is t
 carries. Measured on plasmodb.org on 2026-09-28, `GenesByNgsSnps.variation_sample_meta`
 term `VAR_68bb04bd` (ontology `display` `sex`) under P. falciparum 3D7 answered `female`
 6 and `male` 6 of 12 samples.
+
+### WDK-PARAM-015 - `isReadOnly` is presentation only
+
+- class: CONTRACT
+- upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/Param.java#L340-L354
+- anchor: src/veupathdb/wdk/wdk_parameters.py:site_set
+- status: ENFORCED by tests/unit/domain/parameters/test_a_parameter_states_who_sets_it.py::test_a_read_only_parameter_is_set_by_the_site
+
+`Param` holds the model's `readonly` attribute in `_readonly` and returns it from
+`isReadonly`. At this sha the only caller of `isReadonly` in the repository is
+[`ParamFormatter.getBaseJson`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/formatter/param/ParamFormatter.java#L50),
+which publishes it as `isReadOnly`. No validation step and no fill strategy reads it.
+`wdk-client` uses it the same way: the string field
+[sets `readOnly={parameter.isReadOnly}` on the input](https://github.com/VEuPathDB/web-monorepo/blob/63d1705463d553c0ac19ee577c1b09666597b903/packages/libs/wdk-client/src/Views/Question/Params/StringParam.tsx#L32),
+so the form shows the value and the user cannot change it.
+
+A read-only parameter is therefore the same case as a hidden one
+([WDK-PARAM-011](#wdk-param-011---isvisible-false-is-presentation-only-a-hidden-parameter-is-still-required-and-still-validated-and-a-run-sends-it)):
+the site sets its value, WDK still validates it, and a run must send it. This client
+reads both flags into one property, `site_set`, and `bindable` is its negation. A caller
+binds only a `bindable` parameter.
+
+### WDK-PARAM-016 - A site-set dependent's value follows its parents
+
+- class: CONTRACT
+- upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/QuestionService.java#L233-L302
+- anchor: src/veupathdb/domain/parameters/dependencies.py:ParamGraph
+- status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_016_a_site_set_dependent_follows_its_parents
+
+A site-set parameter can depend on a parameter the caller binds. Its vocabulary is read
+under its parents, and its `initialDisplayValue` is the value WDK chose from that
+vocabulary. The published view (`GET`, no context) chooses under the default parents, so
+its value is right only for those parents. `getQuestionChange` builds its spec with
+`FILL_PARAM_IF_MISSING_OR_INVALID` and returns the stale dependents with the values that
+build chose.
+
+Measured on qa.plasmodb.org (the contextual reads on 2026-11-21, the published view on
+2026-10-17), `GenesByNgsSnps.eda_sample_table_suffix` is a hidden `single-pick-vocabulary` with `organismSinglePick` as its parent:
+
+| Read | `organismSinglePick` | `eda_sample_table_suffix` |
+|---|---|---|
+| Published view | `["Plasmodium falciparum 3D7"]` (default) | `s3be28bbe14_sample` |
+| Contextual `POST` | `["Plasmodium vivax P01"]` | `sba1cd4a562_sample` |
+| `refreshed-dependent-params` | `["Plasmodium vivax P01"]` | `sba1cd4a562_sample` |
+
+So a client that fills a site-set dependent from the published view sends the value for
+the default organism under every other organism. It must read the value under the parents
+the caller bound, as for any dependent
+([WDK-VOCAB-004](#wdk-vocab-004---a-dependent-value-is-only-meaningful-under-the-parent-it-was-read-with-and-wdk-accepts-it-under-any-parent-whose-vocabulary-happens-to-contain-it)).
+`ParamGraph` keeps the site-set parameter as a wire parent of its own dependents and as a
+wire child of its parents, so a refresh of a bound parent reaches it.
 
 # WDK-VOCAB - vocabularies, trees, and the parents they were read under
 
