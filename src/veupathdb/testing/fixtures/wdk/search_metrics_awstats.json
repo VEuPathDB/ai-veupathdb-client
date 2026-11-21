@@ -1,0 +1,514 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/record-types/metrics/searches/Awstats?expandParams=true",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-11-21",
+    "reads": "WDK-PARAM-017"
+  },
+  "body": {
+    "searchData": {
+      "summary": "Report on awstats.",
+      "urlSegment": "Awstats",
+      "dynamicAttributes": [
+        {
+          "formats": [
+            {
+              "isInReport": true,
+              "displayName": "Word Cloud",
+              "name": "project_id-wordCloud",
+              "scopes": [],
+              "type": "wordCloud"
+            }
+          ],
+          "displayName": "Project collected",
+          "isSortable": true,
+          "align": "center",
+          "columnDataType": "STRING",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "help": "Stats collected in this project/website; if 'Unknown' it could be any number of websites,                                  a subset of requests within the time period requested",
+          "isInReport": true,
+          "truncateTo": 100,
+          "name": "project_id",
+          "isDisplayable": true,
+          "isRemovable": true,
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "isInReport": true,
+          "formats": [
+            {
+              "isInReport": true,
+              "displayName": "Histogram",
+              "name": "unique_visitors-histogram",
+              "scopes": [],
+              "type": "histogram"
+            }
+          ],
+          "truncateTo": 100,
+          "displayName": "# Unique visitors",
+          "name": "unique_visitors",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "align": "center",
+          "columnDataType": "STRING",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "isInReport": true,
+          "formats": [
+            {
+              "isInReport": true,
+              "displayName": "Histogram",
+              "name": "visits-histogram",
+              "scopes": [],
+              "type": "histogram"
+            }
+          ],
+          "truncateTo": 100,
+          "displayName": "# Visits",
+          "name": "visits",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "align": "center",
+          "columnDataType": "STRING",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "isInReport": true,
+          "formats": [
+            {
+              "isInReport": true,
+              "displayName": "Histogram",
+              "name": "page_data_requests-histogram",
+              "scopes": [],
+              "type": "histogram"
+            }
+          ],
+          "truncateTo": 100,
+          "displayName": "# Page data requests",
+          "name": "page_data_requests",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "align": "center",
+          "columnDataType": "STRING",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "isInReport": true,
+          "formats": [
+            {
+              "isInReport": true,
+              "displayName": "Histogram",
+              "name": "avg_visit_duration-histogram",
+              "scopes": [],
+              "type": "histogram"
+            }
+          ],
+          "truncateTo": 100,
+          "displayName": "Average visit duration",
+          "name": "avg_visit_duration",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "align": "center",
+          "columnDataType": "STRING",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "isInReport": true,
+          "formats": [
+            {
+              "isInReport": true,
+              "displayName": "Histogram",
+              "name": "bandwidth_gb-histogram",
+              "scopes": [],
+              "type": "histogram"
+            }
+          ],
+          "truncateTo": 100,
+          "displayName": "Bandwidth (GB)",
+          "name": "bandwidth_gb",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "align": "center",
+          "columnDataType": "STRING",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "isInReport": true,
+          "formats": [],
+          "truncateTo": 100,
+          "displayName": "Month",
+          "name": "start_date",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "columnDataType": "STRING",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "isInReport": true,
+          "formats": [],
+          "truncateTo": 100,
+          "displayName": "End date",
+          "name": "end_date",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "columnDataType": "STRING",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "help": "The *search result weight*. This is the sum of the weights you specified for individual searches that found this record.   The more searches that found this record the higher will be its weight.  To give a search a weight, click \"Use Weights\" on the search page, and provide the desired weight.",
+          "isInReport": true,
+          "formats": [
+            {
+              "isInReport": true,
+              "displayName": "Histogram",
+              "name": "wdk_weight-histogram",
+              "description": "Display a histogram of weight distribution",
+              "scopes": [],
+              "type": "histogram"
+            }
+          ],
+          "truncateTo": 100,
+          "displayName": "Search Weight",
+          "name": "wdk_weight",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "columnDataType": "NUMBER",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        }
+      ],
+      "defaultSorting": [
+        {
+          "attributeName": "page_data_requests",
+          "direction": "DESC"
+        }
+      ],
+      "isAnalyzable": false,
+      "displayName": "Awstats",
+      "fullName": "MetricsQuestions.Awstats",
+      "description": "<p>Report on metrics gathered by Awstats.  This information is ultimately derived from the apache log.</p>\n\n\t<p>Awstats does not reliably filter away robots, so these numbers might be inflated.</p>",
+      "defaultAttributes": [
+        "primary_key",
+        "project_id",
+        "start_date",
+        "unique_visitors",
+        "visits",
+        "page_data_requests",
+        "avg_visit_duration",
+        "bandwidth_gb"
+      ],
+      "groups": [
+        {
+          "displayType": "empty",
+          "displayName": "",
+          "name": "empty",
+          "description": "",
+          "isVisible": true,
+          "parameters": [
+            "date",
+            "projectIdSelect"
+          ]
+        }
+      ],
+      "filters": [],
+      "shortDisplayName": "Awstats",
+      "paramNames": [
+        "date",
+        "projectIdSelect"
+      ],
+      "isCacheable": true,
+      "outputRecordClassName": "metrics",
+      "noSummaryOnSingleRecord": false,
+      "queryName": "Awstats",
+      "defaultSummaryView": "_default",
+      "parameters": [
+        {
+          "minDate": "2024-01-01",
+          "displayName": "Choose start and end dates.",
+          "isVisible": true,
+          "type": "date-range",
+          "help": "\"Select the earliest and latest dates to include metrics for one month or several consecutive months.\"",
+          "dependentParams": [],
+          "isReadOnly": false,
+          "allowEmptyValue": false,
+          "name": "date",
+          "maxDate": "2028-12-31",
+          "initialDisplayValue": "{\"min\":\"2026-08-01\",\"max\":\"2026-12-31\"}",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "Project",
+          "minSelectedCount": 1,
+          "maxSelectedCount": -1,
+          "isVisible": true,
+          "type": "multi-pick-vocabulary",
+          "help": "Select projects",
+          "dependentParams": [],
+          "displayType": "checkBox",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "All",
+              "All",
+              null
+            ],
+            [
+              "AmoebaDB",
+              "AmoebaDB",
+              null
+            ],
+            [
+              "CryptoDB",
+              "CryptoDB",
+              null
+            ],
+            [
+              "FungiDB",
+              "FungiDB",
+              null
+            ],
+            [
+              "GiardiaDB",
+              "GiardiaDB",
+              null
+            ],
+            [
+              "HostDB",
+              "HostDB",
+              null
+            ],
+            [
+              "MicrosporidiaDB",
+              "MicrosporidiaDB",
+              null
+            ],
+            [
+              "PiroplasmaDB",
+              "PiroplasmaDB",
+              null
+            ],
+            [
+              "PlasmoDB",
+              "PlasmoDB",
+              null
+            ],
+            [
+              "ToxoDB",
+              "ToxoDB",
+              null
+            ],
+            [
+              "TrichDB",
+              "TrichDB",
+              null
+            ],
+            [
+              "TriTrypDB",
+              "TriTrypDB",
+              null
+            ],
+            [
+              "UniDB",
+              "UniDB",
+              null
+            ],
+            [
+              "VectorBase",
+              "VectorBase",
+              null
+            ],
+            [
+              "EuPathDB",
+              "VEuPathDB",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "projectIdSelect",
+          "initialDisplayValue": "[\"All\"]",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        }
+      ],
+      "properties": {
+        "organisms": [
+          "P. falciparum",
+          "P. vivax",
+          "P. yoelii",
+          "P. berghei",
+          "P. chabaudi",
+          "P. knowlesi"
+        ],
+        "specificAttribution": []
+      },
+      "summaryViewPlugins": [
+        {
+          "displayName": "Metric Results",
+          "name": "_default",
+          "description": ""
+        }
+      ]
+    },
+    "validation": {
+      "level": "DISPLAYABLE",
+      "isValid": true
+    }
+  }
+}

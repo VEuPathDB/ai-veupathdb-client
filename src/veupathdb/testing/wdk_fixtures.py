@@ -274,6 +274,61 @@ FIXTURES: tuple[FixtureRequest, ...] = (
         reads="WDK-PARAM-014",
     ),
     FixtureRequest(
+        name="search_metrics_awstats",
+        path="/record-types/metrics/searches/Awstats",
+        params={"expandParams": "true"},
+        reads="WDK-PARAM-017",
+    ),
+    FixtureRequest(
+        name="search_genes_by_variant_characteristics",
+        path=f"{_TRANSCRIPT}/GenesByVariantCharacteristics",
+        params={"expandParams": "true"},
+        reads="WDK-PARAM-018",
+    ),
+    FixtureRequest(
+        name="ontology_term_summary_total_variants",
+        path=f"{_TRANSCRIPT}/GenesByVariantCharacteristics/gene_variant_stats/ontology-term-summary",
+        method="POST",
+        body={
+            "ontologyId": "total_variants",
+            "filters": [],
+            "contextParamValues": {
+                "organism_select_none": '["Plasmodium falciparum 3D7"]',
+                "gene_variant_stats": '{"filters":[]}',
+            },
+        },
+        reads="WDK-PARAM-018",
+    ),
+    FixtureRequest(
+        name="ontology_term_summary_pi_per_site_cds",
+        path=f"{_TRANSCRIPT}/GenesByVariantCharacteristics/gene_variant_stats/ontology-term-summary",
+        method="POST",
+        body={
+            "ontologyId": "pi_per_site_cds",
+            "filters": [],
+            "contextParamValues": {
+                "organism_select_none": '["Plasmodium falciparum 3D7"]',
+                "gene_variant_stats": '{"filters":[]}',
+            },
+        },
+        reads="WDK-PARAM-018",
+    ),
+    FixtureRequest(
+        name="ontology_term_summary_ngs_snps_collection_date",
+        path=f"{_TRANSCRIPT}/GenesByNgsSnps/variation_sample_meta/ontology-term-summary",
+        method="POST",
+        body={
+            "ontologyId": "VAR_338f1760",
+            "filters": [],
+            "contextParamValues": {
+                "organismSinglePick": '["Plasmodium falciparum 3D7"]',
+                "eda_sample_table_suffix": "s3be28bbe14_sample",
+                "variation_sample_meta": '{"filters":[]}',
+            },
+        },
+        reads="WDK-PARAM-018",
+    ),
+    FixtureRequest(
         name="refresh_without_changed_param",
         path=f"{_TRANSCRIPT}/GenesByLocation/refreshed-dependent-params",
         method="POST",

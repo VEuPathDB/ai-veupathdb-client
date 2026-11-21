@@ -1,0 +1,902 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/record-types/transcript/searches/GenesByNgsSnps/variation_sample_meta/ontology-term-summary",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-11-21",
+    "reads": "WDK-PARAM-018"
+  },
+  "body": {
+    "internalsFilteredCount": 200,
+    "valueCounts": [
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2010-11-19"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2004-09-20"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-07-01"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2004-01-17"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-08-13"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2003-07-29"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-06-30"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-12-11"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-01-14"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-05-27"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2009-07-11"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-06-28"
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": "2012-12-03"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-12-07"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2004-10-08"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2004-10-01"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2004-12-28"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2011-07-15"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2012-06-11"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-11-25"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-09-04"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2011-07-18"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-06-13"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2011-04-07"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-06-09"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-03-17"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-06-19"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-06-18"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-06-03"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-07-10"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2003-08-07"
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": "2008-06-02"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2004-09-16"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-06-05"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-07-16"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-08-28"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-04-24"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2014-07-14"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-12-15"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-07-09"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-12-02"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-07-07"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2011-09-20"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2010-02-09"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-12-19"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-04-18"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-06-26"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-06-25"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2011-09-27"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-03-31"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2002-03-10"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-12-04"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-02-18"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2003-04-14"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-07-21"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-07-29"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-11-20"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-05-05"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2004-05-02"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2014-07-25"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2002-11-11"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-07-17"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-02-06"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2002-11-18"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-02-26"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2012-05-28"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-07-30"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-08-02"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2003-07-19"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-08-09"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-12-01"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-08-07"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-05-16"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-11-10"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-08-22"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-07-29"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2001-11-22"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2004-10-18"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-05-20"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2010-12-23"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-03-12"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-11-14"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-05-31"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2004-10-10"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-04-27"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2011-11-24"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-05-23"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2010-01-10"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-09-29"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2004-05-14"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-10-23"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-02-24"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2004-05-15"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2009-06-01"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-05-17"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2003-12-14"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2014-05-19"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-07-11"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2010-01-05"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2003-12-12"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2012-05-02"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-10-13"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-05-01"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-02-17"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2002-01-29"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2011-06-01"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-05-30"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2011-11-14"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-05-31"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2014-06-03"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2003-09-19"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-06-04"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-08-26"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-08-25"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-07-21"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2003-12-25"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-05-14"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2004-11-02"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-08-07"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-08-08"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-10-29"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-02-24"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-10-26"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2012-08-01"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2003-10-06"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-08-02"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2002-01-31"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-05-11"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-03-29"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-04-06"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-08-30"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-03-20"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2008-06-11"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-01-08"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2010-03-14"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-06-13"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-06-15"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-01-05"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-06-12"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-06-13"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-12-12"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-10-02"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2009-06-26"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-12-28"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-04-12"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-04-13"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-07-07"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-04-14"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-07-05"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2011-02-04"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-07-03"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-12-15"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-04-07"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-04-08"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-04-16"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2002-06-18"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-04-18"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2003-12-10"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2008-09-17"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-06-23"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-01-06"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2004-03-06"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2009-03-23"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-06-27"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-06-26"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-06-26"
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": "2014-06-23"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2001-12-29"
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": "2014-06-18"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2002-12-12"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2014-06-19"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-09-30"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-09-23"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2012-04-24"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-10-01"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2008-10-04"
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": "2003-12-08"
+      }
+    ],
+    "internalsCount": 200
+  }
+}

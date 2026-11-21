@@ -1,0 +1,2717 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "POST",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/record-types/transcript/searches/GenesByVariantCharacteristics/gene_variant_stats/ontology-term-summary",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-11-21",
+    "reads": "WDK-PARAM-018"
+  },
+  "body": {
+    "internalsFilteredCount": 5643,
+    "valueCounts": [
+      {
+        "filteredCount": 35,
+        "count": 35,
+        "value": 2.0
+      },
+      {
+        "filteredCount": 28,
+        "count": 28,
+        "value": 3.0
+      },
+      {
+        "filteredCount": 21,
+        "count": 21,
+        "value": 4.0
+      },
+      {
+        "filteredCount": 18,
+        "count": 18,
+        "value": 5.0
+      },
+      {
+        "filteredCount": 15,
+        "count": 15,
+        "value": 6.0
+      },
+      {
+        "filteredCount": 11,
+        "count": 11,
+        "value": 7.0
+      },
+      {
+        "filteredCount": 11,
+        "count": 11,
+        "value": 8.0
+      },
+      {
+        "filteredCount": 21,
+        "count": 21,
+        "value": 9.0
+      },
+      {
+        "filteredCount": 16,
+        "count": 16,
+        "value": 10.0
+      },
+      {
+        "filteredCount": 19,
+        "count": 19,
+        "value": 11.0
+      },
+      {
+        "filteredCount": 14,
+        "count": 14,
+        "value": 12.0
+      },
+      {
+        "filteredCount": 19,
+        "count": 19,
+        "value": 13.0
+      },
+      {
+        "filteredCount": 15,
+        "count": 15,
+        "value": 14.0
+      },
+      {
+        "filteredCount": 23,
+        "count": 23,
+        "value": 15.0
+      },
+      {
+        "filteredCount": 19,
+        "count": 19,
+        "value": 16.0
+      },
+      {
+        "filteredCount": 15,
+        "count": 15,
+        "value": 17.0
+      },
+      {
+        "filteredCount": 18,
+        "count": 18,
+        "value": 18.0
+      },
+      {
+        "filteredCount": 20,
+        "count": 20,
+        "value": 19.0
+      },
+      {
+        "filteredCount": 17,
+        "count": 17,
+        "value": 20.0
+      },
+      {
+        "filteredCount": 30,
+        "count": 30,
+        "value": 21.0
+      },
+      {
+        "filteredCount": 13,
+        "count": 13,
+        "value": 22.0
+      },
+      {
+        "filteredCount": 34,
+        "count": 34,
+        "value": 23.0
+      },
+      {
+        "filteredCount": 36,
+        "count": 36,
+        "value": 24.0
+      },
+      {
+        "filteredCount": 24,
+        "count": 24,
+        "value": 25.0
+      },
+      {
+        "filteredCount": 44,
+        "count": 44,
+        "value": 26.0
+      },
+      {
+        "filteredCount": 37,
+        "count": 37,
+        "value": 27.0
+      },
+      {
+        "filteredCount": 42,
+        "count": 42,
+        "value": 28.0
+      },
+      {
+        "filteredCount": 32,
+        "count": 32,
+        "value": 29.0
+      },
+      {
+        "filteredCount": 33,
+        "count": 33,
+        "value": 30.0
+      },
+      {
+        "filteredCount": 39,
+        "count": 39,
+        "value": 31.0
+      },
+      {
+        "filteredCount": 41,
+        "count": 41,
+        "value": 33.0
+      },
+      {
+        "filteredCount": 45,
+        "count": 45,
+        "value": 32.0
+      },
+      {
+        "filteredCount": 33,
+        "count": 33,
+        "value": 34.0
+      },
+      {
+        "filteredCount": 24,
+        "count": 24,
+        "value": 35.0
+      },
+      {
+        "filteredCount": 42,
+        "count": 42,
+        "value": 37.0
+      },
+      {
+        "filteredCount": 49,
+        "count": 49,
+        "value": 36.0
+      },
+      {
+        "filteredCount": 46,
+        "count": 46,
+        "value": 39.0
+      },
+      {
+        "filteredCount": 35,
+        "count": 35,
+        "value": 38.0
+      },
+      {
+        "filteredCount": 45,
+        "count": 45,
+        "value": 41.0
+      },
+      {
+        "filteredCount": 32,
+        "count": 32,
+        "value": 40.0
+      },
+      {
+        "filteredCount": 31,
+        "count": 31,
+        "value": 43.0
+      },
+      {
+        "filteredCount": 35,
+        "count": 35,
+        "value": 42.0
+      },
+      {
+        "filteredCount": 43,
+        "count": 43,
+        "value": 44.0
+      },
+      {
+        "filteredCount": 40,
+        "count": 40,
+        "value": 45.0
+      },
+      {
+        "filteredCount": 38,
+        "count": 38,
+        "value": 47.0
+      },
+      {
+        "filteredCount": 51,
+        "count": 51,
+        "value": 46.0
+      },
+      {
+        "filteredCount": 56,
+        "count": 56,
+        "value": 48.0
+      },
+      {
+        "filteredCount": 44,
+        "count": 44,
+        "value": 49.0
+      },
+      {
+        "filteredCount": 39,
+        "count": 39,
+        "value": 50.0
+      },
+      {
+        "filteredCount": 35,
+        "count": 35,
+        "value": 51.0
+      },
+      {
+        "filteredCount": 41,
+        "count": 41,
+        "value": 52.0
+      },
+      {
+        "filteredCount": 52,
+        "count": 52,
+        "value": 53.0
+      },
+      {
+        "filteredCount": 55,
+        "count": 55,
+        "value": 55.0
+      },
+      {
+        "filteredCount": 56,
+        "count": 56,
+        "value": 54.0
+      },
+      {
+        "filteredCount": 42,
+        "count": 42,
+        "value": 57.0
+      },
+      {
+        "filteredCount": 52,
+        "count": 52,
+        "value": 56.0
+      },
+      {
+        "filteredCount": 41,
+        "count": 41,
+        "value": 59.0
+      },
+      {
+        "filteredCount": 54,
+        "count": 54,
+        "value": 58.0
+      },
+      {
+        "filteredCount": 53,
+        "count": 53,
+        "value": 60.0
+      },
+      {
+        "filteredCount": 44,
+        "count": 44,
+        "value": 61.0
+      },
+      {
+        "filteredCount": 43,
+        "count": 43,
+        "value": 63.0
+      },
+      {
+        "filteredCount": 54,
+        "count": 54,
+        "value": 62.0
+      },
+      {
+        "filteredCount": 36,
+        "count": 36,
+        "value": 64.0
+      },
+      {
+        "filteredCount": 46,
+        "count": 46,
+        "value": 65.0
+      },
+      {
+        "filteredCount": 47,
+        "count": 47,
+        "value": 66.0
+      },
+      {
+        "filteredCount": 41,
+        "count": 41,
+        "value": 67.0
+      },
+      {
+        "filteredCount": 35,
+        "count": 35,
+        "value": 68.0
+      },
+      {
+        "filteredCount": 45,
+        "count": 45,
+        "value": 69.0
+      },
+      {
+        "filteredCount": 40,
+        "count": 40,
+        "value": 71.0
+      },
+      {
+        "filteredCount": 45,
+        "count": 45,
+        "value": 70.0
+      },
+      {
+        "filteredCount": 58,
+        "count": 58,
+        "value": 72.0
+      },
+      {
+        "filteredCount": 34,
+        "count": 34,
+        "value": 75.0
+      },
+      {
+        "filteredCount": 44,
+        "count": 44,
+        "value": 74.0
+      },
+      {
+        "filteredCount": 35,
+        "count": 35,
+        "value": 73.0
+      },
+      {
+        "filteredCount": 40,
+        "count": 40,
+        "value": 77.0
+      },
+      {
+        "filteredCount": 39,
+        "count": 39,
+        "value": 78.0
+      },
+      {
+        "filteredCount": 49,
+        "count": 49,
+        "value": 76.0
+      },
+      {
+        "filteredCount": 35,
+        "count": 35,
+        "value": 79.0
+      },
+      {
+        "filteredCount": 45,
+        "count": 45,
+        "value": 80.0
+      },
+      {
+        "filteredCount": 30,
+        "count": 30,
+        "value": 82.0
+      },
+      {
+        "filteredCount": 36,
+        "count": 36,
+        "value": 83.0
+      },
+      {
+        "filteredCount": 43,
+        "count": 43,
+        "value": 81.0
+      },
+      {
+        "filteredCount": 35,
+        "count": 35,
+        "value": 87.0
+      },
+      {
+        "filteredCount": 51,
+        "count": 51,
+        "value": 84.0
+      },
+      {
+        "filteredCount": 33,
+        "count": 33,
+        "value": 85.0
+      },
+      {
+        "filteredCount": 34,
+        "count": 34,
+        "value": 86.0
+      },
+      {
+        "filteredCount": 20,
+        "count": 20,
+        "value": 90.0
+      },
+      {
+        "filteredCount": 35,
+        "count": 35,
+        "value": 88.0
+      },
+      {
+        "filteredCount": 32,
+        "count": 32,
+        "value": 91.0
+      },
+      {
+        "filteredCount": 35,
+        "count": 35,
+        "value": 89.0
+      },
+      {
+        "filteredCount": 27,
+        "count": 27,
+        "value": 92.0
+      },
+      {
+        "filteredCount": 34,
+        "count": 34,
+        "value": 94.0
+      },
+      {
+        "filteredCount": 33,
+        "count": 33,
+        "value": 93.0
+      },
+      {
+        "filteredCount": 33,
+        "count": 33,
+        "value": 95.0
+      },
+      {
+        "filteredCount": 34,
+        "count": 34,
+        "value": 97.0
+      },
+      {
+        "filteredCount": 31,
+        "count": 31,
+        "value": 99.0
+      },
+      {
+        "filteredCount": 24,
+        "count": 24,
+        "value": 96.0
+      },
+      {
+        "filteredCount": 34,
+        "count": 34,
+        "value": 98.0
+      },
+      {
+        "filteredCount": 26,
+        "count": 26,
+        "value": 103.0
+      },
+      {
+        "filteredCount": 20,
+        "count": 20,
+        "value": 102.0
+      },
+      {
+        "filteredCount": 24,
+        "count": 24,
+        "value": 100.0
+      },
+      {
+        "filteredCount": 34,
+        "count": 34,
+        "value": 101.0
+      },
+      {
+        "filteredCount": 34,
+        "count": 34,
+        "value": 104.0
+      },
+      {
+        "filteredCount": 28,
+        "count": 28,
+        "value": 107.0
+      },
+      {
+        "filteredCount": 31,
+        "count": 31,
+        "value": 106.0
+      },
+      {
+        "filteredCount": 26,
+        "count": 26,
+        "value": 105.0
+      },
+      {
+        "filteredCount": 24,
+        "count": 24,
+        "value": 111.0
+      },
+      {
+        "filteredCount": 22,
+        "count": 22,
+        "value": 110.0
+      },
+      {
+        "filteredCount": 25,
+        "count": 25,
+        "value": 109.0
+      },
+      {
+        "filteredCount": 27,
+        "count": 27,
+        "value": 108.0
+      },
+      {
+        "filteredCount": 27,
+        "count": 27,
+        "value": 113.0
+      },
+      {
+        "filteredCount": 29,
+        "count": 29,
+        "value": 112.0
+      },
+      {
+        "filteredCount": 22,
+        "count": 22,
+        "value": 115.0
+      },
+      {
+        "filteredCount": 30,
+        "count": 30,
+        "value": 114.0
+      },
+      {
+        "filteredCount": 29,
+        "count": 29,
+        "value": 116.0
+      },
+      {
+        "filteredCount": 20,
+        "count": 20,
+        "value": 117.0
+      },
+      {
+        "filteredCount": 16,
+        "count": 16,
+        "value": 119.0
+      },
+      {
+        "filteredCount": 23,
+        "count": 23,
+        "value": 118.0
+      },
+      {
+        "filteredCount": 23,
+        "count": 23,
+        "value": 123.0
+      },
+      {
+        "filteredCount": 16,
+        "count": 16,
+        "value": 121.0
+      },
+      {
+        "filteredCount": 20,
+        "count": 20,
+        "value": 120.0
+      },
+      {
+        "filteredCount": 13,
+        "count": 13,
+        "value": 122.0
+      },
+      {
+        "filteredCount": 19,
+        "count": 19,
+        "value": 124.0
+      },
+      {
+        "filteredCount": 23,
+        "count": 23,
+        "value": 127.0
+      },
+      {
+        "filteredCount": 20,
+        "count": 20,
+        "value": 125.0
+      },
+      {
+        "filteredCount": 17,
+        "count": 17,
+        "value": 126.0
+      },
+      {
+        "filteredCount": 20,
+        "count": 20,
+        "value": 134.0
+      },
+      {
+        "filteredCount": 16,
+        "count": 16,
+        "value": 135.0
+      },
+      {
+        "filteredCount": 16,
+        "count": 16,
+        "value": 133.0
+      },
+      {
+        "filteredCount": 16,
+        "count": 16,
+        "value": 128.0
+      },
+      {
+        "filteredCount": 16,
+        "count": 16,
+        "value": 132.0
+      },
+      {
+        "filteredCount": 23,
+        "count": 23,
+        "value": 131.0
+      },
+      {
+        "filteredCount": 13,
+        "count": 13,
+        "value": 129.0
+      },
+      {
+        "filteredCount": 22,
+        "count": 22,
+        "value": 130.0
+      },
+      {
+        "filteredCount": 18,
+        "count": 18,
+        "value": 136.0
+      },
+      {
+        "filteredCount": 11,
+        "count": 11,
+        "value": 139.0
+      },
+      {
+        "filteredCount": 13,
+        "count": 13,
+        "value": 141.0
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": 142.0
+      },
+      {
+        "filteredCount": 21,
+        "count": 21,
+        "value": 138.0
+      },
+      {
+        "filteredCount": 12,
+        "count": 12,
+        "value": 137.0
+      },
+      {
+        "filteredCount": 10,
+        "count": 10,
+        "value": 143.0
+      },
+      {
+        "filteredCount": 16,
+        "count": 16,
+        "value": 140.0
+      },
+      {
+        "filteredCount": 13,
+        "count": 13,
+        "value": 146.0
+      },
+      {
+        "filteredCount": 16,
+        "count": 16,
+        "value": 149.0
+      },
+      {
+        "filteredCount": 10,
+        "count": 10,
+        "value": 150.0
+      },
+      {
+        "filteredCount": 9,
+        "count": 9,
+        "value": 144.0
+      },
+      {
+        "filteredCount": 10,
+        "count": 10,
+        "value": 151.0
+      },
+      {
+        "filteredCount": 22,
+        "count": 22,
+        "value": 147.0
+      },
+      {
+        "filteredCount": 16,
+        "count": 16,
+        "value": 145.0
+      },
+      {
+        "filteredCount": 13,
+        "count": 13,
+        "value": 148.0
+      },
+      {
+        "filteredCount": 13,
+        "count": 13,
+        "value": 153.0
+      },
+      {
+        "filteredCount": 14,
+        "count": 14,
+        "value": 154.0
+      },
+      {
+        "filteredCount": 7,
+        "count": 7,
+        "value": 155.0
+      },
+      {
+        "filteredCount": 16,
+        "count": 16,
+        "value": 152.0
+      },
+      {
+        "filteredCount": 13,
+        "count": 13,
+        "value": 158.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 159.0
+      },
+      {
+        "filteredCount": 14,
+        "count": 14,
+        "value": 157.0
+      },
+      {
+        "filteredCount": 11,
+        "count": 11,
+        "value": 156.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 160.0
+      },
+      {
+        "filteredCount": 8,
+        "count": 8,
+        "value": 161.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 166.0
+      },
+      {
+        "filteredCount": 7,
+        "count": 7,
+        "value": 167.0
+      },
+      {
+        "filteredCount": 12,
+        "count": 12,
+        "value": 162.0
+      },
+      {
+        "filteredCount": 11,
+        "count": 11,
+        "value": 164.0
+      },
+      {
+        "filteredCount": 10,
+        "count": 10,
+        "value": 163.0
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": 165.0
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": 169.0
+      },
+      {
+        "filteredCount": 11,
+        "count": 11,
+        "value": 173.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 172.0
+      },
+      {
+        "filteredCount": 12,
+        "count": 12,
+        "value": 168.0
+      },
+      {
+        "filteredCount": 7,
+        "count": 7,
+        "value": 175.0
+      },
+      {
+        "filteredCount": 8,
+        "count": 8,
+        "value": 174.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 171.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 170.0
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": 177.0
+      },
+      {
+        "filteredCount": 9,
+        "count": 9,
+        "value": 178.0
+      },
+      {
+        "filteredCount": 8,
+        "count": 8,
+        "value": 183.0
+      },
+      {
+        "filteredCount": 12,
+        "count": 12,
+        "value": 179.0
+      },
+      {
+        "filteredCount": 8,
+        "count": 8,
+        "value": 181.0
+      },
+      {
+        "filteredCount": 10,
+        "count": 10,
+        "value": 180.0
+      },
+      {
+        "filteredCount": 10,
+        "count": 10,
+        "value": 176.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 182.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 189.0
+      },
+      {
+        "filteredCount": 8,
+        "count": 8,
+        "value": 184.0
+      },
+      {
+        "filteredCount": 7,
+        "count": 7,
+        "value": 190.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 188.0
+      },
+      {
+        "filteredCount": 9,
+        "count": 9,
+        "value": 187.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 185.0
+      },
+      {
+        "filteredCount": 8,
+        "count": 8,
+        "value": 191.0
+      },
+      {
+        "filteredCount": 7,
+        "count": 7,
+        "value": 186.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 193.0
+      },
+      {
+        "filteredCount": 9,
+        "count": 9,
+        "value": 192.0
+      },
+      {
+        "filteredCount": 7,
+        "count": 7,
+        "value": 196.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 199.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 195.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 198.0
+      },
+      {
+        "filteredCount": 10,
+        "count": 10,
+        "value": 197.0
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": 194.0
+      },
+      {
+        "filteredCount": 7,
+        "count": 7,
+        "value": 204.0
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": 202.0
+      },
+      {
+        "filteredCount": 8,
+        "count": 8,
+        "value": 205.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 201.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 206.0
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": 207.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 200.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 203.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 215.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 209.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 210.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 212.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 211.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 214.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 208.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 213.0
+      },
+      {
+        "filteredCount": 8,
+        "count": 8,
+        "value": 216.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 220.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 217.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 218.0
+      },
+      {
+        "filteredCount": 8,
+        "count": 8,
+        "value": 223.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 222.0
+      },
+      {
+        "filteredCount": 10,
+        "count": 10,
+        "value": 221.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 219.0
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": 226.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 227.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 225.0
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": 224.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 228.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 229.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 231.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 230.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 237.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 233.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 235.0
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": 234.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 236.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 239.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 238.0
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": 244.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 242.0
+      },
+      {
+        "filteredCount": 8,
+        "count": 8,
+        "value": 245.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 243.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 247.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 240.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 246.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 241.0
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": 248.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 249.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 252.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 254.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 251.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 250.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 271.0
+      },
+      {
+        "filteredCount": 6,
+        "count": 6,
+        "value": 267.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 269.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 270.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 260.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 261.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 264.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 262.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 265.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 266.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 257.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 256.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 263.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 258.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 259.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 285.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 278.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 279.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 286.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 273.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 284.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 274.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 280.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 287.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 272.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 282.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 283.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 281.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 277.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 276.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 302.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 295.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 292.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 303.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 289.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 288.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 296.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 299.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 298.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 297.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 294.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 293.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 300.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 291.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 316.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 312.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 318.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 315.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 306.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 304.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 311.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 313.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 314.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 310.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 309.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 308.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 319.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 332.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 322.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 330.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 320.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 327.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 321.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 333.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 334.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 335.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 325.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 324.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 329.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 328.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 323.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 339.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 348.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 350.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 349.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 340.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 341.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 351.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 345.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 346.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 347.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 337.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 338.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 342.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 343.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 355.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 352.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 353.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 367.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 366.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 359.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 356.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 354.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 361.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 363.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 362.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 368.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 373.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 372.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 378.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 374.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 371.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 369.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 370.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 375.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 377.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 380.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 376.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 381.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 385.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 387.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 397.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 398.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 389.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 388.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 390.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 391.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 384.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 386.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 395.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 392.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 393.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 403.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 400.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 412.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 413.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 408.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 415.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 409.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 402.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 401.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 407.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 404.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 406.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 417.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 421.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 429.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 416.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 423.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 424.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 425.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 430.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 431.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 418.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 447.0
+      },
+      {
+        "filteredCount": 8,
+        "count": 8,
+        "value": 432.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 434.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 439.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 442.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 443.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 438.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 437.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 446.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 445.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 441.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 440.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 451.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 458.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 453.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 457.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 461.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 462.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 454.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 460.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 448.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 450.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 475.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 470.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 469.0
+      },
+      {
+        "filteredCount": 5,
+        "count": 5,
+        "value": 478.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 479.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 477.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 466.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 473.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 493.0
+      },
+      {
+        "filteredCount": 4,
+        "count": 4,
+        "value": 487.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 483.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 492.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 494.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 480.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 488.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 490.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 497.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 504.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 507.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 503.0
+      },
+      {
+        "filteredCount": 3,
+        "count": 3,
+        "value": 502.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 510.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 500.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 518.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 524.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 521.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 533.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 540.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 535.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 538.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 537.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 536.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 519.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 517.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 526.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 512.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 514.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 549.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 544.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 563.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 552.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 574.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 556.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 569.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 599.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 586.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 607.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 587.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 580.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 579.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 594.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 582.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 636.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 633.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 623.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 651.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 664.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 642.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 647.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 679.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 700.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 727.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 772.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 794.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 901.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 951.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 938.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 1030.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 1224.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 1258.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 1336.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 1847.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2044.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2334.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2810.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2720.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2780.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2708.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2884.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2882.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2902.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2886.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2850.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2860.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2844.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2870.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2966.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2976.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2964.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3160.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 3144.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3156.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3176.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3076.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3240.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3584.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3724.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3802.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3934.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2665.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2755.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2785.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2695.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2727.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 2865.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2927.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2933.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2885.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3051.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2989.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 2985.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3033.0
+      },
+      {
+        "filteredCount": 2,
+        "count": 2,
+        "value": 3025.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3053.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3219.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3345.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 3549.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 4031.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 4250.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 4411.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 4823.0
+      },
+      {
+        "filteredCount": 1,
+        "count": 1,
+        "value": 4651.0
+      },
+      {
+        "filteredCount": 55,
+        "count": 55,
+        "value": 1.0
+      }
+    ],
+    "internalsCount": 5643
+  }
+}
