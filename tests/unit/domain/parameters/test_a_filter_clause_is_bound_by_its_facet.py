@@ -393,7 +393,7 @@ def test_a_range_is_read_under_the_other_clauses() -> None:
     [
         (NumberBounds(min=4824, max=None), '{"min": 4824}'),
         (NumberBounds(min=1e-8, max=0.5), '{"min": 0.00000001, "max": 0.5}'),
-        (DateBounds(min=None, max="2014-08-30"), '{"max":"2014-08-30"}'),
+        (DateBounds(min=None, max="2014-08-30"), '{"max": "2014-08-30"}'),
     ],
 )
 def test_bounds_are_written_as_stated(

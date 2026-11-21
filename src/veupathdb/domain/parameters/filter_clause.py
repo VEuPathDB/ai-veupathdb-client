@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from decimal import Decimal
 from typing import Annotated, Literal, Protocol, Self
 
@@ -29,6 +29,15 @@ from veupathdb.model import CamelModel
 ClauseKey = tuple[str, bool, bool, frozenset[str]]
 
 
+def _bounds_text[T](low: T | None, high: T | None, written: Callable[[T], str]) -> str:
+    stated = (
+        f'"{k}": {written(v)}'
+        for k, v in (("min", low), ("max", high))
+        if v is not None
+    )
+    return "{" + ", ".join(stated) + "}"
+
+
 class _Bounds(CamelModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -45,8 +54,7 @@ class NumberBounds(_Bounds):
     max: float | None = None
 
     def text(self) -> str:
-        stated = self.model_dump(exclude_none=True).items()
-        return "{" + ", ".join(f'"{k}": {decimal_text(v)}' for k, v in stated) + "}"
+        return _bounds_text(self.min, self.max, decimal_text)
 
 
 class DateBounds(_Bounds):
@@ -54,7 +62,7 @@ class DateBounds(_Bounds):
     max: ISODate | None = None
 
     def text(self) -> str:
-        return self.model_dump_json(exclude_none=True)
+        return _bounds_text(self.min, self.max, json.dumps)
 
 
 class _Clause(
