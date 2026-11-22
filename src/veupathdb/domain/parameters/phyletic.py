@@ -418,18 +418,27 @@ def census_states(pattern: str) -> dict[str, TriState]:
     return read.states
 
 
-def sort_profile_pattern(pattern: str) -> str:
-    """Rewrite a census pattern with its codes in ascending order.
+def canonical_census_pattern(pattern: str, tree: PhyleticTree | None) -> str:
+    """A stated census pattern in the form WDK's census matches.
 
-    The pattern is matched against a census that lists codes ascending, and
-    ``%A%B%`` means "A, then later B", so entries out of that order describe a
-    census that cannot exist. A repeated code is refused here as well as on the
-    expansion path, because both of them reach the wire.
+    The census lists leaf species codes in ascending order, so a clade code
+    becomes its species, an explicit species overrides the clade above it, and
+    the codes are sorted. Without a readable tree the pattern is only sorted.
+    Refuses a value that is not a census pattern, a repeated code, and a code
+    the tree does not carry.
     """
-    read = read_census(pattern)
-    if read.repeated_code is not None:
-        _refuse_repeated_code(read.repeated_code, pattern)
-    return pattern if read.states is None else encode_profile_pattern(read.states)
+    states = census_states(pattern)
+    if not states:
+        return pattern
+    if tree is None:
+        return encode_profile_pattern(states)
+    validate_phyletic_codes(list(states), tree.codes())
+    return encode_profile_pattern(
+        tree.leaf_states(
+            [code for code, s in states.items() if s == "include"],
+            [code for code, s in states.items() if s == "exclude"],
+        )
+    )
 
 
 def validate_phyletic_codes(

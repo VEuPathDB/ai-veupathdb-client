@@ -21,9 +21,11 @@
   entry passes it through, no stated reader offers it, `value_kind` gives it no kind, and
   `from_wire_as` reads a wire in a value's own kind.
 - A step write (`create_step`, `create_transform_step`, `update_step_search_config`)
-  takes `verbatim`, the names it sends exactly as given: no normalization, leaf expansion
-  or `profile_pattern` sort reads them. A caller names each held value (`held_names`)
-  and each value read from WDK that nobody stated.
+  sends its parameters as given, apart from the input-step wiring WDK requires.
+  Leaf expansion and the census pattern's sort and clade expansion are canonicalization:
+  `ParameterCanonicalizer` expands leaves when a value is stated, and
+  `canonical_census_pattern` (replacing `sort_profile_pattern` and
+  `_expand_profile_pattern_groups`) is called where a pattern is stated.
 - `veupathdb-py` is 0.9.0b9.
 
 ## 2026-11-21 - A filter is read as stated clauses

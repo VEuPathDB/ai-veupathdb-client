@@ -786,18 +786,19 @@ asserts the rejection pins the loud path and leaves the silent one open, which i
 how a `SILENT` rule gets marked enforced by a test that cannot see its hazard.
 
 So "0 selected" from a tree parameter means *the terms you sent matched no
-leaves*, not *you sent nothing*. This client expands parent terms to leaves at
-the WDK boundary for this reason, and its tree widget had to be taught the same
+leaves*, not *you sent nothing*. This client expands a stated parent term to its
+leaves for this reason, and its tree widget had to be taught the same
 rule after a correctly-scoped step rendered as an empty required field
 (`pathfinder: docs/knowledge/decisions/parent-term-is-a-selection.md`).
 
 **This client expands in two independent places, and both are named by a
-test.** `ParameterCanonicalizer` in `domain/parameters/` serves the validation
-path; `leaves_of_tree_values` in `wdk/tree_leaves.py` is a separate
-implementation at the WDK boundary. `VEuPathDBClient.expand_tree_params_to_leaves`
-reads the search and applies it, and both `create_step` and `run_search_report`
-send their parameters through it, so a step and a report of one configuration
-send the same leaves. Delete either and a branch term reaches WDK on that path.
+test.** `ParameterCanonicalizer.canonicalize` in `domain/parameters/` expands a
+value when it is stated, so a step holds the leaves and a step write sends its
+parameters as given; a branch WDK already holds is WDK's own and goes back
+unchanged. `leaves_of_tree_values` in `wdk/tree_leaves.py`, applied by
+`VEuPathDBClient.expand_tree_params_to_leaves`, serves `run_search_report`,
+which runs a configuration no step holds. Delete either and a branch term reaches
+WDK on that path.
 
 **Having both is not sufficient, because order decides which one runs first.**
 Parameter validation resolves the search *with the values as they arrived* so it

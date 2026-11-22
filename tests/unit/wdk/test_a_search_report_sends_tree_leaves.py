@@ -74,19 +74,17 @@ async def test_a_parent_organism_is_sent_as_the_leaves_under_it(
     assert sent.body["searchConfig"]["parameters"]["min_molecular_weight"] == "10000"
 
 
-async def test_a_report_and_a_step_send_the_same_organisms(
+async def test_a_step_sends_the_organisms_as_stated(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     client, sent = _client(monkeypatch)
-    await client.run_search_report("transcript", _SEARCH, _CONFIG, _PAGE)
-    report_organisms = _organism(sent.body)
-
     sent.reply = {"id": 7}
+
     await StrategyAPI(client, "1").create_step(
         NewStepSpec(search_name=_SEARCH, search_config=_CONFIG), "transcript"
     )
 
-    assert _organism(sent.body) == report_organisms
+    assert sent.body["searchConfig"]["parameters"] == _CONFIG.parameters
 
 
 async def test_a_report_with_no_parameters_reads_no_search(

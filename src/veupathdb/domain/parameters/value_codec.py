@@ -1,7 +1,7 @@
 """Conversion between a typed ``ParamValue`` and WDK's wire and decoded forms."""
 
 import json
-from collections.abc import Callable, Mapping
+from collections.abc import Callable
 
 from pydantic import JsonValue, TypeAdapter
 
@@ -94,10 +94,6 @@ def from_wire_as(value: ParamValue, wire: str) -> ParamValue:
             return HeldValue(wire=wire)
         case _:
             return from_wire(value.type, wire)
-
-
-def held_names(values: Mapping[str, ParamValue]) -> frozenset[str]:
-    return frozenset(name for name, value in values.items() if value.type == "held")
 
 
 def to_wire(value: ParamValue) -> str:

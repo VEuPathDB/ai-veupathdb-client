@@ -26,7 +26,7 @@ The explainer these rules come from is
 
 - class: CONTRACT
 - upstream: https://github.com/VEuPathDB/ApiCommonModel/blob/301b2be012af713411e9b0e216ed93c51d04c239/Model/lib/wdk/model/questions/queries/geneQueries.xml#L2239-L2266
-- anchor: src/veupathdb/wdk/strategy_api/base.py:_expand_profile_pattern_groups
+- anchor: src/veupathdb/domain/parameters/phyletic.py:canonical_census_pattern
 - status: ENFORCED by tests/unit/rules/test_site_model_parameter_rules.py::test_wdk_site_001_the_pattern_wraps_and_separates_its_tokens_with_the_wildcard
 
 `GenesByOrthologPattern`'s query uses the parameter twice, and the second use is the
@@ -98,9 +98,8 @@ This client refuses three shapes before the value leaves it, all of them read in
 `code:Y` / `code:N` tokens and returns no states for any other shape, and
 `census_states` answers that with a 422 - which is what prose, OrthoMCL
 syntax and the published default get. A code that states two states is a 422 of its own,
-naming the repeated code, because one species has one state in the census; both paths to
-the wire raise it, the expansion in `base.py:_expand_profile_pattern_groups` and
-`sort_profile_pattern` under `_normalize_parameters`. A code the phyletic tree does not
+naming the repeated code, because one species has one state in the census;
+`canonical_census_pattern` raises it when the pattern is stated. A code the phyletic tree does not
 carry is a second 422, raised by `validate_phyletic_codes`. All three run at
 `set_criterion` time as well, from
 `veupathdb-mcp: src/veupathdb_mcp/catalog/param_validation.py`, because the
@@ -240,7 +239,7 @@ chooses the science.
 
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/web-monorepo/blob/63d1705463d553c0ac19ee577c1b09666597b903/packages/sites/genomics-site/webapp/wdkCustomization/js/client/components/questions/GenesByOrthologPattern.tsx#L154-L178
-- anchor: src/veupathdb/domain/parameters/phyletic.py:sort_profile_pattern
+- anchor: src/veupathdb/domain/parameters/phyletic.py:canonical_census_pattern
 - status: ENFORCED by tests/unit/rules/test_site_model_parameter_rules.py::test_wdk_site_004_the_tokens_are_written_in_ascending_code_order
 
 `%A%B%` under `LIKE` means "A, then later B". The stored census lists codes in ascending
@@ -282,8 +281,8 @@ ascending form of each pair and 0 for the reverse.
 
 This client sorts in one place. `domain/parameters/phyletic.py:encode_profile_pattern` emits
 the tokens sorted, so every pattern the authoring path produces is in census order by
-construction, and `sort_profile_pattern` beside it re-orders only a pattern that reaches
-the wire when the clade tree cannot be read. Re-measured on plasmodb.org on 2026-09-04:
+construction, and `canonical_census_pattern` re-orders a stated pattern, expanding its
+clades when the tree can be read. A step write sends the pattern as given. Re-measured on plasmodb.org on 2026-09-04:
 `%hsap:Y%atum:Y%` pushed through `create_step` reads back off the stored step as
 `%atum:Y%hsap:Y%`. Both name the stored census as the reason, which is
 worth keeping in the code, because the plausible wrong reason - that OrthoMCL requires

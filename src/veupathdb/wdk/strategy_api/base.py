@@ -1,17 +1,8 @@
 from collections.abc import Sequence
 
-from veupathdb.domain.parameters.phyletic import (
-    census_states,
-    encode_profile_pattern,
-    sort_profile_pattern,
-    validate_phyletic_codes,
-)
 from veupathdb.errors import validate_response
-from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
 from veupathdb.wdk.client import VEuPathDBClient
-from veupathdb.wdk.param_utils import normalize_param_value
-from veupathdb.wdk.phyletic_tree import phyletic_tree_of
 from veupathdb.wdk.strategy_api.helpers import (
     CURRENT_USER,
     resolve_wdk_user_id,
@@ -27,24 +18,6 @@ class StrategyAPIBase:
         self._initial_user_id = user_id
         self._resolved_user_id = user_id
         self._session_initialized = False
-
-    def _normalize_parameters(self, parameters: JSONObject) -> dict[str, str]:
-        """Normalize parameters to WDK string values; drop ``None``.
-
-        ``None`` values are dropped (caller never set them). Every other
-        value is coerced via :func:`normalize_param_value`. Empty strings
-        are preserved: callers pass them explicitly (e.g. AnswerParams
-        that WDK requires as ``""``) and WDK accepts them via
-        ``allowEmptyValue``.
-        """
-        out: dict[str, str] = {
-            key: normalize_param_value(value)
-            for key, value in (parameters or {}).items()
-            if value is not None
-        }
-        if "profile_pattern" in out:
-            out["profile_pattern"] = sort_profile_pattern(out["profile_pattern"])
-        return out
 
     async def _ensure_session(self) -> None:
         """Resolve the concrete user id once, so every later path names it.
@@ -67,39 +40,6 @@ class StrategyAPIBase:
             return user_id
         await self._ensure_session()
         return self._resolved_user_id
-
-    async def _expand_profile_pattern_groups(
-        self,
-        record_type: str,
-        pattern: str,
-    ) -> str:
-        """Expand clade codes in a profile_pattern to their leaf species codes.
-
-        The pattern is matched via SQL LIKE against a census that holds only
-        leaf species codes, so a clade code never matches and the search
-        silently returns 0. An explicit species overrides the clade above it.
-
-        Raises ``ValidationError`` when the value is not a census pattern,
-        states one code twice, or names a code the phyletic tree does not carry.
-        """
-        states = census_states(pattern)
-        if not states:
-            return pattern
-
-        response = await self.client.get_search_details(
-            record_type, "GenesByOrthologPattern", expand_params=True
-        )
-        tree = phyletic_tree_of(response.search_data.parameters or [])
-        if tree is None:
-            logger.debug("The phyletic tree is unreadable; the pattern stands")
-            return encode_profile_pattern(states)
-        validate_phyletic_codes(list(states), tree.codes())
-        return encode_profile_pattern(
-            tree.leaf_states(
-                [code for code, s in states.items() if s == "include"],
-                [code for code, s in states.items() if s == "exclude"],
-            )
-        )
 
     async def _standard_report(
         self,

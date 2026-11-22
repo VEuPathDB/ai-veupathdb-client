@@ -1,14 +1,12 @@
 """Step creation, update, and deletion methods for the Strategy API."""
 
 import asyncio
-from collections.abc import Collection
 from http import HTTPStatus
 
 from veupathdb.errors import DataParsingError, VEuPathDBError
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
 from veupathdb.wdk._search_config_body import search_config_write_body
-from veupathdb.wdk.param_utils import normalize_param_value
 from veupathdb.wdk.strategy_api.base import StrategyAPIBase
 from veupathdb.wdk.wdk_models import (
     CombinedStepSpec,
@@ -42,8 +40,8 @@ class StepsMixin(StrategyAPIBase):
         self,
         record_type: str,
         search_name: str,
-        raw_params: JSONObject,
-    ) -> JSONObject:
+        raw_params: dict[str, str],
+    ) -> dict[str, str]:
         """Force every ``input-step`` (AnswerParam) of the search to ``""``.
 
         WDK requires an answer param on a new step to be the empty string; the
@@ -51,7 +49,7 @@ class StepsMixin(StrategyAPIBase):
         leaves the params as given, because the create endpoint takes no
         record type and the caller's one may not hold the search.
         """
-        params: JSONObject = dict(raw_params)
+        params = dict(raw_params)
         try:
             answer_param_names = await self._get_answer_param_names(
                 record_type, search_name
@@ -72,8 +70,8 @@ class StepsMixin(StrategyAPIBase):
         step: WDKStep,
         record_type: str,
         search_name: str,
-        raw_params: JSONObject,
-    ) -> JSONObject:
+        raw_params: dict[str, str],
+    ) -> dict[str, str]:
         """The params with every input-step (AnswerParam) at the step's own value.
 
         A step that holds no value for one raises: WDK refuses any other value.
@@ -82,7 +80,7 @@ class StepsMixin(StrategyAPIBase):
             record_type, search_name
         )
         held = step.search_config.parameters
-        params: JSONObject = dict(raw_params)
+        params = dict(raw_params)
         for ap_name in sorted(answer_param_names):
             if ap_name not in held:
                 msg = f"WDK step {step.id} holds no value for input '{ap_name}'"
@@ -96,51 +94,15 @@ class StepsMixin(StrategyAPIBase):
         raw = await self.client.get(f"/users/{uid}/steps/{step_id}")
         return WDKStep.model_validate(raw)
 
-    async def _prepare_parameters(
-        self,
-        raw_params: JSONObject,
-        record_type: str,
-        search_name: str,
-        verbatim: Collection[str],
-    ) -> dict[str, str]:
-        """Normalize and expand raw parameters into WDK wire values.
-
-        A ``verbatim`` value goes out as given and no shaping step reads it.
-        """
-        kept = {
-            name: normalize_param_value(value)
-            for name, value in raw_params.items()
-            if name in verbatim
-        }
-        normalized = self._normalize_parameters(
-            {name: value for name, value in raw_params.items() if name not in kept}
-        )
-
-        if search_name == "GenesByOrthologPattern" and "profile_pattern" in normalized:
-            normalized["profile_pattern"] = await self._expand_profile_pattern_groups(
-                record_type,
-                normalized["profile_pattern"],
-            )
-
-        expanded = await self.client.expand_tree_params_to_leaves(
-            record_type, search_name, normalized
-        )
-        return {**expanded, **kept}
-
     async def create_step(
         self,
         spec: NewStepSpec,
         record_type: str,
         user_id: str | None = None,
-        *,
-        verbatim: Collection[str] = (),
     ) -> WDKIdentifier:
-        """Create an unattached step; each ``verbatim`` value goes out as given."""
-        raw_params = await self._empty_answer_params(
+        """Create an unattached step, its parameters sent as given."""
+        normalized = await self._empty_answer_params(
             record_type, spec.search_name, dict(spec.search_config.parameters)
-        )
-        normalized = await self._prepare_parameters(
-            raw_params, record_type, spec.search_name, verbatim
         )
         search_config = WDKSearchConfig(
             parameters=normalized, wdk_weight=spec.search_config.wdk_weight
@@ -217,19 +179,14 @@ class StepsMixin(StrategyAPIBase):
         record_type: str = "transcript",
         *,
         user_id: str | None = None,
-        verbatim: Collection[str] = (),
     ) -> WDKIdentifier:
-        """Create a transform step; each ``verbatim`` value goes out as given.
+        """Create a transform step, its parameters sent as given.
 
         WDK requires every ``input-step`` (AnswerParam) to be the empty string
         on a new step; the input is wired through the ``stepTree``.
         """
-        clean_params = await self._empty_answer_params(
+        normalized = await self._empty_answer_params(
             record_type, spec.search_name, dict(spec.search_config.parameters)
-        )
-
-        normalized = await self._prepare_parameters(
-            clean_params, record_type, spec.search_name, verbatim
         )
         search_config = WDKSearchConfig(
             parameters=normalized, wdk_weight=spec.search_config.wdk_weight
@@ -271,7 +228,6 @@ class StepsMixin(StrategyAPIBase):
         search_name: str,
         *,
         user_id: str | None = None,
-        verbatim: Collection[str] = (),
     ) -> None:
         """Update a step's parameters, and its weight when the caller sets one.
 
@@ -279,16 +235,14 @@ class StepsMixin(StrategyAPIBase):
         endpoint resets every key the body omits and refuses a changed input,
         so the write starts from the step's own config: its filters, column
         filters, weight and input-step params. The caller's parameters are
-        normalized and expanded as on step creation, apart from ``verbatim``.
+        sent as given: a stated value is canonical when it is stated, and a value
+        read from WDK is WDK's own.
         """
         uid = await self._get_user_id(user_id)
         step = await self.find_step(step_id, uid)
 
-        raw_params = await self._current_answer_params(
+        parameters = await self._current_answer_params(
             step, record_type, search_name, dict(search_config.parameters)
-        )
-        parameters = await self._prepare_parameters(
-            raw_params, record_type, search_name, verbatim
         )
         weight = (
             search_config.wdk_weight

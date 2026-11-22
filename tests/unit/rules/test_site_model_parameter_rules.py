@@ -6,9 +6,9 @@ import pytest
 
 from veupathdb.domain.parameters.phyletic import (
     NO_CONSTRAINT_PATTERN,
+    canonical_census_pattern,
     encode_profile_pattern,
     read_census,
-    sort_profile_pattern,
 )
 from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
@@ -37,7 +37,7 @@ def test_wdk_site_002_an_included_species_is_written_as_the_matching_state() -> 
 
 def test_wdk_site_004_the_tokens_are_written_in_ascending_code_order() -> None:
     """The census lists codes ascending, so tokens out of order match nothing."""
-    assert sort_profile_pattern("%pfal:Y%atum:N%") == "%atum:N%pfal:Y%"
+    assert canonical_census_pattern("%pfal:Y%atum:N%", None) == "%atum:N%pfal:Y%"
 
 
 @pytest.mark.skipif(

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import asyncio
 import copy
+import json
 from collections.abc import Iterator
 from contextlib import contextmanager
 
@@ -292,7 +293,7 @@ async def test_outside_a_scope_a_strategy_api_keeps_no_definition_of_its_own(
     await _create(api)
     await _create(api)
 
-    assert read.call_count == 4
+    assert read.call_count == 2
 
 
 async def test_a_save_that_creates_and_updates_steps_reads_the_definition_once(
@@ -307,6 +308,4 @@ async def test_a_save_that_creates_and_updates_steps_reads_the_definition_once(
         await _update(StrategyAPI(client))
 
     assert read.call_count == 1
-    organisms = put.calls.last.request.read().decode()
-    assert "Plasmodium berghei ANKA" in organisms
-    assert '\\"Plasmodium\\"' not in organisms
+    assert json.loads(put.calls.last.request.read())["parameters"] == _PARAMS

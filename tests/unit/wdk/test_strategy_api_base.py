@@ -10,19 +10,19 @@ from __future__ import annotations
 
 import json
 from typing import cast
-from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from pydantic import JsonValue
 
 from veupathdb.domain.parameters.phyletic import (
+    canonical_census_pattern,
     read_census,
     validate_phyletic_codes,
 )
 from veupathdb.domain.parameters.wdk_vocab import FAKE_ALL_SENTINEL, WDKVocabTerm
 from veupathdb.errors import VEuPathDBError
 from veupathdb.json_types import JSONObject
-from veupathdb.wdk.strategy_api.base import StrategyAPIBase
+from veupathdb.wdk.phyletic_tree import phyletic_tree_of
 from veupathdb.wdk.tree_leaves import leaves_of_tree_values
 from veupathdb.wdk.wdk_parameters import (
     WDKEnumParam,
@@ -76,12 +76,7 @@ def _empty_indent_map() -> WDKParameter:
     )
 
 
-def _api(params: list[WDKParameter] | None = None) -> StrategyAPIBase:
-    details = MagicMock()
-    details.search_data.parameters = _TREE_PARAMS if params is None else params
-    client = MagicMock()
-    client.get_search_details = AsyncMock(return_value=details)
-    return StrategyAPIBase(client)
+_TREE = phyletic_tree_of(_TREE_PARAMS)
 
 
 class TestACensusPatternIsRead:
@@ -156,36 +151,30 @@ class TestTheCodeCheck:
 
 
 class TestTheProfilePatternExpansion:
-    async def test_a_clade_becomes_its_species(self) -> None:
-        got = await _api()._expand_profile_pattern_groups(
-            "transcript", "%MAMM:N%pfal:Y%"
-        )
+    def test_a_clade_becomes_its_species(self) -> None:
+        got = canonical_census_pattern("%MAMM:N%pfal:Y%", _TREE)
 
         assert got == "%hsap:N%mmus:N%pfal:Y%"
 
-    async def test_an_explicit_species_overrides_its_clade(self) -> None:
-        got = await _api()._expand_profile_pattern_groups(
-            "transcript", "%MAMM:N%hsap:Y%"
-        )
+    def test_an_explicit_species_overrides_its_clade(self) -> None:
+        got = canonical_census_pattern("%MAMM:N%hsap:Y%", _TREE)
 
         assert got == "%hsap:Y%mmus:N%"
 
-    async def test_species_codes_are_sorted_into_census_order(self) -> None:
-        got = await _api()._expand_profile_pattern_groups(
-            "transcript", "%pfal:Y%hsap:N%"
-        )
+    def test_species_codes_are_sorted_into_census_order(self) -> None:
+        got = canonical_census_pattern("%pfal:Y%hsap:N%", _TREE)
 
         assert got == "%hsap:N%pfal:Y%"
 
-    async def test_the_bare_wildcard_stands(self) -> None:
-        assert await _api()._expand_profile_pattern_groups("transcript", "%") == "%"
+    def test_the_bare_wildcard_stands(self) -> None:
+        assert canonical_census_pattern("%", _TREE) == "%"
 
-    async def test_a_search_that_carries_no_tree_leaves_the_pattern_alone(self) -> None:
-        got = await _api([])._expand_profile_pattern_groups("transcript", "%pfal:Y%")
+    def test_a_search_that_carries_no_tree_leaves_the_pattern_alone(self) -> None:
+        got = canonical_census_pattern("%pfal:Y%", None)
 
         assert got == "%pfal:Y%"
 
-    async def test_an_unreadable_tree_ships_the_pattern_sorted_and_unexpanded(
+    def test_an_unreadable_tree_ships_the_pattern_sorted_and_unexpanded(
         self,
     ) -> None:
         # Without the depths a clade holds no species, so expanding would drop
@@ -195,47 +184,32 @@ class TestTheProfilePatternExpansion:
             for p in _TREE_PARAMS
         ]
 
-        got = await _api(flat)._expand_profile_pattern_groups(
-            "transcript", "%pfal:Y%MAMM:N%"
-        )
+        got = canonical_census_pattern("%pfal:Y%MAMM:N%", phyletic_tree_of(flat))
 
         assert got == "%MAMM:N%pfal:Y%"
 
 
 class TestTheProfilePatternGuard:
-    async def test_the_published_default_is_refused(self) -> None:
+    def test_the_published_default_is_refused(self) -> None:
         with pytest.raises(VEuPathDBError) as err:
-            await _api()._expand_profile_pattern_groups("transcript", "hsap=1T")
+            canonical_census_pattern("hsap=1T", _TREE)
 
         assert err.value.status == 422
 
-    async def test_an_unknown_code_is_refused(self) -> None:
+    def test_an_unknown_code_is_refused(self) -> None:
         with pytest.raises(VEuPathDBError) as err:
-            await _api()._expand_profile_pattern_groups("transcript", "%zzzz:Y%")
+            canonical_census_pattern("%zzzz:Y%", _TREE)
 
         assert err.value.status == 422
         assert "zzzz" in str(err.value.detail)
 
-    async def test_a_repeated_code_is_named(self) -> None:
+    def test_a_repeated_code_is_named(self) -> None:
         with pytest.raises(VEuPathDBError) as err:
-            await _api()._expand_profile_pattern_groups("transcript", "%hsap:Y%hsap:N%")
+            canonical_census_pattern("%hsap:Y%hsap:N%", _TREE)
 
         assert err.value.status == 422
         assert "hsap" in str(err.value.detail)
         assert "census token" not in str(err.value.detail)
-
-    def test_the_normalizer_refuses_a_repeated_code_too(self) -> None:
-        # The expansion path is not the only way a pattern reaches the wire.
-        with pytest.raises(VEuPathDBError) as err:
-            _api()._normalize_parameters({"profile_pattern": "%hsap:Y%hsap:N%"})
-
-        assert err.value.status == 422
-        assert "hsap" in str(err.value.detail)
-
-    def test_the_normalizer_still_sorts_a_valid_pattern(self) -> None:
-        got = _api()._normalize_parameters({"profile_pattern": "%pfal:Y%hsap:N%"})
-
-        assert got["profile_pattern"] == "%hsap:N%pfal:Y%"
 
 
 def _tree() -> JSONObject:
