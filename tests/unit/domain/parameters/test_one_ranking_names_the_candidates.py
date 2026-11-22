@@ -113,6 +113,24 @@ def test_the_spelling_neighbours_follow_the_lexical_entries() -> None:
     assert ranked[:15] == lexical
     assert [o.value for o in ranked].index("Mitochondrial TCA cycle") == 8
     assert ranked[15].value == "Actin and filaments"
+    assert len(ranked) == DECIDED_CANDIDATES
+
+
+def test_a_ranking_within_its_limit_holds_every_entry() -> None:
+    options = [
+        VocabOption(value=value, display=f"{value} {name}")
+        for value, name in (
+            ("PF00069", "Protein kinase"),
+            ("PF00070", "Pyridine nucleotide"),
+            ("PF00071", "Ras family"),
+            ("PF13499", "EF-hand"),
+        )
+    ]
+
+    ranked = rank_entries(options, "PF00069", 4)
+
+    assert ranked[0].value == "PF00069"
+    assert {o.value for o in ranked} == {o.value for o in options}
 
 
 def test_a_plural_ranks_its_singular_entry_first() -> None:

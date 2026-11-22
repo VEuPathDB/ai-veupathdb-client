@@ -249,7 +249,8 @@ def rank_entries(
     for option in entries:
         by_label.setdefault(option.value, option)
         by_label.setdefault(option.display, option)
-    spelled = difflib.get_close_matches(phrase, list(by_label), n=limit, cutoff=0.0)
+    labels = list(by_label)
+    spelled = difflib.get_close_matches(phrase, labels, n=len(labels) or 1, cutoff=0.0)
     ranked: dict[str, VocabOption] = {}
     for option in [*lexical, *(by_label[label] for label in spelled)]:
         ranked.setdefault(option.value, option)
