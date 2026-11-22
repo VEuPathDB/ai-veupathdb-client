@@ -102,6 +102,7 @@ from veupathdb.wdk.strategy_line import (
     use_strategy_gate,
 )
 from veupathdb.wdk.temporary_results import TemporaryResultsAPI
+from veupathdb.wdk.tree_leaves import leaves_of_tree_values
 from veupathdb.wdk.value_decoding import (
     decode_params,
     encode_params,
@@ -317,6 +318,7 @@ __all__ = [
     "get_wdk_client",
     "in_turn_line",
     "is_internal_wdk_strategy_name",
+    "leaves_of_tree_values",
     "list_sites",
     "load_sites_config",
     "open_search_gate",

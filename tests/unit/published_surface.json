@@ -530,6 +530,7 @@
     "get_wdk_client",
     "in_turn_line",
     "is_internal_wdk_strategy_name",
+    "leaves_of_tree_values",
     "list_sites",
     "load_sites_config",
     "open_search_gate",
