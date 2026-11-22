@@ -51,6 +51,7 @@ from veupathdb.errors import ValidationError
 Stated = ParamValue | FilterProposals
 
 _MAX_ENUM_TERMS = 50
+_WDK_NUMBER = r"^[+-]?\d+(\.\d+)?([eE][+-]?\d+)?$"
 _MODEL_KINDS = frozenset({"number-range", "date-range", "filter"})
 _STRICT = ConfigDict(strict=True, extra="forbid")
 
@@ -207,7 +208,11 @@ def _first_day(d: _Declared) -> str:
 
 def _number_text(length: int) -> Callable[[float | str], StringValue]:
     def text(v: float | str) -> StringValue:
-        written = decimal_text(float(v))
+        match v:
+            case str():
+                written = v
+            case _:
+                written = decimal_text(v)
         if length and len(written) > length:
             msg = f"{written} is longer than {length} characters"
             raise ValueError(msg)
@@ -219,7 +224,7 @@ def _number_text(length: int) -> Callable[[float | str], StringValue]:
 def _string(d: _Declared) -> _Shape:
     limit = f" of at most {d.length} characters" if d.length else ""
     if d.is_number:
-        decimal: Any = Annotated[str, Field(pattern=r"^-?([0-9]+\.?[0-9]*|\.[0-9]+)$")]
+        decimal: Any = Annotated[str, Field(pattern=_WDK_NUMBER)]
         finite: Any = Annotated[float, Field(allow_inf_nan=False)]
         return _Shape(finite | decimal, _number_text(d.length), f"a number{limit}", 5)
     return _Shape(

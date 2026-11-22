@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Callable, Sequence
 from decimal import Decimal
 from typing import Annotated, Literal, Protocol, Self
@@ -97,7 +98,7 @@ class StringMembers(_Clause, frozen=True):
 class NumberMembers(_Clause, frozen=True):
     type: Literal["number"]
     is_range: Literal[False]
-    value: list[float]
+    value: list[int | float]
 
     def _terms(self) -> frozenset[str]:
         return frozenset(map(str, self.value))
@@ -140,6 +141,16 @@ class MultiMembers(_Clause, frozen=True):
 FilterClause = StringMembers | NumberMembers | NumberRange | DateRange | MultiMembers
 
 _CLAUSE: TypeAdapter[FilterClause] = TypeAdapter(FilterClause)
+_INTEGER = re.compile(r"[+-]?\d+")
+_DECIMAL = re.compile(r"[+-]?\d+(\.\d+)?([eE][+-]?\d+)?")
+
+
+def _number_members(members: Sequence[str]) -> dict[float, int | float]:
+    return {
+        float(member): int(member) if _INTEGER.fullmatch(member) else float(member)
+        for member in members
+        if _DECIMAL.fullmatch(member)
+    }
 
 
 class FilterValue(CamelModel):
@@ -172,7 +183,7 @@ class FilterValue(CamelModel):
 class FilterProposal(CamelModel):
     model_config = ConfigDict(extra="forbid")
     field: str
-    value: list[str | float] | dict[str, float | str | None]
+    value: list[str | int | float] | dict[str, float | str | None]
     include_unknown: bool = False
 
 
@@ -300,8 +311,18 @@ class FilterFacet(CamelModel):
         if not self.members and not self.ranged:
             text = f"{self.term} ({self.display}) has no members under the current parameter values."
             raise FilterStatementError([text])
-        unknown = sorted({str(v) for v in proposal.value} - set(self.members))
-        if not self.ranged and unknown:
+        match clause:
+            case NumberMembers(value=numbers):
+                held = _number_members(self.members)
+                unknown = sorted({decimal_text(n) for n in numbers if n not in held})
+                clause = clause.model_copy(
+                    update={"value": [held.get(n, n) for n in numbers]}
+                )
+            case StringMembers(value=terms):
+                unknown = sorted(set(terms) - set(self.members))
+            case _:
+                unknown = []
+        if unknown:
             text = (
                 f"{self.term} ({self.display}) has no member {', '.join(unknown)}; "
                 f"its members are {', '.join(self.members)}."

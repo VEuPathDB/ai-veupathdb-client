@@ -4,13 +4,11 @@ from __future__ import annotations
 
 from pydantic import ConfigDict, JsonValue
 
-from veupathdb.domain.parameters.decimals import decimal_text
 from veupathdb.domain.parameters.filter_clause import (
     FilterClause,
     FilterProposal,
     FilterValue,
     MultiMembers,
-    NumberMembers,
 )
 from veupathdb.domain.parameters.values import HeldValue, ParamValue
 from veupathdb.model import CamelModel
@@ -28,10 +26,10 @@ def _clause(clause: FilterClause) -> JsonValue:
     match clause:
         case MultiMembers():
             return None
-        case NumberMembers(value=numbers):
-            stated: JsonValue = [decimal_text(n) for n in numbers]
         case _:
-            stated = clause.model_dump(mode="json", exclude_none=True)["value"]
+            stated: JsonValue = clause.model_dump(mode="json", exclude_none=True)[
+                "value"
+            ]
     proposal = FilterProposal.model_validate(
         {
             "field": clause.field,

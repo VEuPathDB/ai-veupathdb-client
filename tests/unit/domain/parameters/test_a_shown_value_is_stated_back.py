@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 from pydantic import JsonValue, TypeAdapter
 
 from veupathdb.domain.parameters import (
     FilterFacets,
     FilterProposals,
+    FilterStatementError,
     FilterValue,
     HeldValue,
     KeptValue,
@@ -26,6 +29,9 @@ from veupathdb.domain.parameters.values import (
     StringValue,
     TimestampValue,
 )
+from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
+from veupathdb.testing.wdk_fixtures import load_recorded
+from veupathdb.wdk.wdk_models import WDKSearchResponse
 from veupathdb.wdk.wdk_parameters import WDKParameter
 
 _PARAM: TypeAdapter[WDKParameter] = TypeAdapter(WDKParameter)
@@ -136,7 +142,7 @@ _HELD_WIRES: list[tuple[str, str]] = [
     ),
     (
         "samples",
-        '{"filters": [{"field": "count", "type": "number", "isRange": false, "includeUnknown": false, "value": [1.0, 3.0]}]}',
+        '{"filters": [{"field": "count", "type": "number", "isRange": false, "includeUnknown": false, "value": [1, 3]}]}',
     ),
     (
         "samples",
@@ -210,3 +216,86 @@ def test_an_empty_filter_list_names_a_non_empty_list() -> None:
         _param("samples").read_stated([])
 
     assert "takes a non-empty list of" in str(refusal.value)
+
+
+_NGS_SNPS = "search_genes_by_ngs_snps"
+_NGS_SNPS_FILE = "wdk/search_genes_by_ngs_snps.json"
+_YEAR = "VAR_dc0e1a57"
+
+
+def _recorded(name: str) -> WDKParameter:
+    search = WDKSearchResponse.model_validate(
+        load_recorded(_NGS_SNPS).json_body()
+    ).search_data
+    return next(p for p in search.parameters or [] if p.name == name)
+
+
+def _year_members() -> WDKParameter:
+    param = _recorded("variation_sample_meta")
+    ontology = [
+        term.model_copy(update={"is_range": False}) if term.term == _YEAR else term
+        for term in param.ontology
+    ]
+    values = {**(param.values or {}), _YEAR: ["2010", "2011", "2012.5"]}
+    return param.model_copy(update={"ontology": ontology, "values": values})
+
+
+def _year_wire(stated: JsonValue) -> str:
+    param = _year_members()
+    read = param.read_stated([{"field": _YEAR, "value": stated}])
+    assert isinstance(read, FilterProposals)
+    return FilterFacets.of(param).bind(read).to_wire()
+
+
+@pytest.mark.skipif(needs_qa_recording(_NGS_SNPS_FILE), reason=NEEDS_QA_RECORDING)
+class TestNumberMembers:
+    def test_numbers_and_their_text_bind_the_same(self) -> None:
+        assert _year_wire([2010, 2012.5]) == _year_wire(["2010", "2012.5"])
+
+    def test_a_member_goes_out_as_the_text_wdk_matches(self) -> None:
+        assert '"value": [2010, 2012.5]' in _year_wire([2010.0, "2012.50"])
+
+    def test_a_number_no_member_equals_is_refused(self) -> None:
+        with pytest.raises(FilterStatementError, match="no member 2013"):
+            _year_wire([2013])
+
+    def test_a_held_clause_reads_back_to_its_wire(self) -> None:
+        wire = (
+            f'{{"filters": [{{"field": "{_YEAR}", "type": "number", "isRange": false, '
+            '"includeUnknown": false, "value": [2010, 2012.5]}]}'
+        )
+        value = from_wire("filter", wire)
+        form = stated_form(value)
+
+        assert json.dumps(form) == json.dumps(
+            [{"field": _YEAR, "value": [2010, 2012.5]}]
+        )
+        assert (
+            FilterFacets.of(_year_members())
+            .bind(FilterProposals.model_validate(form))
+            .to_wire()
+            == value.to_wire()
+        )
+
+
+@pytest.mark.skipif(needs_qa_recording(_NGS_SNPS_FILE), reason=NEEDS_QA_RECORDING)
+class TestANumberStringWdkHolds:
+    @pytest.mark.parametrize(
+        "held", ["1e-5", "2.5E+3", "+3", "5.0", "0.000000000000000000001"]
+    )
+    def test_a_held_number_text_reads_back_as_written(self, held: str) -> None:
+        param = _recorded("dn_ds_ratio_lower")
+        form = stated_form(StringValue(value=held))
+        assert not isinstance(form, KeptValue)
+
+        assert param.read_stated(form) == StringValue(value=held)
+
+    @pytest.mark.parametrize("text", [".5", "5.", "5,000", "1e", "0x10"])
+    def test_a_text_wdk_refuses_is_refused(self, text: str) -> None:
+        with pytest.raises(StatedValuesError):
+            _recorded("dn_ds_ratio_lower").read_stated(text)
+
+    def test_a_number_goes_out_as_its_shortest_decimal(self) -> None:
+        assert _recorded("dn_ds_ratio_lower").read_stated(1e-5) == StringValue(
+            value="0.00001"
+        )

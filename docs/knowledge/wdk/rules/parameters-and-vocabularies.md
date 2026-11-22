@@ -635,7 +635,11 @@ boolean written as text is `true` or `True`, and a `yes`/`no` vocabulary such as
 `read_stated_values` reads each stated value by its parameter's kind and gathers every
 fault of a search into one refusal. A number is written as its shortest decimal and never
 with an exponent: `5.0` is `5` and `1e-8` is `0.00000001`; `NaN`, infinity and a boolean
-are refused. A date that is not `ISO_LOCAL_DATE` is refused. A boolean is no vocabulary
+are refused. A text is read as WDK reads it: `StringParam` takes it when `Double.valueOf`
+parses it and it matches the default number regex `[+-]?\d+(\.\d+)?([eE][+-]?\d+)?`
+([source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/StringParam.java#L160-L183)),
+so `1e-5`, `+3` and `5.0` are sent as written and `.5`, `5.` and `5,000` are refused. A
+site regex that the parameter does not publish can still refuse a text, and WDK names it. A date that is not `ISO_LOCAL_DATE` is refused. A boolean is no vocabulary
 term and is refused with the terms named. The tests read the recorded
 `GenesByNgsSnps`, `metrics/Awstats` and `GenesByOrthologs` documents.
 
@@ -666,6 +670,13 @@ nothing the researcher meant. A range is inclusive, and a null bound is unbounde
 display, exactly; it gets its `type` and `isRange` from that facet, and a member is
 checked against the facet's members. A name that is no facet is refused with the facet
 terms named.
+
+A number member matches by its text: `NumberMembersFilter` keeps each raw JSON member and
+compares its `toString()` with the published `values`
+([source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNewStableValue.java#L491-L585)),
+so `1.0` is no member of `"1"`. `FilterFacet.clause` reads a stated member of a number facet
+as a number, whether it is written `1`, `1.0` or `"1"`. It binds the member whose value is
+equal, written in that member's own form: an integer member as an integer.
 
 The published `values` map leaves out every `isRange` term, so it holds no bound for a
 range facet. In the recorded `GenesByVariantCharacteristics.gene_variant_stats` the map

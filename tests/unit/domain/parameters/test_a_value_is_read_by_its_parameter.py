@@ -99,7 +99,7 @@ class TestAYesNoVocabulary:
 class TestANumberString:
     @pytest.mark.parametrize(
         ("raw", "wire"),
-        [(5.0, "5"), (1e-8, "0.00000001"), ("5.0", "5"), (0.25, "0.25")],
+        [(5.0, "5"), (1e-8, "0.00000001"), ("5.0", "5.0"), (0.25, "0.25")],
     )
     def test_a_number_goes_out_as_its_shortest_decimal(
         self, raw: JsonValue, wire: str

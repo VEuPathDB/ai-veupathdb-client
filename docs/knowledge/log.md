@@ -6,6 +6,9 @@
   inverse of the stated reader: a value is shown in the form `read_stated` reads back to the
   same wire, and a value with no such form is a `KeptValue` that carries its wire.
 - The refusal of a filter statement says it takes a non-empty list.
+- A number member of a filter facet is matched as a number and sent in its member's own
+  form, because WDK compares the raw JSON text with the published values.
+- An `isNumber` text is read as `StringParam` reads it and sent as written, `1e-5` included.
 
 ## 2026-11-22 - One rule names a vocabulary entry
 
