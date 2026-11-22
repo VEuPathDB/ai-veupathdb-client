@@ -1,5 +1,12 @@
 # Knowledge log
 
+## 2026-11-22 - Every refusal row has one shape
+
+- A `StatedValuesError` row holds `param`, `detail` and `value`, and the row of an entry fault
+  is the row `VocabularyEntryError` writes (`entry_row`), with its `candidates`, so a reader
+  orders the candidates of a mixed refusal as it orders an entry refusal
+  ([WDK-PARAM-017](wdk/rules/parameters-and-vocabularies.md)).
+
 ## 2026-11-22 - A refusal names every parameter's fault once
 
 - `read_stated_values` reads every shape, then names the entries of every parameter whose

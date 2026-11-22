@@ -111,6 +111,28 @@ class TestAStatedCallNamesEveryParameter:
         assert (refused.value.detail or "").splitlines() == [f.text for f in faults]
         _assert_one_line_per_row(refused.value)
 
+    def test_a_mixed_reads_entry_rows_carry_what_an_entry_refusal_carries(
+        self,
+    ) -> None:
+        with pytest.raises(VocabularyEntryError) as entries_only:
+            read_stated_values(_sheet(), _TWO_ENTRIES)
+        stated: dict[str, JsonValue] = {
+            **_TWO_ENTRIES,
+            "MinPercentMinorAlleles": {"x": 1},
+        }
+
+        with pytest.raises(StatedValuesError) as refused:
+            read_stated_values(_sheet(), stated)
+
+        [shape, *entries] = _ROWS.validate_python(refused.value.errors)
+        assert (shape.param, shape.value, shape.candidates) == (
+            "MinPercentMinorAlleles",
+            {"x": 1},
+            None,
+        )
+        assert entries == _ROWS.validate_python(entries_only.value.errors)
+        assert all(row.candidates for row in entries)
+
     def test_a_pick_whose_shape_fails_is_never_entry_read(self) -> None:
         stated: dict[str, JsonValue] = {
             "snp_class": 5,

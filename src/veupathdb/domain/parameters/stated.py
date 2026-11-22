@@ -46,6 +46,7 @@ from veupathdb.domain.parameters.vocab_lookup import (
     VocabularyEntryError,
     entries_or_refusal,
     entry_fault,
+    entry_row,
 )
 from veupathdb.domain.parameters.wdk_vocab import (
     VocabOption,
@@ -54,6 +55,7 @@ from veupathdb.domain.parameters.wdk_vocab import (
     flatten_vocab,
 )
 from veupathdb.errors import ValidationError
+from veupathdb.json_types import JSONObject
 
 Stated = ParamValue | FilterProposals
 
@@ -101,6 +103,12 @@ class StatedFault:
     name: str
     read: JsonValue
     text: str
+    unnamed: Resolution | None = None
+
+    def row(self) -> JSONObject:
+        if self.unnamed is not None:
+            return entry_row(self.name, self.unnamed)
+        return {"param": self.name, "detail": self.text, "value": self.read}
 
 
 class StatedValuesError(ValidationError):
@@ -109,7 +117,7 @@ class StatedValuesError(ValidationError):
         super().__init__(
             title="Invalid parameter value",
             detail="\n".join(fault.text for fault in faults),
-            errors=[{"param": fault.name, "detail": fault.text} for fault in faults],
+            errors=[fault.row() for fault in faults],
         )
 
 
@@ -495,7 +503,10 @@ def read_stated_values(
         raise StatedValuesError(
             [
                 *shape_faults,
-                *(StatedFault(p, r.phrase, entry_fault(p, r)) for p, r in entry_faults),
+                *(
+                    StatedFault(p, r.phrase, entry_fault(p, r), r)
+                    for p, r in entry_faults
+                ),
             ]
         )
     if entry_faults:

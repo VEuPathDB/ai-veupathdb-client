@@ -652,7 +652,8 @@ fault of a search into one refusal: the shape of every value is read, then the e
 every value whose shape read. When only entries fail it raises `VocabularyEntryError` with
 every parameter's faults; when a shape fails it raises `StatedValuesError` with the shape
 faults first and one fault per entry fault after them. The detail has one line per fault,
-and every `errors` row holds `param` and that line as `detail`. A number is written as its shortest decimal and never
+and every `errors` row holds `param`, that line as `detail` and the stated `value`; an
+entry fault's row also holds its `candidates`, as a `VocabularyEntryError` row does. A number is written as its shortest decimal and never
 with an exponent: `5.0` is `5` and `1e-8` is `0.00000001`; `NaN`, infinity and a boolean
 are refused. A text is read as WDK reads it: `StringParam` takes it when `Double.valueOf`
 parses it and it matches the default number regex `[+-]?\d+(\.\d+)?([eE][+-]?\d+)?`, whose `\d`
