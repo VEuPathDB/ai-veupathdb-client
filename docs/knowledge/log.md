@@ -7,6 +7,7 @@
   oracle of WDK's own rule, and fail on six mutations of the kinds (a trimmed string, a
   case-folded pick, the first term of a held array, an unordered range, a date range by
   one end, a step id stripped of zeros).
+- `veupathdb-py` is 0.9.0b13.
 
 ## 2026-11-22 - Equality is on the value types
 
