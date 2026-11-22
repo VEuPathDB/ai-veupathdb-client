@@ -12,6 +12,7 @@ from veupathdb.domain.parameters import (
     SinglePickValue,
     VocabOption,
     VocabularyEntryError,
+    entry_name,
 )
 from veupathdb.errors import ValidationError
 from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
@@ -222,3 +223,19 @@ def test_a_candidate_whose_display_is_its_value_is_named_once() -> None:
     assert len(named) == SHOWN_CANDIDATES
     assert all("(" not in entry for entry in named)
     assert "Missense" in named
+
+
+@pytest.mark.parametrize(
+    ("option", "name"),
+    [
+        (
+            VocabOption(value="pfal", display="Plasmodium falciparum 3D7"),
+            "Plasmodium falciparum 3D7 (pfal)",
+        ),
+        (VocabOption(value="Missense", display="Missense"), "Missense"),
+    ],
+)
+def test_an_entry_is_named_by_its_display_and_its_value(
+    option: VocabOption, name: str
+) -> None:
+    assert entry_name(option) == name

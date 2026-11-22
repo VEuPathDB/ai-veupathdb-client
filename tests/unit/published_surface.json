@@ -177,6 +177,7 @@
     "dedupe_options",
     "derive_binding",
     "empty_value",
+    "entry_name",
     "exact_or_candidates",
     "fill_site_set_defaults",
     "filled_site_set_defaults",
