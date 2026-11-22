@@ -1,5 +1,15 @@
 # Knowledge log
 
+## 2026-11-22 - A page in place of JSON is a typed WDK error
+
+- A 2xx service answer whose body is not JSON (a login page) raises `WDKError` (502) that
+  names the method, the URL without its query, the status and the content type, never the
+  body; it carries no cause, so no handler logs the page.
+- A redirect from a service call to another host (a pre-release gate sending every request to
+  the login page) is refused before the page is read: the client's response hook raises
+  `WDKError` naming the URL, the status and the target host. A redirect on the site's own
+  host is still followed.
+
 ## 2026-11-22 - A per-parameter row carries its detail
 
 - `param_message_rows` writes `detail` beside `messages`: the messages as one line. Every

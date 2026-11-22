@@ -8,7 +8,6 @@ import urllib.request
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import dataclass
 from http.cookiejar import Cookie, CookieJar, DefaultCookiePolicy
-from typing import cast
 from urllib.parse import urlparse
 
 import httpx
@@ -166,6 +165,53 @@ class _Call:
     budget_seconds: float | None
 
 
+def _without_query(url: httpx.URL) -> httpx.URL:
+    return url.copy_with(query=None, fragment=None)
+
+
+def _refuse_a_redirect_off(
+    base_url: str,
+) -> Callable[[httpx.Response], Awaitable[None]]:
+    host = httpx.URL(base_url).host
+
+    async def refuse(response: httpx.Response) -> None:
+        if not response.has_redirect_location:
+            return
+        target = response.url.join(response.headers["location"])
+        if target.host != host:
+            msg = (
+                f"{response.request.method} {_without_query(response.url)} answered "
+                f"{response.status_code} with a redirect to {target.host}, off the "
+                "site's service."
+            )
+            raise WDKError(msg, status=502)
+
+    return refuse
+
+
+def _answer(method: str, response: httpx.Response) -> JsonValue:
+    if not response.content or not response.text.strip():
+        return None
+    result = _json_of(method, response)
+    if result is not None and is_delayed_result(result):
+        # WDK sends this with a 2xx, so only the body identifies it.
+        raise WDKDelayedResultError
+    return result
+
+
+def _json_of(method: str, response: httpx.Response) -> JsonValue:
+    try:
+        body: JsonValue = response.json()
+    except ValueError:
+        content_type = response.headers.get("content-type") or "no content type"
+        msg = (
+            f"{method} {_without_query(response.url)} answered "
+            f"{response.status_code} with {content_type}, not JSON."
+        )
+        raise WDKError(msg, status=502) from None
+    return body
+
+
 class HTTPClient:
     """Low-level HTTP transport for VEuPathDB WDK REST services."""
 
@@ -207,6 +253,7 @@ class HTTPClient:
                     cookies=CookieJar(policy=_NoAuthorizationPolicy()),
                     timeout=httpx.Timeout(self.timeout),
                     follow_redirects=True,
+                    event_hooks={"response": [_refuse_a_redirect_off(self.base_url)]},
                     limits=httpx.Limits(
                         max_connections=_MAX_CONNECTIONS,
                         max_keepalive_connections=_MAX_KEEPALIVE_CONNECTIONS,
@@ -343,15 +390,7 @@ class HTTPClient:
             async with asyncio.timeout(budget_seconds):
                 response = await client.send(request)
             response.raise_for_status()
-            if not response.content or not response.text.strip():
-                return None
-            result = response.json()
-            if result is None:
-                return None
-            if is_delayed_result(result):
-                # WDK sends this with a 2xx, so only the body identifies it.
-                raise WDKDelayedResultError
-            return cast("JsonValue", result)
+            return _answer(method, response)
         except httpx.HTTPStatusError as e:
             allow = e.response.headers.get("allow") or e.response.headers.get("Allow")
             log_fn = (
