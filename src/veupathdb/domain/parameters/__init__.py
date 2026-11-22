@@ -62,7 +62,14 @@ from veupathdb.domain.parameters.stated import (
     StatedValuesError,
     read_stated_values,
 )
-from veupathdb.domain.parameters.stated_form import KeptValue, StatedForm, stated_form
+from veupathdb.domain.parameters.stated_form import (
+    KEPT_MARK,
+    KeptValue,
+    StatedForm,
+    shown_stated,
+    shown_stated_text,
+    stated_form,
+)
 from veupathdb.domain.parameters.unbound import UnboundParameter
 from veupathdb.domain.parameters.value_codec import (
     as_param_kind,
@@ -122,6 +129,7 @@ from veupathdb.domain.parameters.wdk_vocab import (
 __all__ = [
     "DECIDED_CANDIDATES",
     "FAKE_ALL_SENTINEL",
+    "KEPT_MARK",
     "NO_CONSTRAINT_PATTERN",
     "PHYLETIC_EXPRESSION_PARAM",
     "PHYLETIC_EXPRESSION_SEARCH",
@@ -215,6 +223,8 @@ __all__ = [
     "read_census",
     "read_options",
     "read_stated_values",
+    "shown_stated",
+    "shown_stated_text",
     "species_of",
     "stated_form",
     "to_decoded_map",

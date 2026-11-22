@@ -636,7 +636,8 @@ boolean written as text is `true` or `True`, and a `yes`/`no` vocabulary such as
 fault of a search into one refusal. A number is written as its shortest decimal and never
 with an exponent: `5.0` is `5` and `1e-8` is `0.00000001`; `NaN`, infinity and a boolean
 are refused. A text is read as WDK reads it: `StringParam` takes it when `Double.valueOf`
-parses it and it matches the default number regex `[+-]?\d+(\.\d+)?([eE][+-]?\d+)?`
+parses it and it matches the default number regex `[+-]?\d+(\.\d+)?([eE][+-]?\d+)?`, whose `\d`
+is an ASCII digit in Java
 ([source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/StringParam.java#L160-L183)),
 so `1e-5`, `+3` and `5.0` are sent as written and `.5`, `5.` and `5,000` are refused. A
 site regex that the parameter does not publish can still refuse a text, and WDK names it. A date that is not `ISO_LOCAL_DATE` is refused. A boolean is no vocabulary
@@ -646,9 +647,11 @@ term and is refused with the terms named. The tests read the recorded
 `stated_form` is the reader's inverse: it gives the form `read_stated` reads back to the
 same wire. Every kind but a filter states its decoded value. A filter states its clauses as
 `{"field", "value"}`, with `includeUnknown` only when it is true, and the number members of a
-clause as their decimal text, the form the facet's members spell. A value no stated form
-reads back to is a `KeptValue` that carries its wire: a `HeldValue`, a filter with no
-clauses, and a filter with a `multiFilter` clause. A range has no one-sided form to give,
+clause as the numbers the clause holds. A value no stated form reads back to is a `KeptValue`
+that carries its wire: a `HeldValue`, a filter with no clauses, and a filter with a
+`multiFilter` clause. What the agent sees is `shown_stated` (`shown_stated_text` in prose): the
+stated form, or for a kept value the one marked text `'<wire>' (kept as the site holds it)`,
+which no reader of a non-string kind takes. A range has no one-sided form to give,
 because `NumberRangeParam` and `DateRangeParam` read both `min` and `max`.
 
 ### WDK-PARAM-018 - A filter clause states `type` and `isRange` from its facet, and a range facet's bounds come only from its term summary
@@ -676,7 +679,9 @@ compares its `toString()` with the published `values`
 ([source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNewStableValue.java#L491-L585)),
 so `1.0` is no member of `"1"`. `FilterFacet.clause` reads a stated member of a number facet
 as a number, whether it is written `1`, `1.0` or `"1"`. It binds the member whose value is
-equal, written in that member's own form: an integer member as an integer.
+equal, written in that member's own form: an integer member as an integer. A member whose text
+no JSON number writes again (`1.50`, `1e3`, `+3`) cannot be sent so that WDK matches it, and a
+statement that names it is refused with the member named. Digits are ASCII digits only.
 
 The published `values` map leaves out every `isRange` term, so it holds no bound for a
 range facet. In the recorded `GenesByVariantCharacteristics.gene_variant_stats` the map

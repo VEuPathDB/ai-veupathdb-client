@@ -141,16 +141,17 @@ class MultiMembers(_Clause, frozen=True):
 FilterClause = StringMembers | NumberMembers | NumberRange | DateRange | MultiMembers
 
 _CLAUSE: TypeAdapter[FilterClause] = TypeAdapter(FilterClause)
-_INTEGER = re.compile(r"[+-]?\d+")
-_DECIMAL = re.compile(r"[+-]?\d+(\.\d+)?([eE][+-]?\d+)?")
+_INTEGER = re.compile(r"[+-]?[0-9]+")
+_DECIMAL = re.compile(r"[+-]?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?")
 
 
-def _number_members(members: Sequence[str]) -> dict[float, int | float]:
-    return {
-        float(member): int(member) if _INTEGER.fullmatch(member) else float(member)
-        for member in members
-        if _DECIMAL.fullmatch(member)
-    }
+def _sent_as(member: str) -> int | float | None:
+    number = int(member) if _INTEGER.fullmatch(member) else float(member)
+    return number if json.dumps(number) == member else None
+
+
+def _number_members(members: Sequence[str]) -> dict[float, str]:
+    return {float(member): member for member in members if _DECIMAL.fullmatch(member)}
 
 
 class FilterValue(CamelModel):
@@ -314,9 +315,21 @@ class FilterFacet(CamelModel):
         match clause:
             case NumberMembers(value=numbers):
                 held = _number_members(self.members)
+                sent = {
+                    n: number
+                    for n, member in held.items()
+                    if (number := _sent_as(member)) is not None
+                }
                 unknown = sorted({decimal_text(n) for n in numbers if n not in held})
+                lost = sorted({held[n] for n in numbers if n in held and n not in sent})
+                if lost:
+                    text = (
+                        f"{self.term} ({self.display}) member {', '.join(lost)} has no "
+                        f"JSON number that WDK reads as that text, so it cannot be bound."
+                    )
+                    raise FilterStatementError([text])
                 clause = clause.model_copy(
-                    update={"value": [held.get(n, n) for n in numbers]}
+                    update={"value": [sent.get(n, n) for n in numbers]}
                 )
             case StringMembers(value=terms):
                 unknown = sorted(set(terms) - set(self.members))

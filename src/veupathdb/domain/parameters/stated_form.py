@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 from pydantic import ConfigDict, JsonValue
 
 from veupathdb.domain.parameters.filter_clause import (
@@ -57,3 +59,22 @@ def stated_form(value: ParamValue) -> StatedForm:
             return _filter(value)
         case _:
             return value.to_decoded()
+
+
+KEPT_MARK = "(kept as the site holds it)"
+
+
+def shown_stated(value: ParamValue) -> JsonValue:
+    match stated_form(value):
+        case KeptValue(wire=wire):
+            return f"{wire!r} {KEPT_MARK}"
+        case form:
+            return form
+
+
+def shown_stated_text(value: ParamValue) -> str:
+    match stated_form(value):
+        case KeptValue(wire=wire):
+            return f"{wire!r} {KEPT_MARK}"
+        case form:
+            return json.dumps(form)

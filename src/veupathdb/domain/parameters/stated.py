@@ -51,7 +51,7 @@ from veupathdb.errors import ValidationError
 Stated = ParamValue | FilterProposals
 
 _MAX_ENUM_TERMS = 50
-_WDK_NUMBER = r"^[+-]?\d+(\.\d+)?([eE][+-]?\d+)?$"
+_WDK_NUMBER = r"^[+-]?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?$"
 _MODEL_KINDS = frozenset({"number-range", "date-range", "filter"})
 _STRICT = ConfigDict(strict=True, extra="forbid")
 

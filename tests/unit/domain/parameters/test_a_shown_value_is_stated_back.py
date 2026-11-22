@@ -15,6 +15,8 @@ from veupathdb.domain.parameters import (
     ParamValue,
     StatedValuesError,
     from_wire,
+    shown_stated,
+    shown_stated_text,
     stated_form,
 )
 from veupathdb.domain.parameters.values import (
@@ -221,6 +223,7 @@ def test_an_empty_filter_list_names_a_non_empty_list() -> None:
 _NGS_SNPS = "search_genes_by_ngs_snps"
 _NGS_SNPS_FILE = "wdk/search_genes_by_ngs_snps.json"
 _YEAR = "VAR_dc0e1a57"
+_ARABIC_FIVE = chr(0x0665)
 
 
 def _recorded(name: str) -> WDKParameter:
@@ -299,3 +302,52 @@ class TestANumberStringWdkHolds:
         assert _recorded("dn_ds_ratio_lower").read_stated(1e-5) == StringValue(
             value="0.00001"
         )
+
+
+def _members(values: list[str]) -> WDKParameter:
+    param = _year_members()
+    return param.model_copy(update={"values": {**(param.values or {}), _YEAR: values}})
+
+
+def _bound(param: WDKParameter, stated: JsonValue) -> str:
+    read = param.read_stated([{"field": _YEAR, "value": stated}])
+    assert isinstance(read, FilterProposals)
+    return FilterFacets.of(param).bind(read).to_wire()
+
+
+@pytest.mark.skipif(needs_qa_recording(_NGS_SNPS_FILE), reason=NEEDS_QA_RECORDING)
+class TestAMemberWdkCannotMatch:
+    @pytest.mark.parametrize(("member", "stated"), [("1.50", 1.5), ("1e3", 1000)])
+    def test_a_member_whose_text_a_number_loses_is_refused(
+        self, member: str, stated: float
+    ) -> None:
+        with pytest.raises(FilterStatementError, match=member):
+            _bound(_members([member, "2"]), [stated])
+
+    def test_a_member_in_other_digits_is_no_number(self) -> None:
+        with pytest.raises(FilterStatementError, match="no member 5"):
+            _bound(_members([_ARABIC_FIVE, "2"]), [5])
+
+    def test_a_member_whose_text_survives_binds(self) -> None:
+        assert '"value": [2, 0.5]' in _bound(_members(["2", "0.5"]), ["2", 0.5])
+
+
+@pytest.mark.skipif(needs_qa_recording(_NGS_SNPS_FILE), reason=NEEDS_QA_RECORDING)
+def test_a_number_text_in_other_digits_is_refused() -> None:
+    with pytest.raises(StatedValuesError):
+        _recorded("dn_ds_ratio_lower").read_stated(_ARABIC_FIVE)
+
+
+def test_a_kept_value_shows_as_the_marked_text() -> None:
+    assert (
+        shown_stated(FilterValue()) == "'{\"filters\": []}' (kept as the site holds it)"
+    )
+    assert (
+        shown_stated_text(HeldValue(wire="x,y")) == "'x,y' (kept as the site holds it)"
+    )
+
+
+@pytest.mark.parametrize("value", [value for _, value in _STATEABLE])
+def test_a_stateable_value_shows_as_its_stated_form(value: ParamValue) -> None:
+    assert shown_stated(value) == stated_form(value)
+    assert shown_stated_text(value) == json.dumps(stated_form(value))

@@ -9,6 +9,9 @@
 - A number member of a filter facet is matched as a number and sent in its member's own
   form, because WDK compares the raw JSON text with the published values.
 - An `isNumber` text is read as `StringParam` reads it and sent as written, `1e-5` included.
+- `shown_stated` and `shown_stated_text` render a value for the agent: the stated form, or one
+  marked text for a kept value. A number member whose text no JSON number writes again is
+  refused, and number text takes ASCII digits only.
 
 ## 2026-11-22 - One rule names a vocabulary entry
 
