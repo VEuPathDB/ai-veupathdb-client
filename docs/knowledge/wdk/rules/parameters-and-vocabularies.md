@@ -793,12 +793,12 @@ names the parameter, the text and the first `SHOWN_CANDIDATES` entries `rank_ent
 ranks (the lexical entries first, then the spelling neighbours); each item of `errors`
 carries the candidates as `{value, display}` and its line as `detail`. The refusal names no
 tool and no example from another vocabulary. `ParameterCanonicalizer.canonicalize` reads
-every parameter of a call and raises one refusal for all of them. Every entry fault is one
-`VocabularyEntryError`, so a call whose only faults are entries keeps that type and every
-parameter's candidates. Faults of other kinds are joined with it by `joined_refusal` into one
-`ValidationError` whose `errors` hold every row in order, each with `param` and its one line
-as `detail`; the entry rows keep their `candidates`, so a reader orders them from the rows
-whatever the refusal's type.
+every parameter of a call and raises one refusal for all of them. A call whose only faults are
+entries raises one `VocabularyEntryError` with every parameter's faults and candidates. A call
+with faults of other kinds raises `joined_refusal` of every parameter's refusal, one
+`ValidationError` whose `errors` hold each parameter's rows at that parameter's place in the
+call, each with `param` and its one line as `detail`; an entry row keeps its `value` and
+`candidates`, so a reader orders the candidates from the rows whatever the refusal's type.
 
 # WDK-VOCAB - vocabularies, trees, and the parents they were read under
 

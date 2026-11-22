@@ -55,6 +55,7 @@ class _Row(BaseModel):
 
     param: str
     detail: str
+    value: JsonValue = None
     candidates: list[_Candidate] | None = None
 
 
@@ -163,7 +164,7 @@ class TestACanonicalizedCallNamesEveryParameter:
         assert all(row.candidates for row in rows)
         _assert_one_line_per_row(refused.value)
 
-    def test_a_mixed_refusal_keeps_every_entry_row_with_its_candidates(
+    def test_a_mixed_refusal_keeps_every_row_in_call_order_with_its_candidates(
         self,
     ) -> None:
         specs = {param.name: _spec(param) for param in _sheet()}
@@ -179,10 +180,10 @@ class TestACanonicalizedCallNamesEveryParameter:
 
         rows = _ROWS.validate_python(refused.value.errors)
         assert type(refused.value) is ValidationError
-        assert [(row.param, bool(row.candidates)) for row in rows] == [
-            ("snp_class", True),
-            ("ReadFrequencyPercent", True),
-            ("snp_klass", False),
+        assert [(row.param, row.value, bool(row.candidates)) for row in rows] == [
+            ("snp_class", "non-synonymous", True),
+            ("snp_klass", "Missense", False),
+            ("ReadFrequencyPercent", "95 percent", True),
         ]
         assert "Synonymous" in [c.value for c in rows[0].candidates or []]
         _assert_one_line_per_row(refused.value)

@@ -6,8 +6,9 @@
   shape read, and raises once with both kinds of fault
   ([WDK-PARAM-017](wdk/rules/parameters-and-vocabularies.md)).
 - `ParameterCanonicalizer.canonicalize` reads every parameter and raises one refusal for
-  the call: every entry fault is one `VocabularyEntryError`, joined with any other fault by
-  `joined_refusal`, and the entry rows keep their candidates
+  the call: one `VocabularyEntryError` when every fault is an entry, else `joined_refusal` of
+  every parameter's refusal with each parameter's rows at its place in the call; an entry row
+  keeps its value and candidates
   ([WDK-PARAM-020](wdk/rules/parameters-and-vocabularies.md)).
 - A refusal's detail has one line per problem, `StatedValuesError` included, and every row
   holds `param` and its line as `detail`.

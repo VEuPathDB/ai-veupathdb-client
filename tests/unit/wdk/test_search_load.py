@@ -65,10 +65,14 @@ class _Site(httpx.AsyncBaseTransport):
 
 
 class _ClockedSite(httpx.AsyncBaseTransport):
+    def __init__(self) -> None:
+        self.read_timeouts: list[float] = []
+
     async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
         if request.url.path.startswith("/app"):
             return httpx.Response(200, text="ok")
         budget = request.extensions["timeout"]["read"]
+        self.read_timeouts.append(budget)
         try:
             async with asyncio.timeout(budget):
                 await asyncio.sleep(0.05)
@@ -247,7 +251,8 @@ class TestAWaitIsNotARequest:
         self,
     ) -> None:
         async def scenario() -> None:
-            client = await _client(_ClockedSite(), seconds=0.2)
+            site = _ClockedSite()
+            client = await _client(site, seconds=0.2)
             previous = search_gate()
 
             @asynccontextmanager
@@ -262,6 +267,7 @@ class TestAWaitIsNotARequest:
                 use_search_gate(previous)
 
             assert answer == {"id": 1}
+            assert site.read_timeouts == [0.2]
 
         on_the_virtual_clock(scenario())
 

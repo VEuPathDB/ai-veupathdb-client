@@ -106,21 +106,22 @@ class ParameterCanonicalizer:
         canonical: dict[str, ParamValue] = {}
         refusals: list[ValidationError] = []
         entry_faults: list[tuple[str, Resolution]] = []
-        entry_at = 0
+        refused_otherwise = False
         for name, value in (parameters or {}).items():
             try:
                 kept = self._canonical(name, value)
             except VocabularyEntryError as refusal:
-                entry_at = entry_at if entry_faults else len(refusals)
                 entry_faults.extend(refusal.faults)
+                refusals.append(refusal)
                 continue
             except ValidationError as refusal:
                 refusals.append(refusal)
+                refused_otherwise = True
                 continue
             if kept is not None:
                 canonical[name] = kept
-        if entry_faults:
-            refusals.insert(entry_at, VocabularyEntryError(entry_faults))
+        if entry_faults and not refused_otherwise:
+            raise VocabularyEntryError(entry_faults)
         if refusals:
             raise joined_refusal(refusals)
         return canonical

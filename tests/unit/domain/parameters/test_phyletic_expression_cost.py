@@ -60,7 +60,7 @@ def _describe(_text: str, parsed: PhyleticExpression, tree: PhyleticTree) -> str
     return parsed.describe(tree)
 
 
-def growth(stage: Stage, build: Callable[[PhyleticTree, int], str]) -> float:
+def _growth(stage: Stage, build: Callable[[PhyleticTree, int], str]) -> float:
     tree = _recorded_tree()
     texts = (build(tree, UNITS), build(tree, 2 * UNITS))
     parsed = tuple(PhyleticExpression.parse(text) for text in texts)
@@ -101,5 +101,4 @@ def test_the_doubled_expression_reads_every_unit(
 def test_twice_the_units_take_each_stage_under_three_times_as_long(
     stage: Stage, build: Callable[[PhyleticTree, int], str]
 ) -> None:
-    """Linear work doubles its time with its units; quadratic work quadruples it."""
-    assert growth(stage, build) < GROWTH
+    assert _growth(stage, build) < GROWTH
