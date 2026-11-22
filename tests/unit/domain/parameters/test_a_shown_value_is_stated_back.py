@@ -316,13 +316,34 @@ def _bound(param: WDKParameter, stated: JsonValue) -> str:
 
 
 @pytest.mark.skipif(needs_qa_recording(_NGS_SNPS_FILE), reason=NEEDS_QA_RECORDING)
-class TestAMemberWdkCannotMatch:
-    @pytest.mark.parametrize(("member", "stated"), [("1.50", 1.5), ("1e3", 1000)])
-    def test_a_member_whose_text_a_number_loses_is_refused(
-        self, member: str, stated: float
+class TestAMemberNoNumberWrites:
+    @pytest.mark.parametrize(
+        ("member", "stated"),
+        [("1.50", 1.5), ("1.50", "1.50"), ("1e3", 1000), ("1e3", "1e3"), ("+3", 3)],
+    )
+    def test_it_goes_out_as_its_published_text(
+        self, member: str, stated: JsonValue
     ) -> None:
-        with pytest.raises(FilterStatementError, match=member):
-            _bound(_members([member, "2"]), [stated])
+        wire = _bound(_members([member, "2"]), [stated, 2])
+
+        assert f'"value": [{json.dumps(member)}, 2]' in wire
+
+    def test_a_held_text_member_reads_back_to_its_wire(self) -> None:
+        param = _members(["1.50", "2"])
+        wire = _bound(param, [1.5, 2])
+        form = stated_form(from_wire("filter", wire))
+
+        assert json.dumps(form) == json.dumps([{"field": _YEAR, "value": ["1.50", 2]}])
+        assert (
+            _bound(param, [1.5, 2])
+            == FilterFacets.of(param)
+            .bind(FilterProposals.model_validate(form))
+            .to_wire()
+        )
+
+    def test_a_text_that_is_no_number_is_no_member(self) -> None:
+        with pytest.raises(FilterStatementError, match="no member abc"):
+            _bound(_members(["1.50", "2"]), ["abc"])
 
     def test_a_member_in_other_digits_is_no_number(self) -> None:
         with pytest.raises(FilterStatementError, match="no member 5"):

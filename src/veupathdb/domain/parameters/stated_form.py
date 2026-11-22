@@ -74,7 +74,7 @@ def shown_stated(value: ParamValue) -> JsonValue:
 
 def shown_stated_text(value: ParamValue) -> str:
     match stated_form(value):
-        case KeptValue(wire=wire):
-            return f"{wire!r} {KEPT_MARK}"
+        case KeptValue():
+            return str(shown_stated(value))
         case form:
             return json.dumps(form)

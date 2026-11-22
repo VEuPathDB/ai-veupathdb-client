@@ -98,7 +98,7 @@ class StringMembers(_Clause, frozen=True):
 class NumberMembers(_Clause, frozen=True):
     type: Literal["number"]
     is_range: Literal[False]
-    value: list[int | float]
+    value: list[int | float | str]
 
     def _terms(self) -> frozenset[str]:
         return frozenset(map(str, self.value))
@@ -145,9 +145,25 @@ _INTEGER = re.compile(r"[+-]?[0-9]+")
 _DECIMAL = re.compile(r"[+-]?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?")
 
 
-def _sent_as(member: str) -> int | float | None:
+def _sent_as(member: str) -> int | float | str:
     number = int(member) if _INTEGER.fullmatch(member) else float(member)
-    return number if json.dumps(number) == member else None
+    return number if json.dumps(number) == member else member
+
+
+def _number_key(stated: int | float | str) -> float | None:
+    match stated:
+        case str():
+            return float(stated) if _DECIMAL.fullmatch(stated) else None
+        case _:
+            return float(stated)
+
+
+def _member_text(stated: int | float | str) -> str:
+    match stated:
+        case str():
+            return stated
+        case _:
+            return decimal_text(stated)
 
 
 def _number_members(members: Sequence[str]) -> dict[float, str]:
@@ -315,21 +331,22 @@ class FilterFacet(CamelModel):
         match clause:
             case NumberMembers(value=numbers):
                 held = _number_members(self.members)
-                sent = {
-                    n: number
-                    for n, member in held.items()
-                    if (number := _sent_as(member)) is not None
-                }
-                unknown = sorted({decimal_text(n) for n in numbers if n not in held})
-                lost = sorted({held[n] for n in numbers if n in held and n not in sent})
-                if lost:
-                    text = (
-                        f"{self.term} ({self.display}) member {', '.join(lost)} has no "
-                        f"JSON number that WDK reads as that text, so it cannot be bound."
-                    )
-                    raise FilterStatementError([text])
+                keys = [_number_key(n) for n in numbers]
+                unknown = sorted(
+                    {
+                        _member_text(n)
+                        for n, k in zip(numbers, keys, strict=True)
+                        if k not in held
+                    }
+                )
                 clause = clause.model_copy(
-                    update={"value": [sent.get(n, n) for n in numbers]}
+                    update={
+                        "value": [
+                            _sent_as(held[k])
+                            for k in keys
+                            if k is not None and k in held
+                        ]
+                    }
                 )
             case StringMembers(value=terms):
                 unknown = sorted(set(terms) - set(self.members))

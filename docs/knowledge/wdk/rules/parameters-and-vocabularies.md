@@ -679,9 +679,11 @@ compares its `toString()` with the published `values`
 ([source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNewStableValue.java#L491-L585)),
 so `1.0` is no member of `"1"`. `FilterFacet.clause` reads a stated member of a number facet
 as a number, whether it is written `1`, `1.0` or `"1"`. It binds the member whose value is
-equal, written in that member's own form: an integer member as an integer. A member whose text
-no JSON number writes again (`1.50`, `1e3`, `+3`) cannot be sent so that WDK matches it, and a
-statement that names it is refused with the member named. Digits are ASCII digits only.
+equal, written in that member's own form: an integer member as an integer. WDK picks
+`NumberMembersFilter` from the clause's `type`, not from the JSON type of a member, and keeps
+each raw member, so a member whose text no JSON number writes again (`1.50`, `1e3`, `+3`) is
+sent as its published text, a JSON string, and still matches. `stated_form` gives that text
+back, and the reader binds it to the same member. Digits are ASCII digits only.
 
 The published `values` map leaves out every `isRange` term, so it holds no bound for a
 range facet. In the recorded `GenesByVariantCharacteristics.gene_variant_stats` the map
