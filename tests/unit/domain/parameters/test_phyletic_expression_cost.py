@@ -19,7 +19,7 @@ from veupathdb.wdk.wdk_models import WDKAnswer
 
 UNITS = 10_000
 GROWTH = 3.0
-RUNS = 3
+RUNS = 5
 
 
 def _recorded_tree() -> PhyleticTree:
@@ -44,34 +44,62 @@ def _every_code(tree: PhyleticTree, units: int) -> str:
     )
 
 
-def _read_seconds(text: str, tree: PhyleticTree) -> float:
-    fastest = float("inf")
+type Stage = Callable[[str, PhyleticExpression, PhyleticTree], object]
+
+
+def _parse(text: str, _parsed: PhyleticExpression, _tree: PhyleticTree) -> object:
+    return PhyleticExpression.parse(text)
+
+
+def _check(_text: str, parsed: PhyleticExpression, tree: PhyleticTree) -> object:
+    check_expression(parsed, tree)
+    return None
+
+
+def _describe(_text: str, parsed: PhyleticExpression, tree: PhyleticTree) -> str:
+    return parsed.describe(tree)
+
+
+def growth(stage: Stage, build: Callable[[PhyleticTree, int], str]) -> float:
+    tree = _recorded_tree()
+    texts = (build(tree, UNITS), build(tree, 2 * UNITS))
+    parsed = tuple(PhyleticExpression.parse(text) for text in texts)
+    fastest = [float("inf"), float("inf")]
     gc.collect()
     gc.disable()
     try:
         for _ in range(RUNS):
-            started = time.process_time()
-            expression = PhyleticExpression.parse(text)
-            check_expression(expression, tree)
-            expression.describe(tree)
-            fastest = min(fastest, time.process_time() - started)
+            for size in (0, 1):
+                started = time.process_time()
+                stage(texts[size], parsed[size], tree)
+                fastest[size] = min(fastest[size], time.process_time() - started)
     finally:
         gc.enable()
-    return fastest
+    return fastest[1] / fastest[0]
 
 
-@pytest.mark.parametrize("build", [_ladder, _every_code], ids=["ladder", "every-code"])
-def test_twice_the_units_take_under_three_times_as_long(
+BUILDS = pytest.mark.parametrize(
+    "build", [_ladder, _every_code], ids=["ladder", "every-code"]
+)
+
+
+@BUILDS
+def test_the_doubled_expression_reads_every_unit(
     build: Callable[[PhyleticTree, int], str],
 ) -> None:
-    """Linear reading doubles its time with its units; a quadratic one quadruples it."""
     tree = _recorded_tree()
-    single = build(tree, UNITS)
-    double = build(tree, 2 * UNITS)
-
-    expression = PhyleticExpression.parse(double)
-    ratio = _read_seconds(double, tree) / _read_seconds(single, tree)
+    expression = PhyleticExpression.parse(build(tree, 2 * UNITS))
 
     assert len(expression.units()) == 2 * UNITS
     assert expression.describe(tree).count(" or ") == UNITS - 1
-    assert ratio < GROWTH
+
+
+@BUILDS
+@pytest.mark.parametrize(
+    "stage", [_parse, _check, _describe], ids=["parse", "check", "describe"]
+)
+def test_twice_the_units_take_each_stage_under_three_times_as_long(
+    stage: Stage, build: Callable[[PhyleticTree, int], str]
+) -> None:
+    """Linear work doubles its time with its units; quadratic work quadruples it."""
+    assert growth(stage, build) < GROWTH
