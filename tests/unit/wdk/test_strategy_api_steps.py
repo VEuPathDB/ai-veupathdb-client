@@ -16,7 +16,7 @@ from typing import Any
 import httpx
 import pytest
 import respx
-from tests.unit.wdk._step_writes import Recorder, no_expansion
+from tests.unit.wdk._step_writes import Recorder
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.errors import WDKError
@@ -69,7 +69,6 @@ def _api(monkeypatch: pytest.MonkeyPatch) -> tuple[StrategyAPI, Recorder]:
     monkeypatch.setattr(api.client, "get", _read_step)
     monkeypatch.setattr(api.client, "get_search_details", _no_input_params)
     monkeypatch.setattr(api.client, "put", put)
-    monkeypatch.setattr(api.client, "expand_tree_params_to_leaves", no_expansion)
     return api, put
 
 
@@ -216,7 +215,6 @@ class TestANewStepSendsItsAnswerParamsEmpty:
 
         monkeypatch.setattr(api.client, "get_search_details", missing)
         monkeypatch.setattr(api.client, "post", post)
-        monkeypatch.setattr(api.client, "expand_tree_params_to_leaves", no_expansion)
 
         await api.create_step(
             NewStepSpec(
@@ -361,9 +359,7 @@ class TestAStepForASearchWithNoParametersSendsAnEmptyMap:
 
     @staticmethod
     def _wire_api(monkeypatch: pytest.MonkeyPatch) -> StrategyAPI:
-        api = _api_with_params(monkeypatch, [])
-        monkeypatch.setattr(api.client, "expand_tree_params_to_leaves", no_expansion)
-        return api
+        return _api_with_params(monkeypatch, [])
 
     @respx.mock
     async def test_a_leaf_step_sends_parameters_on_the_wire(

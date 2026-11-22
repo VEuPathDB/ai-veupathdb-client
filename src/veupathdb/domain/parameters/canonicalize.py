@@ -30,8 +30,8 @@ from veupathdb.domain.parameters.vocab_utils import match_vocab_value
 from veupathdb.domain.parameters.wdk_vocab import (
     FAKE_ALL_SENTINEL,
     WDKVocabulary,
-    collect_leaf_terms,
     find_vocab_node,
+    leaf_terms,
 )
 from veupathdb.errors import ValidationError
 
@@ -167,18 +167,13 @@ class ParameterCanonicalizer:
     ) -> list[str]:
         if not spec.count_only_leaves:
             return values
-        enforced: list[str] = []
-        seen: set[str] = set()
-        for value in values:
-            leaves = self._expand_leaf_terms_for_match(spec.vocabulary, value)
-            if not leaves:
-                raise _refuse(spec, "requires leaf selections", value)
-            for leaf in leaves:
-                if leaf in seen:
-                    continue
-                seen.add(leaf)
-                enforced.append(leaf)
-        return enforced
+        leaves = leaf_terms(spec.vocabulary, values)
+        if leaves is None:
+            unknown = next(
+                v for v in values if leaf_terms(spec.vocabulary, [v]) is None
+            )
+            raise _refuse(spec, "requires leaf selections", unknown)
+        return leaves
 
     def _enforce_leaf_value(self, spec: ParamSpecNormalized, value: str) -> str:
         if not spec.count_only_leaves or not value:
@@ -187,14 +182,6 @@ class ParameterCanonicalizer:
         if not leaf:
             raise _refuse(spec, "requires leaf selections", value)
         return leaf
-
-    def _expand_leaf_terms_for_match(
-        self, vocabulary: WDKVocabulary | None, match: str
-    ) -> list[str]:
-        matched_node = find_vocab_node(vocabulary, match)
-        if matched_node is None:
-            return []
-        return collect_leaf_terms(matched_node)
 
     def _find_leaf_term_for_match(
         self, vocabulary: WDKVocabulary | None, match: str

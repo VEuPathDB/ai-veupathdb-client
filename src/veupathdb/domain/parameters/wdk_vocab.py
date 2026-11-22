@@ -216,6 +216,21 @@ def collect_leaf_terms(node: WDKTreeBoxVocabNode) -> list[str]:
     return leaves
 
 
+def leaf_terms(
+    vocabulary: WDKVocabulary | None, terms: Sequence[str]
+) -> list[str] | None:
+    """Each term as the leaves under it, in order and each once, the form WDK
+    counts under countOnlyLeaves (WDK-VOCAB-002). None when a term names no node
+    of the tree; the synthetic root names none."""
+    leaves: list[str] = []
+    for term in terms:
+        node = None if term == FAKE_ALL_SENTINEL else find_vocab_node(vocabulary, term)
+        if node is None:
+            return None
+        leaves.extend(collect_leaf_terms(node))
+    return list(dict.fromkeys(leaves))
+
+
 def find_vocab_node(
     vocab: WDKVocabulary | None,
     match: str,

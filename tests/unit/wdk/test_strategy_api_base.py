@@ -8,22 +8,24 @@ census holds, and under ``countOnlyLeaves`` a branch term expands to its leaves.
 
 from __future__ import annotations
 
-import json
 from typing import cast
 
 import pytest
-from pydantic import JsonValue
 
 from veupathdb.domain.parameters.phyletic import (
     canonical_census_pattern,
     read_census,
     validate_phyletic_codes,
 )
-from veupathdb.domain.parameters.wdk_vocab import FAKE_ALL_SENTINEL, WDKVocabTerm
+from veupathdb.domain.parameters.wdk_vocab import (
+    FAKE_ALL_SENTINEL,
+    WDKTreeBoxVocabNode,
+    WDKVocabTerm,
+    leaf_terms,
+)
 from veupathdb.errors import VEuPathDBError
 from veupathdb.json_types import JSONObject
 from veupathdb.wdk.phyletic_tree import phyletic_tree_of
-from veupathdb.wdk.tree_leaves import leaves_of_tree_values
 from veupathdb.wdk.wdk_parameters import (
     WDKEnumParam,
     WDKParameter,
@@ -241,26 +243,8 @@ def _tree() -> JSONObject:
     )
 
 
-def _tree_param(*, count_only_leaves: bool = True) -> WDKParameter:
-    raw: JSONObject = {
-        "type": "multi-pick-vocabulary",
-        "name": "samples",
-        "display_name": "Samples",
-        "display_type": "treeBox",
-        "count_only_leaves": count_only_leaves,
-        "vocabulary": cast("JsonValue", _tree()),
-        "allow_empty_value": False,
-    }
-    return cast("WDKParameter", WDKEnumParam.model_validate(raw))
-
-
-def _expand(value: list[str], *, count_only_leaves: bool = True) -> list[str]:
-    result = leaves_of_tree_values(
-        [_tree_param(count_only_leaves=count_only_leaves)],
-        {"samples": json.dumps(value)},
-        "GenesByProfile",
-    )
-    return list(json.loads(result["samples"]))
+def _expand(value: list[str]) -> list[str] | None:
+    return leaf_terms(WDKTreeBoxVocabNode.model_validate(_tree()), value)
 
 
 class TestABranchBecomesItsLeaves:
@@ -282,17 +266,9 @@ class TestABranchBecomesItsLeaves:
         assert _expand(["Late Trophozoite", "18 Hour"]) == [*_OTHER_LEAVES, "18 Hour"]
 
 
-class TestWhatIsLeftUntouched:
-    def test_a_param_that_counts_branches_is_not_expanded(self) -> None:
-        assert _expand(["Trophozoite"], count_only_leaves=False) == ["Trophozoite"]
-
-    def test_an_unknown_term_is_passed_through_for_wdk_to_judge(self) -> None:
-        assert _expand(["99 Hour"]) == ["99 Hour"]
+class TestWhatNamesNoNode:
+    def test_an_unknown_term_names_no_node(self) -> None:
+        assert _expand(["99 Hour"]) is None
 
     def test_the_synthetic_root_does_not_select_the_whole_vocabulary(self) -> None:
-        # It names no real term, so expanding it would turn a filter into a
-        # criterion that removes nothing.
-        assert _expand([FAKE_ALL_SENTINEL]) != [*_LEAVES, *_OTHER_LEAVES]
-
-    def test_the_synthetic_root_is_left_for_wdk_to_refuse(self) -> None:
-        assert _expand([FAKE_ALL_SENTINEL]) == [FAKE_ALL_SENTINEL]
+        assert _expand([FAKE_ALL_SENTINEL]) is None

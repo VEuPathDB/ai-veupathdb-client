@@ -23,11 +23,3 @@ class Recorder:
     @property
     def body(self) -> dict[str, Any]:
         return self.bodies[-1]
-
-
-async def no_expansion(
-    record_type: str, search_name: str, params: dict[str, str]
-) -> dict[str, str]:
-    """Stands in for the tree-param expansion, which reads the catalog."""
-    del record_type, search_name
-    return params

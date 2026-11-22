@@ -26,6 +26,10 @@
   `ParameterCanonicalizer` expands leaves when a value is stated, and
   `canonical_census_pattern` (replacing `sort_profile_pattern` and
   `_expand_profile_pattern_groups`) is called where a pattern is stated.
+- `leaf_terms` is the one implementation of WDK-VOCAB-002: the canonicalizer calls it, and
+  `wdk/tree_leaves.py`, `expand_tree_params_to_leaves` and the send-time expansion of
+  `run_search_report` and `run_search_column_report` are gone; a report sends its
+  parameters as given.
 - `veupathdb-py` is 0.9.0b9.
 
 ## 2026-11-21 - A filter is read as stated clauses

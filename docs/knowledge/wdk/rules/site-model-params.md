@@ -315,10 +315,10 @@ The same reason makes it case-sensitive: `%HSAP:Y%` returns 0 where `%hsap:Y%` r
 
 The expansion has one implementation, and both paths call it. `PhyleticTree.leaf_states`
 pushes each selection down to the species the census holds: the authoring path reaches it
-through `derive_binding`, and the wire guard through `_expand_profile_pattern_groups`. The
-code check is `validate_phyletic_codes`, called before the expansion and again from the
-pre-flight, so a code the tree does not carry is a 422 rather than a token that matches
-nothing (`tests/unit/wdk/test_strategy_api_base.py`,
+through `derive_binding`, and a stated pattern through `canonical_census_pattern`. A value
+is canonical once, when it is stated, so a step write sends the pattern as given. The code
+check is `validate_phyletic_codes`, called before the expansion, so a stated code the tree
+does not carry is a 422 rather than a token that matches nothing (`tests/unit/wdk/test_strategy_api_base.py`,
 `veupathdb-mcp: tests/unit/catalog/test_param_validation_phyletic.py`). The editor
 widget keeps its own copy of the same rule, tested at
 `pathfinder: apps/web/src/features/strategy/editor/widgets/PhyleticProfileParam.test.tsx`.

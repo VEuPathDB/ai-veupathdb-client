@@ -46,19 +46,12 @@ class _Sent:
         return _REPLY
 
 
-async def _unchanged(
-    _rt: str, _search: str, parameters: dict[str, str]
-) -> dict[str, str]:
-    return parameters
-
-
 async def test_the_column_is_counted_on_the_search_with_its_filters(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     client = VEuPathDBClient("https://qa.vectorbase.org/vectorbase.qa/service")
     sent = _Sent()
     monkeypatch.setattr(client, "post", sent)
-    monkeypatch.setattr(client, "expand_tree_params_to_leaves", _unchanged)
 
     distribution = await client.run_search_column_report(
         "dataset",

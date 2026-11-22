@@ -748,7 +748,7 @@ nothing. Skip the root or drop `@@fake@@` by name; there is no flag to test.
 
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/AbstractEnumParam.java#L457-L467
-- anchor: src/veupathdb/wdk/tree_leaves.py:leaves_of_tree_values
+- anchor: src/veupathdb/domain/parameters/wdk_vocab.py:leaf_terms
 - status: ENFORCED by tests/unit/wdk/test_strategy_api_base.py::TestABranchBecomesItsLeaves::test_a_top_branch_expands_to_every_leaf_under_it
 
 `getNumSelected` builds the parameter tree, marks the selected terms on it, and
@@ -791,14 +791,11 @@ leaves for this reason, and its tree widget had to be taught the same
 rule after a correctly-scoped step rendered as an empty required field
 (`pathfinder: docs/knowledge/decisions/parent-term-is-a-selection.md`).
 
-**This client expands in two independent places, and both are named by a
-test.** `ParameterCanonicalizer.canonicalize` in `domain/parameters/` expands a
-value when it is stated, so a step holds the leaves and a step write sends its
-parameters as given; a branch WDK already holds is WDK's own and goes back
-unchanged. `leaves_of_tree_values` in `wdk/tree_leaves.py`, applied by
-`VEuPathDBClient.expand_tree_params_to_leaves`, serves `run_search_report`,
-which runs a configuration no step holds. Delete either and a branch term reaches
-WDK on that path.
+**This client expands in one place.** `leaf_terms` in `domain/parameters/wdk_vocab.py`
+expands a stated term to its leaves; `ParameterCanonicalizer.canonicalize` calls it, and
+so does the reader of stated values in veupathdb-mcp (`as_tree_leaves`). A value is
+canonical once, when it is stated, so a step write and a search report send their
+parameters as given, and a branch WDK already holds is WDK's own and goes back unchanged.
 
 **Having both is not sufficient, because order decides which one runs first.**
 Parameter validation resolves the search *with the values as they arrived* so it

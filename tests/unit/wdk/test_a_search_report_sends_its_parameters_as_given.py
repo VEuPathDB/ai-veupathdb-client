@@ -1,8 +1,7 @@
-"""A search report sends a countOnlyLeaves tree value as its leaves, as a step does."""
+"""A search report sends its parameters as given, as a step does."""
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import pytest
@@ -56,22 +55,17 @@ def _client(monkeypatch: pytest.MonkeyPatch) -> tuple[VEuPathDBClient, Recorder]
     return client, sent
 
 
-def _organism(body: dict[str, Any]) -> list[str]:
-    return list(json.loads(body["searchConfig"]["parameters"]["organism"]))
-
-
-async def test_a_parent_organism_is_sent_as_the_leaves_under_it(
+async def test_a_report_sends_a_parent_organism_as_given_and_reads_no_search(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     client, sent = _client(monkeypatch)
+    catalog = _Catalog()
+    monkeypatch.setattr(client, "get", catalog)
 
     await client.run_search_report("transcript", _SEARCH, _CONFIG, _PAGE)
 
-    organisms = _organism(sent.body)
-    assert len(organisms) == 61
-    assert organisms[:2] == ["Plasmodium adleri G01", "Plasmodium berghei ANKA"]
-    assert "Plasmodium" not in organisms
-    assert sent.body["searchConfig"]["parameters"]["min_molecular_weight"] == "10000"
+    assert catalog.paths == []
+    assert sent.body["searchConfig"]["parameters"] == _CONFIG.parameters
 
 
 async def test_a_step_sends_the_organisms_as_stated(
@@ -85,34 +79,3 @@ async def test_a_step_sends_the_organisms_as_stated(
     )
 
     assert sent.body["searchConfig"]["parameters"] == _CONFIG.parameters
-
-
-async def test_a_report_with_no_parameters_reads_no_search(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    client, sent = _client(monkeypatch)
-    catalog = _Catalog()
-    monkeypatch.setattr(client, "get", catalog)
-
-    await client.run_search_report("organism", "GenomeDataTypes", WDKSearchConfig())
-
-    assert catalog.paths == []
-    assert sent.body["searchConfig"] == {"parameters": {}}
-
-
-async def test_a_report_with_no_term_list_reads_no_definition(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Only a multi-pick value names a tree parent, and WDK sends it as a list."""
-    client, sent = _client(monkeypatch)
-    catalog = _Catalog()
-    monkeypatch.setattr(client, "get", catalog)
-    by_id = WDKSearchConfig(parameters={"ds_gene_ids": "12345", "weight": "10"})
-
-    await client.run_search_report("transcript", "GeneByLocusTag", by_id, _PAGE)
-
-    assert catalog.paths == []
-    assert sent.body["searchConfig"]["parameters"] == {
-        "ds_gene_ids": "12345",
-        "weight": "10",
-    }

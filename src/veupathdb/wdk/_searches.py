@@ -10,7 +10,7 @@ from pydantic import JsonValue, TypeAdapter
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.domain.parameters.filter_clause import FilterClause
-from veupathdb.errors import DataParsingError, VEuPathDBError, validate_response
+from veupathdb.errors import DataParsingError, validate_response
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
 from veupathdb.wdk._helpers import _validate_list
@@ -19,7 +19,6 @@ from veupathdb.wdk.ai_expression import (
     AiExpressionReport,
     AiExpressionReportConfig,
 )
-from veupathdb.wdk.tree_leaves import holds_a_term_list, leaves_of_tree_values
 from veupathdb.wdk.wdk_models import (
     WDKAnswer,
     WDKColumnDistribution,
@@ -189,30 +188,6 @@ class SearchEndpoints:
             held[key] = details
         return details
 
-    async def expand_tree_params_to_leaves(
-        self,
-        record_type: str,
-        search_name: str,
-        params: dict[str, str],
-    ) -> dict[str, str]:
-        """The parameters with each parent term of a countOnlyLeaves tree as its leaves.
-
-        When the search read fails, the values go unchanged and WDK judges them.
-        A configuration with no term list names no tree parent and reads nothing.
-        """
-        if not holds_a_term_list(params):
-            return params
-        try:
-            response = await self.get_search_details(
-                record_type, search_name, expand_params=True
-            )
-        except VEuPathDBError:
-            logger.debug("Failed to expand tree params (non-fatal)")
-            return params
-        return leaves_of_tree_values(
-            response.search_data.parameters or [], params, search_name
-        )
-
     async def get_search_details_with_params(
         self,
         record_type: str,
@@ -319,19 +294,17 @@ class SearchEndpoints:
         budget_seconds: float | None = None,
     ) -> WDKAnswer:
         """Runs a report on a search and creates no step or strategy. The endpoint
-        needs no user session, so several calls can run in parallel. A tree value
-        goes as its leaves, as ``create_step`` sends it.
+        needs no user session, so several calls can run in parallel. The
+        parameters go as given, as ``create_step`` sends them.
 
         :param view_filters: View filters, sent beside ``reportConfig``.
         :param budget_seconds: How long the report may take once it is sent.
             Time spent waiting for a search slot does not count.
         """
-        parameters = await self.expand_tree_params_to_leaves(
-            record_type, search_name, dict(search_config.parameters)
-        )
-        sent = search_config.model_copy(update={"parameters": parameters})
         payload: JSONObject = {
-            "searchConfig": sent.model_dump(by_alias=True, exclude_defaults=True),
+            "searchConfig": search_config.model_dump(
+                by_alias=True, exclude_defaults=True
+            ),
             "reportConfig": report_config or {},
         }
         if view_filters is not None:
@@ -358,19 +331,17 @@ class SearchEndpoints:
     ) -> WDKColumnDistribution:
         """Counts the search's records by each value of one column, with the
         site's ``byValue`` column reporter. It creates no step, and the search
-        config's column filters apply first. A tree value goes as its leaves.
+        config's column filters apply first. The parameters go as given.
 
         :param budget_seconds: How long the report may take once it is sent.
         """
-        parameters = await self.expand_tree_params_to_leaves(
-            record_type, search_name, dict(search_config.parameters)
-        )
-        sent = search_config.model_copy(update={"parameters": parameters})
         result = await self.post(
             f"/record-types/{record_type}/searches/{search_name}"
             f"/columns/{column}/reports/byValue",
             json={
-                "searchConfig": sent.model_dump(by_alias=True, exclude_defaults=True),
+                "searchConfig": search_config.model_dump(
+                    by_alias=True, exclude_defaults=True
+                ),
                 "reportConfig": {},
             },
             budget_seconds=budget_seconds,
