@@ -338,7 +338,7 @@ def _filter(d: _Declared) -> _Shape:
     return _Shape(
         Annotated[FilterProposals, WithJsonSchema(schema)],
         lambda v: v,
-        'a list of {"field": <facet>, "value": <members or {"min", "max"}>}',
+        'a non-empty list of {"field": <facet>, "value": <members or {"min", "max"}>}',
         [{"field": "<facet>", "value": ["<member>"]}],
     )
 

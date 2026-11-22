@@ -1,5 +1,12 @@
 # Knowledge log
 
+## 2026-11-22 - A shown value is a value the reader reads back
+
+- [WDK-PARAM-017](wdk/rules/parameters-and-vocabularies.md) records `stated_form`, the
+  inverse of the stated reader: a value is shown in the form `read_stated` reads back to the
+  same wire, and a value with no such form is a `KeptValue` that carries its wire.
+- The refusal of a filter statement says it takes a non-empty list.
+
 ## 2026-11-22 - One rule names a vocabulary entry
 
 - [WDK-PARAM-020](wdk/rules/parameters-and-vocabularies.md) records that WDK compares a

@@ -62,6 +62,7 @@ from veupathdb.domain.parameters.stated import (
     StatedValuesError,
     read_stated_values,
 )
+from veupathdb.domain.parameters.stated_form import KeptValue, StatedForm, stated_form
 from veupathdb.domain.parameters.unbound import UnboundParameter
 from veupathdb.domain.parameters.value_codec import (
     as_param_kind,
@@ -146,6 +147,7 @@ __all__ = [
     "ISODate",
     "InputDatasetValue",
     "InputStepValue",
+    "KeptValue",
     "MultiFilterValue",
     "MultiMembers",
     "MultiPickValue",
@@ -168,6 +170,7 @@ __all__ = [
     "SinglePickValue",
     "SpeciesGroup",
     "Stated",
+    "StatedForm",
     "StatedValuesError",
     "StringMembers",
     "StringValue",
@@ -211,6 +214,7 @@ __all__ = [
     "read_options",
     "read_stated_values",
     "species_of",
+    "stated_form",
     "to_decoded_map",
     "to_wire",
     "validate_phyletic_codes",

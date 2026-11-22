@@ -639,6 +639,14 @@ are refused. A date that is not `ISO_LOCAL_DATE` is refused. A boolean is no voc
 term and is refused with the terms named. The tests read the recorded
 `GenesByNgsSnps`, `metrics/Awstats` and `GenesByOrthologs` documents.
 
+`stated_form` is the reader's inverse: it gives the form `read_stated` reads back to the
+same wire. Every kind but a filter states its decoded value. A filter states its clauses as
+`{"field", "value"}`, with `includeUnknown` only when it is true, and the number members of a
+clause as their decimal text, the form the facet's members spell. A value no stated form
+reads back to is a `KeptValue` that carries its wire: a `HeldValue`, a filter with no
+clauses, and a filter with a `multiFilter` clause. A range has no one-sided form to give,
+because `NumberRangeParam` and `DateRangeParam` read both `min` and `max`.
+
 ### WDK-PARAM-018 - A filter clause states `type` and `isRange` from its facet, and a range facet's bounds come only from its term summary
 
 - class: SILENT
