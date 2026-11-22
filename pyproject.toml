@@ -39,6 +39,7 @@ dev = [
     "hypothesis>=6.167.1",
     "mypy>=2.3.1",
     "opentelemetry-sdk>=1.44.0",
+    "pyright>=1.1.408",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
     "respx>=0.23.1",

@@ -40,6 +40,9 @@ jobs:
       - name: Run mypy
         run: uv run mypy --strict src tests
 
+      - name: Run pyright
+        run: uv run pyright src tests
+
       - name: Run the hermetic suite
         run: uv run pytest tests/unit
 

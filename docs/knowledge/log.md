@@ -1,5 +1,11 @@
 # Knowledge log
 
+## 2026-11-22 - pyright reads the tests
+
+- The pyright gate in CI and pre-commit is `uv run pyright src tests`, and `pyright` is in
+  the dev group. A test builds a model by its field names, and a test of a refused
+  value passes it through `model_validate`.
+
 ## 2026-11-22 - The organism parameter is the one that highlights reference organisms
 
 - `WDKBaseParameter.is_organism` is true only when the parameter's `organismProperties`
