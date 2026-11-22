@@ -97,8 +97,10 @@
     "walk_entities"
   ],
   "veupathdb.domain.parameters": [
+    "AccessionNames",
     "ClauseKey",
     "Combination",
+    "DECIDED_CANDIDATES",
     "DateBounds",
     "DateRange",
     "DeclaredParam",
@@ -135,11 +137,14 @@
     "ParamSpecNormalized",
     "ParamValue",
     "ParameterCanonicalizer",
+    "PhrasingMatch",
     "PhyleticBinding",
     "PhyleticExpression",
     "PhyleticNode",
     "PhyleticTree",
     "PhyleticUnresolved",
+    "Resolution",
+    "SHOWN_CANDIDATES",
     "SinglePickValue",
     "SpeciesGroup",
     "Stated",
@@ -150,7 +155,9 @@
     "TaxonEntry",
     "TriState",
     "UnboundParameter",
+    "VocabLookup",
     "VocabOption",
+    "VocabRead",
     "WDKDatasetParser",
     "WDKFilterOntologyTerm",
     "WDKTreeBoxVocabNode",
@@ -158,6 +165,7 @@
     "WDKVocabTerm",
     "WDKVocabulary",
     "accession_matches",
+    "accession_names",
     "as_param_kind",
     "canonical_census_pattern",
     "census_states",
@@ -167,6 +175,7 @@
     "dedupe_options",
     "derive_binding",
     "empty_value",
+    "exact_or_candidates",
     "fill_site_set_defaults",
     "filled_site_set_defaults",
     "find_input_step_param",
@@ -177,7 +186,9 @@
     "leaf_terms",
     "match_exact_option",
     "nearest_entries",
+    "rank_entries",
     "read_census",
+    "read_options",
     "read_stated_values",
     "species_of",
     "to_decoded_map",
@@ -364,8 +375,10 @@
   ],
   "veupathdb.model": [
     "CamelModel",
+    "Computed",
     "NonFiniteToNone",
-    "NonFiniteToNoneRounded"
+    "NonFiniteToNoneRounded",
+    "computed"
   ],
   "veupathdb.observability.otel": [
     "OpenTelemetryObserver"

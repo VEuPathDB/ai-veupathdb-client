@@ -1,0 +1,2547 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/record-types/transcript/searches/GenesByMetabolicPathwayHagai?expandParams=true",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-11-22",
+    "reads": "WDK-PARAM-020"
+  },
+  "body": {
+    "searchData": {
+      "summary": "Find genes involved in a specific metabolic pathway.",
+      "urlSegment": "GenesByMetabolicPathwayHagai",
+      "dynamicAttributes": [
+        {
+          "isInReport": true,
+          "formats": [],
+          "truncateTo": 100,
+          "displayName": "Met Search Criteria",
+          "name": "matched_result",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "columnDataType": "STRING",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "help": "The *search result weight*. This is the sum of the weights you specified for individual searches that found this record.   The more searches that found this record the higher will be its weight.  To give a search a weight, click \"Use Weights\" on the search page, and provide the desired weight.",
+          "isInReport": true,
+          "formats": [
+            {
+              "isInReport": true,
+              "displayName": "Histogram",
+              "name": "wdk_weight-histogram",
+              "description": "Display a histogram of weight distribution",
+              "scopes": [],
+              "type": "histogram"
+            }
+          ],
+          "truncateTo": 100,
+          "displayName": "Search Weight",
+          "name": "wdk_weight",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "columnDataType": "NUMBER",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        }
+      ],
+      "defaultSorting": [
+        {
+          "attributeName": "gene_location_text",
+          "direction": "ASC"
+        }
+      ],
+      "isAnalyzable": true,
+      "displayName": "Metabolic Pathway - MPMP",
+      "fullName": "GeneQuestions.GenesByMetabolicPathwayHagai",
+      "description": "Find genes involved in a specific metabolic pathway (Malaria Parasite Metabolism Pathways - MPMP) \n          <br><br>\n\n         Maps of Metabolic Pathways were constructed as described on the Malaria Parasite Metabolic Pathways website\n            <a href=\"http://mpmp.huji.ac.il\">here</a> .",
+      "defaultAttributes": [
+        "primary_key",
+        "gene_location_text",
+        "gene_product"
+      ],
+      "groups": [
+        {
+          "displayType": "empty",
+          "displayName": "",
+          "name": "empty",
+          "description": "",
+          "isVisible": true,
+          "parameters": [
+            "org_with_Hagai_pathways",
+            "metabolic_pathway"
+          ]
+        }
+      ],
+      "filters": [
+        {
+          "isViewOnly": false,
+          "name": "organismFilter"
+        },
+        {
+          "displayName": "Transcripts",
+          "isViewOnly": false,
+          "name": "matched_transcript_filter_array"
+        },
+        {
+          "isViewOnly": false,
+          "name": "genesByPathway"
+        }
+      ],
+      "shortDisplayName": "Metabol Path",
+      "paramNames": [
+        "org_with_Hagai_pathways",
+        "metabolic_pathway"
+      ],
+      "isCacheable": true,
+      "outputRecordClassName": "transcript",
+      "noSummaryOnSingleRecord": false,
+      "queryName": "GenesByMetabolicPathwayHagai",
+      "defaultSummaryView": "_default",
+      "parameters": [
+        {
+          "displayName": "Organism",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "Select the organism(s) you wish to query.",
+          "dependentParams": [
+            "metabolic_pathway"
+          ],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "Plasmodium falciparum 3D7",
+              "Plasmodium falciparum 3D7",
+              null
+            ],
+            [
+              "Toxoplasma gondii ME49",
+              "Toxoplasma gondii ME49",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "org_with_Hagai_pathways",
+          "initialDisplayValue": "Plasmodium falciparum 3D7",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "maxRecommendedMsg": [
+              "<p>\n          <b>Please select five or fewer organisms where possible.</b>\n        </p>\n        <p>\n          Selecting a large number of organisms may impact performance and make results harder to interpret.\n        </p>\n        <p>\n          For the best experience, use <i>My Organism Preferences</i> in the page header to focus on the organisms you care about most.\n        </p>"
+            ],
+            "specificAttribution": [],
+            "maxRecommended": [
+              "5"
+            ]
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "Metabolic Pathway",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "Results will be sorted ascending or descending order",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "14-3-3 protein",
+              "14-3-3 protein",
+              null
+            ],
+            [
+              "4-hydroxynonenal-modified proteins",
+              "4-hydroxynonenal-modified proteins",
+              null
+            ],
+            [
+              "Acetylation recognition by the bromodomain and other modules",
+              "Acetylation recognition by the bromodomain and other modules",
+              null
+            ],
+            [
+              "Acetyl-CoA production in the mitochondrion",
+              "Acetyl-CoA production in the mitochondrion",
+              null
+            ],
+            [
+              "Actin and filaments",
+              "Actin and filaments",
+              null
+            ],
+            [
+              "Activation of eiF5A",
+              "Activation of eiF5A",
+              null
+            ],
+            [
+              "Activation of the calcium and cAMP signaling pathway by melatonin",
+              "Activation of the calcium and cAMP signaling pathway by melatonin",
+              null
+            ],
+            [
+              "ADP ribosylation factors functions in the secretory pathway",
+              "ADP ribosylation factors functions in the secretory pathway",
+              null
+            ],
+            [
+              "a-Linolenic acid (ALA) pathway",
+              "a-Linolenic acid (ALA) pathway",
+              null
+            ],
+            [
+              "Alternative splicing events confirmed by RNA-Seq",
+              "Alternative splicing events confirmed by RNA-Seq",
+              null
+            ],
+            [
+              "Aminosugars metabolism",
+              "Aminosugars metabolism",
+              null
+            ],
+            [
+              "A model for global single-strand break (SSB) repair",
+              "A model for global single-strand break (SSB) repair",
+              null
+            ],
+            [
+              "A Model for Hrd1-Mediated Retrotranslocation in ERAD",
+              "A Model for Hrd1-Mediated Retrotranslocation in ERAD",
+              null
+            ],
+            [
+              "A model for UbpX function in the regulation of PCNA deubiquitylation",
+              "A model for UbpX function in the regulation of PCNA deubiquitylation",
+              null
+            ],
+            [
+              "Anaphase promoting complex ubiquitin-ligase",
+              "Anaphase promoting complex ubiquitin-ligase",
+              null
+            ],
+            [
+              "Apicoplast Kae1api-protein interactions",
+              "Apicoplast Kae1api-protein interactions",
+              null
+            ],
+            [
+              "Apicoplast putative membrane proteins",
+              "Apicoplast putative membrane proteins",
+              null
+            ],
+            [
+              "Approved drugs with anti-malarial activity and their possible targets",
+              "Approved drugs with anti-malarial activity and their possible targets",
+              null
+            ],
+            [
+              "Architecture- Dynamic Formation- and Processing of the 90S Pre-ribosome during Early Ribosome Biogenesis",
+              "Architecture, Dynamic Formation, and Processing of the 90S Pre-ribosome during Early Ribosome Biogenesis",
+              null
+            ],
+            [
+              "Arginine and proline metabolism",
+              "Arginine and proline metabolism",
+              null
+            ],
+            [
+              "Arginine-methylated proteins",
+              "Arginine-methylated proteins",
+              null
+            ],
+            [
+              "Artemisinin - effect of drug on gene transcription",
+              "Artemisinin - effect of drug on gene transcription",
+              null
+            ],
+            [
+              "Asparagine and Aspartate metabolism",
+              "Asparagine and Aspartate metabolism",
+              null
+            ],
+            [
+              "Assembly and recycling of spliceosome components with respect to Prp8",
+              "Assembly and recycling of spliceosome components with respect to Prp8",
+              null
+            ],
+            [
+              "Assembly factors and their roles in quality control during ribosome maturation",
+              "Assembly factors and their roles in quality control during ribosome maturation",
+              null
+            ],
+            [
+              "Assembly of the retromer complex",
+              "Assembly of the retromer complex",
+              null
+            ],
+            [
+              "Assisted assembly of Sm-class snRNPs",
+              "Assisted assembly of Sm-class snRNPs",
+              null
+            ],
+            [
+              "ATP-dependent chromatin remodeling complexes",
+              "ATP-dependent chromatin remodeling complexes",
+              null
+            ],
+            [
+              "ATP synthase complex",
+              "ATP synthase complex",
+              null
+            ],
+            [
+              "Autophagy and autophagy-related pathways",
+              "Autophagy and autophagy-related pathways",
+              null
+            ],
+            [
+              "Base excision repair of AP sites",
+              "Base excision repair of AP sites",
+              null
+            ],
+            [
+              "Binding modes of methyllysine readers",
+              "Binding modes of methyllysine readers",
+              null
+            ],
+            [
+              "Biogenesis and functions of mitochondrial cytochrome c",
+              "Biogenesis and functions of mitochondrial cytochrome c",
+              null
+            ],
+            [
+              "Biogenesis of cytochrome oxidase",
+              "Biogenesis of cytochrome oxidase",
+              null
+            ],
+            [
+              "Biogenesis of Maurer's clefts",
+              "Biogenesis of Maurer's clefts",
+              null
+            ],
+            [
+              "Biosynthesis of Fe-S proteins in the apicoplast",
+              "Biosynthesis of Fe-S proteins in the apicoplast",
+              null
+            ],
+            [
+              "Bulk mRNA transport through the nuclear pore",
+              "Bulk mRNA transport through the nuclear pore",
+              null
+            ],
+            [
+              "Calcium - calmodulin activation of protein kinases",
+              "Calcium - calmodulin activation of protein kinases",
+              null
+            ],
+            [
+              "Candidate genes related to virulence",
+              "Candidate genes related to virulence",
+              null
+            ],
+            [
+              "Catabolism of polyphosphates",
+              "Catabolism of polyphosphates",
+              null
+            ],
+            [
+              "CCR4 - NOT complex",
+              "CCR4 - NOT complex",
+              null
+            ],
+            [
+              "Cdc48 is the driving force in the targeting of the ER-substrates to the 26S-proteasome",
+              "Cdc48 is the driving force in the targeting of the ER-substrates to the 26S-proteasome",
+              null
+            ],
+            [
+              "Cell cycle compartment assocation between P. falciparum cell cycle perturbed transcriptomes",
+              "Cell cycle compartment assocation between P. falciparum cell cycle perturbed transcriptomes",
+              null
+            ],
+            [
+              "Cellular responses to endoplasmic reticulum stress",
+              "Cellular responses to endoplasmic reticulum stress",
+              null
+            ],
+            [
+              "Centriole proteins",
+              "Centriole proteins",
+              null
+            ],
+            [
+              "Centrosome proteins",
+              "Centrosome proteins",
+              null
+            ],
+            [
+              "cGMP/PKG signalling in egress/invasion",
+              "cGMP/PKG signalling in egress/invasion",
+              null
+            ],
+            [
+              "Chaperone-assisted protein folding",
+              "Chaperone-assisted protein folding",
+              null
+            ],
+            [
+              "Chaperone-mediated modulation of nucleosome-histone interactions",
+              "Chaperone-mediated modulation of nucleosome-histone interactions",
+              null
+            ],
+            [
+              "Chaperone network and protein quality control of the mitochondrion",
+              "Chaperone network and protein quality control of the mitochondrion",
+              null
+            ],
+            [
+              "Chaperones associate with proteins in various iRBC locations",
+              "Chaperones associate with proteins in various iRBC locations",
+              null
+            ],
+            [
+              "Characteristics of Plasmodium falciparum export proteins that remodel infected erythrocyte",
+              "Characteristics of Plasmodium falciparum export proteins that remodel infected erythrocyte",
+              null
+            ],
+            [
+              "Chloramphenicol - effect of drug on gene transcription",
+              "Chloramphenicol - effect of drug on gene transcription",
+              null
+            ],
+            [
+              "Chloroquine - effect of drug on gene transcription",
+              "Chloroquine - effect of drug on gene transcription",
+              null
+            ],
+            [
+              "Chromatin-associated protein degradation (CAD) regulated by CDC48-Ufd1-Npl4",
+              "Chromatin-associated protein degradation (CAD) regulated by CDC48-Ufd1-Npl4",
+              null
+            ],
+            [
+              "Chromatin dynamics controlling temporal regulation of var gene expression",
+              "Chromatin dynamics controlling temporal regulation of var gene expression",
+              null
+            ],
+            [
+              "Chromatin modifying proteins",
+              "Chromatin modifying proteins",
+              null
+            ],
+            [
+              "Classical clathrin-mediated vesicular transport",
+              "Classical clathrin-mediated vesicular transport",
+              null
+            ],
+            [
+              "Classical COPII-mediated vesicular transport",
+              "Classical COPII-mediated vesicular transport",
+              null
+            ],
+            [
+              "Classical COPI-mediated vesicular transport",
+              "Classical COPI-mediated vesicular transport",
+              null
+            ],
+            [
+              "Cleavage and polyadenylation of pre-mRNA",
+              "Cleavage and polyadenylation of pre-mRNA",
+              null
+            ],
+            [
+              "Clp proteases and the translocon of exported proteins",
+              "Clp proteases and the translocon of exported proteins",
+              null
+            ],
+            [
+              "CoA biosynthesis",
+              "CoA biosynthesis",
+              null
+            ],
+            [
+              "Compartmentalization of transcription site in the nucleus",
+              "Compartmentalization of transcription site in the nucleus",
+              null
+            ],
+            [
+              "Compartmentation of redox metabolism",
+              "Compartmentation of redox metabolism",
+              null
+            ],
+            [
+              "Components of exosomes",
+              "Components of exosomes",
+              null
+            ],
+            [
+              "Components of the linear motor responsible for merozoite motility in invasion",
+              "Components of the linear motor responsible for merozoite motility in invasion",
+              null
+            ],
+            [
+              "Components of translation machinery in apicoplast",
+              "Components of translation machinery in apicoplast",
+              null
+            ],
+            [
+              "Control of microtubule assembly",
+              "Control of microtubule assembly",
+              null
+            ],
+            [
+              "Control of the mitotic spindle organization by kinesins",
+              "Control of the mitotic spindle organization by kinesins",
+              null
+            ],
+            [
+              "Cooperation and competition of splicing factors in regulated splicing",
+              "Cooperation and competition of splicing factors in regulated splicing",
+              null
+            ],
+            [
+              "Co-translational capturing of selected ribosomal proteins by their dedicated chaperones",
+              "Co-translational capturing of selected ribosomal proteins by their dedicated chaperones",
+              null
+            ],
+            [
+              "Cotranslational cleavage of N-terminal methionine residues and N-terminal acetylation",
+              "Cotranslational cleavage of N-terminal methionine residues and N-terminal acetylation",
+              null
+            ],
+            [
+              "Crosstalk between ubiquitination and SUMOylation",
+              "Crosstalk between ubiquitination and SUMOylation",
+              null
+            ],
+            [
+              "CUL3 ubiquitin ligase is regulated by a calcium-dependent co-adaptor",
+              "CUL3 ubiquitin ligase is regulated by a calcium-dependent co-adaptor",
+              null
+            ],
+            [
+              "Differentially expressed genes in 3D7 strain treated for 5h with melatonin",
+              "Differentially expressed genes in 3D7 strain treated for 5h with melatonin",
+              null
+            ],
+            [
+              "Differentially expressed genes in different stages treated with cAMP",
+              "Differentially expressed genes in different stages treated with cAMP",
+              null
+            ],
+            [
+              "Differential proteome analysis under drug treatment",
+              "Differential proteome analysis under drug treatment",
+              null
+            ],
+            [
+              "Different kinesins with different roles",
+              "Different kinesins with different roles",
+              null
+            ],
+            [
+              "Distinct H3/H4 - histone chaperone complexes are marked by specific H3/H4 posttranslational modifications",
+              "Distinct H3/H4 - histone chaperone complexes are marked by specific H3/H4 posttranslational modifications",
+              null
+            ],
+            [
+              "DNA binding proteins with AP2 domain(s)",
+              "DNA binding proteins with AP2 domain(s)",
+              null
+            ],
+            [
+              "DNA mismatch repair system",
+              "DNA mismatch repair system",
+              null
+            ],
+            [
+              "DNA-protein crosslink repair",
+              "DNA-protein crosslink repair",
+              null
+            ],
+            [
+              "DNA Replication",
+              "DNA Replication",
+              null
+            ],
+            [
+              "Dolichol metabolism",
+              "Dolichol metabolism",
+              null
+            ],
+            [
+              "Domains binding modified histones",
+              "Domains binding modified histones",
+              null
+            ],
+            [
+              "Domains of merozoite surface proteins",
+              "Domains of merozoite surface proteins",
+              null
+            ],
+            [
+              "Double strand break repair and homologous recombination",
+              "Double strand break repair and homologous recombination",
+              null
+            ],
+            [
+              "Doxycycline - effect of drug on gene transcription",
+              "Doxycycline - effect of drug on gene transcription",
+              null
+            ],
+            [
+              "Drug-target associations predicted for P. falciparum",
+              "Drug-target associations predicted for P. falciparum",
+              null
+            ],
+            [
+              "Drug targets",
+              "Drug targets",
+              null
+            ],
+            [
+              "Effect of different motors on spindle length",
+              "Effect of different motors on spindle length",
+              null
+            ],
+            [
+              "Effect of hyperoxia on gene expression",
+              "Effect of hyperoxia on gene expression",
+              null
+            ],
+            [
+              "Effects of small metabolites on gene expression",
+              "Effects of small metabolites on gene expression",
+              null
+            ],
+            [
+              "eIF5A Functions globally in translation elongation and termination",
+              "eIF5A Functions globally in translation elongation and termination",
+              null
+            ],
+            [
+              "Encoded proteins that could be constituents of P-bodies",
+              "Encoded proteins that could be constituents of P-bodies",
+              null
+            ],
+            [
+              "Endosome maturation",
+              "Endosome maturation",
+              null
+            ],
+            [
+              "Enhanced protein degradation by branched ubiquitin chains",
+              "Enhanced protein degradation by branched ubiquitin chains",
+              null
+            ],
+            [
+              "Enzyme involved in protein degradation within mitochondria",
+              "Enzyme involved in protein degradation within mitochondria",
+              null
+            ],
+            [
+              "Enzymes involved in glycerophospholipid synthesis",
+              "Enzymes involved in glycerophospholipid synthesis",
+              null
+            ],
+            [
+              "Enzymes involved in vthe metabolism of various sugar derivatives",
+              "Enzymes involved in vthe metabolism of various sugar derivatives",
+              null
+            ],
+            [
+              "Epigenetic regulation of specific genes and gene families in Plasmodium falciparum",
+              "Epigenetic regulation of specific genes and gene families in Plasmodium falciparum",
+              null
+            ],
+            [
+              "Epigenetic switching mechanisms",
+              "Epigenetic switching mechanisms",
+              null
+            ],
+            [
+              "ER protein VAP establish membrane contact sites",
+              "ER protein VAP establish membrane contact sites",
+              null
+            ],
+            [
+              "ER Sec61 translocon",
+              "ER Sec61 translocon",
+              null
+            ],
+            [
+              "ER-to Golgi- translocation and quality control",
+              "ER-to Golgi, translocation and quality control",
+              null
+            ],
+            [
+              "Essential metabolic genes",
+              "Essential metabolic genes",
+              null
+            ],
+            [
+              "Established and putative Maurer's clefts proteins",
+              "Established and putative Maurer's clefts proteins",
+              null
+            ],
+            [
+              "Eukaryotic fMet/N-End Rule Pathway",
+              "Eukaryotic fMet/N-End Rule Pathway",
+              null
+            ],
+            [
+              "Evolution of parasite resistance to antifolates",
+              "Evolution of parasite resistance to antifolates",
+              null
+            ],
+            [
+              "Exon definition during the earliest stages of spliceosome assembly",
+              "Exon definition during the earliest stages of spliceosome assembly",
+              null
+            ],
+            [
+              "Exported parasite proteins associated with Maurer's clefts",
+              "Exported parasite proteins associated with Maurer's clefts",
+              null
+            ],
+            [
+              "Exported proteins containing a PHIST domain",
+              "Exported proteins containing a PHIST domain",
+              null
+            ],
+            [
+              "Exported proteins of Plasmodium falciparum with confirmed location",
+              "Exported proteins of Plasmodium falciparum with confirmed location",
+              null
+            ],
+            [
+              "Exportome - compiled from various sources",
+              "Exportome - compiled from various sources",
+              null
+            ],
+            [
+              "FAD-dependent enzymes",
+              "FAD-dependent enzymes",
+              null
+            ],
+            [
+              "Fatty acids elongation in the endoplasmic reticulum",
+              "Fatty acids elongation in the endoplasmic reticulum",
+              null
+            ],
+            [
+              "Fatty acid synthesis in the apicoplast",
+              "Fatty acid synthesis in the apicoplast",
+              null
+            ],
+            [
+              "Folate biosynthesis",
+              "Folate biosynthesis",
+              null
+            ],
+            [
+              "Food vacuole proteome",
+              "Food vacuole proteome",
+              null
+            ],
+            [
+              "Functional annotation of merozoite invasion-related proteins",
+              "Functional annotation of merozoite invasion-related proteins",
+              null
+            ],
+            [
+              "Functional orthologs of known cell cycle proteins in E. coli",
+              "Functional orthologs of known cell cycle proteins in E. coli",
+              null
+            ],
+            [
+              "Functions of the ER-Mitochondrial contacts",
+              "Functions of the ER-Mitochondrial contacts",
+              null
+            ],
+            [
+              "G6PD deficiency and malaria",
+              "G6PD deficiency and malaria",
+              null
+            ],
+            [
+              "GARP (Golgi-associated retrograde protein) complex",
+              "GARP (Golgi-associated retrograde protein) complex",
+              null
+            ],
+            [
+              "Geldanamycin - effect of drug on gene transcription",
+              "Geldanamycin - effect of drug on gene transcription",
+              null
+            ],
+            [
+              "Gene expression affected by lumefantrine",
+              "Gene expression affected by lumefantrine",
+              null
+            ],
+            [
+              "Gene gating and mRNA export",
+              "Gene gating and mRNA export",
+              null
+            ],
+            [
+              "General roles of deubiquitinases",
+              "General roles of deubiquitinases",
+              null
+            ],
+            [
+              "Generation of polyphosphates",
+              "Generation of polyphosphates",
+              null
+            ],
+            [
+              "Genes coding for apicoplast ribosome subunits",
+              "Genes coding for apicoplast ribosome subunits",
+              null
+            ],
+            [
+              "Genes coding for chaperones and their regulators",
+              "Genes coding for chaperones and their regulators",
+              null
+            ],
+            [
+              "Genes coding for components involved in ribosome assembly",
+              "Genes coding for components involved in ribosome assembly",
+              null
+            ],
+            [
+              "Genes coding for components of the proteasome degradation machinery & their timed transcription",
+              "Genes coding for components of the proteasome degradation machinery & their timed transcription",
+              null
+            ],
+            [
+              "Genes coding for enzymes/proteins involved in DNA replication",
+              "Genes coding for enzymes/proteins involved in DNA replication",
+              null
+            ],
+            [
+              "Genes coding for Fe-S containing proteins",
+              "Genes coding for Fe-S containing proteins",
+              null
+            ],
+            [
+              "Genes coding for GPI-anchored membrane proteins",
+              "Genes coding for GPI-anchored membrane proteins",
+              null
+            ],
+            [
+              "Genes coding for mitochondrial ribosome subunits",
+              "Genes coding for mitochondrial ribosome subunits",
+              null
+            ],
+            [
+              "Genes coding for protein traffic related proteins",
+              "Genes coding for protein traffic related proteins",
+              null
+            ],
+            [
+              "Genes coding for transport proteins",
+              "Genes coding for transport proteins",
+              null
+            ],
+            [
+              "Genes differentially expressed in severe malaria",
+              "Genes differentially expressed in severe malaria",
+              null
+            ],
+            [
+              "Genes encoding ubiquitin-related reactions",
+              "Genes encoding ubiquitin-related reactions",
+              null
+            ],
+            [
+              "Genes for which expression is significantly correlated with coma score",
+              "Genes for which expression is significantly correlated with coma score",
+              null
+            ],
+            [
+              "Genes involved in DNA repair",
+              "Genes involved in DNA repair",
+              null
+            ],
+            [
+              "Genes of the apicoplast genome",
+              "Genes of the apicoplast genome",
+              null
+            ],
+            [
+              "Genes up and down regulated in response to ER stress",
+              "Genes up and down regulated in response to ER stress",
+              null
+            ],
+            [
+              "Genes whose expression is highly positively or negatively correlated with pfcrt or pfmdr1",
+              "Genes whose expression is highly positively or negatively correlated with pfcrt or pfmdr1",
+              null
+            ],
+            [
+              "Genetic polymorphisms in target-genes at and surrounding resistant linked mutations",
+              "Genetic polymorphisms in target-genes at and surrounding resistant linked mutations",
+              null
+            ],
+            [
+              "Genomic landscape of splicing regulators",
+              "Genomic landscape of splicing regulators",
+              null
+            ],
+            [
+              "Glutamate metabolism",
+              "Glutamate metabolism",
+              null
+            ],
+            [
+              "Glutathione metabolism",
+              "Glutathione metabolism",
+              null
+            ],
+            [
+              "Glycine and Serine metabolism",
+              "Glycine and Serine metabolism",
+              null
+            ],
+            [
+              "Glycolysis",
+              "Glycolysis",
+              null
+            ],
+            [
+              "Glycosylphosphatidylinositol (GPI) anchor biosynthesis",
+              "Glycosylphosphatidylinositol (GPI) anchor biosynthesis",
+              null
+            ],
+            [
+              "Glyoxalase metabolism",
+              "Glyoxalase metabolism",
+              null
+            ],
+            [
+              "gp78 and Hrd1-mediated ERAD pathways",
+              "gp78 and Hrd1-mediated ERAD pathways",
+              null
+            ],
+            [
+              "Helicases",
+              "Helicases",
+              null
+            ],
+            [
+              "Hemoglobin digestion",
+              "Hemoglobin digestion",
+              null
+            ],
+            [
+              "Hemozoin and b-hematin formation",
+              "Hemozoin and b-hematin formation",
+              null
+            ],
+            [
+              "Heterochromatin structure of the telomeric and subtelomeric regions",
+              "Heterochromatin structure of the telomeric and subtelomeric regions",
+              null
+            ],
+            [
+              "Highest expressed genes based on mRNA abundance",
+              "Highest expressed genes based on mRNA abundance",
+              null
+            ],
+            [
+              "Histone acetylation",
+              "Histone acetylation",
+              null
+            ],
+            [
+              "Histone chaperones",
+              "Histone chaperones",
+              null
+            ],
+            [
+              "Histone lysine methylation",
+              "Histone lysine methylation",
+              null
+            ],
+            [
+              "Histone modification cross-talk",
+              "Histone modification cross-talk",
+              null
+            ],
+            [
+              "Histone mRNA degradation",
+              "Histone mRNA degradation",
+              null
+            ],
+            [
+              "Histone post-translational modifications landscape",
+              "Histone post-translational modifications landscape",
+              null
+            ],
+            [
+              "Hsp70 machinery interacts with J-domains",
+              "Hsp70 machinery interacts with J-domains",
+              null
+            ],
+            [
+              "Hsp90-associated multiprotein complex (R2TP-Hsp90 complex)",
+              "Hsp90-associated multiprotein complex (R2TP-Hsp90 complex)",
+              null
+            ],
+            [
+              "HSP90-R2TP complex (yeast)",
+              "HSP90-R2TP complex (yeast)",
+              null
+            ],
+            [
+              "Import and export through the nuclear pore",
+              "Import and export through the nuclear pore",
+              null
+            ],
+            [
+              "Important interacting proteins",
+              "Important interacting proteins",
+              null
+            ],
+            [
+              "Import of proteins into the mitochondrion",
+              "Import of proteins into the mitochondrion",
+              null
+            ],
+            [
+              "Initiation of translation",
+              "Initiation of translation",
+              null
+            ],
+            [
+              "Inositol Phosphate metabolism",
+              "Inositol Phosphate metabolism",
+              null
+            ],
+            [
+              "Interactions between modified host cell membrane and endothelial cell",
+              "Interactions between modified host cell membrane and endothelial cell",
+              null
+            ],
+            [
+              "Interactions of HDAC1 with other proteins",
+              "Interactions of HDAC1 with other proteins",
+              null
+            ],
+            [
+              "Interactome of the Ser/Thr Protein Phosphatase type 1",
+              "Interactome of the Ser/Thr Protein Phosphatase type 1",
+              null
+            ],
+            [
+              "Intracellular distribution of phosphoinositides and small GTPases involved in membrane traffic",
+              "Intracellular distribution of phosphoinositides and small GTPases involved in membrane traffic",
+              null
+            ],
+            [
+              "In vitro resistance to experimental antimalarials",
+              "In vitro resistance to experimental antimalarials",
+              null
+            ],
+            [
+              "Involvement of GTP-binding proteins and ribosomes in amino acid shortage",
+              "Involvement of GTP-binding proteins and ribosomes in amino acid shortage",
+              null
+            ],
+            [
+              "Isoprenoids metabolism",
+              "Isoprenoids metabolism",
+              null
+            ],
+            [
+              "K13-mediated resistance to artemisinins in mutated K13",
+              "K13-mediated resistance to artemisinins in mutated K13",
+              null
+            ],
+            [
+              "Karyopherin/exportin-mediated nuclear export pathways",
+              "Karyopherin/exportin-mediated nuclear export pathways",
+              null
+            ],
+            [
+              "KEOPS complex",
+              "KEOPS complex",
+              null
+            ],
+            [
+              "Kinetochore-microtubule attachment and kinetochore oscillations",
+              "Kinetochore-microtubule attachment and kinetochore oscillations",
+              null
+            ],
+            [
+              "Kinetochores power chromosome movements in mitosis",
+              "Kinetochores power chromosome movements in mitosis",
+              null
+            ],
+            [
+              "Large Tethering Complexes that Act in the Secretory and Endocytic Pathways",
+              "Large Tethering Complexes that Act in the Secretory and Endocytic Pathways",
+              null
+            ],
+            [
+              "Leucine- Isoleucine and Valine metabolism",
+              "Leucine, Isoleucine and Valine metabolism",
+              null
+            ],
+            [
+              "Lipoic acid metabolism",
+              "Lipoic acid metabolism",
+              null
+            ],
+            [
+              "Lipolytic enzymes",
+              "Lipolytic enzymes",
+              null
+            ],
+            [
+              "Localization and function of some Hsp40s and Hsp70s",
+              "Localization and function of some Hsp40s and Hsp70s",
+              null
+            ],
+            [
+              "Localization of aminoacyl-tRNA ligases in the three protein translational compartments",
+              "Localization of aminoacyl-tRNA ligases in the three protein translational compartments",
+              null
+            ],
+            [
+              "Localization of the key cyclic nucleotide signaling components in a merozoite prior to egress",
+              "Localization of the key cyclic nucleotide signaling components in a merozoite prior to egress",
+              null
+            ],
+            [
+              "Location and function of the six HSP70s in infected erythrocytes",
+              "Location and function of the six HSP70s in infected erythrocytes",
+              null
+            ],
+            [
+              "Location of lipid raft-associated proteins",
+              "Location of lipid raft-associated proteins",
+              null
+            ],
+            [
+              "Lsm proteins and RNA processing",
+              "Lsm proteins and RNA processing",
+              null
+            ],
+            [
+              "Lysine acetylated proteins",
+              "Lysine acetylated proteins",
+              null
+            ],
+            [
+              "Lysine metabolism",
+              "Lysine metabolism",
+              null
+            ],
+            [
+              "LysoPC depletion induces gene activity",
+              "LysoPC depletion induces gene activity",
+              null
+            ],
+            [
+              "Malaria infection disrupts nitric oxide metabolism",
+              "Malaria infection disrupts nitric oxide metabolism",
+              null
+            ],
+            [
+              "Mannose and Fructose metabolism",
+              "Mannose and Fructose metabolism",
+              null
+            ],
+            [
+              "Maturation and export of 60S and 40S ribosomal subunits",
+              "Maturation and export of 60S and 40S ribosomal subunits",
+              null
+            ],
+            [
+              "Maturation of cytosolic and nuclear Fe-S proteins",
+              "Maturation of cytosolic and nuclear Fe-S proteins",
+              null
+            ],
+            [
+              "Maturation of snRNAs requires nuclear and cytoplasmic regulatory steps",
+              "Maturation of snRNAs requires nuclear and cytoplasmic regulatory steps",
+              null
+            ],
+            [
+              "Maurer's clefts",
+              "Maurer's clefts",
+              null
+            ],
+            [
+              "Mechanism of Fe-S-protein biogenesis",
+              "Mechanism of Fe-S-protein biogenesis",
+              null
+            ],
+            [
+              "Mechanism of resistance to artemisinin",
+              "Mechanism of resistance to artemisinin",
+              null
+            ],
+            [
+              "Mechanism of ubiquitin transfer",
+              "Mechanism of ubiquitin transfer",
+              null
+            ],
+            [
+              "Mechanisms of alternative splicing by splice site selection",
+              "Mechanisms of alternative splicing by splice site selection",
+              null
+            ],
+            [
+              "Mechanisms of alternative splicing regulation at the transition from exon definition to intron definition",
+              "Mechanisms of alternative splicing regulation at the transition from exon definition to intron definition",
+              null
+            ],
+            [
+              "Mechanisms of crosstalk between autophagy and double-strand break repair",
+              "Mechanisms of crosstalk between autophagy and double-strand break repair",
+              null
+            ],
+            [
+              "Merozoite egress",
+              "Merozoite egress",
+              null
+            ],
+            [
+              "Merozoite ligands- their erythrocyte receptors",
+              "Merozoite ligands, their erythrocyte receptors",
+              null
+            ],
+            [
+              "Merozoite protein complexes",
+              "Merozoite protein complexes",
+              null
+            ],
+            [
+              "Methionine and Polyamine metabolism",
+              "Methionine and Polyamine metabolism",
+              null
+            ],
+            [
+              "Methotrexate - effect of drug on gene transcription",
+              "Methotrexate - effect of drug on gene transcription",
+              null
+            ],
+            [
+              "Methyl lysine binding modules readers",
+              "Methyl lysine binding modules readers",
+              null
+            ],
+            [
+              "Methyl Methanesulfonate  - effect of drug on gene transcription",
+              "Methyl Methanesulfonate  - effect of drug on gene transcription",
+              null
+            ],
+            [
+              "Microtubule organization at the centrosome",
+              "Microtubule organization at the centrosome",
+              null
+            ],
+            [
+              "Mitochondrial antioxidant system",
+              "Mitochondrial antioxidant system",
+              null
+            ],
+            [
+              "Mitochondrial copper transport pathways to cytochrome C oxidase subunits",
+              "Mitochondrial copper transport pathways to cytochrome C oxidase subunits",
+              null
+            ],
+            [
+              "Mitochondrial disulfide relay system",
+              "Mitochondrial disulfide relay system",
+              null
+            ],
+            [
+              "Mitochondrial division",
+              "Mitochondrial division",
+              null
+            ],
+            [
+              "Mitochondrial electron flow",
+              "Mitochondrial electron flow",
+              null
+            ],
+            [
+              "Mitochondrial TCA cycle",
+              "Mitochondrial TCA cycle",
+              null
+            ],
+            [
+              "Model for merozoite invasion",
+              "Model for merozoite invasion",
+              null
+            ],
+            [
+              "Model for metabolic compartmentalization of PI biosynthesis",
+              "Model for metabolic compartmentalization of PI biosynthesis",
+              null
+            ],
+            [
+              "Model for the regulation of commitment and gametocytogenesis",
+              "Model for the regulation of commitment and gametocytogenesis",
+              null
+            ],
+            [
+              "Model for translesion DNA synthesis",
+              "Model for translesion DNA synthesis",
+              null
+            ],
+            [
+              "Model of PfEMP1 export",
+              "Model of PfEMP1 export",
+              null
+            ],
+            [
+              "Model of reaction schemes showing possible ADP-ribosylation and deacetylation outcomes of the sirtuin reaction",
+              "Model of reaction schemes showing possible ADP-ribosylation and deacetylation outcomes of the sirtuin reaction",
+              null
+            ],
+            [
+              "Model of RNA Pol II biogenesis",
+              "Model of RNA Pol II biogenesis",
+              null
+            ],
+            [
+              "Model of the Ube2w/CHIP/Ataxin-3 Ubiquitination Cycle",
+              "Model of the Ube2w/CHIP/Ataxin-3 Ubiquitination Cycle",
+              null
+            ],
+            [
+              "Models for selenocysteine incorporation",
+              "Models for selenocysteine incorporation",
+              null
+            ],
+            [
+              "Models for ubiquitin (Ub) chain amputation and trimming in regulating proteasomal degradation",
+              "Models for ubiquitin (Ub) chain amputation and trimming in regulating proteasomal degradation",
+              null
+            ],
+            [
+              "Modification of proteins by adenylylation and ADP-ribosylation",
+              "Modification of proteins by adenylylation and ADP-ribosylation",
+              null
+            ],
+            [
+              "Modification of the wobble position uridine (U34) in Lys- Glu- Gln- Leu and Arg tRNAs",
+              "Modification of the wobble position uridine (U34) in Lys, Glu, Gln, Leu and Arg tRNAs",
+              null
+            ],
+            [
+              "Molecular markers of resistance to antimalarial drugs",
+              "Molecular markers of resistance to antimalarial drugs",
+              null
+            ],
+            [
+              "Molecular model of vesicle exocytosis",
+              "Molecular model of vesicle exocytosis",
+              null
+            ],
+            [
+              "Molecular motor prototypes",
+              "Molecular motor prototypes",
+              null
+            ],
+            [
+              "mRNA 5' capping",
+              "mRNA 5' capping",
+              null
+            ],
+            [
+              "mRNA-binding proteins in trophozoite and schizonts",
+              "mRNA-binding proteins in trophozoite and schizonts",
+              null
+            ],
+            [
+              "mRNA degradation",
+              "mRNA degradation",
+              null
+            ],
+            [
+              "MSP1 as an anchor in merozoite invasion",
+              "MSP1 as an anchor in merozoite invasion",
+              null
+            ],
+            [
+              "MSPDBL and MSP1 mediate merozoite invasion",
+              "MSPDBL and MSP1 mediate merozoite invasion",
+              null
+            ],
+            [
+              "Myristoylated proteins",
+              "Myristoylated proteins",
+              null
+            ],
+            [
+              "Network analysis of drCDC-UNK proteins and their potential protein interactions",
+              "Network analysis of drCDC-UNK proteins and their potential protein interactions",
+              null
+            ],
+            [
+              "N-glycans biosynthesis",
+              "N-glycans biosynthesis",
+              null
+            ],
+            [
+              "Nicotinate and nicotinamide metabolism",
+              "Nicotinate and nicotinamide metabolism",
+              null
+            ],
+            [
+              "Nitrogen metabolism",
+              "Nitrogen metabolism",
+              null
+            ],
+            [
+              "N-myristoylation- S-palmitoylation and prenylation of proteins",
+              "N-myristoylation, S-palmitoylation and prenylation of proteins",
+              null
+            ],
+            [
+              "Nuclear export of tRNA",
+              "Nuclear export of tRNA",
+              null
+            ],
+            [
+              "Nuclear genes with apicoplast signal sequences",
+              "Nuclear genes with apicoplast signal sequences",
+              null
+            ],
+            [
+              "Nuclear genes with mitochondrial signal sequences",
+              "Nuclear genes with mitochondrial signal sequences",
+              null
+            ],
+            [
+              "Nuclear proteome",
+              "Nuclear proteome",
+              null
+            ],
+            [
+              "Nucleosome assembly and regulation",
+              "Nucleosome assembly and regulation",
+              null
+            ],
+            [
+              "Nucleotide excision repair",
+              "Nucleotide excision repair",
+              null
+            ],
+            [
+              "O-GlcNAcylated proteins identified by mass spectrometry",
+              "O-GlcNAcylated proteins identified by mass spectrometry",
+              null
+            ],
+            [
+              "One-carbon enzyme systems serine hydroxymethyltransferase and glycine-cleavage complex",
+              "One-carbon enzyme systems serine hydroxymethyltransferase and glycine-cleavage complex",
+              null
+            ],
+            [
+              "Organellar distribution of translation components",
+              "Organellar distribution of translation components",
+              null
+            ],
+            [
+              "Organellar ribosomal proteins",
+              "Organellar ribosomal proteins",
+              null
+            ],
+            [
+              "Organellar ribosome assembly proteins  and their predicted targeting",
+              "Organellar ribosome assembly proteins  and their predicted targeting",
+              null
+            ],
+            [
+              "Organization of chaperone pathways in the cytosol",
+              "Organization of chaperone pathways in the cytosol",
+              null
+            ],
+            [
+              "Oxidative protein folding in the endoplasmic reticulum",
+              "Oxidative protein folding in the endoplasmic reticulum",
+              null
+            ],
+            [
+              "Parasite encoded proteins associated with the membrane of infected erythrocytes",
+              "Parasite encoded proteins associated with the membrane of infected erythrocytes",
+              null
+            ],
+            [
+              "Parasite invasion ligands and human erythrocyte receptors",
+              "Parasite invasion ligands and human erythrocyte receptors",
+              null
+            ],
+            [
+              "Parasite proteins co-exported  with Hsp70x",
+              "Parasite proteins co-exported  with Hsp70x",
+              null
+            ],
+            [
+              "Parasite proteins that form complexes with natural products",
+              "Parasite proteins that form complexes with natural products",
+              null
+            ],
+            [
+              "Parasitophorous vacuole proteins",
+              "Parasitophorous vacuole proteins",
+              null
+            ],
+            [
+              "Pathway for Cytoplasmic 40S maturation",
+              "Pathway for Cytoplasmic 40S maturation",
+              null
+            ],
+            [
+              "Pathway for Cytoplasmic 60S maturation",
+              "Pathway for Cytoplasmic 60S maturation",
+              null
+            ],
+            [
+              "Pathways of peptide export from the mitochondrion",
+              "Pathways of peptide export from the mitochondrion",
+              null
+            ],
+            [
+              "Pentose Phosphate Cycle",
+              "Pentose Phosphate Cycle",
+              null
+            ],
+            [
+              "Peptidases and proteases",
+              "Peptidases and proteases",
+              null
+            ],
+            [
+              "Peptides with confirmed methylated lysine residues",
+              "Peptides with confirmed methylated lysine residues",
+              null
+            ],
+            [
+              "P. falciparum genes harboring G-quadruplexes",
+              "P. falciparum genes harboring G-quadruplexes",
+              null
+            ],
+            [
+              "PfEMP1 domain architectures",
+              "PfEMP1 domain architectures",
+              null
+            ],
+            [
+              "PfWDR genes",
+              "PfWDR genes",
+              null
+            ],
+            [
+              "Phenylalanine and Tyrosine metabolism",
+              "Phenylalanine and Tyrosine metabolism",
+              null
+            ],
+            [
+              "Phosphatidylcholine metabolism",
+              "Phosphatidylcholine metabolism",
+              null
+            ],
+            [
+              "Phosphatidylethanolamine and phosphatidylserine metabolism",
+              "Phosphatidylethanolamine and phosphatidylserine metabolism",
+              null
+            ],
+            [
+              "Phosphatidylinositol 3-kinase (PI3K)-controlled endocytosis of host cell hemoglobin",
+              "Phosphatidylinositol 3-kinase (PI3K)-controlled endocytosis of host cell hemoglobin",
+              null
+            ],
+            [
+              "Phosphatome - Phosphatases of Plasmodium falciparum",
+              "Phosphatome - Phosphatases of Plasmodium falciparum",
+              null
+            ],
+            [
+              "Phosphoinositides and membrane traffic",
+              "Phosphoinositides and membrane traffic",
+              null
+            ],
+            [
+              "Phosphoproteome",
+              "Phosphoproteome",
+              null
+            ],
+            [
+              "Phosphoproteome - Collins et al 2014",
+              "Phosphoproteome - Collins et al 2014",
+              null
+            ],
+            [
+              "Phosphoproteome - Lasonder et al 2011",
+              "Phosphoproteome - Lasonder et al 2011",
+              null
+            ],
+            [
+              "Phosphoproteome of the merozoite",
+              "Phosphoproteome of the merozoite",
+              null
+            ],
+            [
+              "Phosphoproteome - Pease et al 2013",
+              "Phosphoproteome - Pease et al 2013",
+              null
+            ],
+            [
+              "Phosphoproteome - Treeck et al 2011",
+              "Phosphoproteome - Treeck et al 2011",
+              null
+            ],
+            [
+              "pH regulation in the parasite cytosol",
+              "pH regulation in the parasite cytosol",
+              null
+            ],
+            [
+              "Plasmodium falciparum chromatin landscape",
+              "Plasmodium falciparum chromatin landscape",
+              null
+            ],
+            [
+              "Plasmodium falciparum histone acetylation and methylation",
+              "Plasmodium falciparum histone acetylation and methylation",
+              null
+            ],
+            [
+              "Plasmodium ubiquitin-protein conjugates",
+              "Plasmodium ubiquitin-protein conjugates",
+              null
+            ],
+            [
+              "Porphyrin metabolism",
+              "Porphyrin metabolism",
+              null
+            ],
+            [
+              "Possible paths for apoptosis",
+              "Possible paths for apoptosis",
+              null
+            ],
+            [
+              "Possible reasons for increased permeability of host cell membrane",
+              "Possible reasons for increased permeability of host cell membrane",
+              null
+            ],
+            [
+              "Possible regulators of gene regulation during commitment and gametocytogenesis",
+              "Possible regulators of gene regulation during commitment and gametocytogenesis",
+              null
+            ],
+            [
+              "Post-translational modification of elongation factor 2",
+              "Post-translational modification of elongation factor 2",
+              null
+            ],
+            [
+              "Post-translational modifications identified of histones",
+              "Post-translational modifications identified of histones",
+              null
+            ],
+            [
+              "Post-translational modification -SUMOylation",
+              "Post-translational modification -SUMOylation",
+              null
+            ],
+            [
+              "Posttranslational translocation in eukaryotes",
+              "Posttranslational translocation in eukaryotes",
+              null
+            ],
+            [
+              "Postulated artemisinins' modes of action",
+              "Postulated artemisinins' modes of action",
+              null
+            ],
+            [
+              "Potential models for lncRNA-TARE at chromosome ends",
+              "Potential models for lncRNA-TARE at chromosome ends",
+              null
+            ],
+            [
+              "Potential PKG substrates in  schizonts",
+              "Potential PKG substrates in  schizonts",
+              null
+            ],
+            [
+              "Predicted protein-protein interactions of plausible stress helicases",
+              "Predicted protein-protein interactions of plausible stress helicases",
+              null
+            ],
+            [
+              "Prenylated proteins",
+              "Prenylated proteins",
+              null
+            ],
+            [
+              "Pre-replicative complex formation and transition to replication",
+              "Pre-replicative complex formation and transition to replication",
+              null
+            ],
+            [
+              "Pre-ribosomal particles along the 40S assembly pathway",
+              "Pre-ribosomal particles along the 40S assembly pathway",
+              null
+            ],
+            [
+              "Pre-ribosomal particles along the 60S assembly pathway",
+              "Pre-ribosomal particles along the 60S assembly pathway",
+              null
+            ],
+            [
+              "Processing or protecting stalled replication forks",
+              "Processing or protecting stalled replication forks",
+              null
+            ],
+            [
+              "Proguanil - effect of drug on gene transcription",
+              "Proguanil - effect of drug on gene transcription",
+              null
+            ],
+            [
+              "Properties of proteins exported to erythrocyte",
+              "Properties of proteins exported to erythrocyte",
+              null
+            ],
+            [
+              "Proteasome-mediated degradation of non-native ER proteins",
+              "Proteasome-mediated degradation of non-native ER proteins",
+              null
+            ],
+            [
+              "Proteasome-mediated proteolysis of ubiquinated proteins",
+              "Proteasome-mediated proteolysis of ubiquinated proteins",
+              null
+            ],
+            [
+              "Protein acetylation and lysine aminoacylation",
+              "Protein acetylation and lysine aminoacylation",
+              null
+            ],
+            [
+              "Protein arginine methylation",
+              "Protein arginine methylation",
+              null
+            ],
+            [
+              "Protein biosynthesis",
+              "Protein biosynthesis",
+              null
+            ],
+            [
+              "Protein composition of affinity-purified exon and B-like complexes",
+              "Protein composition of affinity-purified exon and B-like complexes",
+              null
+            ],
+            [
+              "Protein factors in pre-mRNA 3'-end processing",
+              "Protein factors in pre-mRNA 3'-end processing",
+              null
+            ],
+            [
+              "Protein kinase coding genes",
+              "Protein kinase coding genes",
+              null
+            ],
+            [
+              "Protein kinase G-dependent phosphorylation in schizonts",
+              "Protein kinase G-dependent phosphorylation in schizonts",
+              null
+            ],
+            [
+              "Protein-lysine methylation and demethylation",
+              "Protein-lysine methylation and demethylation",
+              null
+            ],
+            [
+              "Protein N-terminal acetylation",
+              "Protein N-terminal acetylation",
+              null
+            ],
+            [
+              "Protein phosphorylation",
+              "Protein phosphorylation",
+              null
+            ],
+            [
+              "Protein-protein associations involving proteases",
+              "Protein-protein associations involving proteases",
+              null
+            ],
+            [
+              "Protein-Protein Interactions between Human Erythrocytes and Plasmodium falciparum",
+              "Protein-Protein Interactions between Human Erythrocytes and Plasmodium falciparum",
+              null
+            ],
+            [
+              "Proteins and complexes that are involved in protein transport into the endoplasmic reticulum",
+              "Proteins and complexes that are involved in protein transport into the endoplasmic reticulum",
+              null
+            ],
+            [
+              "Proteins associated with detergent-resistant membrane (DRM)",
+              "Proteins associated with detergent-resistant membrane (DRM)",
+              null
+            ],
+            [
+              "Proteins containing histone post translational modification-binding modules",
+              "Proteins containing histone post translational modification-binding modules",
+              null
+            ],
+            [
+              "Proteins interacting with DnaJ proteins",
+              "Proteins interacting with DnaJ proteins",
+              null
+            ],
+            [
+              "Proteins involved in steps during passage through prophase",
+              "Proteins involved in steps during passage through prophase",
+              null
+            ],
+            [
+              "Proteins of detergent-resistant membranes",
+              "Proteins of detergent-resistant membranes",
+              null
+            ],
+            [
+              "Proteins of erythrocyte-derived microvesicles",
+              "Proteins of erythrocyte-derived microvesicles",
+              null
+            ],
+            [
+              "Proteins of the parasitophorous vacuolar membrane",
+              "Proteins of the parasitophorous vacuolar membrane",
+              null
+            ],
+            [
+              "Proteins predicted to be involved in cell cycle regulatory network",
+              "Proteins predicted to be involved in cell cycle regulatory network",
+              null
+            ],
+            [
+              "Proteins released from infected cells during rupture",
+              "Proteins released from infected cells during rupture",
+              null
+            ],
+            [
+              "Proteins targeted by the thioredoxin superfamily enzymes",
+              "Proteins targeted by the thioredoxin superfamily enzymes",
+              null
+            ],
+            [
+              "Proteins with ATPase activity",
+              "Proteins with ATPase activity",
+              null
+            ],
+            [
+              "Proteins with conserved phosphatase related superfamily domains",
+              "Proteins with conserved phosphatase related superfamily domains",
+              null
+            ],
+            [
+              "Proteins with ER retention sequences",
+              "Proteins with ER retention sequences",
+              null
+            ],
+            [
+              "Proteolytic processing of the MSP1/6/7 complex",
+              "Proteolytic processing of the MSP1/6/7 complex",
+              null
+            ],
+            [
+              "Proteome of the parasitophorous vacuole",
+              "Proteome of the parasitophorous vacuole",
+              null
+            ],
+            [
+              "Purine metabolism",
+              "Purine metabolism",
+              null
+            ],
+            [
+              "Putative flagellar proteins",
+              "Putative flagellar proteins",
+              null
+            ],
+            [
+              "Putative Golgi disassembly and reassembly mechanisms",
+              "Putative Golgi disassembly and reassembly mechanisms",
+              null
+            ],
+            [
+              "Putative organization of the kinetochore",
+              "Putative organization of the kinetochore",
+              null
+            ],
+            [
+              "Putative role of PfSR25 in activation of Ca2+ signaling and stress survival",
+              "Putative role of PfSR25 in activation of Ca2+ signaling and stress survival",
+              null
+            ],
+            [
+              "Putative SUMO substrates",
+              "Putative SUMO substrates",
+              null
+            ],
+            [
+              "Pyridoxal phosphate (Vitamin B6) metabolism",
+              "Pyridoxal phosphate (Vitamin B6) metabolism",
+              null
+            ],
+            [
+              "Pyrimidine metabolism",
+              "Pyrimidine metabolism",
+              null
+            ],
+            [
+              "Pyruvate metabolism",
+              "Pyruvate metabolism",
+              null
+            ],
+            [
+              "Rab and other proteins involved in intracellular traffic",
+              "Rab and other proteins involved in intracellular traffic",
+              null
+            ],
+            [
+              "Rab cycle",
+              "Rab cycle",
+              null
+            ],
+            [
+              "Rab GTPase regulation of membrane identity",
+              "Rab GTPase regulation of membrane identity",
+              null
+            ],
+            [
+              "Rab proteins",
+              "Rab proteins",
+              null
+            ],
+            [
+              "Reactions and transformations of the superoxide anion",
+              "Reactions and transformations of the superoxide anion",
+              null
+            ],
+            [
+              "Recruitment of the exosome to mRNA substrates",
+              "Recruitment of the exosome to mRNA substrates",
+              null
+            ],
+            [
+              "Redox Metabolism",
+              "Redox Metabolism",
+              null
+            ],
+            [
+              "Redox-proteome changes induced by chloroquine across the intraerythrocytic stages of P. falciparum Dd2",
+              "Redox-proteome changes induced by chloroquine across the intraerythrocytic stages of P. falciparum Dd2",
+              null
+            ],
+            [
+              "Regulated splicing through controlling the assembly of the core splicing machinery",
+              "Regulated splicing through controlling the assembly of the core splicing machinery",
+              null
+            ],
+            [
+              "Regulation of Sexual Commitment",
+              "Regulation of Sexual Commitment",
+              null
+            ],
+            [
+              "Regulation of spindle microtubule dynamics",
+              "Regulation of spindle microtubule dynamics",
+              null
+            ],
+            [
+              "Regulators of alternative splicing",
+              "Regulators of alternative splicing",
+              null
+            ],
+            [
+              "Replication in prokaryotes - a model for apicoplast and mitochondion DNA replication",
+              "Replication in prokaryotes - a model for apicoplast and mitochondion DNA replication",
+              null
+            ],
+            [
+              "Resistance to experimental antimalarials generated in vitro",
+              "Resistance to experimental antimalarials generated in vitro",
+              null
+            ],
+            [
+              "Riboflavin metabolism",
+              "Riboflavin metabolism",
+              null
+            ],
+            [
+              "Ribosomal structure",
+              "Ribosomal structure",
+              null
+            ],
+            [
+              "Ribosome-associated protein quality control",
+              "Ribosome-associated protein quality control",
+              null
+            ],
+            [
+              "Ribosome recycling and mRNA surveillance",
+              "Ribosome recycling and mRNA surveillance",
+              null
+            ],
+            [
+              "RNA binding proteins",
+              "RNA binding proteins",
+              null
+            ],
+            [
+              "RNA Channeling in the Exosome-Ski Assembly during mRNA degradation",
+              "RNA Channeling in the Exosome-Ski Assembly during mRNA degradation",
+              null
+            ],
+            [
+              "RNA Degradation Factors",
+              "RNA Degradation Factors",
+              null
+            ],
+            [
+              "RNA polymerase III transcribes tRNA and 5S rRNA",
+              "RNA polymerase III transcribes tRNA and 5S rRNA",
+              null
+            ],
+            [
+              "RNA polymerase II transcribes mRNA",
+              "RNA polymerase II transcribes mRNA",
+              null
+            ],
+            [
+              "RNA polymerase I transcribes rRNA",
+              "RNA polymerase I transcribes rRNA",
+              null
+            ],
+            [
+              "Role of histone exchange in transcription elongation",
+              "Role of histone exchange in transcription elongation",
+              null
+            ],
+            [
+              "Role of perforin 1 in merozoite egress",
+              "Role of perforin 1 in merozoite egress",
+              null
+            ],
+            [
+              "Role of the PfRh5/PfRipr/CyRPA Complex during Invasion of Erythrocytes",
+              "Role of the PfRh5/PfRipr/CyRPA Complex during Invasion of Erythrocytes",
+              null
+            ],
+            [
+              "Roles of rhoptry neck proteins during invasion",
+              "Roles of rhoptry neck proteins during invasion",
+              null
+            ],
+            [
+              "Rosette formation between normal and infected RBC",
+              "Rosette formation between normal and infected RBC",
+              null
+            ],
+            [
+              "SCF (Skp1-Cullin-F-box) ubiquitin-ligase",
+              "SCF (Skp1-Cullin-F-box) ubiquitin-ligase",
+              null
+            ],
+            [
+              "Schematic depiction of pseudouridylation",
+              "Schematic depiction of pseudouridylation",
+              null
+            ],
+            [
+              "Schematic representation of the spliceosome pathway in yeast",
+              "Schematic representation of the spliceosome pathway in yeast",
+              null
+            ],
+            [
+              "Secondary structure of spliceosomal RNAs",
+              "Secondary structure of spliceosomal RNAs",
+              null
+            ],
+            [
+              "Selenocysteine biosynthesis",
+              "Selenocysteine biosynthesis",
+              null
+            ],
+            [
+              "S-Glutathionylated proteins",
+              "S-Glutathionylated proteins",
+              null
+            ],
+            [
+              "Shared themes in cascading Rab and phosphoinositide pathways",
+              "Shared themes in cascading Rab and phosphoinositide pathways",
+              null
+            ],
+            [
+              "Shikimate biosynthesis",
+              "Shikimate biosynthesis",
+              null
+            ],
+            [
+              "Signaling machinery in malaria parasites",
+              "Signaling machinery in malaria parasites",
+              null
+            ],
+            [
+              "Signal recognition particle-mediated targeting of membrane and secretory proteins",
+              "Signal recognition particle-mediated targeting of membrane and secretory proteins",
+              null
+            ],
+            [
+              "Single Gene/enzyme deletions predicted to cause impairment of metabolic networks",
+              "Single Gene/enzyme deletions predicted to cause impairment of metabolic networks",
+              null
+            ],
+            [
+              "SNAREs and their accessories",
+              "SNAREs and their accessories",
+              null
+            ],
+            [
+              "SNAREs are traffic-specific",
+              "SNAREs are traffic-specific",
+              null
+            ],
+            [
+              "S-nitrosylated proteins",
+              "S-nitrosylated proteins",
+              null
+            ],
+            [
+              "Sphingomyelin and ceramide metabolism",
+              "Sphingomyelin and ceramide metabolism",
+              null
+            ],
+            [
+              "Spliceosome dynamics during the catalytic steps",
+              "Spliceosome dynamics during the catalytic steps",
+              null
+            ],
+            [
+              "Splicing and non-sense-mediated decay factors",
+              "Splicing and non-sense-mediated decay factors",
+              null
+            ],
+            [
+              "Splicing of pre-mRNA",
+              "Splicing of pre-mRNA",
+              null
+            ],
+            [
+              "SRP independent translocation of GPI anchored proteins",
+              "SRP independent translocation of GPI anchored proteins",
+              null
+            ],
+            [
+              "SR (Ser-Arg) proteins",
+              "SR (Ser-Arg) proteins",
+              null
+            ],
+            [
+              "Stage-specific involvement of cyclic nucleotide signaling components and calcium-dependent protein kinases",
+              "Stage-specific involvement of cyclic nucleotide signaling components and calcium-dependent protein kinases",
+              null
+            ],
+            [
+              "Sterol transport and phosphatidylinositol 4-phosphate transfer between endoplasmic reticulum and Golgi membranes",
+              "Sterol transport and phosphatidylinositol 4-phosphate transfer between endoplasmic reticulum and Golgi membranes",
+              null
+            ],
+            [
+              "Structure and organization of centromeric chromatin",
+              "Structure and organization of centromeric chromatin",
+              null
+            ],
+            [
+              "Structure and processing of pre rRNA",
+              "Structure and processing of pre rRNA",
+              null
+            ],
+            [
+              "Structure of telomere and sub-telomeric regions",
+              "Structure of telomere and sub-telomeric regions",
+              null
+            ],
+            [
+              "Structure of the mitotic centrosome",
+              "Structure of the mitotic centrosome",
+              null
+            ],
+            [
+              "Structure of the nuclear pore",
+              "Structure of the nuclear pore",
+              null
+            ],
+            [
+              "Subcellular localization of exported proteins",
+              "Subcellular localization of exported proteins",
+              null
+            ],
+            [
+              "Subcellular localization of proteins involved in invasion",
+              "Subcellular localization of proteins involved in invasion",
+              null
+            ],
+            [
+              "Subcellular location of adaptor proteins",
+              "Subcellular location of adaptor proteins",
+              null
+            ],
+            [
+              "Subcellular location of exported proteins",
+              "Subcellular location of exported proteins",
+              null
+            ],
+            [
+              "Sugar nucleotide biosynthesis",
+              "Sugar nucleotide biosynthesis",
+              null
+            ],
+            [
+              "Sugar nucleotide biosynthesis pathways",
+              "Sugar nucleotide biosynthesis pathways",
+              null
+            ],
+            [
+              "Synergism between SWR1- HIRA and FACT in histone variant exchange",
+              "Synergism between SWR1, HIRA and FACT in histone variant exchange",
+              null
+            ],
+            [
+              "Tafenoquine - effect of drug on gene transcription",
+              "Tafenoquine - effect of drug on gene transcription",
+              null
+            ],
+            [
+              "Telomerase and some telomerase associated proteins",
+              "Telomerase and some telomerase associated proteins",
+              null
+            ],
+            [
+              "Terpenoid metabolism",
+              "Terpenoid metabolism",
+              null
+            ],
+            [
+              "The 35 most abundant proteins",
+              "The 35 most abundant proteins",
+              null
+            ],
+            [
+              "The acidocalcisome",
+              "The acidocalcisome",
+              null
+            ],
+            [
+              "The ART proteome",
+              "The ART proteome",
+              null
+            ],
+            [
+              "The Atg8 and Atg12 ubiquitin-like conjugation systems",
+              "The Atg8 and Atg12 ubiquitin-like conjugation systems",
+              null
+            ],
+            [
+              "The ATG autophagic pathway",
+              "The ATG autophagic pathway",
+              null
+            ],
+            [
+              "The chaperone cycle of Hsp90",
+              "The chaperone cycle of Hsp90",
+              null
+            ],
+            [
+              "The different RNA export pathways",
+              "The different RNA export pathways",
+              null
+            ],
+            [
+              "The homeostasis of Ca2+ in malaria parasites",
+              "The homeostasis of Ca2+ in malaria parasites",
+              null
+            ],
+            [
+              "The HSP70 chaperone cycle",
+              "The HSP70 chaperone cycle",
+              null
+            ],
+            [
+              "The phosphoproteome of Plasmodium falciparum infected RBCs",
+              "The phosphoproteome of Plasmodium falciparum infected RBCs",
+              null
+            ],
+            [
+              "The proteome of the apicoplast",
+              "The proteome of the apicoplast",
+              null
+            ],
+            [
+              "The structure of translation initiation factor 3",
+              "The structure of translation initiation factor 3",
+              null
+            ],
+            [
+              "The structures of RNA polymerases",
+              "The structures of RNA polymerases",
+              null
+            ],
+            [
+              "The ubiquitylation machineries of the ER for misfolded secretory proteins",
+              "The ubiquitylation machineries of the ER for misfolded secretory proteins",
+              null
+            ],
+            [
+              "Thiamine metabolism",
+              "Thiamine metabolism",
+              null
+            ],
+            [
+              "Thioredoxin- Glutaredoxin and Peroxiredoxin",
+              "Thioredoxin, Glutaredoxin and Peroxiredoxin",
+              null
+            ],
+            [
+              "Topogenesis of the Rieske FeS protein",
+              "Topogenesis of the Rieske FeS protein",
+              null
+            ],
+            [
+              "Top ranked surface exposed proteins",
+              "Top ranked surface exposed proteins",
+              null
+            ],
+            [
+              "Total palmitome of Plasmodium falciparum",
+              "Total palmitome of Plasmodium falciparum",
+              null
+            ],
+            [
+              "Transcriptional mediator complex",
+              "Transcriptional mediator complex",
+              null
+            ],
+            [
+              "Transcription and processing of snRNAs",
+              "Transcription and processing of snRNAs",
+              null
+            ],
+            [
+              "Transcription associated proteins implicated in the transcriptional machinery",
+              "Transcription associated proteins implicated in the transcriptional machinery",
+              null
+            ],
+            [
+              "Transcription in prokaryotes",
+              "Transcription in prokaryotes",
+              null
+            ],
+            [
+              "Transcription related proteins encoding genes",
+              "Transcription related proteins encoding genes",
+              null
+            ],
+            [
+              "Transcriptomic response of dihydroartemisinin (DHA) treated K1 strain trophozoites",
+              "Transcriptomic response of dihydroartemisinin (DHA) treated K1 strain trophozoites",
+              null
+            ],
+            [
+              "Transcripts translationally regulated in asexual blood stages",
+              "Transcripts translationally regulated in asexual blood stages",
+              null
+            ],
+            [
+              "Translation in mitochondrion",
+              "Translation in mitochondrion",
+              null
+            ],
+            [
+              "Translation in prokaryotes - a template for apicoplast and mitochondrion",
+              "Translation in prokaryotes - a template for apicoplast and mitochondrion",
+              null
+            ],
+            [
+              "Translocon of exported proteins (PTEX)",
+              "Translocon of exported proteins (PTEX)",
+              null
+            ],
+            [
+              "Transporters of the ER/Golgi and digestive vacuole membranes",
+              "Transporters of the ER/Golgi and digestive vacuole membranes",
+              null
+            ],
+            [
+              "Transporters of the mitochondrial and apicoplast membranes",
+              "Transporters of the mitochondrial and apicoplast membranes",
+              null
+            ],
+            [
+              "Transporters of the plasma membrane",
+              "Transporters of the plasma membrane",
+              null
+            ],
+            [
+              "tRNA modifications",
+              "tRNA modifications",
+              null
+            ],
+            [
+              "tRNA thiolation",
+              "tRNA thiolation",
+              null
+            ],
+            [
+              "tRNA-wybutosine biosynthesis",
+              "tRNA-wybutosine biosynthesis",
+              null
+            ],
+            [
+              "Tubulin and microtubules",
+              "Tubulin and microtubules",
+              null
+            ],
+            [
+              "U6 snRNP role in pre-mRNA splicing",
+              "U6 snRNP role in pre-mRNA splicing",
+              null
+            ],
+            [
+              "Ubiquinone metabolism",
+              "Ubiquinone metabolism",
+              null
+            ],
+            [
+              "Utilization of phospholipids",
+              "Utilization of phospholipids",
+              null
+            ],
+            [
+              "Vacuole biogenesis and ER proliferation",
+              "Vacuole biogenesis and ER proliferation",
+              null
+            ],
+            [
+              "Various features of C/D and H/ACA snoRNAs",
+              "Various features of C/D and H/ACA snoRNAs",
+              null
+            ],
+            [
+              "WD40 proteins as platforms of protein-protein interactions",
+              "WD40 proteins as platforms of protein-protein interactions",
+              null
+            ],
+            [
+              "Working model for recognition of a stalled ribosome by recycling factors",
+              "Working model for recognition of a stalled ribosome by recycling factors",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "metabolic_pathway",
+          "initialDisplayValue": "14-3-3 protein",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        }
+      ],
+      "properties": {
+        "organisms": [
+          "P. falciparum",
+          "P. vivax",
+          "P. yoelii",
+          "P. berghei",
+          "P. chabaudi",
+          "P. knowlesi"
+        ],
+        "specificAttribution": []
+      },
+      "summaryViewPlugins": [
+        {
+          "displayName": "Gene Results",
+          "name": "_default",
+          "description": "View transcripts."
+        },
+        {
+          "displayName": "Genome View",
+          "name": "genomic-view",
+          "description": "View your hits mapped to their corresponding largest assembled genomic DNA segment, often a chromosome, but\n sometimes a contig or scaffold."
+        }
+      ]
+    },
+    "validation": {
+      "level": "DISPLAYABLE",
+      "isValid": true
+    }
+  }
+}

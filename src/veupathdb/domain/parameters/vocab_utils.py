@@ -33,7 +33,7 @@ def numeric_equivalent(a: str | None, b: str | None) -> bool:
     )
 
 
-def _looks_numeric(value: str) -> bool:
+def looks_numeric(value: str) -> bool:
     """Quick check if a string could plausibly be a number."""
     try:
         float(value)
@@ -59,7 +59,7 @@ def match_vocab_value(
     value_norm = value.strip()
 
     options = flatten_vocab(vocab)
-    try_numeric = _looks_numeric(value_norm)
+    try_numeric = looks_numeric(value_norm)
     for option in options:
         if value_norm in (option.display, option.value):
             return option.value

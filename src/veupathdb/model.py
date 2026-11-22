@@ -1,9 +1,16 @@
 """The base model every VEuPathDB wire type inherits, and its number shapes."""
 
 import math
-from typing import Annotated
+from collections.abc import Callable
+from typing import Annotated, Protocol
 
-from pydantic import BaseModel, BeforeValidator, ConfigDict, PlainSerializer
+from pydantic import (
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    PlainSerializer,
+    computed_field,
+)
 from pydantic.alias_generators import to_camel
 
 
@@ -49,8 +56,19 @@ NonFiniteToNoneRounded = Annotated[
 ]
 """NonFiniteToNone that also rounds to 4 dp on serialization."""
 
+
+class Computed[T](Protocol):
+    def __get__(self, instance: object, owner: type | None = None, /) -> T: ...
+
+
+def computed[S, T](func: Callable[[S], T]) -> Computed[T]:
+    return computed_field(property(func))
+
+
 __all__ = [
     "CamelModel",
+    "Computed",
     "NonFiniteToNone",
     "NonFiniteToNoneRounded",
+    "computed",
 ]

@@ -212,6 +212,40 @@ FIXTURES: tuple[FixtureRequest, ...] = (
         reads="WDK-PARAM-016",
     ),
     FixtureRequest(
+        name="search_genes_by_taxon",
+        path=f"{_TRANSCRIPT}/GenesByTaxon",
+        params={"expandParams": "true"},
+        reads="WDK-PARAM-020",
+    ),
+    FixtureRequest(
+        name="search_genes_by_gene_type",
+        path=f"{_TRANSCRIPT}/GenesByGeneType",
+        params={"expandParams": "true"},
+        reads="WDK-PARAM-020",
+    ),
+    FixtureRequest(
+        name="search_genes_by_metabolic_pathway_hagai",
+        path=f"{_TRANSCRIPT}/GenesByMetabolicPathwayHagai",
+        params={"expandParams": "true"},
+        reads="WDK-PARAM-020",
+    ),
+    FixtureRequest(
+        name="refresh_interpro_domain_pfam_on_dal972",
+        site="tritrypdb",
+        path=f"{_TRANSCRIPT}/GenesByInterproDomain/refreshed-dependent-params",
+        method="POST",
+        body={
+            "changedParam": {"name": "domain_database", "value": "Pfam"},
+            "contextParamValues": {
+                "organism": '["Trypanosoma brucei gambiense DAL972"]',
+                "domain_database": "Pfam",
+                "domain_typeahead": "[]",
+                "domain_accession": "",
+            },
+        },
+        reads="WDK-PARAM-020",
+    ),
+    FixtureRequest(
         name="search_genes_by_gene_model_chars",
         path=f"{_TRANSCRIPT}/GenesByGeneModelChars",
         site="vectorbase",
