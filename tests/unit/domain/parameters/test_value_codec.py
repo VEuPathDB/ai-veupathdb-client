@@ -5,13 +5,17 @@ from __future__ import annotations
 import json
 
 import pytest
+from pydantic import TypeAdapter
 from pydantic import ValidationError as PydanticValidationError
 
 from veupathdb.domain.parameters.filter_clause import FilterValue, StringMembers
-from veupathdb.domain.parameters.value_codec import _PARAM_VALUE_ADAPTER, from_wire
+from veupathdb.domain.parameters.value_codec import from_wire
 from veupathdb.domain.parameters.values import (
     MultiPickValue,
+    ParamValue,
 )
+
+_PARAM_VALUE_ADAPTER: TypeAdapter[ParamValue] = TypeAdapter(ParamValue)
 
 
 class TestTheEmptyMultiPick:

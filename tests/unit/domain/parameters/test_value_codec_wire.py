@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 import json
-from typing import get_args
+from typing import cast, get_args
 
 import pytest
 from pydantic import ValidationError as PydanticValidationError
@@ -129,7 +129,7 @@ class TestWdkMap001DriftIsNoticedInBothDirections:
 
     def test_wdk_map_001_a_twelfth_kind_has_no_wire_form(self) -> None:
         with pytest.raises(PydanticValidationError):
-            from_wire("gene-list", "anything")  # type: ignore[arg-type]
+            from_wire(cast("ParamKind", "gene-list"), "anything")
 
     def test_wdk_map_001_every_kind_round_trips_from_a_wire_string(self) -> None:
         wire_by_kind: dict[str, str] = {

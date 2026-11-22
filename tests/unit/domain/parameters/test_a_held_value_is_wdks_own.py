@@ -14,7 +14,6 @@ from veupathdb.domain.parameters import (
     StatedValuesError,
     StringValue,
     fill_site_set_defaults,
-    from_wire_as,
     value_kind,
     wire_map,
 )
@@ -163,11 +162,10 @@ def test_no_stated_value_is_read_as_held(param: WDKParameter) -> None:
     assert '"held"' not in json.dumps(reading.adapter.json_schema())
 
 
-def test_a_held_value_has_no_kind_and_reads_another_wire_as_held() -> None:
-    held = HeldValue(wire="abc")
+def test_a_held_value_has_no_kind_and_is_read_in_the_kind_it_meets() -> None:
+    held = HeldValue(wire='{"min": 1}')
 
-    assert (value_kind(held), from_wire_as(held, "x")) == (None, HeldValue(wire="x"))
-    assert from_wire_as(NumberRangeValue(), '{"min": 1}') == NumberRangeValue(min=1)
+    assert (value_kind(held), held == NumberRangeValue(min=1)) == (None, True)
 
 
 def test_a_site_set_default_never_fills_over_a_held_value() -> None:

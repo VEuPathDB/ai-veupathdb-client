@@ -12,7 +12,8 @@ from veupathdb.domain.parameters.filter_clause import (
     FilterValue,
     MultiMembers,
 )
-from veupathdb.domain.parameters.values import HeldValue, ParamValue
+from veupathdb.domain.parameters.value_base import HeldValue
+from veupathdb.domain.parameters.values import ParamValue
 from veupathdb.model import CamelModel
 
 

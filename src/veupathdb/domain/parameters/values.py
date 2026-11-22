@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import json
-from typing import Annotated, Literal
+from collections.abc import Hashable
+from typing import Annotated, Literal, Self
 
-from pydantic import Field, JsonValue, model_validator
+from pydantic import Field, JsonValue, TypeAdapter, model_validator
 
 from veupathdb.domain.parameters.date_bounds import ISODate
 from veupathdb.domain.parameters.decimals import decimal_text
 from veupathdb.domain.parameters.filter_clause import FilterValue
-from veupathdb.model import CamelModel
+from veupathdb.domain.parameters.value_base import HeldValue, KindValue
 
 ParamKind = Literal[
     "string",
@@ -25,9 +26,31 @@ ParamKind = Literal[
 ]
 
 
-class StringValue(CamelModel):
+_ONE_TERM: TypeAdapter[list[str]] = TypeAdapter(list[str])
+
+
+def _decoded_object(wire: str, kind: str) -> dict[str, JsonValue]:
+    decoded: JsonValue = json.loads(wire) if wire else {}
+    match decoded:
+        case dict():
+            return decoded
+        case _:
+            msg = f"{kind} wire payload must be a JSON object"
+            raise TypeError(msg)
+
+
+class StringValue(KindValue):
     type: Literal["string"] = "string"
     value: str
+
+    __hash__ = KindValue.__hash__
+
+    @classmethod
+    def from_wire(cls, wire: str) -> Self:
+        return cls(value=wire)
+
+    def identity(self) -> Hashable:
+        return self.value
 
     def to_wire(self) -> str:
         return self.value
@@ -36,9 +59,18 @@ class StringValue(CamelModel):
         return self.value
 
 
-class NumberValue(CamelModel):
+class NumberValue(KindValue):
     type: Literal["number"] = "number"
     value: float | None
+
+    __hash__ = KindValue.__hash__
+
+    @classmethod
+    def from_wire(cls, wire: str) -> Self:
+        return cls(value=float(wire) if wire else None)
+
+    def identity(self) -> Hashable:
+        return self.value
 
     def to_wire(self) -> str:
         return "" if self.value is None else decimal_text(self.value)
@@ -47,10 +79,19 @@ class NumberValue(CamelModel):
         return "" if self.value is None else self.value
 
 
-class NumberRangeValue(CamelModel):
+class NumberRangeValue(KindValue):
     type: Literal["number-range"] = "number-range"
     min: float | None = None
     max: float | None = None
+
+    __hash__ = KindValue.__hash__
+
+    @classmethod
+    def from_wire(cls, wire: str) -> Self:
+        return cls.model_validate(_decoded_object(wire, "number-range"))
+
+    def identity(self) -> Hashable:
+        return (self.min, self.max)
 
     @model_validator(mode="after")
     def _ordered(self) -> NumberRangeValue:
@@ -84,9 +125,18 @@ class NumberRangeValue(CamelModel):
         return payload
 
 
-class DateValue(CamelModel):
+class DateValue(KindValue):
     type: Literal["date"] = "date"
     value: ISODate | None
+
+    __hash__ = KindValue.__hash__
+
+    @classmethod
+    def from_wire(cls, wire: str) -> Self:
+        return cls(value=wire or None)
+
+    def identity(self) -> Hashable:
+        return self.value
 
     def to_wire(self) -> str:
         return self.value or ""
@@ -95,10 +145,19 @@ class DateValue(CamelModel):
         return self.value or ""
 
 
-class DateRangeValue(CamelModel):
+class DateRangeValue(KindValue):
     type: Literal["date-range"] = "date-range"
     min: ISODate | None = None
     max: ISODate | None = None
+
+    __hash__ = KindValue.__hash__
+
+    @classmethod
+    def from_wire(cls, wire: str) -> Self:
+        return cls.model_validate(_decoded_object(wire, "date-range"))
+
+    def identity(self) -> Hashable:
+        return (self.min, self.max)
 
     @property
     def empty(self) -> bool:
@@ -125,10 +184,19 @@ class DateRangeValue(CamelModel):
         return payload
 
 
-class TimestampValue(CamelModel):
+class TimestampValue(KindValue):
     type: Literal["timestamp"] = "timestamp"
     value: str
 
+    __hash__ = KindValue.__hash__
+
+    @classmethod
+    def from_wire(cls, wire: str) -> Self:
+        return cls(value=wire)
+
+    def identity(self) -> Hashable:
+        return self.value
+
     def to_wire(self) -> str:
         return self.value
 
@@ -136,10 +204,29 @@ class TimestampValue(CamelModel):
         return self.value
 
 
-class SinglePickValue(CamelModel):
+class SinglePickValue(KindValue):
     type: Literal["single-pick-vocabulary"] = "single-pick-vocabulary"
     value: str
 
+    __hash__ = KindValue.__hash__
+
+    @classmethod
+    def from_wire(cls, wire: str) -> Self:
+        try:
+            terms = _ONE_TERM.validate_json(wire) if wire.startswith("[") else [wire]
+        except ValueError:
+            terms = [wire]
+        match terms:
+            case []:
+                return cls(value="")
+            case [term]:
+                return cls(value=term)
+            case _:
+                return cls(value=wire)
+
+    def identity(self) -> Hashable:
+        return self.value
+
     def to_wire(self) -> str:
         return self.value
 
@@ -147,13 +234,22 @@ class SinglePickValue(CamelModel):
         return self.value
 
 
-class MultiPickValue(CamelModel):
+class MultiPickValue(KindValue):
     type: Literal["multi-pick-vocabulary"] = "multi-pick-vocabulary"
     # An empty list means "nothing selected", which is legal for any param
     # whose spec allows it. Forbidding it here left callers no way to express
     # an empty selection, so they sent the literal string "[]" and vocabulary
     # matching rejected it. Required-ness is enforced per spec, not per type.
     values: list[str] = Field(default_factory=list)
+
+    __hash__ = KindValue.__hash__
+
+    @classmethod
+    def from_wire(cls, wire: str) -> Self:
+        return cls(values=_ONE_TERM.validate_json(wire) if wire else [])
+
+    def identity(self) -> Hashable:
+        return frozenset(self.values)
 
     def to_wire(self) -> str:
         return json.dumps(self.values)
@@ -162,10 +258,19 @@ class MultiPickValue(CamelModel):
         return list(self.values)
 
 
-class InputDatasetValue(CamelModel):
+class InputDatasetValue(KindValue):
     type: Literal["input-dataset"] = "input-dataset"
     dataset_id: str = Field(pattern=r"^([1-9][0-9]*)?$")
 
+    __hash__ = KindValue.__hash__
+
+    @classmethod
+    def from_wire(cls, wire: str) -> Self:
+        return cls(dataset_id=wire)
+
+    def identity(self) -> Hashable:
+        return self.dataset_id
+
     def to_wire(self) -> str:
         return self.dataset_id
 
@@ -173,26 +278,24 @@ class InputDatasetValue(CamelModel):
         return self.dataset_id
 
 
-class InputStepValue(CamelModel):
+class InputStepValue(KindValue):
     type: Literal["input-step"] = "input-step"
     step_id: str = Field(pattern=r"^[0-9]*$")
 
+    __hash__ = KindValue.__hash__
+
+    @classmethod
+    def from_wire(cls, wire: str) -> Self:
+        return cls(step_id=wire)
+
+    def identity(self) -> Hashable:
+        return self.step_id
+
     def to_wire(self) -> str:
         return self.step_id
 
     def to_decoded(self) -> JsonValue:
         return self.step_id
-
-
-class HeldValue(CamelModel):
-    type: Literal["held"] = "held"
-    wire: str
-
-    def to_wire(self) -> str:
-        return self.wire
-
-    def to_decoded(self) -> JsonValue:
-        return self.wire
 
 
 ParamValue = Annotated[
@@ -237,13 +340,3 @@ def value_kind(value: ParamValue) -> ParamKind | None:
             return None
         case _:
             return value.type
-
-
-def same_value(left: ParamValue, right: ParamValue) -> bool:
-    match left, right:
-        case MultiPickValue(values=held), MultiPickValue(values=read):
-            return set(held) == set(read)
-        case FilterValue(empty=False), FilterValue(empty=False):
-            return left.clause_set == right.clause_set
-        case _:
-            return left == right

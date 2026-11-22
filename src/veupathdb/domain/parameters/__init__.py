@@ -72,24 +72,18 @@ from veupathdb.domain.parameters.stated_form import (
     stated_form,
 )
 from veupathdb.domain.parameters.unbound import UnboundParameter
+from veupathdb.domain.parameters.value_base import HeldValue
 from veupathdb.domain.parameters.value_codec import (
     as_param_kind,
     from_wire,
-    from_wire_as,
     to_decoded_map,
     to_wire,
     wire_map,
 )
 from veupathdb.domain.parameters.value_equality import (
-    changed_param_names,
-    declared_kind,
-    param_value_key,
-    same_as_wire,
     same_param_value,
-    same_param_values,
 )
 from veupathdb.domain.parameters.values import (
-    HeldValue,
     InputDatasetValue,
     InputStepValue,
     MultiPickValue,
@@ -99,7 +93,6 @@ from veupathdb.domain.parameters.values import (
     SinglePickValue,
     StringValue,
     empty_value,
-    same_value,
     value_kind,
 )
 from veupathdb.domain.parameters.vocab_lookup import (
@@ -214,11 +207,9 @@ __all__ = [
     "as_param_kind",
     "canonical_census_pattern",
     "census_states",
-    "changed_param_names",
     "check_expression",
     "collect_leaf_terms",
     "decimal_text",
-    "declared_kind",
     "dedupe_options",
     "derive_binding",
     "empty_value",
@@ -231,20 +222,15 @@ __all__ = [
     "find_input_step_param",
     "flatten_vocab",
     "from_wire",
-    "from_wire_as",
     "leading_accession_token",
     "leaf_terms",
     "match_exact_option",
-    "param_value_key",
     "rank_entries",
     "read_census",
     "read_options",
     "read_stated_values",
     "restates",
-    "same_as_wire",
     "same_param_value",
-    "same_param_values",
-    "same_value",
     "shown_stated",
     "shown_stated_text",
     "species_of",

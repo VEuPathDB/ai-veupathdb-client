@@ -18,11 +18,11 @@ from veupathdb.domain.parameters import (
     read_stated_values,
 )
 from veupathdb.domain.parameters.specs import ParamSpecNormalized
+from veupathdb.domain.parameters.value_base import HeldValue
 from veupathdb.domain.parameters.value_codec import from_wire
 from veupathdb.domain.parameters.values import (
     DateRangeValue,
     DateValue,
-    HeldValue,
     InputDatasetValue,
     InputStepValue,
     MultiPickValue,

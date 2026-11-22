@@ -1,5 +1,15 @@
 # Knowledge log
 
+## 2026-11-22 - Equality is on the value types
+
+- Each value kind derives from `KindValue` and defines `==` and its hash by its identity in
+  its own kind, and reads its own wire (`from_wire`). A held value meets a typed value in
+  the typed value's kind and has no hash. `same_value`, `same_as_wire`, `param_value_key`,
+  `same_param_values`, `changed_param_names`, `declared_kind` and `from_wire_as` are gone;
+  `same_param_value(name, kind, ...)` stays for two held values or the phyletic expression.
+- The wire-text gate reads only text: wire calls, `str()`, `model_dump()`, sets, counts and
+  locals of wires, `.get` on a wire map, and membership of a wire.
+
 ## 2026-11-22 - A gate keeps the one equality
 
 - `python -m veupathdb.devtools.param_equality <roots> --allow <file>` fails on a comparison

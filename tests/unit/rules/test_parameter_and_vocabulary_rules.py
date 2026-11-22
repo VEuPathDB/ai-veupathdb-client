@@ -21,7 +21,6 @@ from veupathdb.domain.parameters import (
     StatedValuesError,
     StringMembers,
     StringValue,
-    same_value,
 )
 from veupathdb.domain.parameters.dependencies import ParamGraph
 from veupathdb.domain.parameters.specs import (
@@ -521,8 +520,7 @@ def test_wdk_param_020_a_term_is_sent_as_the_vocabulary_spells_it(
 def test_wdk_param_021_a_multi_pick_is_its_set_of_terms() -> None:
     held = MultiPickValue(values=["Plasmodium falciparum 3D7", "Plasmodium vivax P01"])
 
-    assert same_value(
-        held,
-        MultiPickValue(values=["Plasmodium vivax P01", "Plasmodium falciparum 3D7"]),
+    assert held == MultiPickValue(
+        values=["Plasmodium vivax P01", "Plasmodium falciparum 3D7"]
     )
-    assert not same_value(held, MultiPickValue(values=["Plasmodium vivax P01"]))
+    assert held != MultiPickValue(values=["Plasmodium vivax P01"])

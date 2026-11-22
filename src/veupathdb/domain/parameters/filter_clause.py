@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Hashable, Sequence
 from decimal import Decimal
 from typing import Annotated, Literal, Protocol, Self
 
@@ -23,6 +23,7 @@ from pydantic.alias_generators import to_camel
 
 from veupathdb.domain.parameters.date_bounds import ISODate
 from veupathdb.domain.parameters.decimals import decimal_text
+from veupathdb.domain.parameters.value_base import KindValue
 from veupathdb.domain.parameters.wdk_vocab import WDKFilterOntologyTerm
 from veupathdb.errors import ValidationError
 from veupathdb.model import CamelModel
@@ -172,10 +173,29 @@ def _number_members(members: Sequence[str]) -> dict[float, str]:
     return {float(member): member for member in members if _DECIMAL.fullmatch(member)}
 
 
-class FilterValue(CamelModel):
+class FilterValue(KindValue):
     type: Literal["filter"] = "filter"
     filters: list[FilterClause] = Field(default_factory=list)
     empty: bool = Field(default=False, exclude_if=lambda empty: not empty)
+
+    __hash__ = KindValue.__hash__
+
+    @classmethod
+    def from_wire(cls, wire: str) -> Self:
+        if not wire:
+            return cls(empty=True)
+        body: JsonValue = json.loads(wire)
+        match body:
+            case {"filters": filters}:
+                return cls.model_validate({"filters": filters})
+            case dict():
+                return cls()
+            case _:
+                msg = "filter wire payload must be a JSON object"
+                raise TypeError(msg)
+
+    def identity(self) -> Hashable:
+        return (self.empty, self.clause_set)
 
     @model_validator(mode="after")
     def _empty_holds_no_clause(self) -> FilterValue:

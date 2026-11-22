@@ -1093,7 +1093,7 @@ so the combine search the client keeps once per record type is safe.
 
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/EnumParamHandler.java#L28-L84
-- anchor: src/veupathdb/domain/parameters/values.py:same_value
+- anchor: src/veupathdb/domain/parameters/value_base.py:KindValue
 - status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_021_a_multi_pick_is_its_set_of_terms
 
 `EnumParamHandler.toStableValue` sorts the terms before it writes the stable value,
@@ -1105,18 +1105,18 @@ answer nor its cache key. `FilterParamNewStableValue` sorts its filters
 [source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNewStableValue.java#L256-L262)),
 so the order of clauses is not part of a filter value either.
 
-`same_value` is the one equality a caller compares two values with: a multi-pick by its
-set of terms, a filter by its `clause_set`, every other kind by its fields.
-`param_value_key` reads a value in the parameter's declared kind and gives its canonical
-form; `same_param_value` is equality of those keys, so the relation is an equivalence and
-equal values share one key. A value that the declared kind cannot read is another value. On
-a number parameter `1.0` and `1` are one value; on a string parameter they are two, because
-`StringParamHandler` quotes and hashes the text as written. A typed value carries its
-declared kind (the canonicalizer refuses another kind); with no declared kind named, each
-value is read in the kind it carries and a held value is its wire. `phyletic_expression` is
-compared as its parsed and rendered expression. `same_as_wire` reads a wire in the kind of
-the value it is compared with. The tests check symmetry, transitivity and key agreement per
-kind, and every kind read back from its wire.
+Equality is on the value types. Every kind derives from `KindValue`, whose `==` and hash
+are the value's identity in its own kind: a multi-pick is its set of terms, a filter its
+empty mark and clause set, a number or range its floats, every other kind its text. Two
+values of different kinds are never equal, so `==`, `in`, sets, dict keys and model equality
+all hold by construction. A `HeldValue` meets a typed value by being read in the typed
+value's kind; one the kind cannot read is another value. On a string parameter `1.0` and `1`
+are two values, because `StringParamHandler` quotes and hashes the text as written. Two held
+values compare as their wires, and a held value has no hash, since it equals typed values of
+several kinds. `same_param_value(name, kind, left, right)` is the one function that takes a
+kind: it reads both sides in the declared kind, for two held values or a value of another
+kind, and compares `phyletic_expression` as its parsed and rendered expression. Property
+tests compare `==` with an independent reading of each of the 11 kinds.
 
 The no-filter value has one signature in either spelling
 (`FilterParamNewStableValue.toSignatureString`), so the equality treats `{"filters": []}`

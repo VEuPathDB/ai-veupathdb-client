@@ -17,16 +17,15 @@ from pydantic import ValidationError as PydanticValidationError
 
 from veupathdb.domain.parameters.specs import ParamSpecNormalized, accepts_empty
 from veupathdb.domain.parameters.stated import empty_refusal
+from veupathdb.domain.parameters.value_base import HeldValue
 from veupathdb.domain.parameters.value_codec import as_param_kind, from_wire, to_decoded
 from veupathdb.domain.parameters.values import (
     DateRangeValue,
-    HeldValue,
     MultiPickValue,
     NumberRangeValue,
     ParamValue,
     SinglePickValue,
     empty_value,
-    same_value,
 )
 from veupathdb.domain.parameters.vocab_lookup import entries_or_refusal
 from veupathdb.domain.parameters.wdk_vocab import (
@@ -120,7 +119,7 @@ class ParameterCanonicalizer:
                     f"takes a {spec.param_type} value, not a {value.type} value",
                     to_decoded(value),
                 )
-            if same_value(value, empty_value(value.type)) and not accepts_empty(spec):
+            if value == empty_value(value.type) and not accepts_empty(spec):
                 raise empty_refusal(name, to_decoded(value))
             canonical[name] = self._canonicalize_value(spec, value)
         return canonical

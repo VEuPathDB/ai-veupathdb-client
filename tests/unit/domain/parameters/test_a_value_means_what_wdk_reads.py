@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import datetime
 import json
+from collections.abc import Callable, Hashable
+from decimal import Decimal
+from typing import get_args
 
 import pytest
 from hypothesis import given
@@ -10,23 +14,48 @@ from veupathdb.domain.parameters import (
     PHYLETIC_EXPRESSION_PARAM,
     FilterValue,
     HeldValue,
+    InputDatasetValue,
+    InputStepValue,
     MultiPickValue,
     NumberValue,
     ParamKind,
     ParamValue,
     SinglePickValue,
     StringValue,
-    changed_param_names,
+    as_param_kind,
     from_wire,
-    param_value_key,
-    same_as_wire,
     same_param_value,
-    same_param_values,
-    same_value,
-    to_wire,
+)
+from veupathdb.domain.parameters.values import (
+    DateRangeValue,
+    DateValue,
+    NumberRangeValue,
+    TimestampValue,
 )
 
-_TERMS = st.lists(st.sampled_from(["a", "b", "c", "d"]), min_size=1, max_size=4)
+_TERMS = st.lists(st.sampled_from(["a", "b", "c"]), max_size=4)
+_TEXT = st.sampled_from(["", "a", "b", "1", "1.0"])
+_NUMBERS = st.sampled_from([None, 0.0, 1.0, 1.5, 2.0])
+_DAYS = st.sampled_from([None, "2024-01-01", "2024-01-02"])
+_DIGITS = st.sampled_from(["", "1", "2", "12"])
+_CLAUSES = st.none() | st.lists(
+    st.tuples(
+        st.sampled_from(["sex", "age"]),
+        st.lists(st.sampled_from(["x", "y"]), min_size=1, max_size=2),
+    ),
+    max_size=2,
+)
+
+type _Clauses = list[tuple[str, list[str]]] | None
+type _Case = tuple[ParamValue, Hashable]
+
+
+def _decimal(number: float | None) -> Decimal | None:
+    return None if number is None else Decimal(number)
+
+
+def _day(text: str | None) -> datetime.date | None:
+    return None if text is None else datetime.date.fromisoformat(text)
 
 
 def _clause(field: str, members: list[str]) -> dict[str, object]:
@@ -39,72 +68,219 @@ def _clause(field: str, members: list[str]) -> dict[str, object]:
     }
 
 
-@given(_TERMS.flatmap(lambda terms: st.tuples(st.just(terms), st.permutations(terms))))
-def test_a_multi_pick_is_the_same_value_in_any_order_or_repetition(
-    case: tuple[list[str], list[str]],
-) -> None:
-    terms, shuffled = case
-
-    assert same_value(MultiPickValue(values=terms), MultiPickValue(values=shuffled))
-    assert same_value(
-        MultiPickValue(values=terms), MultiPickValue(values=[*shuffled, terms[0]])
+def _filter(clauses: _Clauses) -> ParamValue:
+    if clauses is None:
+        return FilterValue(empty=True)
+    return FilterValue.model_validate(
+        {"filters": [_clause(field, members) for field, members in clauses]}
     )
 
 
-@given(_TERMS, _TERMS)
-def test_two_multi_picks_are_the_same_value_only_with_the_same_terms(
-    left: list[str], right: list[str]
+def _filter_oracle(clauses: _Clauses) -> Hashable:
+    if clauses is None:
+        return None
+    return frozenset((field, frozenset(members)) for field, members in clauses)
+
+
+def _ordered(
+    pair: tuple[float | None, float | None],
+) -> tuple[float | None, float | None]:
+    low, high = pair
+    if low is not None and high is not None and low > high:
+        return high, low
+    return low, high
+
+
+def _ranged(pair: tuple[float | None, float | None]) -> ParamValue:
+    low, high = _ordered(pair)
+    return NumberRangeValue(min=low, max=high)
+
+
+def _range_oracle(pair: tuple[float | None, float | None]) -> Hashable:
+    low, high = _ordered(pair)
+    return (_decimal(low), _decimal(high))
+
+
+def _dated(pair: tuple[str | None, str | None]) -> ParamValue:
+    return DateRangeValue(min=pair[0], max=pair[1])
+
+
+def _kind[T](
+    raw: st.SearchStrategy[T],
+    build: Callable[[T], ParamValue],
+    oracle: Callable[[T], Hashable],
+) -> st.SearchStrategy[_Case]:
+    return raw.map(lambda r: (build(r), oracle(r)))
+
+
+_KINDS: dict[ParamKind, st.SearchStrategy[_Case]] = {
+    "string": _kind(_TEXT, lambda t: StringValue(value=t), lambda t: t),
+    "number": _kind(_NUMBERS, lambda n: NumberValue(value=n), _decimal),
+    "number-range": _kind(st.tuples(_NUMBERS, _NUMBERS), _ranged, _range_oracle),
+    "date": _kind(_DAYS, lambda d: DateValue(value=d), _day),
+    "date-range": _kind(
+        st.tuples(_DAYS, _DAYS), _dated, lambda pair: (_day(pair[0]), _day(pair[1]))
+    ),
+    "timestamp": _kind(_TEXT, lambda t: TimestampValue(value=t), lambda t: t),
+    "single-pick-vocabulary": _kind(
+        _TEXT, lambda t: SinglePickValue(value=t), lambda t: t
+    ),
+    "multi-pick-vocabulary": _kind(
+        _TERMS, lambda terms: MultiPickValue(values=terms), frozenset
+    ),
+    "filter": _kind(_CLAUSES, _filter, _filter_oracle),
+    "input-dataset": _kind(
+        _DIGITS, lambda d: InputDatasetValue(dataset_id=d), lambda d: d
+    ),
+    "input-step": _kind(_DIGITS, lambda d: InputStepValue(step_id=d), lambda d: d),
+}
+
+_ONE_KIND = st.sampled_from(sorted(_KINDS)).flatmap(
+    lambda kind: st.tuples(_KINDS[kind], _KINDS[kind])
+)
+_ANY = st.one_of(*_KINDS.values())
+
+
+def test_every_kind_is_drawn() -> None:
+    assert sorted(_KINDS) == sorted(get_args(ParamKind))
+
+
+@given(_ONE_KIND)
+def test_two_values_of_one_kind_are_equal_exactly_when_their_meaning_is(
+    pair: tuple[_Case, _Case],
 ) -> None:
-    assert same_value(MultiPickValue(values=left), MultiPickValue(values=right)) is (
-        set(left) == set(right)
+    (left, meant_left), (right, meant_right) = pair
+
+    assert (left == right, left != right) == (
+        meant_left == meant_right,
+        meant_left != meant_right,
     )
+    if left == right:
+        assert hash(left) == hash(right)
 
 
-@given(st.permutations([_clause("sex", ["female", "male"]), _clause("age", ["1"])]))
-def test_a_filter_is_the_same_value_in_any_clause_order(
-    clauses: list[dict[str, object]],
+@given(_ANY, _ANY)
+def test_values_of_two_kinds_are_never_equal(left: _Case, right: _Case) -> None:
+    (value, _), (other, _) = left, right
+
+    if value.type != other.type:
+        assert (value == other, value != other) == (False, True)
+
+
+@given(_ANY)
+def test_a_value_is_its_own_wire_held(case: _Case) -> None:
+    value, _ = case
+    held = HeldValue(wire=value.to_wire())
+
+    assert (value == held, held == value) == (True, True)
+
+
+@given(_ANY)
+def test_a_value_is_read_back_from_its_wire(case: _Case) -> None:
+    value, _ = case
+
+    assert from_wire(as_param_kind(value.type), value.to_wire()) == value
+
+
+@pytest.mark.parametrize(
+    ("value", "wire"),
+    [
+        (NumberValue(value=1), "1.0"),
+        (NumberValue(value=1), "1e0"),
+        (MultiPickValue(values=["a", "b"]), '["b", "a", "a"]'),
+        (FilterValue(), '{"filters": []}'),
+        (SinglePickValue(value="a"), '["a"]'),
+        (NumberRangeValue(min=1, max=2), '{"max": 2.0, "min": 1}'),
+    ],
+    ids=[
+        "decimal",
+        "exponent",
+        "reordered",
+        "spaced-no-filter",
+        "one-term-array",
+        "range",
+    ],
+)
+def test_a_held_wire_in_another_spelling_is_the_value(
+    value: ParamValue, wire: str
 ) -> None:
-    held = FilterValue.model_validate(
-        {"filters": [_clause("sex", ["male", "female"]), _clause("age", ["1"])]}
-    )
+    held = HeldValue(wire=wire)
 
-    assert same_value(held, FilterValue.model_validate({"filters": clauses}))
+    assert (value == held, held == value) == (True, True)
 
 
-_VALUES: list[ParamValue] = [
-    StringValue(value="kinase"),
-    NumberValue(value=5),
-    SinglePickValue(value="a"),
-    MultiPickValue(values=["b", "a"]),
-    FilterValue(),
-    FilterValue(empty=True),
-    HeldValue(wire="x,y"),
-]
-
-
-@given(st.sampled_from(_VALUES))
-def test_a_value_is_the_same_value_as_itself_read_back_from_its_wire(
-    value: ParamValue,
+@pytest.mark.parametrize(
+    ("value", "wire"),
+    [
+        (StringValue(value="1"), "1.0"),
+        (MultiPickValue(values=["a"]), "{not json"),
+        (FilterValue(), "[]"),
+        (FilterValue(), ""),
+    ],
+    ids=["string-spelling", "unread-pick", "unread-filter", "empty-filter"],
+)
+def test_a_held_wire_the_kind_reads_otherwise_is_another_value(
+    value: ParamValue, wire: str
 ) -> None:
-    match value:
-        case HeldValue():
-            read: ParamValue = HeldValue(wire=to_wire(value))
-        case _:
-            read = from_wire(value.type, to_wire(value))
-
-    assert same_value(value, read)
-    assert same_value(read, value)
+    assert value != HeldValue(wire=wire)
 
 
-@given(st.sampled_from(_VALUES), st.sampled_from(_VALUES))
-def test_values_of_different_meaning_are_not_the_same(
-    left: ParamValue, right: ParamValue
+def test_two_held_values_compare_as_their_wires() -> None:
+    assert HeldValue(wire='["a","b"]') == HeldValue(wire='["a","b"]')
+    assert HeldValue(wire='["a","b"]') != HeldValue(wire='["b","a"]')
+
+
+def test_a_held_value_has_no_hash() -> None:
+    with pytest.raises(TypeError):
+        hash(HeldValue(wire="a"))
+
+
+def test_a_map_and_a_set_compare_their_values_as_values() -> None:
+    left: dict[str, ParamValue] = {"organism": MultiPickValue(values=["a", "b"])}
+    right: dict[str, ParamValue] = {"organism": MultiPickValue(values=["b", "a"])}
+
+    assert left == right
+    assert MultiPickValue(values=["b", "a"]) in {
+        MultiPickValue(values=["a", "b"]),
+        MultiPickValue(values=["c"]),
+    }
+
+
+@pytest.mark.parametrize(
+    ("kind", "left", "right", "same"),
+    [
+        ("number", StringValue(value="1.0"), NumberValue(value=1), True),
+        ("number", HeldValue(wire="1.0"), HeldValue(wire="1"), True),
+        ("string", StringValue(value="1.0"), NumberValue(value=1), False),
+        ("string", HeldValue(wire="1.0"), HeldValue(wire="1"), False),
+        (
+            "multi-pick-vocabulary",
+            HeldValue(wire='["a","b"]'),
+            HeldValue(wire='["b","a"]'),
+            True,
+        ),
+        (
+            "filter",
+            HeldValue(wire='{"filters":[]}'),
+            HeldValue(wire='{"filters": []}'),
+            True,
+        ),
+        ("number", HeldValue(wire="one"), HeldValue(wire="one"), True),
+        ("number", HeldValue(wire="one"), HeldValue(wire="two"), False),
+    ],
+)
+def test_the_declared_kind_reads_both_sides(
+    kind: ParamKind, left: ParamValue, right: ParamValue, same: bool
 ) -> None:
-    assert same_value(left, right) is (_VALUES.index(left) == _VALUES.index(right))
+    assert (
+        same_param_value("p", kind, left, right),
+        same_param_value("p", kind, right, left),
+    ) == (same, same)
 
 
 _GROUPED = "(pfal>=1T AND pviv>=1T)"
 _WRITTEN = "pfal>=1T AND pviv>=1T"
+_REGROUPED = ("pfal=0 AND tgon>=1 OR pfal>=1", "pfal=0 AND (tgon>=1 OR pfal>=1)")
 
 
 def test_an_expression_parameter_is_the_same_value_in_either_writing() -> None:
@@ -112,26 +288,13 @@ def test_an_expression_parameter_is_the_same_value_in_either_writing() -> None:
 
     assert same_param_value(PHYLETIC_EXPRESSION_PARAM, "string", left, right)
     assert not same_param_value("text_expression", "string", left, right)
+    assert left != right
 
 
-@given(_TERMS.flatmap(lambda terms: st.tuples(st.just(terms), st.permutations(terms))))
-def test_a_wire_in_another_order_or_spacing_is_the_held_value(
-    case: tuple[list[str], list[str]],
-) -> None:
-    terms, shuffled = case
-    held = MultiPickValue(values=terms)
+def test_parentheses_that_regroup_terms_are_another_expression() -> None:
+    left, right = (StringValue(value=text) for text in _REGROUPED)
 
-    assert same_as_wire("organism", held, json.dumps(shuffled, separators=(",", ":")))
-
-
-def test_a_spaced_no_filter_wire_is_the_held_no_filter() -> None:
-    assert same_as_wire("variation_sample_meta", FilterValue(), '{"filters": []}')
-    assert not same_as_wire("variation_sample_meta", FilterValue(), "")
-
-
-def test_a_wire_its_kind_cannot_read_is_another_value() -> None:
-    assert not same_as_wire("organism", MultiPickValue(values=["a"]), "{not json")
-    assert not same_as_wire("variation_sample_meta", FilterValue(), "[]")
+    assert not same_param_value(PHYLETIC_EXPRESSION_PARAM, "string", left, right)
 
 
 @pytest.mark.parametrize(("wire", "term"), [('["Pf"]', "Pf"), ("Pf", "Pf"), ("[]", "")])
@@ -141,154 +304,6 @@ def test_a_single_pick_reads_its_internal_and_external_stable_value_alike(
     assert from_wire("single-pick-vocabulary", wire) == SinglePickValue(value=term)
 
 
-_REGROUPED = ("pfal=0 AND tgon>=1 OR pfal>=1", "pfal=0 AND (tgon>=1 OR pfal>=1)")
-
-
-def test_parentheses_that_regroup_terms_are_another_expression() -> None:
-    left, right = (StringValue(value=text) for text in _REGROUPED)
-
-    assert not same_param_value(PHYLETIC_EXPRESSION_PARAM, "string", left, right)
-
-
-@pytest.mark.parametrize("name", [PHYLETIC_EXPRESSION_PARAM, "text_expression"])
-def test_a_writing_that_does_not_parse_equals_only_itself(name: str) -> None:
-    unparsed = StringValue(value="pfal=0 AND")
-
-    assert same_param_value(name, "string", unparsed, unparsed)
-    assert not same_param_value(
-        name, "string", unparsed, StringValue(value="pfal=0 OR")
-    )
-
-
-def test_a_number_parameter_reads_every_spelling_of_one_number_alike() -> None:
-    assert same_param_value(
-        "floor", "number", StringValue(value="1.0"), NumberValue(value=1)
-    )
-    assert same_param_value(
-        "floor", "number", StringValue(value="1.0"), StringValue(value="1")
-    )
-    assert not same_param_value(
-        "floor", "number", NumberValue(value=1), StringValue(value="2")
-    )
-    assert not same_param_value(
-        "floor", "number", NumberValue(value=1), StringValue(value="one")
-    )
-
-
-def test_a_string_parameter_holds_two_spellings_of_one_number_apart() -> None:
-    assert not same_param_value(
-        "text", "string", StringValue(value="1.0"), StringValue(value="1")
-    )
-    assert not same_param_value(
-        "text", "string", StringValue(value="1.0"), NumberValue(value=1)
-    )
-    assert same_param_value(
-        "text", "string", StringValue(value="1"), NumberValue(value=1)
-    )
-
-
-def test_without_a_declared_kind_each_value_keeps_its_own() -> None:
-    assert not same_param_value(
-        "floor", None, StringValue(value="1"), NumberValue(value=1)
-    )
-    assert not same_param_value(
-        "organism", None, HeldValue(wire='["a"]'), MultiPickValue(values=["a"])
-    )
-    assert same_param_value(
-        "organism",
-        None,
-        MultiPickValue(values=["b", "a"]),
-        MultiPickValue(values=["a", "b"]),
-    )
-
-
-_KEYED: list[tuple[ParamKind, ParamValue, ParamValue]] = [
-    (
-        "multi-pick-vocabulary",
-        HeldValue(wire='["b","a"]'),
-        MultiPickValue(values=["a", "b"]),
-    ),
-    ("filter", FilterValue(), HeldValue(wire='{"filters": []}')),
-    ("single-pick-vocabulary", SinglePickValue(value="a"), HeldValue(wire='["a"]')),
-    ("number", NumberValue(value=1), StringValue(value="1.0")),
-    ("number", NumberValue(value=1), HeldValue(wire="1e0")),
-]
-
-
-@pytest.mark.parametrize(("kind", "left", "right"), _KEYED)
-def test_one_value_has_one_key(
-    kind: ParamKind, left: ParamValue, right: ParamValue
-) -> None:
-    assert same_param_value("p", kind, left, right)
-    assert param_value_key("p", kind, left) == param_value_key("p", kind, right)
-
-
-_KINDS: list[ParamKind] = [
-    "string",
-    "number",
-    "single-pick-vocabulary",
-    "multi-pick-vocabulary",
-    "filter",
-]
-_WIRES = st.sampled_from(
-    [
-        "1",
-        "1.0",
-        "1e0",
-        "2",
-        "a",
-        '["a"]',
-        '["a","b"]',
-        '["b", "a"]',
-        "[]",
-        '{"filters":[]}',
-        '{"filters": []}',
-        "",
-        "{not json",
-    ]
-)
-_ANY_VALUE = st.one_of(
-    _WIRES.map(lambda wire: HeldValue(wire=wire)),
-    _WIRES.map(lambda wire: StringValue(value=wire)),
-    st.sampled_from(
-        [NumberValue(value=1), NumberValue(value=2), NumberValue(value=None)]
-    ),
-    st.sampled_from(["a", "b", ""]).map(lambda term: SinglePickValue(value=term)),
-    _TERMS.map(lambda terms: MultiPickValue(values=terms)),
-    st.sampled_from([FilterValue(), FilterValue(empty=True)]),
-)
-
-
-@given(st.sampled_from(_KINDS), _ANY_VALUE, _ANY_VALUE, _ANY_VALUE)
-def test_one_kind_reads_values_as_an_equivalence(
-    kind: ParamKind, a: ParamValue, b: ParamValue, c: ParamValue
-) -> None:
-    assert same_param_value("p", kind, a, a)
-    assert same_param_value("p", kind, a, b) is same_param_value("p", kind, b, a)
-    if same_param_value("p", kind, a, b) and same_param_value("p", kind, b, c):
-        assert same_param_value("p", kind, a, c)
-
-
-@given(st.sampled_from([*_KINDS, None]), _ANY_VALUE, _ANY_VALUE)
-def test_equal_values_have_equal_keys(
-    kind: ParamKind | None, a: ParamValue, b: ParamValue
-) -> None:
-    assert same_param_value("p", kind, a, b) is (
-        param_value_key("p", kind, a) == param_value_key("p", kind, b)
-    )
-
-
-def test_two_maps_differ_by_the_names_whose_values_differ() -> None:
-    before: dict[str, ParamValue] = {
-        "organism": MultiPickValue(values=["a", "b"]),
-        "floor": NumberValue(value=1),
-    }
-    after: dict[str, ParamValue] = {
-        "organism": MultiPickValue(values=["b", "a"]),
-        "floor": NumberValue(value=2),
-    }
-
-    assert changed_param_names(before, after) == ["floor"]
-    assert not same_param_values(before, after)
-    assert same_param_values(before, {**after, "floor": NumberValue(value=1)})
-    assert changed_param_names(before, {"floor": NumberValue(value=1)}) == ["organism"]
+def test_a_filter_wire_that_is_not_an_object_is_refused() -> None:
+    with pytest.raises(TypeError):
+        from_wire("filter", json.dumps([]))
