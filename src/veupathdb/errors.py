@@ -165,7 +165,10 @@ class ParamMessages(BaseModel):
 def param_message_rows(by_param: Mapping[str, Sequence[str]]) -> JSONArray:
     """The ``errors`` rows a per-parameter refusal carries."""
     return [
-        ParamMessages(param=name, messages=list(texts)).model_dump(mode="json")
+        {
+            **ParamMessages(param=name, messages=list(texts)).model_dump(mode="json"),
+            "detail": " ".join(" ".join(text.split()) for text in texts),
+        }
         for name, texts in by_param.items()
     ]
 

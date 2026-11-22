@@ -12,7 +12,7 @@ from veupathdb.domain.parameters import (
     read_stated_values,
 )
 from veupathdb.domain.parameters.specs import ParamSpecNormalized
-from veupathdb.errors import ValidationError, joined_refusal
+from veupathdb.errors import ValidationError, joined_refusal, param_message_rows
 from veupathdb.json_types import JSONArray
 from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
@@ -239,3 +239,9 @@ class TestJoinedRefusal:
             {"param": "a", "detail": "a."},
             {"param": "b", "detail": "b."},
         ]
+
+
+def test_a_per_parameter_row_carries_its_messages_as_one_detail_line() -> None:
+    rows = param_message_rows({"organism": ["Cannot be empty.", "Pick one."]})
+
+    assert _ROWS.validate_python(rows)[0].detail == "Cannot be empty. Pick one."

@@ -1,5 +1,10 @@
 # Knowledge log
 
+## 2026-11-22 - A per-parameter row carries its detail
+
+- `param_message_rows` writes `detail` beside `messages`: the messages as one line. Every
+  refusal row this library writes now holds `param` and `detail`.
+
 ## 2026-11-22 - Every refusal row has one shape
 
 - A `StatedValuesError` row holds `param`, `detail` and `value`, and the row of an entry fault

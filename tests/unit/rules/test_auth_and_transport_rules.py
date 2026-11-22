@@ -65,4 +65,6 @@ def test_wdk_valid_006_a_keyed_bundle_names_the_parameter() -> None:
     bundle = validation_bundle(body)
 
     assert bundle is not None
-    assert bundle_rows(bundle) == [{"param": "organism", "messages": ["is not a term"]}]
+    assert bundle_rows(bundle) == [
+        {"param": "organism", "messages": ["is not a term"], "detail": "is not a term"}
+    ]

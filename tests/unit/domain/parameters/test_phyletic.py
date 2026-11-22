@@ -308,6 +308,10 @@ class TestARefusalNamesTheParameter:
                         "from census tokens."
                     )
                 ],
+                "detail": (
+                    "'Plasmodium falciparum AND NOT Homo sapiens' is not built "
+                    "from census tokens."
+                ),
             }
         ]
 
@@ -319,6 +323,7 @@ class TestARefusalNamesTheParameter:
             {
                 "param": "profile_pattern",
                 "messages": ["'hsap' appears twice in '%hsap:Y%hsap:N%'."],
+                "detail": "'hsap' appears twice in '%hsap:Y%hsap:N%'.",
             }
         ]
 
@@ -327,7 +332,11 @@ class TestARefusalNamesTheParameter:
             validate_phyletic_codes(["zzzz", "pfal"], {"pfal"})
 
         assert err.value.errors == [
-            {"param": "profile_pattern", "messages": ["Unknown codes: zzzz."]}
+            {
+                "param": "profile_pattern",
+                "messages": ["Unknown codes: zzzz."],
+                "detail": "Unknown codes: zzzz.",
+            }
         ]
 
     def test_the_detail_still_carries_the_repair(self) -> None:
@@ -449,5 +458,9 @@ def test_an_unknown_code_names_the_parameter_it_was_stated_in() -> None:
         validate_phyletic_codes(["zzzz"], {"pfal"}, param_name="phyletic_expression")
 
     assert err.value.errors == [
-        {"param": "phyletic_expression", "messages": ["Unknown codes: zzzz."]}
+        {
+            "param": "phyletic_expression",
+            "messages": ["Unknown codes: zzzz."],
+            "detail": "Unknown codes: zzzz.",
+        }
     ]
