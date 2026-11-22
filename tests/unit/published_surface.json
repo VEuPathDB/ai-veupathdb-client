@@ -219,6 +219,7 @@
     "StepFilter",
     "StepKind",
     "StepReport",
+    "StepSettings",
     "StepValidation",
     "StepValidationErrors",
     "StrategyAst",
@@ -239,6 +240,7 @@
     "record_class_of",
     "root_ids",
     "runs_a_wdk_search",
+    "settings_of",
     "subtree_ids",
     "walk",
     "wdk_search_name"

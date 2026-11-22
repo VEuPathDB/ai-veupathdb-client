@@ -164,6 +164,29 @@ class TestSettingAFilterIsHowItIsTurnedOff:
             "other_filter",
         }
 
+    async def test_a_held_filter_is_replaced_where_it_stands(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        api, put = _api(monkeypatch)
+        held = {"name": "other_filter", "disabled": False, "value": {"values": ["N"]}}
+        two = _STEP | {
+            "searchConfig": _STEP["searchConfig"]
+            | {"filters": [*_STEP["searchConfig"]["filters"], held]}
+        }
+
+        async def read_two(path: str, **_: object) -> Any:
+            del path
+            return two
+
+        monkeypatch.setattr(api.client, "get", read_two)
+
+        await api.set_step_filter(9, _ALWAYS_APPLIED, {"values": ["Y"]}, user_id="1")
+
+        assert put.body["filters"] == [
+            {"name": _ALWAYS_APPLIED, "value": {"values": ["Y"]}, "disabled": False},
+            held,
+        ]
+
 
 class TestANewStepSendsItsAnswerParamsEmpty:
     """``AnswerParam.java``: the value is the empty string or a step id, and for

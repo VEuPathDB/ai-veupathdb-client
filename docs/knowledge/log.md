@@ -1,5 +1,23 @@
 # Knowledge log
 
+## 2026-11-22 - One model holds a step's settings
+
+- `StepSettings` holds the eight fields WDK behaviour depends on: search, parameters,
+  operator, colocation, filters, weight and the expanded strategy id and name.
+  `settings_of` reads them from a step or a node. A combine states no search, so a
+  combine WDK names by its boolean question equals one built here.
+  `changed` compares each parameter with `same_param_value`, in the kind either side
+  states, so a phyletic expression in another writing is no change.
+- `filters_to_put` is the one filter rule: a write sends the list WDK holds with the
+  plan's changes applied, and keeps every filter WDK added that the plan does not set
+  ([WDK-FILTER-002](wdk/rules/filters.md)). `set_step_filter` writes through it.
+  `departures_from` reads a step back against the plan by the same rule, and leaves
+  the parameters to validation. After a plan removes a filter, it expects the filter
+  WDK added on create (`filters_wdk_added`), or none. WDK publishes no always-applied
+  default, so the first read back is the only source.
+- `ColocationParams.from_wdk_params` reads a span logic step's parameters back; a
+  missing key or an unknown value is a `DataParsingError` that names it.
+
 ## 2026-11-23 - 0.9.0b16: entries that share a name are one name
 
 - `same_named_groups` groups the entries whose names past their accessions

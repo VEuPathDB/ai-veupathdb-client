@@ -54,7 +54,7 @@ The fourth name, `viewFilters`, is in none of these places -
 
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/filter/FilterDefinition.java#L120-L136
-- anchor: src/veupathdb/wdk/strategy_api/filters.py:set_step_filter
+- anchor: src/veupathdb/domain/strategy/step_settings.py:filters_to_put
 - status: ENFORCED by tests/unit/wdk/test_strategy_api_steps.py::TestAWriteKeepsTheFiltersItDidNotSet::test_a_disabled_filter_stays_disabled
 
 `FilterDefinition` carries an `isAlwaysApplied` flag onto every `Filter` it
@@ -79,6 +79,25 @@ enough to look like rounding and large enough to be a different answer.
 `isFiltered` will not warn you either. It reports whether any option differs
 from its default, [skipping disabled and default-valued options](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/answer/spec/FilterOptionList.java#L106-L114),
 so the step above reports `isFiltered: false` while carrying the filter.
+
+`StepSettings.filters_to_put` holds the rule for every write of a step's
+filters: it starts from the list WDK holds and applies only the changes a plan
+states, so a filter WDK injected stays unless the plan sets one with its name.
+`set_step_filter` writes its body through it.
+
+WDK does not publish an always-applied filter or its default. A search lists
+its filters with
+[name, display name, description and isViewOnly only](https://github.com/VEuPathDB/WDK/blob/6249671fab84fa10b05e2bb08778b9e77656a823/Service/src/main/java/org/gusdb/wdk/service/formatter/QuestionFormatter.java#L110-L118),
+and [`applyAlwaysOnFilters`](https://github.com/VEuPathDB/WDK/blob/6249671fab84fa10b05e2bb08778b9e77656a823/Model/src/main/java/org/gusdb/wdk/model/answer/spec/AnswerSpec.java#L164-L178)
+asks each filter for its default with the step's own answer spec. On the gene
+sites the default depends on the step:
+[`GeneBooleanFilter`](https://github.com/VEuPathDB/ApiCommonWebsite/blob/1891e5e0c8f021051ab0699ca72cce4c6b5c4125/Model/src/main/java/org/apidb/apicommon/model/filter/GeneBooleanFilter.java#L170-L189)
+reads the boolean operator, and
+[`MatchedTranscriptFilter`](https://github.com/VEuPathDB/ApiCommonWebsite/blob/1891e5e0c8f021051ab0699ca72cce4c6b5c4125/Model/src/main/java/org/apidb/apicommon/model/filter/MatchedTranscriptFilter.java#L158-L167)
+reads the question's answer parameter count. So the default of a step is what
+WDK added on create: `filters_wdk_added` reads it from the first read back, and
+`departures_from` expects it after a plan removes a filter of that name, and
+no filter when WDK added none.
 
 ### WDK-FILTER-003 - `viewFilters` belongs at the top level of a report body, and is rejected outright inside `searchConfig`
 

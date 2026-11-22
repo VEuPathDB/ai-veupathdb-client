@@ -7,6 +7,8 @@ WDK has no dedicated filter endpoint. A step's filters live in
 
 from pydantic import JsonValue
 
+from veupathdb.domain.strategy.ast import StepFilter
+from veupathdb.domain.strategy.step_settings import StepSettings
 from veupathdb.wdk.strategy_api.base import StrategyAPIBase
 from veupathdb.wdk.wdk_models import WDKFilterValue
 
@@ -29,11 +31,14 @@ class StepFilterMixin(StrategyAPIBase):
         """
         uid = await self._get_user_id(user_id)
         current = await self.client.get_step_filters(uid, step_id)
-        updated: list[WDKFilterValue] = [f for f in current if f.name != filter_name]
-        new_filter = WDKFilterValue(
-            name=filter_name,
-            value=value,
-            disabled=disabled,
+        held = StepSettings(
+            filters=[StepFilter.model_validate(f.model_dump()) for f in current]
         )
-        updated.append(new_filter)
+        stated = StepSettings(
+            filters=[StepFilter(name=filter_name, value=value, disabled=disabled)]
+        )
+        updated = [
+            WDKFilterValue.model_validate(f.model_dump())
+            for f in held.filters_to_put(StepSettings(), stated)
+        ]
         await self.client.update_step_filters(uid, step_id, updated)

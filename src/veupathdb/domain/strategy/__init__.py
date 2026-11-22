@@ -30,6 +30,7 @@ from veupathdb.domain.strategy.ops import (
     parse_op,
 )
 from veupathdb.domain.strategy.organism import extract_output_organisms
+from veupathdb.domain.strategy.step_settings import StepSettings, settings_of
 from veupathdb.domain.strategy.strategy_ast import StrategyAst
 from veupathdb.domain.strategy.tree import (
     clone_with_fresh_ids,
@@ -55,6 +56,7 @@ __all__ = [
     "StepFilter",
     "StepKind",
     "StepReport",
+    "StepSettings",
     "StepValidation",
     "StepValidationErrors",
     "StrategyAst",
@@ -75,6 +77,7 @@ __all__ = [
     "record_class_of",
     "root_ids",
     "runs_a_wdk_search",
+    "settings_of",
     "subtree_ids",
     "walk",
     "wdk_search_name",

@@ -59,6 +59,7 @@ def test_the_package_holds_the_wdk_shapes_and_nothing_else() -> None:
         "graph_model.py",
         "ops.py",
         "organism.py",
+        "step_settings.py",
         "strategy_ast.py",
         "tree.py",
         "validation.py",
@@ -90,7 +91,8 @@ def test_the_parameter_that_awaits_a_value_lives_with_the_parameters() -> None:
 
 
 def test_the_wdk_layer_names_wdk_shapes_and_nothing_else() -> None:
-    """The plan node and its fold, the boolean operators, the refusal bundle."""
+    """The plan node and its fold, the boolean operators, the step settings and
+    their filter rule, the refusal bundle."""
     reached = {
         name
         for path in _WDK.rglob("*.py")
@@ -101,6 +103,7 @@ def test_the_wdk_layer_names_wdk_shapes_and_nothing_else() -> None:
     assert reached == {
         f"{_PACKAGE}.ast",
         f"{_PACKAGE}.ops",
+        f"{_PACKAGE}.step_settings",
         f"{_PACKAGE}.tree",
         f"{_PACKAGE}.validation",
     }
