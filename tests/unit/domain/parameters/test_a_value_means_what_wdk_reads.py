@@ -33,11 +33,12 @@ from veupathdb.domain.parameters.values import (
     TimestampValue,
 )
 
-_TERMS = st.lists(st.sampled_from(["a", "b", "c"]), max_size=4)
-_TEXT = st.sampled_from(["", "a", "b", "1", "1.0"])
+_TERMS = st.lists(st.sampled_from(["a", "b", "c", "A"]), max_size=4, unique=True)
+_TEXT = st.sampled_from(["", "a", "A", " a", "a ", "b", "1", "1.0"])
 _NUMBERS = st.sampled_from([None, 0.0, 1.0, 1.5, 2.0])
 _DAYS = st.sampled_from([None, "2024-01-01", "2024-01-02"])
 _DIGITS = st.sampled_from(["", "1", "2", "12"])
+_STEP_IDS = st.sampled_from(["", "0", "1", "01", "12", "012"])
 _CLAUSES = st.none() | st.lists(
     st.tuples(
         st.sampled_from(["sex", "age"]),
@@ -80,6 +81,10 @@ def _filter_oracle(clauses: _Clauses) -> Hashable:
     if clauses is None:
         return None
     return frozenset((field, frozenset(members)) for field, members in clauses)
+
+
+def _step_number(text: str) -> int | None:
+    return int(text) if text else None
 
 
 def _ordered(
@@ -130,9 +135,9 @@ _KINDS: dict[ParamKind, st.SearchStrategy[_Case]] = {
     ),
     "filter": _kind(_CLAUSES, _filter, _filter_oracle),
     "input-dataset": _kind(
-        _DIGITS, lambda d: InputDatasetValue(dataset_id=d), lambda d: d
+        _DIGITS, lambda d: InputDatasetValue(dataset_id=d), _step_number
     ),
-    "input-step": _kind(_DIGITS, lambda d: InputStepValue(step_id=d), lambda d: d),
+    "input-step": _kind(_STEP_IDS, lambda d: InputStepValue(step_id=d), _step_number),
 }
 
 _ONE_KIND = st.sampled_from(sorted(_KINDS)).flatmap(
@@ -187,7 +192,7 @@ def test_a_value_is_read_back_from_its_wire(case: _Case) -> None:
     [
         (NumberValue(value=1), "1.0"),
         (NumberValue(value=1), "1e0"),
-        (MultiPickValue(values=["a", "b"]), '["b", "a", "a"]'),
+        (MultiPickValue(values=["a", "b"]), '["b", "a"]'),
         (FilterValue(), '{"filters": []}'),
         (SinglePickValue(value="a"), '["a"]'),
         (NumberRangeValue(min=1, max=2), '{"max": 2.0, "min": 1}'),
@@ -307,3 +312,54 @@ def test_a_single_pick_reads_its_internal_and_external_stable_value_alike(
 def test_a_filter_wire_that_is_not_an_object_is_refused() -> None:
     with pytest.raises(TypeError):
         from_wire("filter", json.dumps([]))
+
+
+@pytest.mark.parametrize(
+    ("low", "high"), [(1.0, None), (None, 1.0), (1.0, 2.0)], ids=["low", "high", "both"]
+)
+def test_a_range_is_its_ends_in_order(low: float | None, high: float | None) -> None:
+    swapped = (high, low) if low is None or high is None else (low, high + 1)
+
+    assert NumberRangeValue(min=low, max=high) != NumberRangeValue(
+        min=swapped[0], max=swapped[1]
+    )
+
+
+@pytest.mark.parametrize(
+    ("wire", "term", "same"),
+    [
+        ('["a"]', "a", True),
+        ("a", "a", True),
+        ("[]", "", True),
+        ('["a","b"]', "a", False),
+        ('["a","b"]', "b", False),
+        ("A", "a", False),
+        (" a", "a", False),
+    ],
+)
+def test_a_single_pick_holds_one_term_exactly(wire: str, term: str, same: bool) -> None:
+    assert (HeldValue(wire=wire) == SinglePickValue(value=term)) is same
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "same"),
+    [("1", "01", True), ("0", "", False), ("12", "012", True), ("1", "2", False)],
+)
+def test_a_step_input_is_the_step_it_names(left: str, right: str, same: bool) -> None:
+    assert (InputStepValue(step_id=left) == InputStepValue(step_id=right)) is same
+
+
+def test_a_term_named_twice_is_refused() -> None:
+    with pytest.raises(ValueError, match="names each term once"):
+        MultiPickValue(values=["a", "a"])
+
+
+@pytest.mark.parametrize("wire", ["nan", "inf", "-inf"])
+def test_a_number_that_is_not_finite_is_refused(wire: str) -> None:
+    with pytest.raises(ValueError, match="finite"):
+        NumberValue.from_wire(wire)
+
+
+@pytest.mark.parametrize(("left", "right"), [(" a", "a"), ("a ", "a"), ("A", "a")])
+def test_a_string_is_its_text_as_written(left: str, right: str) -> None:
+    assert StringValue(value=left) != StringValue(value=right)

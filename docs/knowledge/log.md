@@ -1,5 +1,13 @@
 # Knowledge log
 
+## 2026-11-22 - Each kind reads as WDK reads it
+
+- A number or range end must be finite, a multi-pick names each term once, and a step input
+  is the step id WDK parses (`01` is step 1). The equality tests read each kind with an
+  oracle of WDK's own rule, and fail on six mutations of the kinds (a trimmed string, a
+  case-folded pick, the first term of a held array, an unordered range, a date range by
+  one end, a step id stripped of zeros).
+
 ## 2026-11-22 - Equality is on the value types
 
 - Each value kind derives from `KindValue` and defines `==` and its hash by its identity in

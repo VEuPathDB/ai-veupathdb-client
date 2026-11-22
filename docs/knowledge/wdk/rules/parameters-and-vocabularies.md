@@ -1116,7 +1116,13 @@ values compare as their wires, and a held value has no hash, since it equals typ
 several kinds. `same_param_value(name, kind, left, right)` is the one function that takes a
 kind: it reads both sides in the declared kind, for two held values or a value of another
 kind, and compares `phyletic_expression` as its parsed and rendered expression. Property
-tests compare `==` with an independent reading of each of the 11 kinds.
+tests compare `==` with an independent reading of each of the 11 kinds: a string and a
+single pick as the text written, case and spaces kept (`StringParamHandler` quotes the text,
+`EnumParamHandler` matches the term); a single pick held as an array of more than one term
+is no single term (`AbstractEnumParam.standardizeStableValue`); a multi-pick as its set of
+terms, each named once; a number and a range as their finite decimals, the range's ends in
+order (`NumberRangeParamHandler` reads `min` and `max`); a step input as the step id
+`AnswerParamHandler` parses with `Long.parseLong`, so `01` is step 1.
 
 The no-filter value has one signature in either spelling
 (`FilterParamNewStableValue.toSignatureString`), so the equality treats `{"filters": []}`

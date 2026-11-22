@@ -4,7 +4,7 @@ import json
 from collections.abc import Hashable
 from typing import Annotated, Literal, Self
 
-from pydantic import Field, JsonValue, TypeAdapter, model_validator
+from pydantic import Field, JsonValue, TypeAdapter, field_validator, model_validator
 
 from veupathdb.domain.parameters.date_bounds import ISODate
 from veupathdb.domain.parameters.decimals import decimal_text
@@ -27,6 +27,7 @@ ParamKind = Literal[
 
 
 _ONE_TERM: TypeAdapter[list[str]] = TypeAdapter(list[str])
+_Finite = Annotated[float, Field(allow_inf_nan=False)]
 
 
 def _decoded_object(wire: str, kind: str) -> dict[str, JsonValue]:
@@ -61,7 +62,7 @@ class StringValue(KindValue):
 
 class NumberValue(KindValue):
     type: Literal["number"] = "number"
-    value: float | None
+    value: _Finite | None
 
     __hash__ = KindValue.__hash__
 
@@ -81,8 +82,8 @@ class NumberValue(KindValue):
 
 class NumberRangeValue(KindValue):
     type: Literal["number-range"] = "number-range"
-    min: float | None = None
-    max: float | None = None
+    min: _Finite | None = None
+    max: _Finite | None = None
 
     __hash__ = KindValue.__hash__
 
@@ -244,6 +245,14 @@ class MultiPickValue(KindValue):
 
     __hash__ = KindValue.__hash__
 
+    @field_validator("values")
+    @classmethod
+    def _each_term_once(cls, values: list[str]) -> list[str]:
+        if len(set(values)) != len(values):
+            msg = "a multi-pick names each term once"
+            raise ValueError(msg)
+        return values
+
     @classmethod
     def from_wire(cls, wire: str) -> Self:
         return cls(values=_ONE_TERM.validate_json(wire) if wire else [])
@@ -289,7 +298,7 @@ class InputStepValue(KindValue):
         return cls(step_id=wire)
 
     def identity(self) -> Hashable:
-        return self.step_id
+        return int(self.step_id) if self.step_id else None
 
     def to_wire(self) -> str:
         return self.step_id

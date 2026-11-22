@@ -97,7 +97,7 @@ class TestScalarsRoundTrip:
 
 class TestVocabulariesRoundTrip:
     @settings(max_examples=300)
-    @given(st.lists(_TERM, max_size=8))
+    @given(st.lists(_TERM, max_size=8, unique=True))
     def test_multi_pick_including_the_empty_selection(self, values: list[str]) -> None:
         """The empty list is the case that produced the ``"[]"`` bug."""
         restored = _round_trip(
@@ -118,7 +118,9 @@ class TestVocabulariesRoundTrip:
         ) == SinglePickValue(value=value)
 
     @settings(max_examples=200)
-    @given(st.lists(st.text(alphabet=",", min_size=1, max_size=3), max_size=4))
+    @given(
+        st.lists(st.text(alphabet=",", min_size=1, max_size=3), max_size=4, unique=True)
+    )
     def test_terms_made_of_the_separator(self, values: list[str]) -> None:
         """A comma-joined encoding would lose these silently."""
         restored = _round_trip(
