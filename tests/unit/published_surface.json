@@ -339,6 +339,7 @@
     "ValidationError",
     "WDKError",
     "WDKLoginRequiredError",
+    "joined_refusal",
     "param_message_rows",
     "validate_response"
   ],

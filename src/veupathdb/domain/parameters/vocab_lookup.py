@@ -311,7 +311,7 @@ def entry_name(option: VocabOption) -> str:
     return f"{option.display} ({option.value})"
 
 
-def _fault_line(param: str, resolution: Resolution) -> str:
+def entry_fault(param: str, resolution: Resolution) -> str:
     shown = resolution.candidates[:SHOWN_CANDIDATES]
     if not shown:
         return f"{param} has no entry {resolution.phrase!r}, and no entry is near it."
@@ -324,10 +324,11 @@ class VocabularyEntryError(ValidationError):
         self.faults = faults
         super().__init__(
             title="Invalid parameter value",
-            detail="\n".join(_fault_line(p, r) for p, r in faults),
+            detail="\n".join(entry_fault(p, r) for p, r in faults),
             errors=[
                 {
                     "param": param,
+                    "detail": entry_fault(param, resolution),
                     "value": resolution.phrase,
                     "candidates": [
                         {"value": c.value, "display": c.display}

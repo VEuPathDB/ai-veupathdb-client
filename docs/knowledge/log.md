@@ -1,5 +1,16 @@
 # Knowledge log
 
+## 2026-11-22 - A refusal names every parameter's fault once
+
+- `read_stated_values` reads every shape, then names the entries of every parameter whose
+  shape read, and raises once with both kinds of fault
+  ([WDK-PARAM-017](wdk/rules/parameters-and-vocabularies.md)).
+- `ParameterCanonicalizer.canonicalize` reads every parameter and raises `joined_refusal`
+  of their refusals, one `ValidationError` for the call
+  ([WDK-PARAM-020](wdk/rules/parameters-and-vocabularies.md)).
+- Every row these refusals and `VocabularyEntryError` carry holds `param` and a
+  one-sentence `detail`.
+
 ## 2026-11-22 - Each kind reads as WDK reads it
 
 - A number or range end must be finite, a multi-pick holds each term once (a repeat is dropped, as WDK's `LinkedHashSet` does), and a step input

@@ -648,7 +648,11 @@ boolean written as text is `true` or `True`, and a `yes`/`no` vocabulary such as
 `GenesByOrthologs.isSyntenic` holds neither.
 
 `read_stated_values` reads each stated value by its parameter's kind and gathers every
-fault of a search into one refusal. A number is written as its shortest decimal and never
+fault of a search into one refusal: the shape of every value is read, then the entries of
+every value whose shape read. When only entries fail it raises `VocabularyEntryError` with
+every parameter's faults; when a shape fails it raises `StatedValuesError` with the shape
+faults first and one fault per entry fault after them. Every `errors` row holds `param` and
+a one-sentence `detail`. A number is written as its shortest decimal and never
 with an exponent: `5.0` is `5` and `1e-8` is `0.00000001`; `NaN`, infinity and a boolean
 are refused. A text is read as WDK reads it: `StringParam` takes it when `Double.valueOf`
 parses it and it matches the default number regex `[+-]?\d+(\.\d+)?([eE][+-]?\d+)?`, whose `\d`
@@ -787,8 +791,11 @@ A text the exact step does not settle is refused with `VocabularyEntryError`, a
 `ValidationError` that holds each parameter and its `Resolution`. Each line of its detail
 names the parameter, the text and the first `SHOWN_CANDIDATES` entries `rank_entries`
 ranks (the lexical entries first, then the spelling neighbours); each item of `errors`
-carries the candidates as `{value, display}`. The refusal names no tool and no example from
-another vocabulary.
+carries the candidates as `{value, display}` and its line as `detail`. The refusal names no
+tool and no example from another vocabulary. `ParameterCanonicalizer.canonicalize` reads
+every parameter of a call and raises one refusal for all of them: one parameter's refusal as
+it is, several joined by `joined_refusal` into one `ValidationError` whose detail has one
+line per refusal and whose `errors` hold every row, each with `param` and `detail`.
 
 # WDK-VOCAB - vocabularies, trees, and the parents they were read under
 

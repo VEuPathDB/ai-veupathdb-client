@@ -35,16 +35,17 @@ from veupathdb.domain.parameters.wdk_vocab import (
     flatten_vocab,
     leaf_terms,
 )
-from veupathdb.errors import ValidationError
+from veupathdb.errors import ValidationError, joined_refusal
 
 
 def _refuse(
     spec: ParamSpecNormalized, reason: str, value: JsonValue
 ) -> ValidationError:
+    detail = f"Parameter '{spec.name}' {reason}."
     return ValidationError(
         title="Invalid parameter value",
-        detail=f"Parameter '{spec.name}' {reason}.",
-        errors=[{"param": spec.name, "value": value}],
+        detail=detail,
+        errors=[{"param": spec.name, "detail": detail, "value": value}],
     )
 
 
@@ -92,37 +93,49 @@ class ParameterCanonicalizer:
         self,
         parameters: dict[str, ParamValue],
     ) -> dict[str, ParamValue]:
-        """Canonicalize each value against its spec.
+        """Canonicalize each value against its spec, or refuse every refused one at once.
 
         An ``input-step`` value is left out: its value is structural, wired by
         the caller, and never a choice WDK made. A held value is WDK's own and
         goes through untouched.
         """
         canonical: dict[str, ParamValue] = {}
+        refusals: list[ValidationError] = []
         for name, value in (parameters or {}).items():
-            if isinstance(value, HeldValue):
-                canonical[name] = value
+            try:
+                kept = self._canonical(name, value)
+            except ValidationError as refusal:
+                refusals.append(refusal)
                 continue
-            spec = self.specs.get(name)
-            if not spec:
-                available = sorted(self.specs.keys())
-                raise ValidationError(
-                    title="Unknown parameter",
-                    detail=f"Parameter '{name}' does not exist for this search. Available parameters: {', '.join(available)}",
-                    errors=[{"param": name, "value": to_decoded(value)}],
-                )
-            if spec.param_type == "input-step":
-                continue
-            if value.type != spec.param_type:
-                raise _refuse(
-                    spec,
-                    f"takes a {spec.param_type} value, not a {value.type} value",
-                    to_decoded(value),
-                )
-            if value == empty_value(value.type) and not accepts_empty(spec):
-                raise empty_refusal(name, to_decoded(value))
-            canonical[name] = self._canonicalize_value(spec, value)
+            if kept is not None:
+                canonical[name] = kept
+        if refusals:
+            raise joined_refusal(refusals)
         return canonical
+
+    def _canonical(self, name: str, value: ParamValue) -> ParamValue | None:
+        if isinstance(value, HeldValue):
+            return value
+        spec = self.specs.get(name)
+        if not spec:
+            available = ", ".join(sorted(self.specs.keys()))
+            detail = f"Parameter '{name}' does not exist for this search. Available parameters: {available}"
+            raise ValidationError(
+                title="Unknown parameter",
+                detail=detail,
+                errors=[{"param": name, "detail": detail, "value": to_decoded(value)}],
+            )
+        if spec.param_type == "input-step":
+            return None
+        if value.type != spec.param_type:
+            raise _refuse(
+                spec,
+                f"takes a {spec.param_type} value, not a {value.type} value",
+                to_decoded(value),
+            )
+        if value == empty_value(value.type) and not accepts_empty(spec):
+            raise empty_refusal(name, to_decoded(value))
+        return self._canonicalize_value(spec, value)
 
     def held(self, wire: Mapping[str, str]) -> dict[str, ParamValue]:
         """Each value WDK holds, read as its kind and never refused or rewritten.

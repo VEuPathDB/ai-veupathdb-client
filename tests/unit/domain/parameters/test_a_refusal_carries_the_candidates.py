@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from pydantic import BaseModel, ConfigDict, TypeAdapter
 
 from veupathdb.domain.parameters import (
     SHOWN_CANDIDATES,
@@ -19,6 +20,13 @@ from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk import WDKParameter, phyletic_tree_of
 from veupathdb.wdk.wdk_models import WDKSearchResponse
+
+
+class _Row(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    param: str
+    value: str
 
 
 def _parameter(fixture: str, name: str) -> WDKParameter:
@@ -118,6 +126,7 @@ def test_the_refusal_states_each_candidate_on_the_wire() -> None:
     assert refused.value.errors == [
         {
             "param": "organism",
+            "detail": refused.value.detail,
             "value": "Pf3D7",
             "candidates": [
                 {"value": c.value, "display": c.display} for c in resolution.candidates
@@ -188,7 +197,7 @@ class TestThePhyleticReaderReadsTheOneRule:
 
 @needs_taxon
 @needs_gene_type
-def test_only_the_first_parameter_with_an_unnamed_pick_is_refused() -> None:
+def test_every_parameter_with_an_unnamed_pick_is_refused_at_once() -> None:
     organism = _parameter("search_genes_by_taxon", "organism")
     gene_type = _parameter("search_genes_by_gene_type", "geneType")
     canonicalizer = ParameterCanonicalizer(
@@ -200,7 +209,7 @@ def test_only_the_first_parameter_with_an_unnamed_pick_is_refused() -> None:
         }
     )
 
-    with pytest.raises(VocabularyEntryError) as refused:
+    with pytest.raises(ValidationError) as refused:
         canonicalizer.canonicalize(
             {
                 "organism": MultiPickValue(values=["Pf3D7"]),
@@ -208,7 +217,12 @@ def test_only_the_first_parameter_with_an_unnamed_pick_is_refused() -> None:
             }
         )
 
-    assert [(n, r.phrase) for n, r in refused.value.faults] == [("organism", "Pf3D7")]
+    rows = TypeAdapter(list[_Row]).validate_python(refused.value.errors)
+    assert [(row.param, row.value) for row in rows] == [
+        ("organism", "Pf3D7"),
+        ("geneType", "mRNA"),
+    ]
+    assert len((refused.value.detail or "").splitlines()) == 2
 
 
 @needs_snps

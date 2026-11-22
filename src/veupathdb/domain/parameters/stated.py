@@ -41,7 +41,12 @@ from veupathdb.domain.parameters.values import (
     TimestampValue,
     empty_value,
 )
-from veupathdb.domain.parameters.vocab_lookup import entries_or_refusal
+from veupathdb.domain.parameters.vocab_lookup import (
+    Resolution,
+    VocabularyEntryError,
+    entries_or_refusal,
+    entry_fault,
+)
 from veupathdb.domain.parameters.wdk_vocab import (
     VocabOption,
     WDKFilterOntologyTerm,
@@ -468,19 +473,31 @@ def stated_reading(param: StatedDeclaration) -> StatedReading:
 def read_stated_values(
     params: Sequence[StatedDeclaration], stated: Mapping[str, JsonValue]
 ) -> dict[str, Stated]:
-    read: dict[str, Stated] = {}
-    faults: list[StatedFault] = []
+    shapes: dict[str, Stated] = {}
+    shape_faults: list[StatedFault] = []
     for param in params:
         if param.name not in stated:
             continue
         try:
-            read[param.name] = stated_reading(param).read_shape(stated[param.name])
+            shapes[param.name] = stated_reading(param).read_shape(stated[param.name])
         except StatedValuesError as refusal:
-            faults.extend(refusal.faults)
-    if faults:
-        raise StatedValuesError(faults)
-    return {
-        param.name: stated_reading(param).named(read[param.name])
-        for param in params
-        if param.name in read
-    }
+            shape_faults.extend(refusal.faults)
+    read: dict[str, Stated] = {}
+    entry_faults: list[tuple[str, Resolution]] = []
+    for param in params:
+        if param.name not in shapes:
+            continue
+        try:
+            read[param.name] = stated_reading(param).named(shapes[param.name])
+        except VocabularyEntryError as refusal:
+            entry_faults.extend(refusal.faults)
+    if shape_faults:
+        raise StatedValuesError(
+            [
+                *shape_faults,
+                *(StatedFault(p, r.phrase, entry_fault(p, r)) for p, r in entry_faults),
+            ]
+        )
+    if entry_faults:
+        raise VocabularyEntryError(entry_faults)
+    return read

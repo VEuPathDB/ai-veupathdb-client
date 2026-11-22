@@ -66,6 +66,16 @@ class ValidationError(VEuPathDBError[VEuPathDBErrorCode]):
         )
 
 
+def joined_refusal(refusals: Sequence[ValidationError]) -> ValidationError:
+    if len(refusals) == 1:
+        return refusals[0]
+    return ValidationError(
+        title="Invalid parameter values",
+        detail="\n".join(r.detail or r.title for r in refusals),
+        errors=[row for r in refusals for row in r.errors or []],
+    )
+
+
 class SiteNotFoundError(VEuPathDBError[VEuPathDBErrorCode]):
     """A site identifier this deployment does not serve."""
 
@@ -179,6 +189,7 @@ __all__ = [
     "ValidationError",
     "WDKError",
     "WDKLoginRequiredError",
+    "joined_refusal",
     "param_message_rows",
     "validate_response",
 ]
