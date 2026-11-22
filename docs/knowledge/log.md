@@ -2,7 +2,7 @@
 
 ## 2026-11-22 - Each kind reads as WDK reads it
 
-- A number or range end must be finite, a multi-pick names each term once, and a step input
+- A number or range end must be finite, a multi-pick holds each term once (a repeat is dropped, as WDK's `LinkedHashSet` does), and a step input
   is the step id WDK parses (`01` is step 1). The equality tests read each kind with an
   oracle of WDK's own rule, and fail on six mutations of the kinds (a trimmed string, a
   case-folded pick, the first term of a held array, an unordered range, a date range by

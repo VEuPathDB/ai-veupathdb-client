@@ -349,9 +349,10 @@ def test_a_step_input_is_the_step_it_names(left: str, right: str, same: bool) ->
     assert (InputStepValue(step_id=left) == InputStepValue(step_id=right)) is same
 
 
-def test_a_term_named_twice_is_refused() -> None:
-    with pytest.raises(ValueError, match="names each term once"):
-        MultiPickValue(values=["a", "a"])
+def test_a_term_named_twice_is_held_once() -> None:
+    picked = MultiPickValue(values=["b", "a", "b"])
+
+    assert (picked.values, picked.to_wire()) == (["b", "a"], '["b", "a"]')
 
 
 @pytest.mark.parametrize("wire", ["nan", "inf", "-inf"])

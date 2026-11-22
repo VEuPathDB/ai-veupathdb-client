@@ -1120,7 +1120,7 @@ tests compare `==` with an independent reading of each of the 11 kinds: a string
 single pick as the text written, case and spaces kept (`StringParamHandler` quotes the text,
 `EnumParamHandler` matches the term); a single pick held as an array of more than one term
 is no single term (`AbstractEnumParam.standardizeStableValue`); a multi-pick as its set of
-terms, each named once; a number and a range as their finite decimals, the range's ends in
+terms, a repeated term held once; a number and a range as their finite decimals, the range's ends in
 order (`NumberRangeParamHandler` reads `min` and `max`); a step input as the step id
 `AnswerParamHandler` parses with `Long.parseLong`, so `01` is step 1.
 

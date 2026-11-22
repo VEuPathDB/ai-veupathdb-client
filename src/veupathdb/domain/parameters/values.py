@@ -248,10 +248,7 @@ class MultiPickValue(KindValue):
     @field_validator("values")
     @classmethod
     def _each_term_once(cls, values: list[str]) -> list[str]:
-        if len(set(values)) != len(values):
-            msg = "a multi-pick names each term once"
-            raise ValueError(msg)
-        return values
+        return list(dict.fromkeys(values))
 
     @classmethod
     def from_wire(cls, wire: str) -> Self:
