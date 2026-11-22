@@ -3,7 +3,6 @@ lists, tree-box trees, filter ontologies, and dataset parsers."""
 
 from __future__ import annotations
 
-import difflib
 import re
 from collections.abc import Iterable, Sequence
 from typing import Literal
@@ -93,36 +92,6 @@ def dedupe_options(options: Iterable[VocabOption]) -> list[VocabOption]:
         seen.add(option.value)
         kept.append(option)
     return kept
-
-
-MAX_NEAREST_ENTRIES = 5
-"""Enough nearest entries to recognise the one meant, few enough to read."""
-
-
-def nearest_entries(
-    options: Sequence[VocabOption], proposal: str, limit: int
-) -> list[str]:
-    """The entries closest to a proposal, the ones it starts first.
-
-    A proposal that starts a value is the accession or the stem of that entry.
-    Character similarity alone ranks such an entry below unrelated ones.
-    """
-    key = proposal.casefold()
-    started: list[str] = []
-    others: list[str] = []
-    for option in options:
-        # One entry holds one place, so a value listed by prefix takes its own
-        # label out of the similarity pool.
-        if option.value.casefold().startswith(key):
-            started.append(option.value)
-        else:
-            others.extend(text for text in (option.value, option.display) if text)
-    room = limit - len(started)
-    if room <= 0:
-        return started[:limit]
-    taken = set(started)
-    rest = [text for text in dict.fromkeys(others) if text not in taken]
-    return started + difflib.get_close_matches(proposal, rest, n=room, cutoff=0.0)
 
 
 def normalize_vocab_key(value: str) -> str:

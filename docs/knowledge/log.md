@@ -1,5 +1,25 @@
 # Knowledge log
 
+## 2026-11-22 - One rule names a vocabulary entry
+
+- [WDK-PARAM-020](wdk/rules/parameters-and-vocabularies.md) records that WDK compares a
+  vocabulary term exactly, so a stated text names a term by the one exact step
+  (`match_exact_option`, then numeric equivalence) and is otherwise refused with the
+  ranked candidates.
+- The vocabulary lookup (`read_options`) lives in `veupathdb.domain.parameters`.
+  `rank_entries` ranks the lexical entries first, then the spelling neighbours, unique by
+  value; `exact_or_candidates` gives a `Resolution`.
+- `ParameterCanonicalizer.canonicalize` resolves every pick with `exact_or_candidates` and
+  refuses with `VocabularyEntryError`, which holds each parameter with its `Resolution`
+  and carries the candidates in `errors`. Every unnamed pick of every parameter is one
+  fault of one refusal. The substring suggestions, the tool text, the fixed example and
+  `validOptions` are gone with `match_vocab_value`.
+- `PhyleticTree.resolve_terms` reads an exact code, else the same exact step, so spacing
+  and case no longer separate a label from its code.
+- `nearest_entries` and `MAX_NEAREST_ENTRIES` are removed. veupathdb-mcp and Strategist
+  import the lookup, the ranking and the refusal from `veupathdb.domain.parameters`.
+- `veupathdb-py` is 0.9.0b10.
+
 ## 2026-11-22 - A recording is read by the address it called
 
 - `check-test-sites.mjs` reads a recording in the fixture store by its `provenance` and

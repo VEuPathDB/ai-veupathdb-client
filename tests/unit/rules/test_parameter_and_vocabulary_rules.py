@@ -11,8 +11,12 @@ from veupathdb.domain.parameters import (
     FacetRange,
     FilterFacets,
     FilterProposals,
+    MultiPickValue,
     NumberBounds,
     NumberRange,
+    ParameterCanonicalizer,
+    ParamValue,
+    SinglePickValue,
     StatedValuesError,
     StringMembers,
     StringValue,
@@ -397,3 +401,61 @@ def test_wdk_param_018_a_range_facets_bounds_come_only_from_its_term_summary() -
     assert FacetRange.of(summary, facet) == FacetRange(
         min=1, max=4823, records=5643, units="variants"
     )
+
+
+def _stated_parameter(fixture: str, name: str) -> WDKParameter:
+    body = load_recorded(fixture).json_body()
+    if fixture.startswith("refresh_"):
+        listed = TypeAdapter(list[WDKParameter]).validate_python(body)
+        return next(p for p in listed if p.name == name)
+    return _parameter(fixture, name)
+
+
+_SPELLINGS = [
+    (
+        "search_genes_by_gene_type",
+        "geneType",
+        MultiPickValue(values=["Protein Coding"]),
+        '["protein coding"]',
+    ),
+    (
+        "search_genes_by_ngs_snps",
+        "snp_class",
+        SinglePickValue(value="missense"),
+        "Missense",
+    ),
+    (
+        "search_genes_by_metabolic_pathway_hagai",
+        "metabolic_pathway",
+        SinglePickValue(value="glycolysis"),
+        "Glycolysis",
+    ),
+    (
+        "refresh_interpro_domain_pfam_on_dal972",
+        "domain_typeahead",
+        MultiPickValue(values=["pf00069"]),
+        '["PF00069"]',
+    ),
+    (
+        "search_genes_by_taxon",
+        "organism",
+        MultiPickValue(values=["Plasmodium  falciparum 3D7"]),
+        '["Plasmodium falciparum 3D7"]',
+    ),
+]
+
+
+@pytest.mark.parametrize(("fixture", "name", "stated", "wire"), _SPELLINGS)
+def test_wdk_param_020_a_term_is_sent_as_the_vocabulary_spells_it(
+    fixture: str, name: str, stated: ParamValue, wire: str
+) -> None:
+    if needs_qa_recording(f"wdk/{fixture}.json"):
+        pytest.skip(NEEDS_QA_RECORDING)
+    param = _stated_parameter(fixture, name)
+    spec = ParamSpecNormalized(
+        name=name, param_type=param.type, vocabulary=param.vocabulary
+    )
+
+    canonical = ParameterCanonicalizer({name: spec}).canonicalize({name: stated})
+
+    assert to_wire(canonical[name]) == wire

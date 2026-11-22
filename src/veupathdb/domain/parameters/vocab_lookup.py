@@ -17,6 +17,7 @@ from pydantic import ConfigDict, Field, model_validator
 
 from veupathdb.domain.parameters.vocab_utils import looks_numeric, numeric_equivalent
 from veupathdb.domain.parameters.wdk_vocab import VocabOption, match_exact_option
+from veupathdb.errors import ValidationError
 from veupathdb.model import CamelModel, computed
 
 Reach = Literal["phrase", "every_word", "word"]
@@ -290,3 +291,31 @@ def exact_or_candidates(
         how="unsettled" if candidates else "none",
         candidates=candidates,
     )
+
+
+def _fault_line(param: str, resolution: Resolution) -> str:
+    shown = resolution.candidates[:SHOWN_CANDIDATES]
+    if not shown:
+        return f"{param} has no entry {resolution.phrase!r}, and no entry is near it."
+    named = ", ".join(f"{c.display} ({c.value})" for c in shown)
+    return f"{param} has no entry {resolution.phrase!r}. Candidates: {named}."
+
+
+class VocabularyEntryError(ValidationError):
+    def __init__(self, faults: list[tuple[str, Resolution]]) -> None:
+        self.faults = faults
+        super().__init__(
+            title="Invalid parameter value",
+            detail="\n".join(_fault_line(p, r) for p, r in faults),
+            errors=[
+                {
+                    "param": param,
+                    "value": resolution.phrase,
+                    "candidates": [
+                        {"value": c.value, "display": c.display}
+                        for c in resolution.candidates
+                    ],
+                }
+                for param, resolution in faults
+            ],
+        )

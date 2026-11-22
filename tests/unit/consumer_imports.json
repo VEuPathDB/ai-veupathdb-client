@@ -60,7 +60,6 @@
       "walk_entities"
     ],
     "veupathdb.domain.parameters": [
-      "MAX_NEAREST_ENTRIES",
       "MultiPickValue",
       "NumberValue",
       "ParamKind",
@@ -80,7 +79,6 @@
       "derive_binding",
       "from_wire",
       "match_exact_option",
-      "nearest_entries",
       "read_census",
       "to_decoded_map",
       "to_wire",
@@ -310,7 +308,6 @@
       "FilterValue",
       "InputDatasetValue",
       "InputStepValue",
-      "MAX_NEAREST_ENTRIES",
       "MultiPickValue",
       "NO_CONSTRAINT_PATTERN",
       "NumberValue",
@@ -346,7 +343,6 @@
       "from_wire",
       "leading_accession_token",
       "match_exact_option",
-      "nearest_entries",
       "to_decoded_map",
       "to_wire",
       "validate_phyletic_codes",

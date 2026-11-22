@@ -8,7 +8,11 @@ from typing import Literal, NoReturn
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from veupathdb.domain.parameters.wdk_vocab import VocabOption, WDKVocabTerm
+from veupathdb.domain.parameters.wdk_vocab import (
+    VocabOption,
+    WDKVocabTerm,
+    match_exact_option,
+)
 from veupathdb.errors import ValidationError, param_message_rows
 
 PHYLETIC_PARAM_NAMES = frozenset(
@@ -252,21 +256,14 @@ class PhyleticTree(BaseModel):
         """Map a proposal to vocabulary codes and report what matched nothing.
 
         A proposal is a code or a display name, one per list entry or comma
-        separated. An exact code wins over a case-insensitive match.
+        separated. An exact code wins over the vocabulary's exact step.
         """
-        nodes = list(self.nodes())
-        exact = {node.code for node in nodes}
-        folded: dict[str, str] = {}
-        for node in nodes:
-            folded.setdefault(node.code.casefold(), node.code)
-        for node in nodes:
-            if node.label:
-                folded.setdefault(node.label.casefold(), node.code)
-
+        labels = self.labels()
+        exact = {option.value for option in labels}
         codes: list[str] = []
         unknown: list[str] = []
         for token in _split_proposal(proposal):
-            code = token if token in exact else folded.get(token.casefold())
+            code = token if token in exact else match_exact_option(labels, token)
             if code is None:
                 if token not in unknown:
                     unknown.append(token)

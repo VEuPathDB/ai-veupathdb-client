@@ -1,5 +1,5 @@
-"""Vocabulary entries: exact matching, the did-you-mean ranker, and the parent
-term the third element carries."""
+"""Vocabulary entries: exact matching and the parent term the third element
+carries."""
 
 from __future__ import annotations
 
@@ -9,7 +9,6 @@ from veupathdb.domain.parameters.wdk_vocab import (
     VocabOption,
     WDKVocabTerm,
     match_exact_option,
-    nearest_entries,
 )
 from veupathdb.wdk.wdk_parameters import WDKEnumParam
 
@@ -22,20 +21,6 @@ _PFAM = [
 _EC = [
     VocabOption(value="2.7.1.1", display="2.7.1.1"),
     VocabOption(value="2.7.11.1", display="2.7.11.1"),
-]
-
-_DOMAINS = [
-    *_PFAM,
-    VocabOption(value="PF00560 : LRR_1", display="PF00560 : LRR_1"),
-    VocabOption(value="PF00006 : ATP-synt_ab", display="PF00006 : ATP-synt_ab"),
-]
-
-_SPECIES = [
-    VocabOption(value="EUKA", display="Eukaryota"),
-    VocabOption(value="MAMM", display="Mammalia"),
-    VocabOption(value="hsap", display="Homo sapiens REF"),
-    VocabOption(value="mmus", display="Mus musculus"),
-    VocabOption(value="pfal", display="Plasmodium falciparum 3D7"),
 ]
 
 # The head of ``GenesByOrthologPattern``'s phyletic term vocabulary.
@@ -97,50 +82,6 @@ class TestMatchExactOption:
         ]
 
         assert _matched(options, "Plasmodium") == ""
-
-
-class TestPrefixMatchesLead:
-    def test_the_entries_the_proposal_starts_come_first(self) -> None:
-        got = nearest_entries(_DOMAINS, "PF0006", 5)
-
-        assert got[0] == "PF00069 : Pkinase"
-        assert got.index("PF00069 : Pkinase") < got.index("PF00569 : ZZ")
-
-    def test_a_prefix_match_ignores_case(self) -> None:
-        assert nearest_entries(_SPECIES, "PFAL", 5)[0] == "pfal"
-
-    def test_prefix_matches_alone_fill_the_limit(self) -> None:
-        assert nearest_entries(_DOMAINS, "PF00", 2) == [
-            "PF00069 : Pkinase",
-            "PF00569 : ZZ",
-        ]
-
-
-class TestSimilarityFillsTheRest:
-    def test_a_label_is_reachable_when_no_value_matches(self) -> None:
-        got = nearest_entries(_SPECIES, "Plasmodium falciparum", 5)
-
-        assert "Plasmodium falciparum 3D7" in got
-
-    def test_the_result_is_capped_at_the_limit(self) -> None:
-        assert len(nearest_entries(_SPECIES, "Nosema", 3)) == 3
-
-    def test_an_entry_listed_by_prefix_is_not_listed_again_as_its_label(self) -> None:
-        """One entry occupies one place in the answer."""
-        got = nearest_entries(_SPECIES, "pfal", 5)
-
-        assert got[0] == "pfal"
-        assert "Plasmodium falciparum 3D7" not in got
-
-    def test_a_value_is_never_repeated_by_its_own_label(self) -> None:
-        options = [VocabOption(value="yes", display="yes")]
-
-        assert nearest_entries(options, "false", 5) == ["yes"]
-
-    def test_an_empty_label_is_not_an_entry(self) -> None:
-        options = [VocabOption(value="text_expression", display="")]
-
-        assert nearest_entries(options, "text_expresion", 5) == ["text_expression"]
 
 
 class TestTheThirdElementIsTheParentTerm:

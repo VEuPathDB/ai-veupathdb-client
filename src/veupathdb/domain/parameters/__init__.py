@@ -92,6 +92,7 @@ from veupathdb.domain.parameters.vocab_lookup import (
     Resolution,
     VocabLookup,
     VocabRead,
+    VocabularyEntryError,
     accession_names,
     exact_or_candidates,
     rank_entries,
@@ -99,7 +100,6 @@ from veupathdb.domain.parameters.vocab_lookup import (
 )
 from veupathdb.domain.parameters.wdk_vocab import (
     FAKE_ALL_SENTINEL,
-    MAX_NEAREST_ENTRIES,
     VocabOption,
     WDKDatasetParser,
     WDKFilterOntologyTerm,
@@ -114,14 +114,12 @@ from veupathdb.domain.parameters.wdk_vocab import (
     leading_accession_token,
     leaf_terms,
     match_exact_option,
-    nearest_entries,
     vocab_keys,
 )
 
 __all__ = [
     "DECIDED_CANDIDATES",
     "FAKE_ALL_SENTINEL",
-    "MAX_NEAREST_ENTRIES",
     "NO_CONSTRAINT_PATTERN",
     "PHYLETIC_EXPRESSION_PARAM",
     "PHYLETIC_EXPRESSION_SEARCH",
@@ -180,6 +178,7 @@ __all__ = [
     "VocabLookup",
     "VocabOption",
     "VocabRead",
+    "VocabularyEntryError",
     "WDKDatasetParser",
     "WDKFilterOntologyTerm",
     "WDKTreeBoxVocabNode",
@@ -207,7 +206,6 @@ __all__ = [
     "leading_accession_token",
     "leaf_terms",
     "match_exact_option",
-    "nearest_entries",
     "rank_entries",
     "read_census",
     "read_options",

@@ -710,6 +710,30 @@ takes exactly one.
 In the VEuPathDB models (ApiCommonModel, OrthoMCLModel, EbrcModelCommon) `allowEmpty` is
 declared on `string`, multi-pick, `input-dataset` and `timestamp` parameters only.
 
+### WDK-PARAM-020 - A vocabulary term is compared exactly by WDK, so the client sends the term the vocabulary spells; a stated text names a term by the one exact step, else it is refused with the ranked candidates
+
+- class: HARD
+- upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/AbstractEnumParam.java#L401-L455
+- anchor: src/veupathdb/domain/parameters/vocab_lookup.py:exact_or_candidates
+- status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_020_a_term_is_sent_as_the_vocabulary_spells_it
+
+`AbstractEnumParam.validateValue` refuses each selected term that
+`vocab.getTerms().contains(term)` does not hold, with `Invalid value '<term>'.`, so
+`protein coding` is a term and `Protein Coding` is not. A text a caller
+states names a term by one exact step, `match_exact_option`: the term or its label equal
+after case and whitespace folding, else the leading accession of exactly one entry, else
+(for a numeric text) a numerically equal term. `ParameterCanonicalizer.canonicalize` and
+`PhyleticTree.resolve_terms` read that step, so `Protein Coding`, `missense`,
+`glycolysis`, `pf00069` and `Plasmodium  falciparum 3D7` (two spaces) go out as
+`protein coding`, `Missense`, `Glycolysis`, `PF00069` and `Plasmodium falciparum 3D7`.
+
+A text the exact step does not settle is refused with `VocabularyEntryError`, a
+`ValidationError` that holds each parameter and its `Resolution`. Each line of its detail
+names the parameter, the text and the first `SHOWN_CANDIDATES` entries `rank_entries`
+ranks (the lexical entries first, then the spelling neighbours); each item of `errors`
+carries the candidates as `{value, display}`. The refusal names no tool and no example from
+another vocabulary.
+
 # WDK-VOCAB - vocabularies, trees, and the parents they were read under
 
 ### WDK-VOCAB-001 - A tree vocabulary's root may be a synthetic `@@fake@@` node that is not a selectable term

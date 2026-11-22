@@ -2,10 +2,11 @@
 
 The canonicalizer takes a typed ``dict[str, ParamValue]`` (the discriminated
 union over the 11 WDK parameter types), rewrites each value into the form WDK
-will accept, and returns a fresh ``dict[str, ParamValue]``. Vocabulary matching
-replaces fuzzy input with the declared term, a branch selection expands to its
-leaf set, and an open range takes the parameter's own limit. Whether a value
-WDK can read is one WDK accepts is WDK's verdict, not this module's.
+will accept, and returns a fresh ``dict[str, ParamValue]``. A stated pick
+becomes the term its exact step names, or is refused with the ranked
+candidates. A branch selection expands to its leaf set, and an open range takes
+the parameter's own limit. Whether a value WDK can read is one WDK accepts is
+WDK's verdict, not this module's.
 """
 
 from collections.abc import Mapping
@@ -26,11 +27,17 @@ from veupathdb.domain.parameters.values import (
     SinglePickValue,
     empty_value,
 )
-from veupathdb.domain.parameters.vocab_utils import match_vocab_value
+from veupathdb.domain.parameters.vocab_lookup import (
+    SHOWN_CANDIDATES,
+    Resolution,
+    VocabularyEntryError,
+    exact_or_candidates,
+)
 from veupathdb.domain.parameters.wdk_vocab import (
     FAKE_ALL_SENTINEL,
     WDKVocabulary,
     find_vocab_node,
+    flatten_vocab,
     leaf_terms,
 )
 from veupathdb.errors import ValidationError
@@ -97,6 +104,7 @@ class ParameterCanonicalizer:
         goes through untouched.
         """
         canonical: dict[str, ParamValue] = {}
+        faults: list[tuple[str, Resolution]] = []
         for name, value in (parameters or {}).items():
             if isinstance(value, HeldValue):
                 canonical[name] = value
@@ -119,7 +127,12 @@ class ParameterCanonicalizer:
                 )
             if value == empty_value(value.type) and not accepts_empty(spec):
                 raise empty_refusal(name, to_decoded(value))
-            canonical[name] = self._canonicalize_value(spec, value)
+            try:
+                canonical[name] = self._canonicalize_value(spec, value)
+            except VocabularyEntryError as refusal:
+                faults.extend(refusal.faults)
+        if faults:
+            raise VocabularyEntryError(faults)
         return canonical
 
     def held(self, wire: Mapping[str, str]) -> dict[str, ParamValue]:
@@ -141,24 +154,31 @@ class ParameterCanonicalizer:
     ) -> ParamValue:
         match value:
             case MultiPickValue(values=values):
-                terms = [self._match(spec, v) for v in values]
+                terms = self._terms(spec, values)
                 return MultiPickValue(values=self._enforce_leaf_values(spec, terms))
             case SinglePickValue(value=""):
                 return value
             case SinglePickValue(value=selected):
-                term = self._match(spec, selected)
+                [term] = self._terms(spec, [selected])
                 return SinglePickValue(value=self._enforce_leaf_value(spec, term))
             case NumberRangeValue() | DateRangeValue():
                 return close_open_range(value, spec)
             case _:
                 return value
 
-    def _match(self, spec: ParamSpecNormalized, value: str) -> str:
-        if value == FAKE_ALL_SENTINEL:
-            raise _refuse(spec, f"does not accept '{FAKE_ALL_SENTINEL}'", value)
-        return match_vocab_value(
-            vocab=spec.vocabulary, param_name=spec.name, value=value
-        )
+    def _terms(self, spec: ParamSpecNormalized, values: list[str]) -> list[str]:
+        if FAKE_ALL_SENTINEL in values:
+            raise _refuse(
+                spec, f"does not accept '{FAKE_ALL_SENTINEL}'", FAKE_ALL_SENTINEL
+            )
+        if not spec.vocabulary:
+            return values
+        options = flatten_vocab(spec.vocabulary)
+        resolved = [exact_or_candidates(options, v, SHOWN_CANDIDATES) for v in values]
+        faults = [(spec.name, r) for r in resolved if r.value is None]
+        if faults:
+            raise VocabularyEntryError(faults)
+        return [r.value for r in resolved if r.value is not None]
 
     # -- leaf enforcement (canonicalizer-only) --------------------------------
 
