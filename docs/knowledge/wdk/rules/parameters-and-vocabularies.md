@@ -528,8 +528,10 @@ are `organism`, `organism_span`, `organism_select_all`, `organism_select_none`,
 `specific_host` (popsetParams.xml, a popset search's host).
 
 One organism parameter lacks the value: `organismsWithAlphafold` (`GenesWithAlphafold`)
-declares `showOnlyPreferredOrganisms` alone, and plasmodb QA publishes it so. Its search
-reads as one with no organism parameter until the model adds the value.
+declares `showOnlyPreferredOrganisms` alone, and plasmodb QA publishes it so.
+`is_organism` is the declaration alone and is false for it. A reader that holds the
+site's organism list (`veupathdb-mcp: src/veupathdb_mcp/catalog/organisms.py:organism_parameter_of`) also takes a
+parameter with `organismProperties` whose every leaf is an exact entry of that list.
 
 In the recorded bodies the mark is on `organism` (plasmodb `GenesByMolecularWeight`,
 `GenesByExonCount`, `GenesByGeneType`, `GenesByOrthologPattern`, `GenesByOrthologs`,

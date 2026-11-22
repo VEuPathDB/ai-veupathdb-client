@@ -14,7 +14,8 @@
   organism branches, and a selected sample is no longer read as an organism.
 - `search_genes_by_mass_spec` is recorded from plasmodb QA for WDK-PARAM-013.
 - `organismsWithAlphafold` (`GenesWithAlphafold`) is an organism parameter without the
-  value, so its search reads as one with no organism parameter.
+  value; `is_organism` is false for it, and a reader with the site's organism list takes
+  it by its leaves (WDK-PARAM-013).
 - `veupathdb-py` is 0.9.0b12.
 
 ## 2026-11-22 - A stated pick is read by the one exact step
