@@ -125,6 +125,7 @@ class StrategyStepNode(CamelModel):
     # the input subtree as a collapsed reference to that saved strategy.
     expanded_strategy_id: int | None = None
     expanded_name: str | None = None
+    filters_wdk_added: list[StepFilter] | None = None
     id: str = Field(default_factory=generate_step_id)
 
     @model_validator(mode="after")

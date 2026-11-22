@@ -16,6 +16,7 @@ from veupathdb.domain.strategy import (
     StepSettings,
     StrategyStepNode,
     flatten_tree,
+    rebuild_tree,
     settings_of,
 )
 from veupathdb.errors import DataParsingError
@@ -340,3 +341,31 @@ def test_a_held_value_is_read_in_the_kind_the_other_side_states() -> None:
     typed = StepSettings(parameters={"o": MultiPickValue(values=["a", "b"])})
     assert held.changed(typed) == []
     assert typed.changed(held) == []
+
+
+def test_a_filter_held_with_another_value_than_the_plan_states_is_wdk_added() -> None:
+    held = StepSettings(filters=[_DEFAULT_LEAF_FILTER, _PLAN_FILTER])
+    stated = StepSettings(filters=[_OVERRIDE, _PLAN_FILTER])
+    assert held.filters_wdk_added(stated) == [_DEFAULT_LEAF_FILTER]
+
+
+@pytest.mark.parametrize("weight", [0, None])
+def test_no_weight_reads_as_none(weight: int | None) -> None:
+    assert StepSettings(wdk_weight=weight).wdk_weight is None
+
+
+def test_what_wdk_added_rides_the_step_and_is_no_setting() -> None:
+    added = [_DEFAULT_LEAF_FILTER]
+    node = _leaf().model_copy(update={"filters_wdk_added": added})
+    step = flatten_tree(node)["a"]
+    assert (
+        step.filters_wdk_added,
+        rebuild_tree("a", {"a": step}).filters_wdk_added,
+    ) == (
+        added,
+        added,
+    )
+    assert "filters_wdk_added" not in StepSettings.model_fields
+    assert settings_of(node) == settings_of(
+        node.model_copy(update={"filters_wdk_added": None})
+    )

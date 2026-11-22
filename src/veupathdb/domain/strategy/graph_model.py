@@ -52,6 +52,7 @@ class StrategyStep(CamelModel):
     wdk_weight: int | None = None
     expanded_strategy_id: int | None = None
     expanded_name: str | None = None
+    filters_wdk_added: list[StepFilter] | None = None
 
     @property
     def display_label(self) -> str:
@@ -125,6 +126,7 @@ def flatten_tree(root: StrategyStepNode) -> dict[str, StrategyStep]:
             wdk_weight=node.wdk_weight,
             expanded_strategy_id=node.expanded_strategy_id,
             expanded_name=node.expanded_name,
+            filters_wdk_added=node.filters_wdk_added,
         )
         for child in node.inputs():
             visit(child)
@@ -155,6 +157,7 @@ def rebuild_tree(root_id: str, steps: dict[str, StrategyStep]) -> StrategyStepNo
             wdk_weight=step.wdk_weight,
             expanded_strategy_id=step.expanded_strategy_id,
             expanded_name=step.expanded_name,
+            filters_wdk_added=step.filters_wdk_added,
             primary_input=(
                 visit(step.primary_input_id)
                 if step.primary_input_id is not None

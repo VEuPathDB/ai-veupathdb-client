@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
 from pydantic_core import PydanticCustomError
 
 from veupathdb.domain.parameters.value_equality import same_param_value
@@ -42,6 +42,11 @@ class StepSettings(CamelModel):
                 msg = "StepSettings reads a mapping; use settings_of for a step"
                 raise PydanticCustomError(code, msg)
 
+    @field_validator("wdk_weight")
+    @classmethod
+    def _no_weight_is_none(cls, weight: int | None) -> int | None:
+        return weight or None
+
     def changed(self, other: StepSettings) -> list[str]:
         return self._fields_that_differ(
             other,
@@ -51,7 +56,7 @@ class StepSettings(CamelModel):
 
     def filters_wdk_added(self, stated: StepSettings) -> list[StepFilter]:
         named = _by_name(stated.filters)
-        return [f for name, f in _by_name(self.filters).items() if name not in named]
+        return [f for name, f in _by_name(self.filters).items() if named.get(name) != f]
 
     def departures_from(
         self,

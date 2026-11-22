@@ -107,9 +107,11 @@ sites the default depends on the step:
 reads the boolean operator, and
 [`MatchedTranscriptFilter`](https://github.com/VEuPathDB/ApiCommonWebsite/blob/1891e5e0c8f021051ab0699ca72cce4c6b5c4125/Model/src/main/java/org/apidb/apicommon/model/filter/MatchedTranscriptFilter.java#L158-L167)
 reads the question's answer parameter count. So the default of a step is what
-WDK added on create: `filters_wdk_added` reads it from the first read back, and
-`departures_from` expects it after a plan removes a filter of that name, and
-no filter when WDK added none.
+WDK added on create: `filters_wdk_added` reads it from a read back as every held
+filter the plan does not state with that value, and `departures_from` expects it
+after a plan removes a filter of that name, and no filter when WDK added none. The
+step carries the record as `filters_wdk_added` (`StrategyStep`, `StrategyStepNode`),
+a WDK fact that is no step setting; `None` means it was not read yet.
 
 ### WDK-FILTER-003 - `viewFilters` belongs at the top level of a report body, and is rejected outright inside `searchConfig`
 

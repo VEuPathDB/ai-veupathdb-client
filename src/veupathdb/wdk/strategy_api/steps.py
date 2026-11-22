@@ -203,6 +203,7 @@ class StepsMixin(StrategyAPIBase):
         search_name: str,
         *,
         user_id: str | None = None,
+        held: WDKStep | None = None,
     ) -> None:
         """Update a step's parameters, and its weight and filters when stated.
 
@@ -213,7 +214,7 @@ class StepsMixin(StrategyAPIBase):
         list whole. The caller's parameters are sent as given.
         """
         uid = await self._get_user_id(user_id)
-        step = await self.find_step(step_id, uid)
+        step = held if held is not None else await self.find_step(step_id, uid)
 
         parameters = await self._current_answer_params(
             step, record_type, search_name, dict(search_config.parameters)

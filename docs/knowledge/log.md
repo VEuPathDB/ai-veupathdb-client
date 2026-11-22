@@ -1,5 +1,17 @@
 # Knowledge log
 
+## 2026-11-22 - A step carries what WDK added, and no weight is None
+
+- `StrategyStep` and `StrategyStepNode` carry `filters_wdk_added`, the filters WDK
+  added to the step, read back; `None` until read. `flatten_tree` and `rebuild_tree`
+  keep it, and `settings_of` leaves it out.
+- `StepSettings.filters_wdk_added` is every held filter the plan does not state with
+  that value, so a default held under a name the plan states with another value is
+  WDK's.
+- `StepSettings` reads a weight of 0 as `None`, as the strategy read does.
+- `update_step_search_config` takes the step a caller already read (`held=`) and then
+  reads nothing, so a filter write costs one read.
+
 ## 2026-11-22 - A missing recording names the state QA does not hold
 
 - A test that waits for a cached AI expression summary skips with

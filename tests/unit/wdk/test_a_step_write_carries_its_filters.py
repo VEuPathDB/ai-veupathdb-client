@@ -16,6 +16,7 @@ from veupathdb.wdk.wdk_models import (
     NewStepSpec,
     WDKFilterValue,
     WDKSearchConfig,
+    WDKStep,
 )
 
 _SEARCH = "GenesByTextSearch"
@@ -210,3 +211,34 @@ async def test_a_search_config_write_that_states_no_filter_list_keeps_the_held_o
     )
 
     assert put.body["filters"] == [_SENT_MATCHED]
+
+
+async def test_a_search_config_write_given_the_held_step_reads_nothing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    api, _post, put = _api(monkeypatch)
+    reads: list[str] = []
+
+    async def counted(path: str, **_: object) -> Any:
+        reads.append(path)
+        return {}
+
+    monkeypatch.setattr(api.client, "get", counted)
+    held = WDKStep.model_validate(
+        {
+            "id": 9,
+            "searchName": _SEARCH,
+            "searchConfig": {"parameters": {}, "filters": [_SENT_MATCHED]},
+        }
+    )
+
+    await api.update_step_search_config(
+        9,
+        WDKSearchConfig(parameters=_PARAMETERS, filters=[]),
+        record_type="transcript",
+        search_name=_SEARCH,
+        user_id="1",
+        held=held,
+    )
+
+    assert (reads, put.body["filters"]) == ([], [])
