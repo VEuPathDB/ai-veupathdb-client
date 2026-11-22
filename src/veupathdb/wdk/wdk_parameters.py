@@ -14,6 +14,8 @@ from veupathdb.domain.parameters.wdk_vocab import (
     WDKVocabulary,
 )
 
+_ORGANISM_ENTRIES = "highlightReferenceOrganisms"
+
 
 class WDKBaseParameter(
     BaseModel,
@@ -67,8 +69,8 @@ class WDKBaseParameter(
 
     @property
     def is_organism(self) -> bool:
-        """True when WDK marks this parameter as the search's organism parameter."""
-        return "organismProperties" in self.properties
+        """True when the model highlights reference organisms among the entries."""
+        return _ORGANISM_ENTRIES in self.properties.get("organismProperties", [])
 
     @property
     def required(self) -> bool:

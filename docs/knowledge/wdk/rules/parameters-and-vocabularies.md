@@ -500,7 +500,7 @@ one whose `value` does not take the shape its class reads. The shape is chosen w
 stated clause is bound to its facet
 ([WDK-PARAM-018](#wdk-param-018---a-filter-clause-states-type-and-isrange-from-its-facet-and-a-range-facets-bounds-come-only-from-its-term-summary)).
 
-### WDK-PARAM-013 - The organism parameter of a search is the one WDK marks with `organismProperties`; a name is not the mark
+### WDK-PARAM-013 - The organism parameter of a search is the one whose `organismProperties` list holds `highlightReferenceOrganisms`; a name is not the mark
 
 - class: CONTRACT
 - upstream: https://github.com/VEuPathDB/WDK/blob/736013d6baf757d8d44709db962952ef512d400f/Service/src/main/java/org/gusdb/wdk/service/formatter/param/ParamFormatter.java#L59
@@ -508,26 +508,39 @@ stated clause is bound to its facet
 - status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_013_the_organism_parameter_is_the_one_wdk_marks
 
 `ParamFormatter.getBaseJson` writes every `<propertyList>` of the model parameter into
-`properties`. ApiCommonModel gives the organism parameters a list named
-`organismProperties`: `organism`, `organism_select_none`, `organismSinglePick` and
-`text_search_organism` among them
-([organismParams.xml](https://github.com/VEuPathDB/ApiCommonModel/blob/be0a8c67c73ddfb929e079f9e9a54e8a9de9cc7a/Model/lib/wdk/model/questions/params/organismParams.xml#L65-L90)).
-`wdk-client` finds the organism parameter the same way:
+`properties`. ApiCommonModel gives a list named `organismProperties` to every parameter
+whose vocabulary is an organism tree, and `wdk-client`'s
 [`isOrganismParam`](https://github.com/VEuPathDB/web-monorepo/blob/4733d56cf7fca324be1973778ff095576877cbef/packages/libs/preferred-organisms/src/lib/components/OrganismParam.tsx#L672-L677)
-tests `properties.organismProperties != null` on an enum parameter. The key is the mark;
-the `organisms` list that every parameter of a search can carry is not.
+draws each of them with the organism picker. The list holds up to three values, and only
+`highlightReferenceOrganisms` says that the entries are organisms: the picker then marks
+the reference strains among them. `showOnlyPreferredOrganisms` and
+`pruneNodesWithSingleExtendingChild` only shape the tree.
 
-In the recorded bodies the mark is at `body.searchData.parameters[0].properties.organismProperties`
-on `organism` (plasmodb `GenesByMolecularWeight`), `organismSinglePick` (plasmodb
-`GenesByNgsSnps`) and `organism_select_none` (vectorbase `GenesByGeneModelChars`).
+`ms_assay` (`GenesByMassSpec`) and `ptm_assay` (`GenesByPTM`) carry `organismProperties`
+with `pruneNodesWithSingleExtendingChild` and `showOnlyPreferredOrganisms` only
+([geneParams.xml](https://github.com/VEuPathDB/ApiCommonModel/blob/0ce647115f1c78e4f038465984a88cfdc91b17b0/Model/lib/wdk/model/questions/params/geneParams.xml#L5110-L5132)):
+their leaves are experiments and samples under organism branches, so a selected value
+is a sample and not an organism. The parameters that carry `highlightReferenceOrganisms`
+are `organism`, `organism_span`, `organism_select_all`, `organism_select_none`,
+`organism_select_all_sequences`, `organismSinglePick` and `text_search_organism`
+([organismParams.xml](https://github.com/VEuPathDB/ApiCommonModel/blob/0ce647115f1c78e4f038465984a88cfdc91b17b0/Model/lib/wdk/model/questions/params/organismParams.xml)),
+`motif_organism` (similarityParams.xml), `BlastDatabaseOrganism` (sharedParams.xml) and
+`specific_host` (popsetParams.xml, a popset search's host).
+
+One organism parameter lacks the value: `organismsWithAlphafold` (`GenesWithAlphafold`)
+declares `showOnlyPreferredOrganisms` alone, and plasmodb QA publishes it so. Its search
+reads as one with no organism parameter until the model adds the value.
+
+In the recorded bodies the mark is on `organism` (plasmodb `GenesByMolecularWeight`,
+`GenesByExonCount`, `GenesByGeneType`, `GenesByOrthologPattern`, `GenesByOrthologs`,
+`GenesByTaxon`), `organismSinglePick` (plasmodb `GenesByNgsSnps`, `GenesByLocation`) and
+`organism_select_none` (vectorbase `GenesByGeneModelChars`, `GenesByVariantCharacteristics`).
+plasmodb `GenesByMassSpec` carries `organismProperties` on `ms_assay` and no mark.
 Measured on 2026-09-27 over every transcript search: on plasmodb 42 of 359 carry one
-marked parameter and 313 carry none; on vectorbase 33 of 876 carry one and 842 carry
-none; the rest answered 500. No search carries two. The marked names are ten on
-plasmodb, so a list of names misses searches.
-
-The mark means the vocabulary is an organism tree, not that a selected value is an
-organism name. `ms_assay` (`GenesByMassSpec`) and `ptm_assay` (`GenesByPTM`) are marked,
-and their leaves are experiments and samples under organism branches.
+parameter with `organismProperties` and 313 carry none; on vectorbase 33 of 876 carry one
+and 842 carry none; the rest answered 500. No search carries two. The marked names are
+ten on plasmodb, so a list of names misses searches. The `organisms` list that every
+parameter of a search can carry is not the mark.
 
 ### WDK-PARAM-014 - A filter parameter's term summary counts the values of one ontology term; the value is its own label, and the term's label is the ontology's `display`
 

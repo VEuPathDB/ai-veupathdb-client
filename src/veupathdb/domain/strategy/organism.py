@@ -61,9 +61,10 @@ def extract_output_organisms(
 ) -> set[str] | None:
     """Return the organism scope of a step's output, or None if unknown.
 
-    ``organism_params`` maps a search name to the parameter WDK marks with
-    ``organismProperties``. ``leaf_organisms`` maps a step id to the organisms of
-    a leaf whose search marks no such parameter. A combine folds both inputs.
+    ``organism_params`` maps a search name to its organism parameter
+    (``WDKBaseParameter.is_organism``). ``leaf_organisms`` maps a step id to the
+    organisms of a leaf whose search marks no such parameter. A combine folds both
+    inputs.
     """
     if step.search_name == "GenesByOrthologs":
         return _parse_organisms(step, organism_params)

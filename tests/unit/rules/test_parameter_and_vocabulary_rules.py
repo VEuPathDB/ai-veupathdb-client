@@ -258,14 +258,22 @@ async def test_wdk_vocab_005_an_empty_array_names_no_stale_dependent(
     ("fixture", "marked"),
     [
         ("search_genes_by_molecular_weight", "organism"),
+        ("search_genes_by_exon_count", "organism"),
+        ("search_genes_by_gene_type", "organism"),
+        ("search_genes_by_ortholog_pattern", "organism"),
+        ("search_genes_by_orthologs", "organism"),
+        ("search_genes_by_taxon", "organism"),
         ("search_genes_by_ngs_snps", "organismSinglePick"),
+        ("search_genes_by_ngs_snps_under_another_organism", "organismSinglePick"),
+        ("search_genes_by_location", "organismSinglePick"),
         ("search_genes_by_gene_model_chars", "organism_select_none"),
+        ("search_genes_by_variant_characteristics", "organism_select_none"),
     ],
 )
 def test_wdk_param_013_the_organism_parameter_is_the_one_wdk_marks(
     fixture: str, marked: str
 ) -> None:
-    """Exactly one parameter carries `organismProperties`, whatever its name."""
+    """Exactly one parameter highlights reference organisms, whatever its name."""
     if needs_qa_recording(f"wdk/{fixture}.json"):
         pytest.skip(NEEDS_QA_RECORDING)
     search = WDKSearchResponse.model_validate(
@@ -273,6 +281,45 @@ def test_wdk_param_013_the_organism_parameter_is_the_one_wdk_marks(
     ).search_data
 
     assert [p.name for p in search.parameters or [] if p.is_organism] == [marked]
+
+
+@pytest.mark.parametrize(
+    "fixture",
+    [
+        "search_boolean_transcript",
+        "search_genes_by_metabolic_pathway_hagai",
+        "search_metrics_awstats",
+        "search_with_a_hidden_required_parameter",
+    ],
+)
+def test_wdk_param_013_a_search_without_the_mark_has_no_organism_parameter(
+    fixture: str,
+) -> None:
+    """No parameter of a search whose declaration has no organism list is marked."""
+    if needs_qa_recording(f"wdk/{fixture}.json"):
+        pytest.skip(NEEDS_QA_RECORDING)
+    search = WDKSearchResponse.model_validate(
+        load_recorded(fixture).json_body()
+    ).search_data
+
+    assert [p.name for p in search.parameters or [] if p.is_organism] == []
+
+
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/search_genes_by_mass_spec.json"), reason=NEEDS_QA_RECORDING
+)
+def test_wdk_param_013_an_organism_tree_of_samples_is_not_the_mark() -> None:
+    """`ms_assay` carries `organismProperties` without `highlightReferenceOrganisms`."""
+    search = WDKSearchResponse.model_validate(
+        load_recorded("search_genes_by_mass_spec").json_body()
+    ).search_data
+    parameters = search.parameters or []
+
+    assert (
+        "organismProperties"
+        in _parameter("search_genes_by_mass_spec", "ms_assay").properties
+    )
+    assert [p.name for p in parameters if p.is_organism] == []
 
 
 @pytest.mark.skipif(

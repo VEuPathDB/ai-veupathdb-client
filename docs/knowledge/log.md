@@ -1,5 +1,16 @@
 # Knowledge log
 
+## 2026-11-22 - The organism parameter is the one that highlights reference organisms
+
+- `WDKBaseParameter.is_organism` is true only when the parameter's `organismProperties`
+  list holds `highlightReferenceOrganisms`. `ms_assay` (`GenesByMassSpec`) and
+  `ptm_assay` (`GenesByPTM`) carry the list without it: their leaves are samples under
+  organism branches, and a selected sample is no longer read as an organism.
+- `search_genes_by_mass_spec` is recorded from plasmodb QA for WDK-PARAM-013.
+- `organismsWithAlphafold` (`GenesWithAlphafold`) is an organism parameter without the
+  value, so its search reads as one with no organism parameter.
+- `veupathdb-py` is 0.9.0b12.
+
 ## 2026-11-22 - A stated pick is read by the one exact step
 
 - `read_stated_values` and `read_stated` read a pick's shape first, then name every term

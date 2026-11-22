@@ -22,7 +22,7 @@ status: stable
 
 A step with one input keeps its rule: `GenesByOrthologs` states its target organism, and
 any other transform has the scope of its input. A leaf reads the parameter its search
-marks with `organismProperties`. A leaf whose search marks none reads its organisms from
+marks as its organism parameter (WDK-PARAM-013). A leaf whose search marks none reads its organisms from
 `leaf_organisms`, a map by step id that the host fills, for example from the dataset a
 study search runs on.
 

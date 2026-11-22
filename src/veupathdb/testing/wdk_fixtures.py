@@ -191,6 +191,12 @@ FIXTURES: tuple[FixtureRequest, ...] = (
         reads="WDK-PARAM-013",
     ),
     FixtureRequest(
+        name="search_genes_by_mass_spec",
+        path=f"{_TRANSCRIPT}/GenesByMassSpec",
+        params={"expandParams": "true"},
+        reads="WDK-PARAM-013",
+    ),
+    FixtureRequest(
         name="search_genes_by_ngs_snps_under_another_organism",
         path=f"{_TRANSCRIPT}/GenesByNgsSnps",
         method="POST",
