@@ -13,23 +13,8 @@ EQUALITY_MODULES = frozenset(
         "veupathdb/domain/parameters/values.py",
     }
 )
-_WIRE_CALLS = frozenset({"to_wire", "wire_map", "dumps", "encode_wdk_params"})
-_PARAM_MAPS = frozenset({"parameters", "params", "param_values", "resolved_params"})
-_VALUE_KINDS = frozenset(
-    {
-        "StringValue",
-        "NumberValue",
-        "NumberRangeValue",
-        "DateValue",
-        "DateRangeValue",
-        "TimestampValue",
-        "SinglePickValue",
-        "MultiPickValue",
-        "FilterValue",
-        "HeldValue",
-        "InputDatasetValue",
-        "InputStepValue",
-    }
+_WIRE_CALLS = frozenset(
+    {"to_wire", "wire_map", "dumps", "encode_wdk_params", "model_dump", "str"}
 )
 
 
@@ -53,59 +38,114 @@ def _called(node: ast.expr) -> str | None:
             return None
 
 
-def _param_map(node: ast.expr) -> bool:
+def _inner(node: ast.expr) -> list[ast.expr]:
     match node:
-        case ast.Attribute(attr=name):
-            return name in _PARAM_MAPS
-        case ast.Subscript(value=inner):
-            return _param_map(inner)
-        case ast.Call(func=ast.Name(id="dict"), args=[inner]):
-            return _param_map(inner)
+        case (
+            ast.Call(func=ast.Name(id="len"), args=[inner])
+            | ast.Call(func=ast.Attribute(attr="get", value=inner))
+            | ast.Subscript(value=inner)
+            | ast.SetComp(elt=inner)
+            | ast.ListComp(elt=inner)
+            | ast.GeneratorExp(elt=inner)
+            | ast.DictComp(value=inner)
+        ):
+            return [inner]
+        case ast.Set(elts=elts) | ast.List(elts=elts) | ast.Tuple(elts=elts):
+            return list(elts)
+        case _:
+            return []
+
+
+def _wire(node: ast.expr, wires: frozenset[str]) -> str | None:
+    match node:
+        case ast.Name(id=name) if name in wires:
+            return f"the wire text held in {name}"
+        case ast.Call() if _called(node) in _WIRE_CALLS:
+            return f"the text of {_called(node)}()"
+        case _:
+            return next(
+                (
+                    reason
+                    for inner in _inner(node)
+                    if (reason := _wire(inner, wires)) is not None
+                ),
+                None,
+            )
+
+
+def _wire_names(scope: ast.AST) -> frozenset[str]:
+    names: set[str] = set()
+    for node in ast.walk(scope):
+        match node:
+            case (
+                ast.Assign(targets=[ast.Name(id=name)], value=value)
+                | ast.AnnAssign(target=ast.Name(id=name), value=ast.expr() as value)
+            ) if _wire(value, frozenset(names)) is not None:
+                names.add(name)
+            case _:
+                pass
+    return frozenset(names)
+
+
+def _counted(node: ast.expr) -> bool:
+    match node:
+        case ast.Call(
+            func=ast.Name(id="len"),
+            args=[ast.SetComp() | ast.ListComp() | ast.Set() | ast.GeneratorExp()],
+        ):
+            return True
         case _:
             return False
 
 
-def _reason(node: ast.expr) -> str | None:
-    called = _called(node)
-    if called in _WIRE_CALLS:
-        return f"compares the text of {called}()"
-    if called in _VALUE_KINDS:
-        return f"compares a {called} with =="
-    if _param_map(node):
-        return "compares a parameter map or value with =="
+def _reason(compare: ast.Compare, wires: frozenset[str]) -> str | None:
+    for op, right in zip(compare.ops, compare.comparators, strict=True):
+        match op:
+            case ast.Eq() | ast.NotEq():
+                sides = [compare.left, right]
+            case ast.In() | ast.NotIn():
+                sides = [compare.left]
+            case _:
+                sides = [side for side in (compare.left, right) if _counted(side)]
+        for side in sides:
+            reason = _wire(side, wires)
+            if reason is not None:
+                return f"compares {reason}"
     return None
 
 
-def _scoped(tree: ast.Module) -> Iterator[tuple[str, ast.Compare]]:
-    def walk(node: ast.AST, scope: str) -> Iterator[tuple[str, ast.Compare]]:
+def _scoped(tree: ast.Module) -> Iterator[tuple[str, frozenset[str], ast.Compare]]:
+    def walk(
+        node: ast.AST, scope: str, wires: frozenset[str]
+    ) -> Iterator[tuple[str, frozenset[str], ast.Compare]]:
         for child in ast.iter_child_nodes(node):
             match child:
                 case (
                     ast.FunctionDef(name=name)
                     | ast.AsyncFunctionDef(name=name)
-                    | (ast.ClassDef(name=name))
+                    | ast.ClassDef(name=name)
                 ):
-                    yield from walk(child, f"{scope}.{name}" if scope else name)
+                    yield from walk(
+                        child,
+                        f"{scope}.{name}" if scope else name,
+                        _wire_names(child),
+                    )
                 case ast.Compare():
-                    yield scope or "<module>", child
-                    yield from walk(child, scope)
+                    yield scope or "<module>", wires, child
+                    yield from walk(child, scope, wires)
                 case _:
-                    yield from walk(child, scope)
+                    yield from walk(child, scope, wires)
 
-    return walk(tree, "")
+    return walk(tree, "", _wire_names(tree))
 
 
 def findings_in(path: Path, relative: str) -> list[Finding]:
     tree = ast.parse(path.read_text(), filename=str(path))
     found: list[Finding] = []
-    for scope, compare in _scoped(tree):
-        if not any(isinstance(op, ast.Eq | ast.NotEq) for op in compare.ops):
-            continue
-        for operand in [compare.left, *compare.comparators]:
-            reason = _reason(operand)
-            if reason is not None:
-                found.append(Finding(relative, scope, compare.lineno, reason))
-                break
+    for scope, wires, compare in _scoped(tree):
+        reason = _reason(compare, wires)
+        if reason is not None:
+            found.append(Finding(relative, scope, compare.lineno, reason))
     return found
 
 
@@ -140,7 +180,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     for finding in unallowed(found, allowed):
         print(
             f"{finding.path}:{finding.line} {finding.scope}: {finding.reason}; "
-            "compare through veupathdb.domain.parameters.same_param_value"
+            "compare the values with =="
         )
     for key in sorted(stale):
         print(f"{args.allow}: {key} is allowed but compares nothing")

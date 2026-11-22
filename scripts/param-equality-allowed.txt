@@ -1,1 +1,3 @@
+src/veupathdb/devtools/qa_sites.py:use_qa_sites
 src/veupathdb/domain/parameters/filter_clause.py:_sent_as
+src/veupathdb/testing/summary.py:DriftLog.record
