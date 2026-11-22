@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import gc
 import time
 from collections.abc import Callable
 
@@ -45,12 +46,17 @@ def _every_code(tree: PhyleticTree, units: int) -> str:
 
 def _read_seconds(text: str, tree: PhyleticTree) -> float:
     fastest = float("inf")
-    for _ in range(RUNS):
-        started = time.perf_counter()
-        expression = PhyleticExpression.parse(text)
-        check_expression(expression, tree)
-        expression.describe(tree)
-        fastest = min(fastest, time.perf_counter() - started)
+    gc.collect()
+    gc.disable()
+    try:
+        for _ in range(RUNS):
+            started = time.process_time()
+            expression = PhyleticExpression.parse(text)
+            check_expression(expression, tree)
+            expression.describe(tree)
+            fastest = min(fastest, time.process_time() - started)
+    finally:
+        gc.enable()
     return fastest
 
 
