@@ -4,9 +4,12 @@ import asyncio
 from http import HTTPStatus
 
 from veupathdb.errors import DataParsingError, VEuPathDBError
-from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
-from veupathdb.wdk._search_config_body import search_config_write_body
+from veupathdb.wdk._search_config_body import (
+    combined_step_body,
+    new_step_body,
+    search_config_write_body,
+)
 from veupathdb.wdk.strategy_api.base import StrategyAPIBase
 from veupathdb.wdk.wdk_models import (
     CombinedStepSpec,
@@ -65,6 +68,20 @@ class StepsMixin(StrategyAPIBase):
             params[ap_name] = ""
         return params
 
+    async def _with_empty_answer_params(
+        self, spec: NewStepSpec, record_type: str
+    ) -> NewStepSpec:
+        parameters = await self._empty_answer_params(
+            record_type, spec.search_name, dict(spec.search_config.parameters)
+        )
+        return spec.model_copy(
+            update={
+                "search_config": spec.search_config.model_copy(
+                    update={"parameters": parameters}
+                )
+            }
+        )
+
     async def _current_answer_params(
         self,
         step: WDKStep,
@@ -100,22 +117,8 @@ class StepsMixin(StrategyAPIBase):
         record_type: str,
         user_id: str | None = None,
     ) -> WDKIdentifier:
-        """Create an unattached step, its parameters sent as given."""
-        normalized = await self._empty_answer_params(
-            record_type, spec.search_name, dict(spec.search_config.parameters)
-        )
-        search_config = WDKSearchConfig(
-            parameters=normalized, wdk_weight=spec.search_config.wdk_weight
-        )
-
-        payload: JSONObject = {
-            "searchName": spec.search_name,
-            "searchConfig": search_config.model_dump(
-                by_alias=True, exclude_defaults=True
-            ),
-        }
-        if spec.custom_name:
-            payload["customName"] = spec.custom_name
+        """Create an unattached step, its search config sent as given."""
+        payload = new_step_body(await self._with_empty_answer_params(spec, record_type))
 
         logger.info(
             "Creating WDK step",
@@ -141,22 +144,7 @@ class StepsMixin(StrategyAPIBase):
         uid = await self._get_user_id(user_id)
         boolean = await self.client.boolean_search(record_type)
 
-        search_config: JSONObject = {
-            "parameters": {
-                # WDK requires empty operands; inputs are wired via the stepTree.
-                boolean.left_param: "",
-                boolean.right_param: "",
-                boolean.operator_param: spec.boolean_operator.value,
-            },
-        }
-        if spec.wdk_weight is not None:
-            search_config["wdkWeight"] = spec.wdk_weight
-        payload: JSONObject = {
-            "searchName": boolean.search_name,
-            "searchConfig": search_config,
-        }
-        if spec.custom_name:
-            payload["customName"] = spec.custom_name
+        payload = combined_step_body(spec, boolean)
 
         logger.info(
             "Creating combined step",
@@ -180,26 +168,13 @@ class StepsMixin(StrategyAPIBase):
         *,
         user_id: str | None = None,
     ) -> WDKIdentifier:
-        """Create a transform step, its parameters sent as given.
+        """Create a transform step, its search config sent as given.
 
         WDK requires every ``input-step`` (AnswerParam) to be the empty string
         on a new step; the input is wired through the ``stepTree``.
         """
-        normalized = await self._empty_answer_params(
-            record_type, spec.search_name, dict(spec.search_config.parameters)
-        )
-        search_config = WDKSearchConfig(
-            parameters=normalized, wdk_weight=spec.search_config.wdk_weight
-        )
-
-        payload: JSONObject = {
-            "searchName": spec.search_name,
-            "searchConfig": search_config.model_dump(
-                by_alias=True, exclude_defaults=True
-            ),
-        }
-        if spec.custom_name:
-            payload["customName"] = spec.custom_name
+        sent = await self._with_empty_answer_params(spec, record_type)
+        payload = new_step_body(sent)
 
         logger.info(
             "Creating transform step",
@@ -209,7 +184,7 @@ class StepsMixin(StrategyAPIBase):
         logger.info(
             "Transform step payload",
             transform=spec.search_name,
-            params=normalized,
+            params=sent.search_config.parameters,
         )
 
         uid = await self._get_user_id(user_id)
@@ -229,14 +204,13 @@ class StepsMixin(StrategyAPIBase):
         *,
         user_id: str | None = None,
     ) -> None:
-        """Update a step's parameters, and its weight when the caller sets one.
+        """Update a step's parameters, and its weight and filters when stated.
 
         Endpoint: ``PUT /users/{uid}/steps/{step_id}/search-config``. The
         endpoint resets every key the body omits and refuses a changed input,
         so the write starts from the step's own config: its filters, column
-        filters, weight and input-step params. The caller's parameters are
-        sent as given: a stated value is canonical when it is stated, and a value
-        read from WDK is WDK's own.
+        filters, weight and input-step params. Stated filters replace the held
+        list whole. The caller's parameters are sent as given.
         """
         uid = await self._get_user_id(user_id)
         step = await self.find_step(step_id, uid)
@@ -244,13 +218,17 @@ class StepsMixin(StrategyAPIBase):
         parameters = await self._current_answer_params(
             step, record_type, search_name, dict(search_config.parameters)
         )
-        weight = (
-            search_config.wdk_weight
-            if "wdk_weight" in search_config.model_fields_set
-            else step.search_config.wdk_weight
-        )
+        stated = search_config.model_fields_set
         written = step.search_config.model_copy(
-            update={"parameters": parameters, "wdk_weight": weight}
+            update={
+                "parameters": parameters,
+                "wdk_weight": search_config.wdk_weight
+                if "wdk_weight" in stated
+                else step.search_config.wdk_weight,
+                "filters": search_config.filters
+                if "filters" in stated
+                else step.search_config.filters,
+            }
         )
 
         logger.info(

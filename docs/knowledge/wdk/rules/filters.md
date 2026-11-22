@@ -70,6 +70,18 @@ holds
 present again on the next read. Setting `disabled: true` is the only way to
 turn it off, and that is stored.
 
+The source is the same for a create and a PUT. Every build of an answer spec whose
+parameters are valid
+([`#L113-L118`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/answer/spec/AnswerSpec.java#L113-L118)) calls
+[`applyAlwaysOnFilters`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/answer/spec/AnswerSpec.java#L164-L189), which adds each always-on filter the
+body's `filters` list does not name, at its enabled default, and adds nothing when that
+default is null. A build whose parameters are invalid gets no always-on filter. So:
+
+- An empty or omitted list removes every filter the caller set, and resets each held
+  always-on filter, including one with `disabled: true`, to its enabled default.
+- A stated filter of that name stops WDK from adding its default. Only a stated filter of
+  that name with `disabled: true` keeps an always-on filter off.
+
 Two consequences. A read-modify-write of `searchConfig` that drops `filters`
 does not remove the filter, so the 204 is not confirmation of anything. And a
 step you never filtered is filtered: on this step the always-applied filter is
@@ -103,7 +115,7 @@ no filter when WDK added none.
 
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/request/answer/AnswerSpecServiceFormat.java#L85-L98
-- anchor: src/veupathdb/wdk/_analyses.py:update_step_filters
+- anchor: src/veupathdb/wdk/_search_config_body.py:search_config_write_body
 - status: ENFORCED by tests/unit/rules/test_filter_rules.py::test_wdk_filter_003_a_search_config_write_carries_no_view_filters
 `parseViewFilters` reads `viewFilters` from whatever object it is handed, and it
 is handed the **request body** - by
@@ -141,12 +153,10 @@ none given the body carries no `viewFilters` key
 transcript search, `representativeTranscriptOnly` makes the rows one per gene, the unit
 the count reports.
 
-**This client's `FilterMixin` is named for the wrong mechanism.**
-`list_step_filters` and `set_step_filter` say `viewFilters` throughout, and the
-client methods behind them are `get_step_view_filters` and
-`update_step_view_filters`. What they actually read and write is
-`searchConfig.filters`, which is correct behaviour under a set of names that
-describe something else - and something that would 400 if it were attempted.
+**This client names the step filter write for its mechanism.** `StepFilterMixin.set_step_filter`
+reads the step once and writes its whole `searchConfig` back with the new `filters` list,
+through `search_config_write_body`. It never sends `viewFilters`, which would 400 inside a
+search config.
 
 ### WDK-FILTER-004 - `totalCount` ignores view filters; only `viewTotalCount` matches the rows you got
 

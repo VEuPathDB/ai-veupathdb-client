@@ -9,8 +9,9 @@ from pydantic import JsonValue
 
 from veupathdb.domain.strategy.ast import StepFilter
 from veupathdb.domain.strategy.step_settings import StepSettings
+from veupathdb.wdk._search_config_body import search_config_write_body
 from veupathdb.wdk.strategy_api.base import StrategyAPIBase
-from veupathdb.wdk.wdk_models import WDKFilterValue
+from veupathdb.wdk.wdk_models import WDKFilterValue, WDKStep
 
 
 class StepFilterMixin(StrategyAPIBase):
@@ -27,12 +28,16 @@ class StepFilterMixin(StrategyAPIBase):
     ) -> None:
         """Create or update one named filter on a step.
 
-        The other filters and the rest of the search config are preserved.
+        The step is read once, and its whole config goes back with the new list.
         """
         uid = await self._get_user_id(user_id)
-        current = await self.client.get_step_filters(uid, step_id)
+        path = f"/users/{uid}/steps/{step_id}"
+        step = WDKStep.model_validate(await self.client.get(path))
         held = StepSettings(
-            filters=[StepFilter.model_validate(f.model_dump()) for f in current]
+            filters=[
+                StepFilter.model_validate(f.model_dump())
+                for f in step.search_config.filters
+            ]
         )
         stated = StepSettings(
             filters=[StepFilter(name=filter_name, value=value, disabled=disabled)]
@@ -41,4 +46,9 @@ class StepFilterMixin(StrategyAPIBase):
             WDKFilterValue.model_validate(f.model_dump())
             for f in held.filters_to_put(StepSettings(), stated)
         ]
-        await self.client.update_step_filters(uid, step_id, updated)
+        await self.client.put(
+            f"{path}/search-config",
+            json=search_config_write_body(
+                step.search_config.model_copy(update={"filters": updated})
+            ),
+        )

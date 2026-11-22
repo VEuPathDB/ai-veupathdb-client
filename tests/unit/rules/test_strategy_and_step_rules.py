@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from http import HTTPStatus
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
+from tests.unit.wdk._step_writes import Recorder
 
 from veupathdb.domain.strategy.ast import COMBINE_SEARCH_NAME
 from veupathdb.domain.strategy.graph_model import (
@@ -19,7 +21,12 @@ from veupathdb.domain.strategy.tree import root_ids, subtree_ids
 from veupathdb.errors import WDKError
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.strategy_api.api import StrategyAPI
-from veupathdb.wdk.wdk_models import WDKStepTree
+from veupathdb.wdk.wdk_models import (
+    NewStepSpec,
+    WDKFilterValue,
+    WDKSearchConfig,
+    WDKStepTree,
+)
 
 _IN_A_STRATEGY = "the step is part of a strategy"
 _ALREADY_GONE = "no such step"
@@ -291,3 +298,47 @@ async def test_a_refused_strategy_delete_still_raises(
         await api.delete_strategy(7)
 
     assert caught.value.status == HTTPStatus.FORBIDDEN
+
+
+async def test_wdk_step_009_a_create_and_a_stated_put_send_exactly_the_stated_filters(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A step's filters are part of its search config, so each write carries them."""
+    filters = [
+        WDKFilterValue(name="matched_transcript_filter_array", value={"values": ["Y"]}),
+        WDKFilterValue(name="gene_boolean_filter_array", value=None, disabled=True),
+    ]
+    held = {"name": "other_filter", "value": {"values": ["N"]}, "disabled": False}
+
+    async def no_inputs(record_type: str, search_name: str, **_: object) -> Any:
+        del record_type, search_name
+        return SimpleNamespace(search_data=SimpleNamespace(parameters=[]))
+
+    async def read_step(path: str, **_: object) -> Any:
+        del path
+        return {
+            "id": 9,
+            "searchName": "GenesByMolecularWeight",
+            "searchConfig": {"parameters": {}, "filters": [held]},
+        }
+
+    api = StrategyAPI(VEuPathDBClient("https://example.invalid/service"), "1")
+    post = Recorder(reply={"id": 41})
+    put = Recorder()
+    monkeypatch.setattr(api.client, "get_search_details", no_inputs)
+    monkeypatch.setattr(api.client, "get", read_step)
+    monkeypatch.setattr(api.client, "post", post)
+    monkeypatch.setattr(api.client, "put", put)
+    config = WDKSearchConfig(parameters={}, filters=filters)
+    sent = [f.model_dump(by_alias=True) for f in filters]
+
+    await api.create_step(
+        NewStepSpec(search_name="GenesByMolecularWeight", search_config=config),
+        "transcript",
+    )
+    await api.update_step_search_config(
+        9, config, record_type="transcript", search_name="GenesByMolecularWeight"
+    )
+
+    assert post.body["searchConfig"]["filters"] == sent
+    assert put.body["filters"] == sent

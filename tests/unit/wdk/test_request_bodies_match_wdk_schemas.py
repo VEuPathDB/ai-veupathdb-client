@@ -16,7 +16,12 @@ from veupathdb.domain.strategy.ops import CombineOp
 from veupathdb.json_types import JSONObject
 from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import fixture_request, load_recorded
-from veupathdb.wdk._search_config_body import search_config_write_body
+from veupathdb.wdk._search_config_body import (
+    combined_step_body,
+    new_step_body,
+    search_config_write_body,
+)
+from veupathdb.wdk._searches import BooleanSearch
 from veupathdb.wdk.wdk_models import (
     CombinedStepSpec,
     NewStepSpec,
@@ -60,54 +65,22 @@ def _recorded_answer_request() -> _RecordedAnswerRequest:
     )
 
 
-def _boolean_search() -> tuple[str, tuple[str, str, str]]:
+def _boolean_search() -> BooleanSearch:
     """The boolean search and its three operand parameters, as WDK publishes them."""
     recorded = WDKSearchResponse.model_validate(
         load_recorded("search_boolean_transcript").json_body()
     )
     names = recorded.search_data.param_names
-    left = next(name for name in names if name.startswith("bq_left_op"))
-    right = next(name for name in names if name.startswith("bq_right_op"))
-    operator = next(name for name in names if name.startswith("bq_operator"))
-    return recorded.search_data.url_segment, (left, right, operator)
-
-
-def _new_step_body(spec: NewStepSpec) -> JSONObject:
-    """``StepsMixin.create_step`` and ``create_transform_step``."""
-    payload: JSONObject = {
-        "searchName": spec.search_name,
-        "searchConfig": spec.search_config.model_dump(
-            by_alias=True, exclude_defaults=True
-        ),
-    }
-    if spec.custom_name:
-        payload["customName"] = spec.custom_name
-    return payload
-
-
-def _combined_step_body(spec: CombinedStepSpec) -> JSONObject:
-    """``StepsMixin.create_combined_step``."""
-    boolean_search, (left, right, operator) = _boolean_search()
-    search_config: JSONObject = {
-        "parameters": {
-            left: "",
-            right: "",
-            operator: spec.boolean_operator.value,
-        },
-    }
-    if spec.wdk_weight is not None:
-        search_config["wdkWeight"] = spec.wdk_weight
-    payload: JSONObject = {
-        "searchName": boolean_search,
-        "searchConfig": search_config,
-    }
-    if spec.custom_name:
-        payload["customName"] = spec.custom_name
-    return payload
+    return BooleanSearch(
+        search_name=recorded.search_data.url_segment,
+        left_param=next(name for name in names if name.startswith("bq_left_op")),
+        right_param=next(name for name in names if name.startswith("bq_right_op")),
+        operator_param=next(name for name in names if name.startswith("bq_operator")),
+    )
 
 
 def _config_write(config: WDKSearchConfig, filters: list[WDKFilterValue]) -> JSONObject:
-    """``update_step_search_config`` and ``update_step_filters`` both send this."""
+    """``update_step_search_config`` and ``set_step_filter`` both send this."""
     return search_config_write_body(config.model_copy(update={"filters": filters}))
 
 
@@ -122,20 +95,61 @@ def test_a_new_step_body_passes_the_schema_wdk_binds() -> None:
         custom_name="50-50.1 kDa",
     )
 
-    assert verify_body("wdk.users.steps.post-request", _new_step_body(spec)) == ()
+    assert verify_body("wdk.users.steps.post-request", new_step_body(spec)) == ()
 
 
 def test_a_new_step_body_without_a_custom_name_passes() -> None:
     spec = NewStepSpec(search_name=_SEARCH, search_config=_mw_config())
 
-    assert verify_body("wdk.users.steps.post-request", _new_step_body(spec)) == ()
+    assert verify_body("wdk.users.steps.post-request", new_step_body(spec)) == ()
 
 
 def test_a_weighted_new_step_body_passes() -> None:
     config = WDKSearchConfig(parameters=_mw_config().parameters, wdk_weight=10)
     spec = NewStepSpec(search_name=_SEARCH, search_config=config)
 
-    assert verify_body("wdk.users.steps.post-request", _new_step_body(spec)) == ()
+    assert verify_body("wdk.users.steps.post-request", new_step_body(spec)) == ()
+
+
+def test_a_new_step_body_with_column_filters_passes() -> None:
+    config = WDKSearchConfig(
+        parameters=_mw_config().parameters,
+        column_filters={"gene_product": {"byValue": {"pattern": "kinase"}}},
+    )
+    spec = NewStepSpec(search_name=_SEARCH, search_config=config)
+
+    assert verify_body("wdk.users.steps.post-request", new_step_body(spec)) == ()
+
+
+def test_a_filtered_new_step_body_passes() -> None:
+    config = WDKSearchConfig(
+        parameters=_mw_config().parameters,
+        filters=[
+            WDKFilterValue(
+                name="matched_transcript_filter_array", value={"values": ["Y"]}
+            ),
+            WDKFilterValue(name="gene_boolean_filter_array", disabled=True),
+        ],
+    )
+    spec = NewStepSpec(search_name=_SEARCH, search_config=config)
+
+    assert verify_body("wdk.users.steps.post-request", new_step_body(spec)) == ()
+
+
+@pytest.mark.skipif(
+    needs_qa_recording("wdk/search_boolean_transcript.json"), reason=NEEDS_QA_RECORDING
+)
+def test_a_filtered_combined_step_body_passes() -> None:
+    spec = CombinedStepSpec(
+        primary_step_id=1,
+        secondary_step_id=2,
+        boolean_operator=CombineOp.UNION,
+        filters=[WDKFilterValue(name="gene_boolean_filter_array", value=None)],
+    )
+
+    body = combined_step_body(spec, _boolean_search())
+
+    assert verify_body("wdk.users.steps.post-request", body) == ()
 
 
 @pytest.mark.skipif(
@@ -150,7 +164,12 @@ def test_a_combined_step_body_passes_the_schema_wdk_binds() -> None:
         wdk_weight=0,
     )
 
-    assert verify_body("wdk.users.steps.post-request", _combined_step_body(spec)) == ()
+    assert (
+        verify_body(
+            "wdk.users.steps.post-request", combined_step_body(spec, _boolean_search())
+        )
+        == ()
+    )
 
 
 @pytest.mark.parametrize(

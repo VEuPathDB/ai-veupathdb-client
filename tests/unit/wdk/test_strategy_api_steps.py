@@ -164,6 +164,49 @@ class TestSettingAFilterIsHowItIsTurnedOff:
             "other_filter",
         }
 
+    async def test_only_the_filters_change(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        api, put = _api(monkeypatch)
+        held_config = {
+            "parameters": {
+                "min_molecular_weight": "10000",
+                "max_molecular_weight": "50000",
+                "gene_result": "77",
+            },
+            "filters": [],
+            "columnFilters": {"gene_product": {"byValue": {"pattern": "kinase"}}},
+            "wdkWeight": 7,
+        }
+
+        async def read_held(path: str, **_: object) -> Any:
+            del path
+            return _STEP | {"searchConfig": held_config}
+
+        monkeypatch.setattr(api.client, "get", read_held)
+
+        await api.set_step_filter(9, _ALWAYS_APPLIED, {"values": ["Y"]}, user_id="1")
+
+        assert put.body == held_config | {
+            "filters": [
+                {"name": _ALWAYS_APPLIED, "value": {"values": ["Y"]}, "disabled": False}
+            ]
+        }
+
+    async def test_the_step_is_read_once(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        api, _put = _api(monkeypatch)
+        reads: list[str] = []
+
+        async def counted(path: str, **_: object) -> Any:
+            reads.append(path)
+            return _STEP
+
+        monkeypatch.setattr(api.client, "get", counted)
+
+        await api.set_step_filter(9, _ALWAYS_APPLIED, {"values": ["Y"]}, user_id="1")
+
+        assert reads == ["/users/1/steps/9"]
+
     async def test_a_held_filter_is_replaced_where_it_stands(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:

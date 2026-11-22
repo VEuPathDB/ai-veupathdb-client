@@ -1,13 +1,16 @@
-"""WDK-FILTER-001 and WDK-FILTER-003 over the search config this client writes."""
+"""WDK-FILTER-001, WDK-FILTER-003 and WDK-STEP-003 over the search config this client writes."""
 
 from __future__ import annotations
 
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
 
 from veupathdb.wdk.client import VEuPathDBClient
-from veupathdb.wdk.wdk_models import WDKFilterValue, WDKSearchConfig
+from veupathdb.wdk.strategy_api.api import StrategyAPI
+from veupathdb.wdk.wdk_models import WDKSearchConfig
+from veupathdb.wdk.wdk_parameters import WDKAnswerParam
 
 _ALWAYS_APPLIED = "matched_transcript_filter_array"
 
@@ -69,7 +72,7 @@ async def test_wdk_filter_003_a_search_config_write_carries_no_view_filters(
     """`viewFilters` inside a search config is a 400, so the write drops it."""
     client, written = _client(monkeypatch)
 
-    await client.update_step_filters("1", 9, [WDKFilterValue(name=_ALWAYS_APPLIED)])
+    await StrategyAPI(client, "1").set_step_filter(9, _ALWAYS_APPLIED, None)
 
     assert "viewFilters" not in written.body
     assert [entry["name"] for entry in written.body["filters"]] == [_ALWAYS_APPLIED]
@@ -80,7 +83,27 @@ async def test_wdk_step_003_a_search_config_write_keeps_the_answer_parameters(
 ) -> None:
     """The endpoint cannot change a step's inputs, so the write sends them back."""
     client, written = _client(monkeypatch)
+    api = StrategyAPI(client, "1")
 
-    await client.update_step_filters("1", 9, [WDKFilterValue(name=_ALWAYS_APPLIED)])
+    async def inputs(record_type: str, search_name: str, **_: object) -> Any:
+        del record_type, search_name
+        return SimpleNamespace(
+            search_data=SimpleNamespace(parameters=[WDKAnswerParam(name="gene_result")])
+        )
 
-    assert written.body["parameters"]["gene_result"] == "77"
+    monkeypatch.setattr(client, "get_search_details", inputs)
+
+    await api.set_step_filter(9, _ALWAYS_APPLIED, None)
+    after_filter = written.body["parameters"]["gene_result"]
+    await api.update_step_search_config(
+        9,
+        WDKSearchConfig(parameters={"min_molecular_weight": "20000"}),
+        record_type="transcript",
+        search_name="GenesByMolecularWeight",
+    )
+
+    assert after_filter == "77"
+    assert written.body["parameters"] == {
+        "min_molecular_weight": "20000",
+        "gene_result": "77",
+    }

@@ -1,5 +1,18 @@
 # Knowledge log
 
+## 2026-11-22 - A step write carries its filters
+
+- `create_step`, `create_transform_step` and `create_combined_step` send the filters their
+  config states; `CombinedStepSpec` carries `filters`. Before, the two leaf creates rebuilt
+  the config without them, and a combine had no way to state them.
+- `update_step_search_config` sends exactly the caller's filters when the caller states
+  them, otherwise the filters the step holds. It does no merging: a caller computes the
+  list with `filters_to_put` ([WDK-STEP-009](wdk/rules/strategies-and-steps.md)). WDK
+  adds and resets its always-on filters on every create and PUT whose parameters are
+  valid, as [WDK-FILTER-002](wdk/rules/filters.md) states.
+- `set_step_filter` reads the step once and writes its whole config back;
+  `get_step_filters` and `update_step_filters` are gone.
+
 ## 2026-11-22 - One model holds a step's settings
 
 - `StepSettings` holds the eight fields WDK behaviour depends on: search, parameters,

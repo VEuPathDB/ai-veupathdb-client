@@ -6,13 +6,10 @@ from veupathdb.errors import validate_response
 from veupathdb.json_types import JSONObject
 from veupathdb.logging import get_logger
 from veupathdb.wdk._helpers import _validate_list
-from veupathdb.wdk._search_config_body import search_config_write_body
 from veupathdb.wdk.analysis_result import WDKAnalysisNotReadyError
 from veupathdb.wdk.wdk_models import (
     WDKAnalysisStatus,
     WDKAnalysisStatusResponse,
-    WDKFilterValue,
-    WDKStep,
     WDKStepAnalysisConfig,
     WDKStepAnalysisSummary,
     WDKStepAnalysisType,
@@ -57,37 +54,6 @@ class AnalysisEndpoints:
     async def put(self, path: str, json: object = None) -> JsonValue:
         """Provided by HTTPClient at runtime."""
         raise NotImplementedError  # pragma: no cover
-
-    # --- Step filters ---
-
-    async def get_step_filters(
-        self, user_id: str, step_id: int
-    ) -> list[WDKFilterValue]:
-        """Get a step's ``searchConfig.filters``.
-
-        These are step filters. ``viewFilters`` is a separate mechanism that
-        does not live in the search config at all.
-        """
-        raw = await self.get(f"/users/{user_id}/steps/{step_id}")
-        step = WDKStep.model_validate(raw)
-        return list(step.search_config.filters)
-
-    async def update_step_filters(
-        self, user_id: str, step_id: int, filters: list[WDKFilterValue]
-    ) -> JsonValue:
-        """Replace a step's ``searchConfig.filters``, keeping the rest of it.
-
-        The whole config is written back because the endpoint replaces it.
-        Naming the keys instead would drop every field not named, and
-        ``columnFilters`` changes the step's counts.
-        """
-        raw = await self.get(f"/users/{user_id}/steps/{step_id}")
-        step = WDKStep.model_validate(raw)
-        config = step.search_config.model_copy(update={"filters": filters})
-        return await self.put(
-            f"/users/{user_id}/steps/{step_id}/search-config",
-            json=search_config_write_body(config),
-        )
 
     # --- Analysis types ---
 

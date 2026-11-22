@@ -725,3 +725,4 @@ class CombinedStepSpec(PatchStepSpec):
     secondary_step_id: int
     boolean_operator: BooleanOperator
     wdk_weight: int | None = None
+    filters: list[WDKFilterValue] = Field(default_factory=list)

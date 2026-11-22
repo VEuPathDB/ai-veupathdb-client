@@ -62,7 +62,7 @@ stronger than omitting the key and is deliberately so: the named test passes a s
 
 - class: HARD
 - upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/request/strategy/StepRequestParser.java#L157-L170
-- anchor: src/veupathdb/wdk/_analyses.py:update_step_filters
+- anchor: src/veupathdb/wdk/strategy_api/steps.py:update_step_search_config
 - status: ENFORCED by tests/unit/rules/test_filter_rules.py::test_wdk_step_003_a_search_config_write_keeps_the_answer_parameters
 
 Answer parameters live in the same flat `searchConfig.parameters` map as everything else, so
@@ -72,8 +72,10 @@ the step's current value and throws `Changes to answer param values are not allo
 any difference. The comment above it says why: the strategy service owns the tree.
 
 A parameter update on an attached step (`update_step_search_config`) therefore reads the
-step back and keeps its filters, column filters and weight (the caller's weight replaces
-it only when the caller sets one). The `parameters` map is replaced whole: it is the
+step back and keeps its filters, column filters and weight. The caller's weight replaces
+the held weight only when the caller sets one, and the caller's filters replace the held
+list whole only when the caller states them
+([WDK-STEP-009](#wdk-step-009---a-steps-filters-are-part-of-its-search-config-so-a-create-sends-them-and-a-search-config-put-that-states-filters-replaces-them-whole)). The `parameters` map is replaced whole: it is the
 caller's map with every input-step value set to the value the step holds. `tests/unit/wdk/test_strategy_api_steps.py::TestAWriteCarriesTheStepsOwnInputs`
 and `tests/unit/wdk/test_search_config_write.py::TestAWriteStartsFromTheStepsOwnConfig`
 pin it. A write that cannot carry every input value never reaches WDK: a failed catalog
@@ -88,8 +90,8 @@ no way around it.
 Practically this makes any search-config write a read-modify-write. You must fetch the
 step, keep its answer parameter values byte for byte, change the parameters you meant to
 change, and PUT the whole thing. Dropping an answer parameter is changing it. This client's
-filter update does the round trip correctly - it copies `step.search_config.parameters`
-wholesale - though nothing tests that it keeps doing so.
+filter write (`set_step_filter`) reads the step once and copies `step.search_config.parameters`
+wholesale. The named test runs both writes on a step with an input value.
 
 Source-only: read off the pinned sha, not confirmed against a running site. See
 [the pin-versus-deployment note](../sources.md).
@@ -248,6 +250,37 @@ either side - plus `snp-chip` on plasmodb.org, which toxodb.org does not have - 
 colocation genuinely relates different kinds of thing. That asymmetry is why colocation is
 excluded from the boolean operator set, for reasons recorded in
 the boolean-operator decision (`pathfinder: docs/knowledge/decisions/boolean-operator-is-a-type.md`).
+
+### WDK-STEP-009 - A step's filters are part of its search config, so a create sends them and a search-config PUT that states filters replaces them whole
+
+- class: HARD
+- upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/user/StepService.java#L314-L364
+- anchor: src/veupathdb/wdk/strategy_api/steps.py:create_step
+- status: ENFORCED by tests/unit/rules/test_strategy_and_step_rules.py::test_wdk_step_009_a_create_and_a_stated_put_send_exactly_the_stated_filters
+
+`putAnswerSpec` parses the body into a new answer spec and replaces the step's spec with it
+(`Step.builder(existingStep).setAnswerSpec(AnswerSpec.builder(newSpec))`). Nothing from the
+old spec is merged in. The
+[`createStep`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/service/user/StepService.java#L86-L114)
+endpoint builds the new step from the same parse. Both reach
+[`AnswerSpecServiceFormat.parse`](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Service/src/main/java/org/gusdb/wdk/service/request/answer/AnswerSpecServiceFormat.java#L22-L66),
+which takes the step's filters from the body's `filters` key and says that omission means
+no filters. So a create that drops a stated filter makes a step without it, and a later
+write must add it.
+
+The body is not the whole list WDK holds: WDK adds and resets its always-on filters by
+[WDK-FILTER-002](filters.md#wdk-filter-002---an-always-applied-filter-is-injected-into-every-step-and-cannot-be-removed-by-omitting-it).
+
+The three creates (`create_step`, `create_transform_step`, `create_combined_step`) send the
+filters their config states. `update_step_search_config` starts from the step's own config
+([WDK-STEP-003](#wdk-step-003---put-search-config-cannot-change-a-steps-inputs)) and,
+when the caller states `filters`, sends exactly that list. The call does no merging. A
+caller that changes some filters and keeps WDK's computes the list with
+`StepSettings.filters_to_put`, the one filter rule; `set_step_filter` writes through it.
+`tests/unit/wdk/test_a_step_write_carries_its_filters.py` pins each write.
+
+Source-only: read off the pinned sha, not confirmed against a running site. See
+[the pin-versus-deployment note](../sources.md).
 
 ### WDK-STRAT-001 - A step tree node carries a step id and nothing else
 
