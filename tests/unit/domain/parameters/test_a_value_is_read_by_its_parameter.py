@@ -16,12 +16,12 @@ from veupathdb.domain.parameters import (
     fill_site_set_defaults,
     read_stated_values,
 )
-from veupathdb.domain.parameters.canonicalize import HeldValues
 from veupathdb.domain.parameters.specs import ParamSpecNormalized
 from veupathdb.domain.parameters.value_codec import from_wire
 from veupathdb.domain.parameters.values import (
     DateRangeValue,
     DateValue,
+    HeldValue,
     InputDatasetValue,
     InputStepValue,
     MultiPickValue,
@@ -646,7 +646,7 @@ class TestAHeldValueIsReadAsWdkHoldsIt:
 
         held = ParameterCanonicalizer({param.name: _spec(param)}).held({param.name: ""})
 
-        assert held == HeldValues(values={param.name: StringValue(value="")})
+        assert held == {param.name: StringValue(value="")}
 
     @pytest.mark.parametrize("index", range(10))
     def test_every_kind_reads_its_empty_wire_form(self, index: int) -> None:
@@ -657,14 +657,14 @@ class TestAHeldValueIsReadAsWdkHoldsIt:
             {param.name: empty.to_wire()}
         )
 
-        assert held.values == {param.name: empty}
+        assert held == {param.name: empty}
 
     def test_a_wire_form_no_kind_reads_is_kept_as_wdk_holds_it(self) -> None:
         param = WDKNumberParam(name="n", min=0, max=10)
 
         held = ParameterCanonicalizer({"n": _spec(param)}).held({"n": "abc"})
 
-        assert held == HeldValues(values={}, unread={"n": "abc"})
+        assert held == {"n": HeldValue(wire="abc")}
 
     def test_a_term_the_vocabulary_lost_is_kept_as_decoded(self) -> None:
         param = _param("search_genes_by_ngs_snps", "ReadFrequencyPercent")
@@ -673,7 +673,7 @@ class TestAHeldValueIsReadAsWdkHoldsIt:
             {param.name: "10%"}
         )
 
-        assert held.values == {param.name: SinglePickValue(value="10%")}
+        assert held == {param.name: SinglePickValue(value="10%")}
 
 
 def test_one_text_refuses_an_empty_value_on_both_paths() -> None:

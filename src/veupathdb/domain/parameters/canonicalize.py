@@ -9,7 +9,7 @@ WDK can read is one WDK accepts is WDK's verdict, not this module's.
 """
 
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from pydantic import JsonValue
 from pydantic import ValidationError as PydanticValidationError
@@ -19,6 +19,7 @@ from veupathdb.domain.parameters.stated import empty_refusal
 from veupathdb.domain.parameters.value_codec import as_param_kind, from_wire, to_decoded
 from veupathdb.domain.parameters.values import (
     DateRangeValue,
+    HeldValue,
     MultiPickValue,
     NumberRangeValue,
     ParamValue,
@@ -43,6 +44,15 @@ def _refuse(
         detail=f"Parameter '{spec.name}' {reason}.",
         errors=[{"param": spec.name, "value": value}],
     )
+
+
+def _read(spec: ParamSpecNormalized | None, raw: str) -> ParamValue:
+    if spec is None:
+        return HeldValue(wire=raw)
+    try:
+        return from_wire(as_param_kind(spec.param_type), raw)
+    except PydanticValidationError, ValueError, TypeError:
+        return HeldValue(wire=raw)
 
 
 def close_open_range(
@@ -71,12 +81,6 @@ def close_open_range(
 
 
 @dataclass(frozen=True)
-class HeldValues:
-    values: dict[str, ParamValue] = field(default_factory=dict)
-    unread: dict[str, str] = field(default_factory=dict)
-
-
-@dataclass(frozen=True)
 class ParameterCanonicalizer:
     """Canonicalize ``ParamValue`` parameters using canonical parameter specs."""
 
@@ -89,10 +93,14 @@ class ParameterCanonicalizer:
         """Canonicalize each value against its spec.
 
         An ``input-step`` value is left out: its value is structural, wired by
-        the caller, and never a choice WDK made.
+        the caller, and never a choice WDK made. A held value is WDK's own and
+        goes through untouched.
         """
         canonical: dict[str, ParamValue] = {}
         for name, value in (parameters or {}).items():
+            if isinstance(value, HeldValue):
+                canonical[name] = value
+                continue
             spec = self.specs.get(name)
             if not spec:
                 available = sorted(self.specs.keys())
@@ -114,26 +122,18 @@ class ParameterCanonicalizer:
             canonical[name] = self._canonicalize_value(spec, value)
         return canonical
 
-    def held(self, wire: Mapping[str, str]) -> HeldValues:
-        """Each value WDK holds, read as its kind and never refused.
+    def held(self, wire: Mapping[str, str]) -> dict[str, ParamValue]:
+        """Each value WDK holds, read as its kind and never refused or rewritten.
 
-        A value no kind reads is kept in its wire form, and a value the spec
-        does not canonicalize is kept as read.
+        A value no kind reads, and a value of a name with no spec, is held in
+        its wire form. A declared ``input-step`` value is the wiring WDK makes.
         """
-        held = HeldValues()
+        held: dict[str, ParamValue] = {}
         for name, raw in wire.items():
             spec = self.specs.get(name)
-            if spec is None or spec.param_type == "input-step":
+            if spec is not None and spec.param_type == "input-step":
                 continue
-            try:
-                value = from_wire(as_param_kind(spec.param_type), raw)
-            except PydanticValidationError, ValueError, TypeError:
-                held.unread[name] = raw
-                continue
-            try:
-                held.values[name] = self._canonicalize_value(spec, value)
-            except ValidationError:
-                held.values[name] = value
+            held[name] = _read(spec, raw)
         return held
 
     def _canonicalize_value(

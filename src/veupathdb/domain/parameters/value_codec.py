@@ -6,6 +6,7 @@ from collections.abc import Callable
 from pydantic import JsonValue, TypeAdapter
 
 from veupathdb.domain.parameters.values import (
+    HeldValue,
     ParamKind,
     ParamValue,
 )
@@ -85,6 +86,14 @@ def _wire_payload(kind: ParamKind, wire: str) -> dict[str, JsonValue]:
 
 def from_wire(kind: ParamKind, wire: str) -> ParamValue:
     return _PARAM_VALUE_ADAPTER.validate_python(_wire_payload(kind, wire))
+
+
+def from_wire_as(value: ParamValue, wire: str) -> ParamValue:
+    match value:
+        case HeldValue():
+            return HeldValue(wire=wire)
+        case _:
+            return from_wire(value.type, wire)
 
 
 def to_wire(value: ParamValue) -> str:

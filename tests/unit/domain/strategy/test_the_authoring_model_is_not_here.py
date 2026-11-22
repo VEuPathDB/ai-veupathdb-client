@@ -57,7 +57,6 @@ def test_the_package_holds_the_wdk_shapes_and_nothing_else() -> None:
         "__init__.py",
         "ast.py",
         "graph_model.py",
-        "held.py",
         "ops.py",
         "organism.py",
         "strategy_ast.py",

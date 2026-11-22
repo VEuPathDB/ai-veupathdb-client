@@ -23,7 +23,6 @@ from veupathdb.domain.strategy.graph_model import (
     runs_a_wdk_search,
     wdk_search_name,
 )
-from veupathdb.domain.strategy.held import sent_wire, settle_values, state_values
 from veupathdb.domain.strategy.ops import (
     DEFAULT_COMBINE_OPERATOR,
     ColocationParams,
@@ -76,9 +75,6 @@ __all__ = [
     "record_class_of",
     "root_ids",
     "runs_a_wdk_search",
-    "sent_wire",
-    "settle_values",
-    "state_values",
     "subtree_ids",
     "walk",
     "wdk_search_name",

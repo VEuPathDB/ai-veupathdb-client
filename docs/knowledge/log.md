@@ -13,13 +13,13 @@
 - A filter's empty value goes out as `""`; `{"filters": []}` stays the value with no
   clauses. The canonicalizer refuses an empty value its parameter does not accept, in
   the reader's words.
-- `ParameterCanonicalizer.held` reads what WDK holds and never refuses (`HeldValues`);
-  `empty_refusal` is the one text the reader and the canonicalizer refuse an empty value
-  with.
-- A step holds `held_wire`, the wire forms WDK holds that no kind reads; a name is never
-  both read and held (a model validator on `StrategyStepNode` and `StrategyStep`).
-  `sent_wire` is what a push sends, `state_values` moves a stated name out of
-  `held_wire`, and `settle_values` takes canonical values without rewriting a held one.
+- `ParameterCanonicalizer.held` reads what WDK holds and never refuses or canonicalizes
+  it; `empty_refusal` is the one text the reader and the canonicalizer refuse an empty
+  value with.
+- `HeldValue` is a kind of `ParamValue`: a wire form no kind reads, or the value of a name
+  with no spec, kept in the step's one parameter map and sent back verbatim. The write
+  entry passes it through, no stated reader offers it, `value_kind` gives it no kind, and
+  `from_wire_as` reads a wire in a value's own kind.
 - `veupathdb-py` is 0.9.0b9.
 
 ## 2026-11-21 - A filter is read as stated clauses

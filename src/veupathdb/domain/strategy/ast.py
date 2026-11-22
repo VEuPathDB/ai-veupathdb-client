@@ -6,7 +6,6 @@ from pydantic import Field, JsonValue, model_validator
 from pydantic_core import PydanticCustomError
 
 from veupathdb.domain.parameters.values import ParamValue
-from veupathdb.domain.strategy.held import refuse_held_overlap
 from veupathdb.domain.strategy.ops import ColocationParams, CombineOp
 from veupathdb.json_types import JSONObject
 from veupathdb.model import CamelModel
@@ -112,9 +111,6 @@ class StrategyStepNode(CamelModel):
 
     search_name: str
     parameters: dict[str, ParamValue] = Field(default_factory=dict)
-    held_wire: dict[str, str] = Field(
-        default_factory=dict, exclude_if=lambda held: not held
-    )
 
     primary_input: StrategyStepNode | None = None
     secondary_input: StrategyStepNode | None = None
@@ -130,11 +126,6 @@ class StrategyStepNode(CamelModel):
     expanded_strategy_id: int | None = None
     expanded_name: str | None = None
     id: str = Field(default_factory=generate_step_id)
-
-    @model_validator(mode="after")
-    def _held_apart(self) -> StrategyStepNode:
-        refuse_held_overlap(self.parameters, self.held_wire)
-        return self
 
     @model_validator(mode="after")
     def _validate_structure(self) -> StrategyStepNode:

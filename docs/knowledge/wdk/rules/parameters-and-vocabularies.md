@@ -697,8 +697,10 @@ filter value (`FilterValue(empty=True)`) goes out as `""`, and `FilterValue()` k
 meaning no clauses. `ParameterCanonicalizer.canonicalize`, the entry for a value a caller
 states, refuses an empty value on a parameter that does not accept it with the same text
 as the reader (`empty_refusal`). `ParameterCanonicalizer.held`, the entry for a value WDK
-holds, never refuses: it reads each wire form as its kind, keeps a value its spec does not
-canonicalize as read, and keeps a wire form no kind reads as WDK holds it. `accepts_empty` is the one predicate: the reader and both
+holds, never refuses or rewrites: it reads each wire form as its kind and does not
+canonicalize it, and a wire form no kind reads, or the value of a name with no spec, is a
+`HeldValue`, a kind of the one parameter map that goes out as WDK holds it. The write entry
+passes a `HeldValue` through untouched, and no stated schema offers it. `accepts_empty` is the one predicate: the reader and both
 `required` properties read it. `AnswerParam.isAllowEmpty` is always true, so a step
 input declares it. A multi-pick that is not empty takes from
 `max(minSelectedCount, 1)` to `maxSelectedCount` terms, the counts `getMinSelectedCount`

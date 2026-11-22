@@ -1,6 +1,6 @@
 """Parameter specs, typed values, vocabularies and the wire codec between them."""
 
-from veupathdb.domain.parameters.canonicalize import HeldValues, ParameterCanonicalizer
+from veupathdb.domain.parameters.canonicalize import ParameterCanonicalizer
 from veupathdb.domain.parameters.date_bounds import ISODate
 from veupathdb.domain.parameters.decimals import decimal_text
 from veupathdb.domain.parameters.dependencies import DeclaredParam, ParamGraph
@@ -65,11 +65,13 @@ from veupathdb.domain.parameters.unbound import UnboundParameter
 from veupathdb.domain.parameters.value_codec import (
     as_param_kind,
     from_wire,
+    from_wire_as,
     to_decoded_map,
     to_wire,
     wire_map,
 )
 from veupathdb.domain.parameters.values import (
+    HeldValue,
     InputDatasetValue,
     InputStepValue,
     MultiPickValue,
@@ -79,6 +81,7 @@ from veupathdb.domain.parameters.values import (
     SinglePickValue,
     StringValue,
     empty_value,
+    value_kind,
 )
 from veupathdb.domain.parameters.wdk_vocab import (
     FAKE_ALL_SENTINEL,
@@ -123,7 +126,7 @@ __all__ = [
     "FilterProposals",
     "FilterStatementError",
     "FilterValue",
-    "HeldValues",
+    "HeldValue",
     "ISODate",
     "InputDatasetValue",
     "InputStepValue",
@@ -175,6 +178,7 @@ __all__ = [
     "find_input_step_param",
     "flatten_vocab",
     "from_wire",
+    "from_wire_as",
     "leading_accession_token",
     "match_exact_option",
     "nearest_entries",
@@ -184,6 +188,7 @@ __all__ = [
     "to_decoded_map",
     "to_wire",
     "validate_phyletic_codes",
+    "value_kind",
     "vocab_keys",
     "wire_map",
 ]

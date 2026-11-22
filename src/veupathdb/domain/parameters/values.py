@@ -184,6 +184,17 @@ class InputStepValue(CamelModel):
         return self.step_id
 
 
+class HeldValue(CamelModel):
+    type: Literal["held"] = "held"
+    wire: str
+
+    def to_wire(self) -> str:
+        return self.wire
+
+    def to_decoded(self) -> JsonValue:
+        return self.wire
+
+
 ParamValue = Annotated[
     StringValue
     | NumberValue
@@ -195,7 +206,8 @@ ParamValue = Annotated[
     | MultiPickValue
     | FilterValue
     | InputDatasetValue
-    | InputStepValue,
+    | InputStepValue
+    | HeldValue,
     Field(discriminator="type"),
 ]
 
@@ -217,3 +229,11 @@ _EMPTY_VALUES: dict[ParamKind, ParamValue] = {
 
 def empty_value(kind: ParamKind) -> ParamValue:
     return _EMPTY_VALUES[kind]
+
+
+def value_kind(value: ParamValue) -> ParamKind | None:
+    match value:
+        case HeldValue():
+            return None
+        case _:
+            return value.type
