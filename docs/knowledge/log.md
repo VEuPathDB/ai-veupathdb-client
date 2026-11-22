@@ -1,5 +1,15 @@
 # Knowledge log
 
+## 2026-11-22 - A value given back is the held value, and no filter goes out as WDK spells it
+
+- `restates` is the one test a reader with held values applies: a value given back in its
+  stated form, or a kept value given back as its marked text or its wire, is the held value.
+- A filter with no clauses goes out as `{"filters":[]}` (`NO_FILTERS_WIRE`), the text
+  `FilterParamNew.getNoFiltersValue` writes and `replaceSql` compares for
+  `filters_present` ([WDK-PARAM-017](wdk/rules/parameters-and-vocabularies.md)).
+- The property test covers required numbers, multi-picks and filters, and tree
+  vocabularies.
+
 ## 2026-11-22 - A filter with no clauses is stated as []
 
 - A `filter` parameter reads `[]` as `{"filters": []}`, the value `FilterParamNew` defaults

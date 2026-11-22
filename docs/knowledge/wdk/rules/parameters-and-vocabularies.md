@@ -663,18 +663,22 @@ term and is refused with the terms named. The tests read the recorded
 same wire. Every kind but a filter states its decoded value. A filter states its clauses as
 `{"field", "value"}`, with `includeUnknown` only when it is true, and the number members of a
 clause as the numbers the clause holds. A filter with no clauses states `[]`, which the reader
-takes as `{"filters": []}`: `FilterParamNew.getDefault` returns that value
-([source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNew.java#L941-L947)),
+takes as the value with no clauses. It goes out as `{"filters":[]}` (`NO_FILTERS_WIRE`), the
+exact text `FilterParamNew.getNoFiltersValue` writes: `getDefault` returns it, and `replaceSql`
+sets `$$<name>.filters_present$$` to 0 only for a stable value equal to that text
+([source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNew.java#L941-L962)),
 and `getFilteredIdsSql` reads zero filters as the full set of internal values
 ([source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNew.java#L872-L881)).
 A value no stated form reads back to is a `KeptValue` that carries its wire: a `HeldValue`
 and a filter with a `multiFilter` clause. What the agent sees is `shown_stated`
 (`shown_stated_text` in prose): the stated form, or for a kept value the one marked text
 `'<wire>' (kept as the site holds it)`, which no reader of a non-string kind takes.
-`restates` is true when a stated value gives back what is held: the stated form, or for a
-kept value its marked text or its wire, so a caller keeps the held value instead of reading
-it again. The tests generate a value of every kind and read its shown form back to the same
-wire. A range has no one-sided form to give, because `NumberRangeParam` and
+`restates` is true when a stated value gives back what is held: its stated form, or for a
+kept value its marked text or its wire. The reader that knows the held value
+(`read_under_parents` in veupathdb-mcp, through its `bound` values) takes a restated value as
+the held one, so a value WDK holds runs as WDK holds it. The tests generate a value of every
+kind, required and optional, flat and tree vocabularies, and read its shown form back to the
+same wire. A range has no one-sided form to give, because `NumberRangeParam` and
 `DateRangeParam` read both `min` and `max`.
 
 ### WDK-PARAM-018 - A filter clause states `type` and `isRange` from its facet, and a range facet's bounds come only from its term summary

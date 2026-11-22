@@ -577,7 +577,7 @@ class TestAnEmptyFilterIsNotAFilterWithNoClauses:
         assert empty_value("filter") != FilterValue()
 
     def test_no_clauses_goes_out_as_an_empty_clause_list(self) -> None:
-        assert FilterValue().to_wire() == '{"filters": []}'
+        assert FilterValue().to_wire() == '{"filters":[]}'
 
     def test_each_wire_reads_back_as_its_own_value(self) -> None:
         assert from_wire("filter", "") == empty_value("filter")

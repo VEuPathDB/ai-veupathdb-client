@@ -11,7 +11,6 @@ from veupathdb.domain.parameters import (
     FilterProposals,
     FilterValue,
     HeldValue,
-    KeptValue,
     ParamValue,
     from_wire,
     restates,
@@ -37,6 +36,23 @@ _VALUE: TypeAdapter[ParamValue] = TypeAdapter(ParamValue)
 
 _TERMS = ["a", "b", "c"]
 _VOCABULARY: JsonValue = [[t, t.upper(), None] for t in _TERMS]
+_LEAVES = ["a1", "a2", "b1"]
+_TREE: JsonValue = {
+    "data": {"term": "@@fake@@", "display": "@@fake@@"},
+    "children": [
+        {
+            "data": {"term": "a", "display": "A"},
+            "children": [
+                {"data": {"term": "a1", "display": "A one"}, "children": []},
+                {"data": {"term": "a2", "display": "A two"}, "children": []},
+            ],
+        },
+        {
+            "data": {"term": "b", "display": "B"},
+            "children": [{"data": {"term": "b1", "display": "B one"}, "children": []}],
+        },
+    ],
+}
 _SEXES = ["female", "male"]
 _COUNTS = ["1", "2", "3"]
 _FACETS: JsonValue = [
@@ -93,10 +109,21 @@ _CLAUSES: st.SearchStrategy[list[JsonValue]] = st.lists(
     ),
     max_size=3,
 )
-_FILTERS: st.SearchStrategy[ParamValue] = st.one_of(
-    st.just(FilterValue(empty=True)),
-    _CLAUSES.map(lambda clauses: FilterValue.model_validate({"filters": clauses})),
+_CLAUSE_FILTERS: st.SearchStrategy[ParamValue] = _CLAUSES.map(
+    lambda clauses: FilterValue.model_validate({"filters": clauses})
 )
+_FILTERS: st.SearchStrategy[ParamValue] = st.one_of(
+    st.just(FilterValue(empty=True)), _CLAUSE_FILTERS
+)
+_FILTER_VALUES: JsonValue = {"sex": list(_SEXES), "count": list(_COUNTS)}
+
+
+def _picks(terms: list[str], fewest: int) -> st.SearchStrategy[ParamValue]:
+    return st.lists(st.sampled_from(terms), min_size=fewest, unique=True).map(
+        lambda v: MultiPickValue(values=v)
+    )
+
+
 _TEXT = st.text(min_size=1)
 
 _CASES: dict[str, tuple[WDKParameter, st.SearchStrategy[ParamValue]]] = {
@@ -113,6 +140,10 @@ _CASES: dict[str, tuple[WDKParameter, st.SearchStrategy[ParamValue]]] = {
     "number": (
         _declared("number", min=0, max=100, allowEmptyValue=True),
         st.one_of(st.none(), _BOUND).map(lambda v: NumberValue(value=v)),
+    ),
+    "required-number": (
+        _declared("number", min=0, max=100),
+        _BOUND.map(lambda v: NumberValue(value=v)),
     ),
     "number-range": (
         _declared("number-range", min=0, max=100),
@@ -131,22 +162,33 @@ _CASES: dict[str, tuple[WDKParameter, st.SearchStrategy[ParamValue]]] = {
         _declared("single-pick-vocabulary", vocabulary=_VOCABULARY),
         st.sampled_from(_TERMS).map(lambda v: SinglePickValue(value=v)),
     ),
+    "tree-single-pick": (
+        _declared("single-pick-vocabulary", vocabulary=_TREE, displayType="treeBox"),
+        st.sampled_from(_LEAVES).map(lambda v: SinglePickValue(value=v)),
+    ),
     "multi-pick-vocabulary": (
         _declared(
             "multi-pick-vocabulary", vocabulary=_VOCABULARY, allowEmptyValue=True
         ),
-        st.lists(st.sampled_from(_TERMS), unique=True).map(
-            lambda v: MultiPickValue(values=v)
-        ),
+        _picks(_TERMS, 0),
+    ),
+    "required-multi-pick": (
+        _declared("multi-pick-vocabulary", vocabulary=_VOCABULARY),
+        _picks(_TERMS, 1),
+    ),
+    "tree-multi-pick": (
+        _declared("multi-pick-vocabulary", vocabulary=_TREE, displayType="treeBox"),
+        _picks(_LEAVES, 1),
     ),
     "filter": (
         _declared(
-            "filter",
-            ontology=_FACETS,
-            values={"sex": list(_SEXES), "count": list(_COUNTS)},
-            allowEmptyValue=True,
+            "filter", ontology=_FACETS, values=_FILTER_VALUES, allowEmptyValue=True
         ),
         _FILTERS,
+    ),
+    "required-filter": (
+        _declared("filter", ontology=_FACETS, values=_FILTER_VALUES),
+        _CLAUSE_FILTERS,
     ),
     "input-dataset": (
         _declared("input-dataset"),
@@ -176,9 +218,8 @@ def test_every_shown_value_reads_back_to_its_wire(
     case: tuple[WDKParameter, ParamValue],
 ) -> None:
     param, value = case
-    form = stated_form(value)
-    assert not isinstance(form, KeptValue)
 
+    assert stated_form(value) == shown_stated(value)
     assert _read_wire(param, shown_stated(value)) == value.to_wire()
 
 
@@ -203,7 +244,7 @@ def test_a_multi_filter_restated_as_shown_is_kept() -> None:
 
 
 @given(_KINDS)
-def test_a_value_restated_in_its_stated_form_is_kept(
+def test_a_value_given_back_in_its_stated_form_restates_it(
     case: tuple[WDKParameter, ParamValue],
 ) -> None:
     _, value = case

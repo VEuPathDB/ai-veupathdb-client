@@ -5,6 +5,7 @@ from veupathdb.domain.parameters.date_bounds import ISODate
 from veupathdb.domain.parameters.decimals import decimal_text
 from veupathdb.domain.parameters.dependencies import DeclaredParam, ParamGraph
 from veupathdb.domain.parameters.filter_clause import (
+    NO_FILTERS_WIRE,
     ClauseKey,
     DateBounds,
     DateRange,
@@ -134,6 +135,7 @@ __all__ = [
     "FAKE_ALL_SENTINEL",
     "KEPT_MARK",
     "NO_CONSTRAINT_PATTERN",
+    "NO_FILTERS_WIRE",
     "PHYLETIC_EXPRESSION_PARAM",
     "PHYLETIC_EXPRESSION_SEARCH",
     "PHYLETIC_LIST_PARAMS",

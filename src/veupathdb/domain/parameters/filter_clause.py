@@ -29,6 +29,8 @@ from veupathdb.model import CamelModel
 
 ClauseKey = tuple[str, bool, bool, frozenset[str]]
 
+NO_FILTERS_WIRE = '{"filters":[]}'
+
 
 def _bounds_text[T](low: T | None, high: T | None, written: Callable[[T], str]) -> str:
     stated = (
@@ -183,7 +185,9 @@ class FilterValue(CamelModel):
         return self
 
     def to_wire(self) -> str:
-        return "" if self.empty else json.dumps(self.to_decoded())
+        if self.empty:
+            return ""
+        return json.dumps(self.to_decoded()) if self.filters else NO_FILTERS_WIRE
 
     def to_decoded(self) -> JsonValue:
         if self.empty:

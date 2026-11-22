@@ -50,7 +50,7 @@ class TestTheFilterValue:
     filter list is "include all"."""
 
     def test_empty_filter_is_include_all(self) -> None:
-        assert FilterValue().to_wire() == '{"filters": []}'
+        assert FilterValue().to_wire() == '{"filters":[]}'
         assert json.loads(FilterValue().to_wire()) == {"filters": []}
 
     def test_clause_emits_authoritative_basefilter_keys(self) -> None:

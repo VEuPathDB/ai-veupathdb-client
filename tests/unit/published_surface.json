@@ -123,6 +123,7 @@
     "MultiMembers",
     "MultiPickValue",
     "NO_CONSTRAINT_PATTERN",
+    "NO_FILTERS_WIRE",
     "NumberBounds",
     "NumberMembers",
     "NumberRange",

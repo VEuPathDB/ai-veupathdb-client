@@ -6,6 +6,7 @@ import pytest
 from pydantic import JsonValue, TypeAdapter
 
 from veupathdb.domain.parameters import (
+    NO_FILTERS_WIRE,
     FilterFacets,
     FilterProposals,
     FilterStatementError,
@@ -217,10 +218,11 @@ def test_a_range_with_no_declared_bound_states_both() -> None:
 
 @pytest.mark.parametrize("name", ["samples", "optional_samples"])
 def test_no_clause_is_the_filter_wdk_defaults_to(name: str) -> None:
-    read = _param(name).read_stated([])
-    assert isinstance(read, FilterProposals)
-
-    assert FilterFacets.of(_param(name)).bind(read).to_wire() == '{"filters": []}'
+    assert _param(name).read_stated([]) == FilterProposals([])
+    assert (
+        FilterFacets.of(_param(name)).bind(FilterProposals([])).to_wire()
+        == NO_FILTERS_WIRE
+    )
 
 
 def test_a_filter_statement_is_refused_with_the_clause_form() -> None:
