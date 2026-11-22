@@ -97,7 +97,7 @@ test("a recording is read by the address it called", () => {
   assert.deepEqual(
     offencesIn([[path, recording(`https://${host("plasmodb")}/plasmo/service`, "")]]),
     [
-      `${path}:4: names the production host ${host("plasmodb")}; a test, a recorder and a default reach the QA sites only`,
+      `${path} (provenance): names the production host ${host("plasmodb")}; a test, a recorder and a default reach the QA sites only`,
     ],
   );
 });
@@ -110,20 +110,22 @@ test("a production link inside a recorded body passes", () => {
   assert.deepEqual(offencesIn([["src/veupathdb/testing/fixtures/wdk/search.json", text]]), []);
 });
 
-test("a body outside the fixture store is read whole", () => {
-  const text = recording(
-    `https://${host("qa", "plasmodb")}/plasmo.qa/service`,
-    `https://${host("plasmodb")}/`,
-  );
-  assert.equal(offencesIn([["tests/unit/recording.json", text]]).length, 1);
+test("a body outside the fixture store is read whole, by its lines", () => {
+  const path = "tests/unit/recording.json";
+  const text = recording(`https://${host("qa", "plasmodb")}/plasmo.qa/service`, `https://${host("plasmodb")}/`);
+  assert.deepEqual(offencesIn([[path, text]]), [
+    `${path}:7: names the production host ${host("plasmodb")}; a test, a recorder and a default reach the QA sites only`,
+  ]);
 });
 
-test("a fixture that is not a recording is read whole", () => {
+test("a fixture that is not a recording is read whole, by its lines", () => {
   const path = "src/veupathdb/testing/fixtures/wdk/schema-pin.json";
-  assert.equal(offencesIn([[path, `{"url": "https://${host("plasmodb")}/"}`]]).length, 1);
+  assert.deepEqual(offencesIn([[path, `{\n  "url": "https://${host("plasmodb")}/"\n}`]]), [
+    `${path}:2: names the production host ${host("plasmodb")}; a test, a recorder and a default reach the QA sites only`,
+  ]);
 });
 
-test("an offence in a recording names the file's own line", () => {
+test("an offence in a recording names its provenance, whatever the key order", () => {
   const path = "src/veupathdb/testing/fixtures/wdk/search.json";
   const text = [
     "{",
@@ -136,6 +138,6 @@ test("an offence in a recording names the file's own line", () => {
     "}",
   ].join("\n");
   assert.deepEqual(offencesIn([[path, text]]), [
-    `${path}:6: names the production host ${host("plasmodb")}; a test, a recorder and a default reach the QA sites only`,
+    `${path} (provenance): names the production host ${host("plasmodb")}; a test, a recorder and a default reach the QA sites only`,
   ]);
 });
