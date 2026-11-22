@@ -26,6 +26,7 @@ from veupathdb.domain.parameters.values import (
     ParamValue,
     SinglePickValue,
     empty_value,
+    same_value,
 )
 from veupathdb.domain.parameters.vocab_lookup import entries_or_refusal
 from veupathdb.domain.parameters.wdk_vocab import (
@@ -119,7 +120,7 @@ class ParameterCanonicalizer:
                     f"takes a {spec.param_type} value, not a {value.type} value",
                     to_decoded(value),
                 )
-            if value == empty_value(value.type) and not accepts_empty(spec):
+            if same_value(value, empty_value(value.type)) and not accepts_empty(spec):
                 raise empty_refusal(name, to_decoded(value))
             canonical[name] = self._canonicalize_value(spec, value)
         return canonical

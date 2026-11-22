@@ -6,8 +6,9 @@
   set of terms, a filter as its set of clauses
   ([WDK-PARAM-021](wdk/rules/parameters-and-vocabularies.md)). `same_param_value`,
   `same_as_wire` and `param_value_key` are the same rule with the parameter's name (an
-  expression compares as parsed), against a wire, and as a hashable key. A value of another
-  kind is read in the held value's kind before it is compared.
+  expression compares as parsed), against a wire, and as a hashable key. A value is read in
+  the parameter's declared kind, and equality is equality of keys. `same_param_values` and
+  `changed_param_names` compare two maps of values.
 - `from_wire` reads a single pick's internal stable value, a JSON array of at most one term
   (`AbstractEnumParam.standardizeStableValue`), as the term its external form names.
 

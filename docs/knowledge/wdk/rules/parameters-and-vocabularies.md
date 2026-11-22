@@ -1107,9 +1107,21 @@ so the order of clauses is not part of a filter value either.
 
 `same_value` is the one equality a caller compares two values with: a multi-pick by its
 set of terms, a filter by its `clause_set`, every other kind by its fields.
-`same_param_value` adds the one parameter that is not its kind's text, `phyletic_expression`,
-compared as its parsed and rendered expression; `same_as_wire` reads a wire in the held
-value's kind and compares through it, so a wire no kind reads is another value; and
-`param_value_key` is the hashable form of the same equality for a cache or a grouping key. The tests
-check it over permutations and repeats and over every kind read back from its wire.
+`param_value_key` reads a value in the parameter's declared kind and gives its canonical
+form; `same_param_value` is equality of those keys, so the relation is an equivalence and
+equal values share one key. A value that the declared kind cannot read is another value. On
+a number parameter `1.0` and `1` are one value; on a string parameter they are two, because
+`StringParamHandler` quotes and hashes the text as written. A typed value carries its
+declared kind (the canonicalizer refuses another kind); with no declared kind named, each
+value is read in the kind it carries and a held value is its wire. `phyletic_expression` is
+compared as its parsed and rendered expression. `same_as_wire` reads a wire in the kind of
+the value it is compared with. The tests check symmetry, transitivity and key agreement per
+kind, and every kind read back from its wire.
+
+The no-filter value has one signature in either spelling
+(`FilterParamNewStableValue.toSignatureString`), so the equality treats `{"filters": []}`
+and `{"filters":[]}` as one value. `FilterParamNew.replaceSql`
+([source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNew.java#L954-L962))
+sets `filters_present` by an exact text compare with `getNoFiltersValue()`, so the wire a
+caller sends is always `NO_FILTERS_WIRE`, WDK's exact spelling.
 

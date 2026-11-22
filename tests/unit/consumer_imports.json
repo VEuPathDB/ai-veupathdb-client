@@ -302,7 +302,6 @@
       "WDKSortDirection"
     ],
     "veupathdb.domain.parameters": [
-      "ClauseKey",
       "FAKE_ALL_SENTINEL",
       "FilterClause",
       "FilterValue",

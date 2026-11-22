@@ -6,7 +6,6 @@ from veupathdb.domain.parameters.decimals import decimal_text
 from veupathdb.domain.parameters.dependencies import DeclaredParam, ParamGraph
 from veupathdb.domain.parameters.filter_clause import (
     NO_FILTERS_WIRE,
-    ClauseKey,
     DateBounds,
     DateRange,
     FacetRange,
@@ -82,9 +81,12 @@ from veupathdb.domain.parameters.value_codec import (
     wire_map,
 )
 from veupathdb.domain.parameters.value_equality import (
+    changed_param_names,
+    declared_kind,
     param_value_key,
     same_as_wire,
     same_param_value,
+    same_param_values,
 )
 from veupathdb.domain.parameters.values import (
     HeldValue,
@@ -150,7 +152,6 @@ __all__ = [
     "PHYLETIC_ROOT_CODE",
     "SHOWN_CANDIDATES",
     "AccessionNames",
-    "ClauseKey",
     "Combination",
     "DateBounds",
     "DateRange",
@@ -213,9 +214,11 @@ __all__ = [
     "as_param_kind",
     "canonical_census_pattern",
     "census_states",
+    "changed_param_names",
     "check_expression",
     "collect_leaf_terms",
     "decimal_text",
+    "declared_kind",
     "dedupe_options",
     "derive_binding",
     "empty_value",
@@ -240,6 +243,7 @@ __all__ = [
     "restates",
     "same_as_wire",
     "same_param_value",
+    "same_param_values",
     "same_value",
     "shown_stated",
     "shown_stated_text",

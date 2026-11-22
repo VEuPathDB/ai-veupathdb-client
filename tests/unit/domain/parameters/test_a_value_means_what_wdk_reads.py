@@ -12,13 +12,16 @@ from veupathdb.domain.parameters import (
     HeldValue,
     MultiPickValue,
     NumberValue,
+    ParamKind,
     ParamValue,
     SinglePickValue,
     StringValue,
+    changed_param_names,
     from_wire,
     param_value_key,
     same_as_wire,
     same_param_value,
+    same_param_values,
     same_value,
     to_wire,
 )
@@ -107,11 +110,8 @@ _WRITTEN = "pfal>=1T AND pviv>=1T"
 def test_an_expression_parameter_is_the_same_value_in_either_writing() -> None:
     left, right = StringValue(value=_GROUPED), StringValue(value=_WRITTEN)
 
-    assert same_param_value(PHYLETIC_EXPRESSION_PARAM, left, right)
-    assert not same_param_value("text_expression", left, right)
-    assert param_value_key(PHYLETIC_EXPRESSION_PARAM, left) == param_value_key(
-        PHYLETIC_EXPRESSION_PARAM, right
-    )
+    assert same_param_value(PHYLETIC_EXPRESSION_PARAM, "string", left, right)
+    assert not same_param_value("text_expression", "string", left, right)
 
 
 @given(_TERMS.flatmap(lambda terms: st.tuples(st.just(terms), st.permutations(terms))))
@@ -122,9 +122,6 @@ def test_a_wire_in_another_order_or_spacing_is_the_held_value(
     held = MultiPickValue(values=terms)
 
     assert same_as_wire("organism", held, json.dumps(shuffled, separators=(",", ":")))
-    assert param_value_key("organism", held) == param_value_key(
-        "organism", MultiPickValue(values=shuffled)
-    )
 
 
 def test_a_spaced_no_filter_wire_is_the_held_no_filter() -> None:
@@ -150,20 +147,148 @@ _REGROUPED = ("pfal=0 AND tgon>=1 OR pfal>=1", "pfal=0 AND (tgon>=1 OR pfal>=1)"
 def test_parentheses_that_regroup_terms_are_another_expression() -> None:
     left, right = (StringValue(value=text) for text in _REGROUPED)
 
-    assert not same_param_value(PHYLETIC_EXPRESSION_PARAM, left, right)
+    assert not same_param_value(PHYLETIC_EXPRESSION_PARAM, "string", left, right)
 
 
 @pytest.mark.parametrize("name", [PHYLETIC_EXPRESSION_PARAM, "text_expression"])
 def test_a_writing_that_does_not_parse_equals_only_itself(name: str) -> None:
     unparsed = StringValue(value="pfal=0 AND")
 
-    assert same_param_value(name, unparsed, unparsed)
-    assert not same_param_value(name, unparsed, StringValue(value="pfal=0 OR"))
+    assert same_param_value(name, "string", unparsed, unparsed)
+    assert not same_param_value(
+        name, "string", unparsed, StringValue(value="pfal=0 OR")
+    )
 
 
-def test_a_value_of_another_kind_is_read_in_the_held_kind() -> None:
-    assert same_param_value("floor", NumberValue(value=1), StringValue(value="1"))
-    assert same_param_value("floor", StringValue(value="1.0"), NumberValue(value=1))
-    assert same_param_value("floor", NumberValue(value=1), StringValue(value="1.0"))
-    assert not same_param_value("floor", NumberValue(value=1), StringValue(value="2"))
-    assert not same_param_value("floor", NumberValue(value=1), StringValue(value="one"))
+def test_a_number_parameter_reads_every_spelling_of_one_number_alike() -> None:
+    assert same_param_value(
+        "floor", "number", StringValue(value="1.0"), NumberValue(value=1)
+    )
+    assert same_param_value(
+        "floor", "number", StringValue(value="1.0"), StringValue(value="1")
+    )
+    assert not same_param_value(
+        "floor", "number", NumberValue(value=1), StringValue(value="2")
+    )
+    assert not same_param_value(
+        "floor", "number", NumberValue(value=1), StringValue(value="one")
+    )
+
+
+def test_a_string_parameter_holds_two_spellings_of_one_number_apart() -> None:
+    assert not same_param_value(
+        "text", "string", StringValue(value="1.0"), StringValue(value="1")
+    )
+    assert not same_param_value(
+        "text", "string", StringValue(value="1.0"), NumberValue(value=1)
+    )
+    assert same_param_value(
+        "text", "string", StringValue(value="1"), NumberValue(value=1)
+    )
+
+
+def test_without_a_declared_kind_each_value_keeps_its_own() -> None:
+    assert not same_param_value(
+        "floor", None, StringValue(value="1"), NumberValue(value=1)
+    )
+    assert not same_param_value(
+        "organism", None, HeldValue(wire='["a"]'), MultiPickValue(values=["a"])
+    )
+    assert same_param_value(
+        "organism",
+        None,
+        MultiPickValue(values=["b", "a"]),
+        MultiPickValue(values=["a", "b"]),
+    )
+
+
+_KEYED: list[tuple[ParamKind, ParamValue, ParamValue]] = [
+    (
+        "multi-pick-vocabulary",
+        HeldValue(wire='["b","a"]'),
+        MultiPickValue(values=["a", "b"]),
+    ),
+    ("filter", FilterValue(), HeldValue(wire='{"filters": []}')),
+    ("single-pick-vocabulary", SinglePickValue(value="a"), HeldValue(wire='["a"]')),
+    ("number", NumberValue(value=1), StringValue(value="1.0")),
+    ("number", NumberValue(value=1), HeldValue(wire="1e0")),
+]
+
+
+@pytest.mark.parametrize(("kind", "left", "right"), _KEYED)
+def test_one_value_has_one_key(
+    kind: ParamKind, left: ParamValue, right: ParamValue
+) -> None:
+    assert same_param_value("p", kind, left, right)
+    assert param_value_key("p", kind, left) == param_value_key("p", kind, right)
+
+
+_KINDS: list[ParamKind] = [
+    "string",
+    "number",
+    "single-pick-vocabulary",
+    "multi-pick-vocabulary",
+    "filter",
+]
+_WIRES = st.sampled_from(
+    [
+        "1",
+        "1.0",
+        "1e0",
+        "2",
+        "a",
+        '["a"]',
+        '["a","b"]',
+        '["b", "a"]',
+        "[]",
+        '{"filters":[]}',
+        '{"filters": []}',
+        "",
+        "{not json",
+    ]
+)
+_ANY_VALUE = st.one_of(
+    _WIRES.map(lambda wire: HeldValue(wire=wire)),
+    _WIRES.map(lambda wire: StringValue(value=wire)),
+    st.sampled_from(
+        [NumberValue(value=1), NumberValue(value=2), NumberValue(value=None)]
+    ),
+    st.sampled_from(["a", "b", ""]).map(lambda term: SinglePickValue(value=term)),
+    _TERMS.map(lambda terms: MultiPickValue(values=terms)),
+    st.sampled_from([FilterValue(), FilterValue(empty=True)]),
+)
+
+
+@given(st.sampled_from(_KINDS), _ANY_VALUE, _ANY_VALUE, _ANY_VALUE)
+def test_one_kind_reads_values_as_an_equivalence(
+    kind: ParamKind, a: ParamValue, b: ParamValue, c: ParamValue
+) -> None:
+    assert same_param_value("p", kind, a, a)
+    assert same_param_value("p", kind, a, b) is same_param_value("p", kind, b, a)
+    if same_param_value("p", kind, a, b) and same_param_value("p", kind, b, c):
+        assert same_param_value("p", kind, a, c)
+
+
+@given(st.sampled_from([*_KINDS, None]), _ANY_VALUE, _ANY_VALUE)
+def test_equal_values_have_equal_keys(
+    kind: ParamKind | None, a: ParamValue, b: ParamValue
+) -> None:
+    assert same_param_value("p", kind, a, b) is (
+        param_value_key("p", kind, a) == param_value_key("p", kind, b)
+    )
+
+
+def test_two_maps_differ_by_the_names_whose_values_differ() -> None:
+    before: dict[str, ParamValue] = {
+        "organism": MultiPickValue(values=["a", "b"]),
+        "floor": NumberValue(value=1),
+    }
+    after: dict[str, ParamValue] = {
+        "organism": MultiPickValue(values=["b", "a"]),
+        "floor": NumberValue(value=2),
+    }
+
+    assert changed_param_names(before, after) == ["floor"]
+    assert not same_param_values(before, after)
+    assert same_param_values(before, {**after, "floor": NumberValue(value=1)})
+    assert changed_param_names(before, {"floor": NumberValue(value=1)}) == ["organism"]
