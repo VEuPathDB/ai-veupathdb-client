@@ -46,7 +46,7 @@ def _filter(value: FilterValue) -> StatedForm:
     if value.empty:
         return ""
     clauses = [_clause(clause) for clause in value.filters]
-    if not clauses or None in clauses:
+    if None in clauses:
         return KeptValue(wire=value.to_wire())
     return clauses
 
@@ -78,3 +78,11 @@ def shown_stated_text(value: ParamValue) -> str:
             return str(shown_stated(value))
         case form:
             return json.dumps(form)
+
+
+def restates(value: ParamValue, stated: JsonValue) -> bool:
+    match stated_form(value):
+        case KeptValue(wire=wire):
+            return stated in (wire, shown_stated(value))
+        case form:
+            return stated == form

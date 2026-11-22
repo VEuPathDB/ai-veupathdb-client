@@ -245,10 +245,10 @@ class TestAFilter:
             param, "sex=female"
         )
 
-    def test_an_empty_list_is_refused(self) -> None:
+    def test_an_empty_list_reads_as_no_clause(self) -> None:
         param = _param("search_genes_by_ngs_snps", "variation_sample_meta")
 
-        assert "variation_sample_meta takes" in _refused(param, [])
+        assert param.read_stated([]) == FilterProposals.model_validate([])
 
 
 class TestANumber:

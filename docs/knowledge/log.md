@@ -1,5 +1,15 @@
 # Knowledge log
 
+## 2026-11-22 - A filter with no clauses is stated as []
+
+- A `filter` parameter reads `[]` as `{"filters": []}`, the value `FilterParamNew` defaults
+  to, and `stated_form` states a filter with no clauses as `[]` instead of keeping its
+  wire ([WDK-PARAM-017](wdk/rules/parameters-and-vocabularies.md)). The refusal of a filter
+  statement names the clause list and `[]` for no filter.
+- `restates` tells a stated value that gives back a held one, a kept value's marked text
+  and wire included, so the caller keeps what is held.
+- A test generates a value of every kind and reads its shown form back to the same wire.
+
 ## 2026-11-22 - pyright reads the tests
 
 - The pyright gate in CI and pre-commit is `uv run pyright src tests`, and `pyright` is in

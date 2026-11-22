@@ -204,7 +204,7 @@ class FilterProposal(CamelModel):
     include_unknown: bool = False
 
 
-class FilterProposals(RootModel[Annotated[list[FilterProposal], Field(min_length=1)]]):
+class FilterProposals(RootModel[list[FilterProposal]]):
     pass
 
 

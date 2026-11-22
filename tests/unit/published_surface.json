@@ -195,6 +195,7 @@
     "read_census",
     "read_options",
     "read_stated_values",
+    "restates",
     "shown_stated",
     "shown_stated_text",
     "species_of",

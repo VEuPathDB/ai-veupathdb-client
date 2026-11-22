@@ -127,6 +127,8 @@ _STATEABLE: list[tuple[str, ParamValue]] = [
     ("ids", InputDatasetValue(dataset_id="123")),
     ("step", InputStepValue(step_id="42")),
     ("optional_samples", from_wire("filter", "")),
+    ("samples", FilterValue()),
+    ("optional_samples", FilterValue()),
 ]
 
 _HELD_WIRES: list[tuple[str, str]] = [
@@ -187,8 +189,8 @@ def test_a_held_value_is_kept() -> None:
     assert stated_form(HeldValue(wire="x,y")) == KeptValue(wire="x,y")
 
 
-def test_a_filter_with_no_clause_is_kept() -> None:
-    assert stated_form(FilterValue()) == KeptValue(wire='{"filters": []}')
+def test_a_filter_with_no_clause_is_stated_as_no_clause() -> None:
+    assert stated_form(FilterValue()) == []
 
 
 def test_a_multi_filter_clause_is_kept() -> None:
@@ -213,11 +215,19 @@ def test_a_range_with_no_declared_bound_states_both() -> None:
         _param("open_span").read_stated({"min": 5})
 
 
-def test_an_empty_filter_list_names_a_non_empty_list() -> None:
-    with pytest.raises(StatedValuesError) as refusal:
-        _param("samples").read_stated([])
+@pytest.mark.parametrize("name", ["samples", "optional_samples"])
+def test_no_clause_is_the_filter_wdk_defaults_to(name: str) -> None:
+    read = _param(name).read_stated([])
+    assert isinstance(read, FilterProposals)
 
-    assert "takes a non-empty list of" in str(refusal.value)
+    assert FilterFacets.of(_param(name)).bind(read).to_wire() == '{"filters": []}'
+
+
+def test_a_filter_statement_is_refused_with_the_clause_form() -> None:
+    with pytest.raises(StatedValuesError) as refusal:
+        _param("samples").read_stated({"filters": []})
+
+    assert 'takes a list of {"field"' in str(refusal.value)
 
 
 _NGS_SNPS = "search_genes_by_ngs_snps"
@@ -360,9 +370,7 @@ def test_a_number_text_in_other_digits_is_refused() -> None:
 
 
 def test_a_kept_value_shows_as_the_marked_text() -> None:
-    assert (
-        shown_stated(FilterValue()) == "'{\"filters\": []}' (kept as the site holds it)"
-    )
+    assert shown_stated(HeldValue(wire="x,y")) == "'x,y' (kept as the site holds it)"
     assert (
         shown_stated_text(HeldValue(wire="x,y")) == "'x,y' (kept as the site holds it)"
     )

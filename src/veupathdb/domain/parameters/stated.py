@@ -342,19 +342,16 @@ def _multi_pick(d: _Declared) -> _Shape:
     )
 
 
-def _listed(item: Any) -> Any:
-    return Annotated[list[item], *FilterProposals.model_fields["root"].metadata]
-
-
 def _filter(d: _Declared) -> _Shape:
     facet = Annotated[str, Field(json_schema_extra={"enum": list(d.facets)})]
     item = create_model(d.name, __base__=FilterProposal, field=(facet, ...))
     inline = Annotated[item, WithJsonSchema(item.model_json_schema())]
-    schema = TypeAdapter(_listed(inline)).json_schema()
+    schema = TypeAdapter(list[inline]).json_schema()
     return _Shape(
         Annotated[FilterProposals, WithJsonSchema(schema)],
         lambda v: v,
-        'a non-empty list of {"field": <facet>, "value": <members or {"min", "max"}>}',
+        'a list of {"field": <facet>, "value": <members or {"min", "max"}>}, '
+        "or [] for no filter",
         [{"field": "<facet>", "value": ["<member>"]}],
     )
 
@@ -399,12 +396,12 @@ def _with_empty(d: _Declared, shape: _Shape) -> _Shape:
     if not d.allow_empty:
         return shape
     empty = empty_value(d.kind)
-    unset: Any = (
-        Literal[""] | _NO_TERMS if d.kind == "multi-pick-vocabulary" else Literal[""]
-    )
+    picks = d.kind == "multi-pick-vocabulary"
+    unset: Any = Literal[""] | _NO_TERMS if picks else Literal[""]
+    empties: tuple[JsonValue, ...] = ("", []) if picks else ("",)
     return _Shape(
         shape.stated | unset,
-        lambda v: empty if v in ("", []) else shape.to_value(v),
+        lambda v: empty if v in empties else shape.to_value(v),
         f'{shape.text}, or "" to leave it empty',
         shape.example,
     )

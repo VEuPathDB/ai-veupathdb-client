@@ -187,9 +187,8 @@ class TestAFacetIsFoundByItsExactName:
 
 
 class TestAStatementIsAListOfClauses:
-    def test_an_empty_list_is_refused(self) -> None:
-        with pytest.raises(PydanticValidationError):
-            FilterProposals.model_validate([])
+    def test_an_empty_list_states_no_clause(self) -> None:
+        assert FilterProposals.model_validate([]).root == []
 
     def test_the_shorthand_is_refused(self) -> None:
         with pytest.raises(PydanticValidationError):

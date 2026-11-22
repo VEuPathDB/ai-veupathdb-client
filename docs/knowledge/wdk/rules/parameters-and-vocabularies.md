@@ -662,12 +662,20 @@ term and is refused with the terms named. The tests read the recorded
 `stated_form` is the reader's inverse: it gives the form `read_stated` reads back to the
 same wire. Every kind but a filter states its decoded value. A filter states its clauses as
 `{"field", "value"}`, with `includeUnknown` only when it is true, and the number members of a
-clause as the numbers the clause holds. A value no stated form reads back to is a `KeptValue`
-that carries its wire: a `HeldValue`, a filter with no clauses, and a filter with a
-`multiFilter` clause. What the agent sees is `shown_stated` (`shown_stated_text` in prose): the
-stated form, or for a kept value the one marked text `'<wire>' (kept as the site holds it)`,
-which no reader of a non-string kind takes. A range has no one-sided form to give,
-because `NumberRangeParam` and `DateRangeParam` read both `min` and `max`.
+clause as the numbers the clause holds. A filter with no clauses states `[]`, which the reader
+takes as `{"filters": []}`: `FilterParamNew.getDefault` returns that value
+([source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNew.java#L941-L947)),
+and `getFilteredIdsSql` reads zero filters as the full set of internal values
+([source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNew.java#L872-L881)).
+A value no stated form reads back to is a `KeptValue` that carries its wire: a `HeldValue`
+and a filter with a `multiFilter` clause. What the agent sees is `shown_stated`
+(`shown_stated_text` in prose): the stated form, or for a kept value the one marked text
+`'<wire>' (kept as the site holds it)`, which no reader of a non-string kind takes.
+`restates` is true when a stated value gives back what is held: the stated form, or for a
+kept value its marked text or its wire, so a caller keeps the held value instead of reading
+it again. The tests generate a value of every kind and read its shown form back to the same
+wire. A range has no one-sided form to give, because `NumberRangeParam` and
+`DateRangeParam` read both `min` and `max`.
 
 ### WDK-PARAM-018 - A filter clause states `type` and `isRange` from its facet, and a range facet's bounds come only from its term summary
 
@@ -734,8 +742,8 @@ offer `""` only where it is allowed. Every kind has one empty value (`empty_valu
 wire is `""`, or `[]` for a multi-pick, and `from_wire` reads that wire back to it.
 `FilterParamNew` does not override `isEmptyValue`, so `{"filters": []}` is not WDK's
 empty value: it passes the filter's own check as a value with no clauses. The empty
-filter value (`FilterValue(empty=True)`) goes out as `""`, and `FilterValue()` keeps
-meaning no clauses. `ParameterCanonicalizer.canonicalize`, the entry for a value a caller
+filter value (`FilterValue(empty=True)`) goes out as `""` and is stated `""`, and
+`FilterValue()` keeps meaning no clauses and is stated `[]`. `ParameterCanonicalizer.canonicalize`, the entry for a value a caller
 states, refuses an empty value on a parameter that does not accept it with the same text
 as the reader (`empty_refusal`). `ParameterCanonicalizer.held`, the entry for a value WDK
 holds, never refuses or rewrites: it reads each wire form as its kind and does not
