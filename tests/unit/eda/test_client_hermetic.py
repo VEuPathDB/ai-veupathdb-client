@@ -43,8 +43,8 @@ async def test_the_request_carries_the_authorization_cookie() -> None:
         return httpx.Response(200, json=fixture("studies_list.json"))
 
     token = veupathdb_auth_token_ctx.set("token-abc")
+    client = eda_client(httpx.MockTransport(handler))
     try:
-        client = eda_client(httpx.MockTransport(handler))
         await client.list_studies()
     finally:
         veupathdb_auth_token_ctx.reset(token)

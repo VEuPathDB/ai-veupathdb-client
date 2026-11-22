@@ -9,7 +9,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import httpx
 import pytest
 from opentelemetry.sdk.metrics import MeterProvider
-from opentelemetry.sdk.metrics.export import InMemoryMetricReader
+from opentelemetry.sdk.metrics.export import (
+    DataPointT,
+    InMemoryMetricReader,
+    NumberDataPoint,
+)
 
 from veupathdb.errors import WDKError
 from veupathdb.observability import otel
@@ -61,12 +65,16 @@ def reader(monkeypatch: pytest.MonkeyPatch) -> Iterator[InMemoryMetricReader]:
         set_observer(previous)
 
 
+def _reading(point: DataPointT) -> float:
+    return point.value if isinstance(point, NumberDataPoint) else point.count
+
+
 def _points(sink: InMemoryMetricReader, name: str) -> list[tuple[Any, dict[str, Any]]]:
     data = sink.get_metrics_data()
     assert data is not None
     return [
         (
-            point.value if hasattr(point, "value") else point.count,
+            _reading(point),
             dict(point.attributes or {}),
         )
         for resource in data.resource_metrics

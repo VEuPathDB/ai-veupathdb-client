@@ -226,7 +226,7 @@ async def test_wdk_strat_005_the_tree_write_is_followed_by_the_read_that_reports
     monkeypatch.setattr(api.client, "put", put)
     monkeypatch.setattr(api.client, "get", get)
 
-    details = await api.update_strategy(5, step_tree=WDKStepTree(stepId=3))
+    details = await api.update_strategy(5, step_tree=WDKStepTree(step_id=3))
 
     assert put_paths == ["/users/1/strategies/5/step-tree"]
     assert read_paths == ["/users/1/strategies/5"]

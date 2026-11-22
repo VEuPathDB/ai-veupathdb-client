@@ -221,6 +221,7 @@ class TestAFacetRange:
         span = FacetRange.of(_summary("ontology_term_summary_total_variants"), facet)
 
         assert span == FacetRange(min=1, max=4823, records=5643, units="variants")
+        assert span is not None
         assert span.text() == "1 to 4,823 variants over 5,643 records"
 
     def test_a_range_past_the_largest_value_selects_nothing(self) -> None:
@@ -419,6 +420,7 @@ def test_a_range_is_read_under_the_other_clauses() -> None:
 
     assert alone == FacetRange(min=1, max=4823, records=5643, units="variants")
     assert under == FacetRange(min=2, max=4823, records=3207, units="variants")
+    assert under is not None
     assert under.selects(NumberBounds(min=None, max=1)) is False
 
 

@@ -32,7 +32,7 @@ def _document(name: str, text: str, status: int = 200) -> WDKProbe:
         method="GET",
         url=f"https://qa.plasmodb.org/plasmo.qa/service/{name}",
         status=status,
-        contentType="application/json",
+        content_type="application/json",
         text=text,
     )
 

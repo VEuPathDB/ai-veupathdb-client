@@ -40,4 +40,4 @@ def test_the_wire_form_names_the_parameter_in_camel_case() -> None:
 
 def test_a_parameter_name_is_required() -> None:
     with pytest.raises(ValidationError):
-        UnboundParameter(question="Which one?")
+        UnboundParameter.model_validate({"question": "Which one?"})

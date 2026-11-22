@@ -382,6 +382,7 @@ async def test_the_agap003685_summary_is_read_from_the_header_read() -> None:
         sum_data=1003541387.8760892,
         sum_squares=41678481556280.266,
     )
+    assert summary is not None
     assert summary.mean_depth == 18.417129736236454
     assert sent == ["bytes=0-343"]
     assert reader.reads == 1

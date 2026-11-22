@@ -192,30 +192,30 @@ def test_no_negative_ever_reaches_a_caller(size: int) -> None:
 class TestTheCountMatchesTheRecords:
     def test_the_view_filtered_display_count_wins(self) -> None:
         meta = WDKAnswerMeta(
-            totalCount=2407,
-            displayTotalCount=2400,
-            viewTotalCount=4,
-            displayViewTotalCount=4,
+            total_count=2407,
+            display_total_count=2400,
+            view_total_count=4,
+            display_view_total_count=4,
         )
 
         assert meta.records_returned() == 4
 
     def test_the_unfiltered_count_is_not_used_when_a_view_filter_applies(self) -> None:
         meta = WDKAnswerMeta(
-            totalCount=2407,
-            displayTotalCount=2400,
-            viewTotalCount=4,
-            displayViewTotalCount=4,
+            total_count=2407,
+            display_total_count=2400,
+            view_total_count=4,
+            display_view_total_count=4,
         )
 
         assert meta.records_returned() != meta.total_count
 
     def test_without_a_view_filter_all_four_agree(self) -> None:
         meta = WDKAnswerMeta(
-            totalCount=2407,
-            displayTotalCount=2407,
-            viewTotalCount=2407,
-            displayViewTotalCount=2407,
+            total_count=2407,
+            display_total_count=2407,
+            view_total_count=2407,
+            display_view_total_count=2407,
         )
 
         assert meta.records_returned() == 2407
@@ -223,7 +223,7 @@ class TestTheCountMatchesTheRecords:
 
 class TestAbsenceIsNotZero:
     def test_an_absent_count_falls_back_to_the_next_one(self) -> None:
-        meta = WDKAnswerMeta(totalCount=2407)
+        meta = WDKAnswerMeta(total_count=2407)
 
         assert meta.records_returned() == 2407
 
@@ -233,10 +233,10 @@ class TestAbsenceIsNotZero:
 
     def test_a_genuine_zero_is_reported_as_zero(self) -> None:
         meta = WDKAnswerMeta(
-            totalCount=0,
-            displayTotalCount=0,
-            viewTotalCount=0,
-            displayViewTotalCount=0,
+            total_count=0,
+            display_total_count=0,
+            view_total_count=0,
+            display_view_total_count=0,
         )
 
         assert meta.records_returned() == 0
@@ -462,15 +462,15 @@ class TestWdkStep008BothOperandsAreOneRecordClass:
 
 class TestWdkStrat001ANodeCarriesAStepIdAndNothingElse:
     def test_wdk_strat_001_a_leaf_node_serializes_to_one_key(self) -> None:
-        node = WDKStepTree(stepId=7)
+        node = WDKStepTree(step_id=7)
 
         assert node.model_dump(by_alias=True, exclude_none=True) == {"stepId": 7}
 
     def test_wdk_strat_001_a_combined_node_carries_its_two_inputs(self) -> None:
         node = WDKStepTree(
-            stepId=3,
-            primaryInput=WDKStepTree(stepId=1),
-            secondaryInput=WDKStepTree(stepId=2),
+            step_id=3,
+            primary_input=WDKStepTree(step_id=1),
+            secondary_input=WDKStepTree(step_id=2),
         )
 
         assert node.model_dump(by_alias=True, exclude_none=True) == {

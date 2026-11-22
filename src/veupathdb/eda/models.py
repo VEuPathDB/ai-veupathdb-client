@@ -559,13 +559,13 @@ def analysis_descriptor_patch(descriptor: EdaAnalysisDescriptor) -> JSONObject:
 
     The document level is written in full, as the site stores every member of it.
     """
-    return descriptor.model_dump(
+    patch: JSONObject = descriptor.model_dump(
         by_alias=True, mode="json", exclude={"computations"}, exclude_none=True
-    ) | {
-        "computations": [
-            _computation_body(computation) for computation in descriptor.computations
-        ]
-    }
+    )
+    patch["computations"] = [
+        _computation_body(computation) for computation in descriptor.computations
+    ]
+    return patch
 
 
 class EdaNewAnalysis(EdaModel):

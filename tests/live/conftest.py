@@ -126,8 +126,8 @@ async def owned_strategy(
         api = get_strategy_api(site)
         step = await api.create_step(
             NewStepSpec(
-                searchName="GenesByMolecularWeight",
-                searchConfig=WDKSearchConfig(
+                search_name="GenesByMolecularWeight",
+                search_config=WDKSearchConfig(
                     parameters={
                         "organism": '["Plasmodium falciparum 3D7"]',
                         "min_molecular_weight": "10000",
@@ -139,7 +139,9 @@ async def owned_strategy(
         )
         steps.append((site, step.id))
         strategy = await api.create_strategy(
-            WDKStepTree(stepId=step.id), name="veupathdb-py-live-lane", is_internal=True
+            WDKStepTree(step_id=step.id),
+            name="veupathdb-py-live-lane",
+            is_internal=True,
         )
         strategies.append((site, strategy.id))
         return strategy.id, step.id
