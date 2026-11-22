@@ -4,6 +4,7 @@ import os
 from collections.abc import Generator
 
 import pytest
+from hypothesis import settings
 
 from veupathdb.guest_token import use_guest_tokens
 from veupathdb.settings import VEuPathDBSettings, use_veupathdb_settings_source
@@ -11,6 +12,9 @@ from veupathdb.testing import QA_SITES_FILE, hermetic_guest_tokens
 from veupathdb.wdk import forget_signing_keys
 
 os.environ["VEUPATHDB_SITES_CONFIG"] = str(QA_SITES_FILE)
+
+settings.register_profile("veupathdb", deadline=None)
+settings.load_profile("veupathdb")
 
 
 @pytest.fixture(autouse=True)
