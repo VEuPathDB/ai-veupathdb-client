@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from veupathdb.domain.parameters.values import ParamValue
 from veupathdb.domain.strategy.ast import (
@@ -18,6 +18,7 @@ from veupathdb.domain.strategy.ast import (
     StepReport,
     StrategyStepNode,
 )
+from veupathdb.domain.strategy.held import refuse_held_overlap
 from veupathdb.domain.strategy.ops import ColocationParams, CombineOp
 from veupathdb.model import CamelModel
 
@@ -41,6 +42,9 @@ class StrategyStep(CamelModel):
     """The record type WDK lists this step's own search under. A transform
     crosses record classes, so it is not the class of the step it consumes."""
     parameters: dict[str, ParamValue] = Field(default_factory=dict)
+    held_wire: dict[str, str] = Field(
+        default_factory=dict, exclude_if=lambda held: not held
+    )
     primary_input_id: str | None = None
     secondary_input_id: str | None = None
     display_name: str | None = None
@@ -52,6 +56,11 @@ class StrategyStep(CamelModel):
     wdk_weight: int | None = None
     expanded_strategy_id: int | None = None
     expanded_name: str | None = None
+
+    @model_validator(mode="after")
+    def _held_apart(self) -> StrategyStep:
+        refuse_held_overlap(self.parameters, self.held_wire)
+        return self
 
     @property
     def display_label(self) -> str:
@@ -114,6 +123,7 @@ def flatten_tree(root: StrategyStepNode) -> dict[str, StrategyStep]:
             kind=kind,
             search_name=own_search_name(node, kind),
             parameters=dict(node.parameters),
+            held_wire=dict(node.held_wire),
             primary_input_id=node.primary_input_id,
             secondary_input_id=node.secondary_input_id,
             display_name=node.display_name,
@@ -146,6 +156,7 @@ def rebuild_tree(root_id: str, steps: dict[str, StrategyStep]) -> StrategyStepNo
                 else step.search_name or ""
             ),
             parameters=dict(step.parameters),
+            held_wire=dict(step.held_wire),
             display_name=step.display_name,
             operator=step.operator,
             colocation_params=step.colocation_params,

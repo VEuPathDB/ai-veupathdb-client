@@ -213,6 +213,9 @@
     "record_class_of",
     "root_ids",
     "runs_a_wdk_search",
+    "sent_wire",
+    "settle_values",
+    "state_values",
     "subtree_ids",
     "walk",
     "wdk_search_name"

@@ -16,6 +16,10 @@
 - `ParameterCanonicalizer.held` reads what WDK holds and never refuses (`HeldValues`);
   `empty_refusal` is the one text the reader and the canonicalizer refuse an empty value
   with.
+- A step holds `held_wire`, the wire forms WDK holds that no kind reads; a name is never
+  both read and held (a model validator on `StrategyStepNode` and `StrategyStep`).
+  `sent_wire` is what a push sends, `state_values` moves a stated name out of
+  `held_wire`, and `settle_values` takes canonical values without rewriting a held one.
 - `veupathdb-py` is 0.9.0b9.
 
 ## 2026-11-21 - A filter is read as stated clauses
