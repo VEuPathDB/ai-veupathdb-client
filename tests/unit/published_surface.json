@@ -197,6 +197,7 @@
     "read_options",
     "read_stated_values",
     "restates",
+    "same_value",
     "shown_stated",
     "shown_stated_text",
     "species_of",

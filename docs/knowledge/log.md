@@ -1,5 +1,11 @@
 # Knowledge log
 
+## 2026-11-22 - A value is compared by what WDK reads
+
+- `same_value` compares two values of one parameter as WDK reads them: a multi-pick as its
+  set of terms, a filter as its set of clauses
+  ([WDK-PARAM-021](wdk/rules/parameters-and-vocabularies.md)).
+
 ## 2026-11-22 - A value given back is the held value, and no filter goes out as WDK spells it
 
 - `restates` is the one test a reader with held values applies: a value given back in its

@@ -92,6 +92,7 @@ from veupathdb.domain.parameters.values import (
     SinglePickValue,
     StringValue,
     empty_value,
+    same_value,
     value_kind,
 )
 from veupathdb.domain.parameters.vocab_lookup import (
@@ -231,6 +232,7 @@ __all__ = [
     "read_options",
     "read_stated_values",
     "restates",
+    "same_value",
     "shown_stated",
     "shown_stated_text",
     "species_of",

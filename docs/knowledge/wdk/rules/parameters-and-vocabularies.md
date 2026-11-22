@@ -1088,3 +1088,24 @@ keeps the definitions one request, turn or job reads, keyed by site, login token
 record type, search and the expand flag, and drops them when the scope ends. The
 search list and a parameter's name are the model's and the same for every user,
 so the combine search the client keeps once per record type is safe.
+
+### WDK-PARAM-021 - A multi-pick value is its set of terms, and a filter value its set of clauses
+
+- class: SILENT
+- upstream: https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/EnumParamHandler.java#L28-L84
+- anchor: src/veupathdb/domain/parameters/values.py:same_value
+- status: ENFORCED by tests/unit/rules/test_parameter_and_vocabulary_rules.py::test_wdk_param_021_a_multi_pick_is_its_set_of_terms
+
+`EnumParamHandler.toStableValue` sorts the terms before it writes the stable value,
+`toSignature` sorts them again before it hashes the value for the answer cache, and
+`toInternalValue` collects the internal values in a `LinkedHashSet` and sends them as an
+`IN` list. So the order of a multi-pick's terms, and a repeated term, change neither the
+answer nor its cache key. `FilterParamNewStableValue` sorts its filters
+([source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNewStableValue.java#L160-L167),
+[source](https://github.com/VEuPathDB/WDK/blob/e534d2e6a5119165e1742c7a9e07a371217ddda5/Model/src/main/java/org/gusdb/wdk/model/query/param/FilterParamNewStableValue.java#L256-L262)),
+so the order of clauses is not part of a filter value either.
+
+`same_value` is the one equality a caller compares two values with: a multi-pick by its
+set of terms, a filter by its `clause_set`, every other kind by its fields. The tests
+check it over permutations and repeats and over every kind read back from its wire.
+

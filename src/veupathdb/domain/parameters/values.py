@@ -237,3 +237,13 @@ def value_kind(value: ParamValue) -> ParamKind | None:
             return None
         case _:
             return value.type
+
+
+def same_value(left: ParamValue, right: ParamValue) -> bool:
+    match left, right:
+        case MultiPickValue(values=held), MultiPickValue(values=read):
+            return set(held) == set(read)
+        case FilterValue(empty=False), FilterValue(empty=False):
+            return left.clause_set == right.clause_set
+        case _:
+            return left == right
