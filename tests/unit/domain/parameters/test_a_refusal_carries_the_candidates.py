@@ -209,7 +209,7 @@ def test_every_parameter_with_an_unnamed_pick_is_refused_at_once() -> None:
         }
     )
 
-    with pytest.raises(ValidationError) as refused:
+    with pytest.raises(VocabularyEntryError) as refused:
         canonicalizer.canonicalize(
             {
                 "organism": MultiPickValue(values=["Pf3D7"]),

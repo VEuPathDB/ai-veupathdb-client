@@ -45,11 +45,17 @@ def _spec(param: WDKParameter) -> ParamSpecNormalized:
     )
 
 
+class _Candidate(BaseModel):
+    value: str
+    display: str
+
+
 class _Row(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     param: str
     detail: str
+    candidates: list[_Candidate] | None = None
 
 
 _ROWS = TypeAdapter(list[_Row])
@@ -59,7 +65,7 @@ def _params(errors: JSONArray | None) -> list[str]:
     return [row.param for row in _ROWS.validate_python(errors)]
 
 
-def _assert_one_sentence_per_row(refusal: ValidationError) -> None:
+def _assert_one_line_per_row(refusal: ValidationError) -> None:
     rows = _ROWS.validate_python(refusal.errors)
     assert rows
     assert all(row.detail and "\n" not in row.detail for row in rows)
@@ -82,7 +88,7 @@ class TestAStatedCallNamesEveryParameter:
             "snp_class",
         ]
         assert _params(refused.value.errors) == ["ReadFrequencyPercent", "snp_class"]
-        _assert_one_sentence_per_row(refused.value)
+        _assert_one_line_per_row(refused.value)
 
     def test_a_shape_fault_comes_first_and_every_entry_fault_follows(self) -> None:
         stated: dict[str, JsonValue] = {
@@ -101,7 +107,25 @@ class TestAStatedCallNamesEveryParameter:
         ]
         assert all(f.name in f.text for f in faults)
         assert [f.read for f in faults[1:]] == ["95 percent", "non-synonymous"]
-        _assert_one_sentence_per_row(refused.value)
+        assert (refused.value.detail or "").splitlines() == [f.text for f in faults]
+        _assert_one_line_per_row(refused.value)
+
+    def test_a_pick_whose_shape_fails_is_never_entry_read(self) -> None:
+        stated: dict[str, JsonValue] = {
+            "snp_class": 5,
+            "ReadFrequencyPercent": "95 percent",
+        }
+
+        with pytest.raises(StatedValuesError) as refused:
+            read_stated_values(_sheet(), stated)
+
+        faults = refused.value.faults
+        assert [(f.name, f.read) for f in faults] == [
+            ("snp_class", 5),
+            ("ReadFrequencyPercent", "95 percent"),
+        ]
+        assert "has no entry" in faults[1].text
+        assert "has no entry" not in faults[0].text
 
 
 @pytest.mark.skipif(needs_qa_recording(f"wdk/{_SNPS}.json"), reason=NEEDS_QA_RECORDING)
@@ -118,7 +142,50 @@ class TestACanonicalizedCallNamesEveryParameter:
             )
 
         assert _params(refused.value.errors) == ["snp_klass", "snp_class"]
-        _assert_one_sentence_per_row(refused.value)
+        _assert_one_line_per_row(refused.value)
+
+    def test_every_unnamed_entry_is_one_vocabulary_refusal(self) -> None:
+        specs = {param.name: _spec(param) for param in _sheet()}
+
+        with pytest.raises(VocabularyEntryError) as refused:
+            ParameterCanonicalizer(specs).canonicalize(
+                {
+                    "snp_class": SinglePickValue(value="non-synonymous"),
+                    "ReadFrequencyPercent": SinglePickValue(value="95 percent"),
+                }
+            )
+
+        assert [p for p, _ in refused.value.faults] == [
+            "snp_class",
+            "ReadFrequencyPercent",
+        ]
+        rows = _ROWS.validate_python(refused.value.errors)
+        assert all(row.candidates for row in rows)
+        _assert_one_line_per_row(refused.value)
+
+    def test_a_mixed_refusal_keeps_every_entry_row_with_its_candidates(
+        self,
+    ) -> None:
+        specs = {param.name: _spec(param) for param in _sheet()}
+
+        with pytest.raises(ValidationError) as refused:
+            ParameterCanonicalizer(specs).canonicalize(
+                {
+                    "snp_class": SinglePickValue(value="non-synonymous"),
+                    "snp_klass": SinglePickValue(value="Missense"),
+                    "ReadFrequencyPercent": SinglePickValue(value="95 percent"),
+                }
+            )
+
+        rows = _ROWS.validate_python(refused.value.errors)
+        assert type(refused.value) is ValidationError
+        assert [(row.param, bool(row.candidates)) for row in rows] == [
+            ("snp_class", True),
+            ("ReadFrequencyPercent", True),
+            ("snp_klass", False),
+        ]
+        assert "Synonymous" in [c.value for c in rows[0].candidates or []]
+        _assert_one_line_per_row(refused.value)
 
     def test_an_unnamed_entry_row_carries_its_sentence(self) -> None:
         specs = {param.name: _spec(param) for param in _sheet()}
@@ -128,7 +195,7 @@ class TestACanonicalizedCallNamesEveryParameter:
                 {"snp_class": SinglePickValue(value="non-synonymous")}
             )
 
-        _assert_one_sentence_per_row(refused.value)
+        _assert_one_line_per_row(refused.value)
 
 
 class TestJoinedRefusal:

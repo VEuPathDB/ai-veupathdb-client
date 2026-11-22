@@ -5,11 +5,12 @@
 - `read_stated_values` reads every shape, then names the entries of every parameter whose
   shape read, and raises once with both kinds of fault
   ([WDK-PARAM-017](wdk/rules/parameters-and-vocabularies.md)).
-- `ParameterCanonicalizer.canonicalize` reads every parameter and raises `joined_refusal`
-  of their refusals, one `ValidationError` for the call
+- `ParameterCanonicalizer.canonicalize` reads every parameter and raises one refusal for
+  the call: every entry fault is one `VocabularyEntryError`, joined with any other fault by
+  `joined_refusal`, and the entry rows keep their candidates
   ([WDK-PARAM-020](wdk/rules/parameters-and-vocabularies.md)).
-- Every row these refusals and `VocabularyEntryError` carry holds `param` and a
-  one-sentence `detail`.
+- A refusal's detail has one line per problem, `StatedValuesError` included, and every row
+  holds `param` and its line as `detail`.
 
 ## 2026-11-22 - Each kind reads as WDK reads it
 

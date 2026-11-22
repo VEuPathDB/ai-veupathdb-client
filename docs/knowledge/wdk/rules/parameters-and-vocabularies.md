@@ -651,8 +651,8 @@ boolean written as text is `true` or `True`, and a `yes`/`no` vocabulary such as
 fault of a search into one refusal: the shape of every value is read, then the entries of
 every value whose shape read. When only entries fail it raises `VocabularyEntryError` with
 every parameter's faults; when a shape fails it raises `StatedValuesError` with the shape
-faults first and one fault per entry fault after them. Every `errors` row holds `param` and
-a one-sentence `detail`. A number is written as its shortest decimal and never
+faults first and one fault per entry fault after them. The detail has one line per fault,
+and every `errors` row holds `param` and that line as `detail`. A number is written as its shortest decimal and never
 with an exponent: `5.0` is `5` and `1e-8` is `0.00000001`; `NaN`, infinity and a boolean
 are refused. A text is read as WDK reads it: `StringParam` takes it when `Double.valueOf`
 parses it and it matches the default number regex `[+-]?\d+(\.\d+)?([eE][+-]?\d+)?`, whose `\d`
@@ -793,9 +793,12 @@ names the parameter, the text and the first `SHOWN_CANDIDATES` entries `rank_ent
 ranks (the lexical entries first, then the spelling neighbours); each item of `errors`
 carries the candidates as `{value, display}` and its line as `detail`. The refusal names no
 tool and no example from another vocabulary. `ParameterCanonicalizer.canonicalize` reads
-every parameter of a call and raises one refusal for all of them: one parameter's refusal as
-it is, several joined by `joined_refusal` into one `ValidationError` whose detail has one
-line per refusal and whose `errors` hold every row, each with `param` and `detail`.
+every parameter of a call and raises one refusal for all of them. Every entry fault is one
+`VocabularyEntryError`, so a call whose only faults are entries keeps that type and every
+parameter's candidates. Faults of other kinds are joined with it by `joined_refusal` into one
+`ValidationError` whose `errors` hold every row in order, each with `param` and its one line
+as `detail`; the entry rows keep their `candidates`, so a reader orders them from the rows
+whatever the refusal's type.
 
 # WDK-VOCAB - vocabularies, trees, and the parents they were read under
 

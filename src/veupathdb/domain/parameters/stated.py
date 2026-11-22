@@ -108,7 +108,7 @@ class StatedValuesError(ValidationError):
         self.faults = faults
         super().__init__(
             title="Invalid parameter value",
-            detail=" ".join(fault.text for fault in faults),
+            detail="\n".join(fault.text for fault in faults),
             errors=[{"param": fault.name, "detail": fault.text} for fault in faults],
         )
 

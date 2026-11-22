@@ -27,7 +27,11 @@ from veupathdb.domain.parameters.values import (
     SinglePickValue,
     empty_value,
 )
-from veupathdb.domain.parameters.vocab_lookup import entries_or_refusal
+from veupathdb.domain.parameters.vocab_lookup import (
+    Resolution,
+    VocabularyEntryError,
+    entries_or_refusal,
+)
 from veupathdb.domain.parameters.wdk_vocab import (
     FAKE_ALL_SENTINEL,
     WDKVocabulary,
@@ -93,7 +97,7 @@ class ParameterCanonicalizer:
         self,
         parameters: dict[str, ParamValue],
     ) -> dict[str, ParamValue]:
-        """Canonicalize each value against its spec, or refuse every refused one at once.
+        """Canonicalize each value, or raise one refusal that names every refused value.
 
         An ``input-step`` value is left out: its value is structural, wired by
         the caller, and never a choice WDK made. A held value is WDK's own and
@@ -101,14 +105,22 @@ class ParameterCanonicalizer:
         """
         canonical: dict[str, ParamValue] = {}
         refusals: list[ValidationError] = []
+        entry_faults: list[tuple[str, Resolution]] = []
+        entry_at = 0
         for name, value in (parameters or {}).items():
             try:
                 kept = self._canonical(name, value)
+            except VocabularyEntryError as refusal:
+                entry_at = entry_at if entry_faults else len(refusals)
+                entry_faults.extend(refusal.faults)
+                continue
             except ValidationError as refusal:
                 refusals.append(refusal)
                 continue
             if kept is not None:
                 canonical[name] = kept
+        if entry_faults:
+            refusals.insert(entry_at, VocabularyEntryError(entry_faults))
         if refusals:
             raise joined_refusal(refusals)
         return canonical
