@@ -172,6 +172,7 @@
     "flatten_vocab",
     "from_wire",
     "from_wire_as",
+    "held_names",
     "leading_accession_token",
     "match_exact_option",
     "nearest_entries",

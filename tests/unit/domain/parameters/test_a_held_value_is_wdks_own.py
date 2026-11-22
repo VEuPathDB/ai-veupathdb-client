@@ -15,6 +15,7 @@ from veupathdb.domain.parameters import (
     StringValue,
     fill_site_set_defaults,
     from_wire_as,
+    held_names,
     value_kind,
     wire_map,
 )
@@ -183,3 +184,12 @@ def test_a_site_set_default_never_fills_over_a_held_value() -> None:
     assert fill_site_set_defaults({"hidden": spec}, {}) == {
         "hidden": StringValue(value="site")
     }
+
+
+def test_the_held_names_are_the_values_no_kind_reads() -> None:
+    values: dict[str, ParamValue] = {
+        "a": HeldValue(wire="x"),
+        "b": NumberRangeValue(min=1),
+    }
+
+    assert held_names(values) == frozenset({"a"})
