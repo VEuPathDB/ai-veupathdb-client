@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 
 import httpx
 import pytest
+from tests.unit.wdk._virtual_clock import on_the_virtual_clock
 
 from veupathdb.observer import MetricAttrs, NoObserver, get_observer, set_observer
 from veupathdb.wdk import (
@@ -242,24 +243,27 @@ class TestThePerProcessCapStands:
 
 @pytest.mark.usefixtures("wdk_request_token")
 class TestAWaitIsNotARequest:
-    async def test_time_in_line_does_not_count_against_the_request_timeout(
+    def test_time_in_line_does_not_count_against_the_request_timeout(
         self,
     ) -> None:
-        client = await _client(_ClockedSite(), seconds=0.2)
-        previous = search_gate()
+        async def scenario() -> None:
+            client = await _client(_ClockedSite(), seconds=0.2)
+            previous = search_gate()
 
-        @asynccontextmanager
-        async def slow_line(_request: SearchRequest) -> AsyncIterator[None]:
-            await asyncio.sleep(0.4)
-            yield
+            @asynccontextmanager
+            async def slow_line(_request: SearchRequest) -> AsyncIterator[None]:
+                await asyncio.sleep(0.4)
+                yield
 
-        use_search_gate(slow_line)
-        try:
-            answer = await client.post(_SNP_REPORT, json={})
-        finally:
-            use_search_gate(previous)
+            use_search_gate(slow_line)
+            try:
+                answer = await client.post(_SNP_REPORT, json={})
+            finally:
+                use_search_gate(previous)
 
-        assert answer == {"id": 1}
+            assert answer == {"id": 1}
+
+        on_the_virtual_clock(scenario())
 
     async def test_a_cancelled_waiter_leaves_the_line_to_the_next(self) -> None:
         site = _Site()
@@ -618,26 +622,32 @@ class _Slow(httpx.AsyncBaseTransport):
 
 @pytest.mark.usefixtures("wdk_request_token")
 class TestABudgetStartsAtTheSend:
-    async def test_time_in_line_does_not_count_against_the_budget(self) -> None:
-        site = _Site()
-        site.release.clear()
-        client = await _client(site)
+    def test_time_in_line_does_not_count_against_the_budget(self) -> None:
+        async def scenario() -> None:
+            site = _Site()
+            site.release.clear()
+            client = await _client(site)
 
-        with search_turn():
-            ahead = _report(client, 1)
-            await site.entered.wait()
-            behind = asyncio.create_task(
-                client.post(_SNP_REPORT, json={}, budget_seconds=0.2)
-            )
-            await asyncio.sleep(0.4)
-            site.release.set()
-            await ahead
-            answer = await behind
+            with search_turn():
+                ahead = _report(client, 1)
+                await site.entered.wait()
+                behind = asyncio.create_task(
+                    client.post(_SNP_REPORT, json={}, budget_seconds=0.2)
+                )
+                await asyncio.sleep(0.4)
+                site.release.set()
+                await ahead
+                answer = await behind
 
-        assert answer == {"id": 102}
+            assert answer == {"id": 102}
 
-    async def test_a_request_past_its_budget_after_the_send_ends(self) -> None:
-        client = await _client(_Slow(0.5))
+        on_the_virtual_clock(scenario())
 
-        with pytest.raises(TimeoutError):
-            await client.post(_SNP_REPORT, json={}, budget_seconds=0.05)
+    def test_a_request_past_its_budget_after_the_send_ends(self) -> None:
+        async def scenario() -> None:
+            client = await _client(_Slow(0.5))
+
+            with pytest.raises(TimeoutError):
+                await client.post(_SNP_REPORT, json={}, budget_seconds=0.05)
+
+        on_the_virtual_clock(scenario())

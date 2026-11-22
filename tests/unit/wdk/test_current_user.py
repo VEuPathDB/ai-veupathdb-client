@@ -7,11 +7,11 @@ that does not answer raises, so a host never reads an outage as signed out.
 from __future__ import annotations
 
 import asyncio
-import time
 
 import httpx
 import pytest
 import respx
+from tests.unit.wdk._virtual_clock import on_the_virtual_clock
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.errors import SiteNotFoundError, WDKError
@@ -137,31 +137,34 @@ def test_the_identity_deadline_is_ten_seconds() -> None:
 
 
 @respx.mock
-async def test_a_read_past_the_deadline_raises_after_one_attempt(
+def test_a_read_past_the_deadline_raises_after_one_attempt(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(current_user, "IDENTITY_READ_TIMEOUT_SECONDS", 0.05)
-    _allow_session_init()
+    async def scenario() -> None:
+        monkeypatch.setattr(current_user, "IDENTITY_READ_TIMEOUT_SECONDS", 0.05)
+        _allow_session_init()
 
-    sent: list[httpx.Request] = []
+        sent: list[httpx.Request] = []
 
-    async def never_answers(request: httpx.Request) -> httpx.Response:
-        sent.append(request)
-        await asyncio.sleep(5)
-        return httpx.Response(200, json=_REGISTERED)
+        async def never_answers(request: httpx.Request) -> httpx.Response:
+            sent.append(request)
+            await asyncio.sleep(5)
+            return httpx.Response(200, json=_REGISTERED)
 
-    respx.get(_CURRENT_USER).mock(side_effect=never_answers)
-    reset = veupathdb_auth_token_ctx.set("a-token")
-    started = time.monotonic()
-    try:
-        with pytest.raises(WDKError) as raised:
-            await fetch_current_user("plasmodb")
-    finally:
-        veupathdb_auth_token_ctx.reset(reset)
+        respx.get(_CURRENT_USER).mock(side_effect=never_answers)
+        reset = veupathdb_auth_token_ctx.set("a-token")
+        started = asyncio.get_running_loop().time()
+        try:
+            with pytest.raises(WDKError) as raised:
+                await fetch_current_user("plasmodb")
+        finally:
+            veupathdb_auth_token_ctx.reset(reset)
 
-    assert raised.value.status == 502
-    assert len(sent) == 1
-    assert time.monotonic() - started < 1.0
+        assert raised.value.status == 502
+        assert len(sent) == 1
+        assert asyncio.get_running_loop().time() - started < 1.0
+
+    on_the_virtual_clock(scenario())
 
 
 async def test_an_unknown_site_raises() -> None:

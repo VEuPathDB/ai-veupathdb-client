@@ -4,6 +4,7 @@ import asyncio
 
 import httpx
 import pytest
+from tests.unit.wdk._virtual_clock import on_the_virtual_clock
 
 from veupathdb.errors import WDKError
 from veupathdb.wdk._http import runs_a_search
@@ -138,38 +139,44 @@ class TestASearchIsSentOnce:
 
 @pytest.mark.usefixtures("wdk_request_token")
 class TestSearchesWaitForASlot:
-    async def test_no_more_searches_run_at_once_than_the_site_allows(self) -> None:
-        transport = _Answering()
-        transport.release.clear()
-        client = await _client(transport, concurrent_searches=2)
+    def test_no_more_searches_run_at_once_than_the_site_allows(self) -> None:
+        async def scenario() -> None:
+            transport = _Answering()
+            transport.release.clear()
+            client = await _client(transport, concurrent_searches=2)
 
-        reports = [
-            asyncio.create_task(
-                client.post(f"/users/1/steps/{step}/reports/standard", json={})
+            reports = [
+                asyncio.create_task(
+                    client.post(f"/users/1/steps/{step}/reports/standard", json={})
+                )
+                for step in range(6)
+            ]
+            await asyncio.sleep(0.05)
+            waiting_at_the_cap = transport.in_flight
+            transport.release.set()
+            await asyncio.gather(*reports)
+
+            assert waiting_at_the_cap == 2
+            assert transport.most_in_flight == 2
+            assert len(transport.sent) == 6
+
+        on_the_virtual_clock(scenario())
+
+    def test_a_metadata_read_does_not_wait_behind_searches(self) -> None:
+        async def scenario() -> None:
+            transport = _Answering()
+            transport.release.clear()
+            client = await _client(transport, concurrent_searches=1)
+            held = asyncio.create_task(
+                client.post("/users/1/steps/1/reports/standard", json={})
             )
-            for step in range(6)
-        ]
-        await asyncio.sleep(0.05)
-        waiting_at_the_cap = transport.in_flight
-        transport.release.set()
-        await asyncio.gather(*reports)
+            await asyncio.sleep(0.05)
 
-        assert waiting_at_the_cap == 2
-        assert transport.most_in_flight == 2
-        assert len(transport.sent) == 6
+            read = asyncio.create_task(client.get("/users/1/strategies"))
+            await asyncio.sleep(0.05)
 
-    async def test_a_metadata_read_does_not_wait_behind_searches(self) -> None:
-        transport = _Answering()
-        transport.release.clear()
-        client = await _client(transport, concurrent_searches=1)
-        held = asyncio.create_task(
-            client.post("/users/1/steps/1/reports/standard", json={})
-        )
-        await asyncio.sleep(0.05)
+            assert transport.in_flight == 2
+            transport.release.set()
+            await asyncio.gather(held, read)
 
-        read = asyncio.create_task(client.get("/users/1/strategies"))
-        await asyncio.sleep(0.05)
-
-        assert transport.in_flight == 2
-        transport.release.set()
-        await asyncio.gather(held, read)
+        on_the_virtual_clock(scenario())
