@@ -293,11 +293,17 @@ def exact_or_candidates(
     )
 
 
+def _named(option: VocabOption) -> str:
+    if option.display == option.value:
+        return option.display
+    return f"{option.display} ({option.value})"
+
+
 def _fault_line(param: str, resolution: Resolution) -> str:
     shown = resolution.candidates[:SHOWN_CANDIDATES]
     if not shown:
         return f"{param} has no entry {resolution.phrase!r}, and no entry is near it."
-    named = ", ".join(f"{c.display} ({c.value})" for c in shown)
+    named = ", ".join(_named(c) for c in shown)
     return f"{param} has no entry {resolution.phrase!r}. Candidates: {named}."
 
 

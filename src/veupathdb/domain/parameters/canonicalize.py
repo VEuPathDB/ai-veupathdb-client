@@ -29,7 +29,6 @@ from veupathdb.domain.parameters.values import (
 )
 from veupathdb.domain.parameters.vocab_lookup import (
     SHOWN_CANDIDATES,
-    Resolution,
     VocabularyEntryError,
     exact_or_candidates,
 )
@@ -104,7 +103,6 @@ class ParameterCanonicalizer:
         goes through untouched.
         """
         canonical: dict[str, ParamValue] = {}
-        faults: list[tuple[str, Resolution]] = []
         for name, value in (parameters or {}).items():
             if isinstance(value, HeldValue):
                 canonical[name] = value
@@ -127,12 +125,7 @@ class ParameterCanonicalizer:
                 )
             if value == empty_value(value.type) and not accepts_empty(spec):
                 raise empty_refusal(name, to_decoded(value))
-            try:
-                canonical[name] = self._canonicalize_value(spec, value)
-            except VocabularyEntryError as refusal:
-                faults.extend(refusal.faults)
-        if faults:
-            raise VocabularyEntryError(faults)
+            canonical[name] = self._canonicalize_value(spec, value)
         return canonical
 
     def held(self, wire: Mapping[str, str]) -> dict[str, ParamValue]:

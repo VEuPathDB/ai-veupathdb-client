@@ -16,7 +16,7 @@ from veupathdb.domain.parameters import (
 from veupathdb.errors import ValidationError
 from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
-from veupathdb.wdk import WDKParameter
+from veupathdb.wdk import WDKParameter, phyletic_tree_of
 from veupathdb.wdk.wdk_models import WDKSearchResponse
 
 
@@ -34,11 +34,12 @@ def _canonicalizer(fixture: str, name: str) -> ParameterCanonicalizer:
 
 
 def _phyletic_tree() -> PhyleticTree:
-    terms = _parameter("search_genes_by_ortholog_pattern", "phyletic_term_map")
-    indents = _parameter("search_genes_by_ortholog_pattern", "phyletic_indent_map")
-    assert isinstance(terms.vocabulary, list)
-    assert isinstance(indents.vocabulary, list)
-    return PhyleticTree.from_vocab(terms.vocabulary, indents.vocabulary)
+    search = WDKSearchResponse.model_validate(
+        load_recorded("search_genes_by_ortholog_pattern").json_body()
+    )
+    tree = phyletic_tree_of(search.search_data.parameters or [])
+    assert tree is not None
+    return tree
 
 
 needs_gene_type = pytest.mark.skipif(
@@ -182,3 +183,42 @@ class TestThePhyleticReaderReadsTheOneRule:
 
         assert resolved.codes == []
         assert resolved.unknown == ["Plasmodium"]
+
+
+@needs_taxon
+@needs_gene_type
+def test_only_the_first_parameter_with_an_unnamed_pick_is_refused() -> None:
+    organism = _parameter("search_genes_by_taxon", "organism")
+    gene_type = _parameter("search_genes_by_gene_type", "geneType")
+    canonicalizer = ParameterCanonicalizer(
+        {
+            p.name: ParamSpecNormalized(
+                name=p.name, param_type=p.type, vocabulary=p.vocabulary
+            )
+            for p in (organism, gene_type)
+        }
+    )
+
+    with pytest.raises(VocabularyEntryError) as refused:
+        canonicalizer.canonicalize(
+            {
+                "organism": MultiPickValue(values=["Pf3D7"]),
+                "geneType": MultiPickValue(values=["mRNA"]),
+            }
+        )
+
+    assert [(n, r.phrase) for n, r in refused.value.faults] == [("organism", "Pf3D7")]
+
+
+@needs_snps
+def test_a_candidate_whose_display_is_its_value_is_named_once() -> None:
+    with pytest.raises(VocabularyEntryError) as refused:
+        _canonicalizer("search_genes_by_ngs_snps", "snp_class").canonicalize(
+            {"snp_class": SinglePickValue(value="nonsense")}
+        )
+
+    detail = refused.value.detail or ""
+    named = detail.split("Candidates: ", 1)[1].rstrip(".").split(", ")
+    assert len(named) == SHOWN_CANDIDATES
+    assert all("(" not in entry for entry in named)
+    assert "Missense" in named

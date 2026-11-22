@@ -11,8 +11,8 @@
   value; `exact_or_candidates` gives a `Resolution`.
 - `ParameterCanonicalizer.canonicalize` resolves every pick with `exact_or_candidates` and
   refuses with `VocabularyEntryError`, which holds each parameter with its `Resolution`
-  and carries the candidates in `errors`. Every unnamed pick of every parameter is one
-  fault of one refusal. The substring suggestions, the tool text, the fixed example and
+  and carries the candidates in `errors`. Every unnamed pick of a parameter is one fault
+  of that parameter's refusal. The substring suggestions, the tool text, the fixed example and
   `validOptions` are gone with `match_vocab_value`.
 - `PhyleticTree.resolve_terms` reads an exact code, else the same exact step, so spacing
   and case no longer separate a label from its code.

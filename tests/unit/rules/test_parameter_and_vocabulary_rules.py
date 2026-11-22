@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 
 import pytest
@@ -403,40 +404,44 @@ def test_wdk_param_018_a_range_facets_bounds_come_only_from_its_term_summary() -
     )
 
 
-def _stated_parameter(fixture: str, name: str) -> WDKParameter:
-    body = load_recorded(fixture).json_body()
-    if fixture.startswith("refresh_"):
-        listed = TypeAdapter(list[WDKParameter]).validate_python(body)
-        return next(p for p in listed if p.name == name)
-    return _parameter(fixture, name)
+def _refreshed_parameter(fixture: str, name: str) -> WDKParameter:
+    listed = TypeAdapter(list[WDKParameter]).validate_python(
+        load_recorded(fixture).json_body()
+    )
+    return next(p for p in listed if p.name == name)
 
 
 _SPELLINGS = [
     (
+        _parameter,
         "search_genes_by_gene_type",
         "geneType",
         MultiPickValue(values=["Protein Coding"]),
         '["protein coding"]',
     ),
     (
+        _parameter,
         "search_genes_by_ngs_snps",
         "snp_class",
         SinglePickValue(value="missense"),
         "Missense",
     ),
     (
+        _parameter,
         "search_genes_by_metabolic_pathway_hagai",
         "metabolic_pathway",
         SinglePickValue(value="glycolysis"),
         "Glycolysis",
     ),
     (
+        _refreshed_parameter,
         "refresh_interpro_domain_pfam_on_dal972",
         "domain_typeahead",
         MultiPickValue(values=["pf00069"]),
         '["PF00069"]',
     ),
     (
+        _parameter,
         "search_genes_by_taxon",
         "organism",
         MultiPickValue(values=["Plasmodium  falciparum 3D7"]),
@@ -445,13 +450,17 @@ _SPELLINGS = [
 ]
 
 
-@pytest.mark.parametrize(("fixture", "name", "stated", "wire"), _SPELLINGS)
+@pytest.mark.parametrize(("reader", "fixture", "name", "stated", "wire"), _SPELLINGS)
 def test_wdk_param_020_a_term_is_sent_as_the_vocabulary_spells_it(
-    fixture: str, name: str, stated: ParamValue, wire: str
+    reader: Callable[[str, str], WDKParameter],
+    fixture: str,
+    name: str,
+    stated: ParamValue,
+    wire: str,
 ) -> None:
     if needs_qa_recording(f"wdk/{fixture}.json"):
         pytest.skip(NEEDS_QA_RECORDING)
-    param = _stated_parameter(fixture, name)
+    param = reader(fixture, name)
     spec = ParamSpecNormalized(
         name=name, param_type=param.type, vocabulary=param.vocabulary
     )
