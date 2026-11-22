@@ -40,7 +40,6 @@ from referencing.jsonschema import DRAFT4, Schema
 
 from veupathdb.devtools.pins import VendoredPin, pin_drift
 from veupathdb.devtools.qa_sites import use_qa_sites
-from veupathdb.testing import NEEDS_QA_RECORDING
 from veupathdb.testing.wdk_credentials import act_as_the_test_account
 from veupathdb.testing.wdk_fixtures import (
     FIXTURE_DIR,
@@ -327,7 +326,7 @@ def _verify_fixtures() -> int:
     for request in FIXTURES:
         if not request.file.exists():
             missing += 1
-            print(f"{request.name:44} MISSING {NEEDS_QA_RECORDING}")
+            print(f"{request.name:44} MISSING {request.unrecorded}")
             continue
         bound = [check for check in checks if check.fixture == request.name]
         if not bound:

@@ -282,6 +282,23 @@ caller that changes some filters and keeps WDK's computes the list with
 Source-only: read off the pinned sha, not confirmed against a running site. See
 [the pin-versus-deployment note](../sources.md).
 
+### WDK-STEP-010 - A span logic step outputs `a` or `b`; the `none` its form starts on never runs
+
+- class: HARD
+- upstream: https://github.com/VEuPathDB/ApiCommonWebService/blob/5952e846d1773b58425907e6098356f51a5f9ce1/WSFPlugin/src/main/java/org/apidb/apicomplexa/wsfplugin/spanlogic/SpanCompositionPlugin.java#L220-L225
+- anchor: src/veupathdb/domain/strategy/ops.py:from_wdk_params
+- status: ENFORCED by tests/unit/domain/strategy/test_a_span_step_reads_by_the_site_definition.py::test_wdk_step_010_the_output_placeholder_the_site_offers_is_refused
+
+`span_output` is an enum parameter whose default term is `none`, displayed as `select...`
+([`spanParams.xml`](https://github.com/VEuPathDB/ApiCommonModel/blob/0ce647115f1c78e4f038465984a88cfdc91b17b0/Model/lib/wdk/model/questions/params/spanParams.xml#L144-L153)),
+so the recorded `GenesBySpanLogic` search answers `initialDisplayValue: "none"`. WDK reads
+`none` as a term of the vocabulary, but the query is a WSF plugin call, and
+[`PluginExecutor.execute`](https://github.com/VEuPathDB/WSF/blob/19cbb004ab1a0d708570973ea2af2acfe13f5ea7/Plugin/src/main/java/org/gusdb/wsf/plugin/PluginExecutor.java#L54)
+calls `validateParameters` before the plugin runs. `SpanCompositionPlugin` accepts only `a`
+and `b` there and throws `Invalid span_output: none` for anything else. A step that holds
+`none` therefore never produces an answer, and `ColocationParams.from_wdk_params` refuses it
+by name instead of giving it a meaning.
+
 ### WDK-STRAT-001 - A step tree node carries a step id and nothing else
 
 - class: CONTRACT

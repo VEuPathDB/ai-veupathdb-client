@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from enum import StrEnum
 from typing import Annotated, Literal
 
-from pydantic import AfterValidator, Field
+from pydantic import AfterValidator, Field, ValidationError
 
 from veupathdb.errors import DataParsingError
 from veupathdb.model import CamelModel
@@ -103,7 +103,16 @@ class ColocationParams(CamelModel):
             _OPERATION_FROM_WDK, "span_operation", words["operation"]
         )
         words["strand"] = _word_for(_STRAND_FROM_WDK, "span_strand", words["strand"])
-        return cls.model_validate(words)
+        words["output"] = _word_for(_OUTPUT_FROM_WDK, "span_output", words["output"])
+        try:
+            return cls.model_validate(words)
+        except ValidationError as exc:
+            refused = [
+                f"{_FIELD_TO_WDK[str(error['loc'][0])]} {error['input']!r}"
+                for error in exc.errors()
+            ]
+            msg = f"span logic step has {', '.join(refused)}"
+            raise DataParsingError(msg) from exc
 
 
 def _word_for(vocabulary: Mapping[str, str], key: str, value: str) -> str:
@@ -150,6 +159,7 @@ _STRAND_TO_WDK: dict[str, str] = {
 
 _OPERATION_FROM_WDK = {wdk: word for word, wdk in _OPERATION_TO_WDK.items()}
 _STRAND_FROM_WDK = {wdk: word for word, wdk in _STRAND_TO_WDK.items()}
+_OUTPUT_FROM_WDK = {"a": "a", "b": "b"}
 
 
 _OP_ALIASES: dict[str, CombineOp] = {

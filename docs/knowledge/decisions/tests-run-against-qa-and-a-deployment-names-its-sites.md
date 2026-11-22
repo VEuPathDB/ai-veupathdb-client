@@ -23,11 +23,12 @@ status: stable
   `veupathdb.devtools.use_qa_sites` before their first request, whatever the process
   names, and `capture_wdk` keeps only exchanges with a QA host. No recorder takes an
   option that reaches another list.
-- **Every recording is a QA recording.** `verify` names each missing body, and each test
-  that reads one is skipped with `veupathdb.testing.NEEDS_QA_RECORDING` while
-  `needs_qa_recording` finds the recordings it reads absent, so a QA recording lifts the
-  skip with no change to the test
-  ([the two states with none](../backlog/two-states-qa-does-not-hold-on-request-are-recorded.md)).
+- **Every recording is a QA recording.** `verify` names each missing body with its reason,
+  and each test that reads one is skipped while `needs_qa_recording` finds the recordings it
+  reads absent, so a QA recording lifts the skip with no change to the test. The reason is
+  `veupathdb.testing.NEEDS_QA_RECORDING`, or the state QA does not hold on request
+  (`QA_HOLDS_NO_AI_SUMMARY`, `QA_HOLDS_NO_CRASHED_IMPORT`;
+  [the two states with none](../backlog/two-states-qa-does-not-hold-on-request-are-recorded.md)).
 - **The guard.** `scripts/check-test-sites.mjs` fails on a production host (a site
   domain whose nearest label is not `qa` or `q2`: bare, `www.`, `beta.`, a numbered
   server, any other subdomain or a mail domain) in any file outside `docs/`, the backup

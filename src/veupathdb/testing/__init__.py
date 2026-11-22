@@ -4,6 +4,8 @@ from veupathdb.testing.fixture_store import FIXTURE_ROOT
 from veupathdb.testing.guest import HERMETIC_GUEST_TOKEN, hermetic_guest_tokens
 from veupathdb.testing.qa_sites import (
     NEEDS_QA_RECORDING,
+    QA_HOLDS_NO_AI_SUMMARY,
+    QA_HOLDS_NO_CRASHED_IMPORT,
     QA_SITES_FILE,
     needs_qa_recording,
 )
@@ -27,6 +29,8 @@ __all__ = [
     "HERMETIC_GUEST_TOKEN",
     "NEEDS_QA_RECORDING",
     "NO_CREDENTIALS_REASON",
+    "QA_HOLDS_NO_AI_SUMMARY",
+    "QA_HOLDS_NO_CRASHED_IMPORT",
     "QA_SITES_FILE",
     "DriftLog",
     "LiveLaneSummary",

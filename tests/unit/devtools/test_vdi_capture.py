@@ -23,7 +23,12 @@ from veupathdb.devtools.vdi_capture import (
     write_install,
 )
 from veupathdb.json_types import JSONObject
-from veupathdb.testing import FIXTURE_ROOT, NEEDS_QA_RECORDING, needs_qa_recording
+from veupathdb.testing import (
+    FIXTURE_ROOT,
+    NEEDS_QA_RECORDING,
+    QA_HOLDS_NO_CRASHED_IMPORT,
+    needs_qa_recording,
+)
 from veupathdb.wdk.vdi.client import VdiClient
 from veupathdb.wdk.vdi.models import (
     RNASEQRC,
@@ -196,7 +201,7 @@ async def test_a_capture_that_fails_mid_poll_still_deletes() -> None:
         "vdi/rnaseqrc_import_failed.json",
         "vdi/rnaseqrc_post_response.json",
     ),
-    reason=NEEDS_QA_RECORDING,
+    reason=QA_HOLDS_NO_CRASHED_IMPORT,
 )
 async def test_the_written_body_names_no_account(tmp_path: Path) -> None:
     failed = _body("rnaseqrc_import_failed")

@@ -3,7 +3,12 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from veupathdb.domain.parameters.values import MultiPickValue, ParamValue, StringValue
+from veupathdb.domain.parameters import (
+    HeldValue,
+    MultiPickValue,
+    ParamValue,
+    StringValue,
+)
 from veupathdb.domain.strategy import (
     ColocationParams,
     CombineOp,
@@ -307,3 +312,31 @@ def test_a_plan_that_names_a_filter_twice_states_the_first() -> None:
     assert twice.changed(held) == []
     assert held.departures_from(twice, twice, wdk_added=[]) == []
     assert held.filters_wdk_added(twice) == []
+
+
+@pytest.mark.parametrize(
+    ("key", "value"), [("span_output", "none"), ("span_begin_offset_a", "far")]
+)
+def test_a_span_value_the_model_refuses_is_a_parse_error_naming_it(
+    key: str, value: str
+) -> None:
+    params = ColocationParams().to_wdk_params() | {key: value}
+    with pytest.raises(DataParsingError, match=key):
+        ColocationParams.from_wdk_params(params)
+
+
+def test_an_expression_restated_in_another_writing_is_the_same_parameters() -> None:
+    grouped = StepSettings(
+        parameters={"phyletic_expression": StringValue(value="(pfal>=1T AND pviv>=1T)")}
+    )
+    written = StepSettings(
+        parameters={"phyletic_expression": StringValue(value="pfal>=1T AND pviv>=1T")}
+    )
+    assert grouped.changed(written) == []
+
+
+def test_a_held_value_is_read_in_the_kind_the_other_side_states() -> None:
+    held = StepSettings(parameters={"o": HeldValue(wire='["b","a"]')})
+    typed = StepSettings(parameters={"o": MultiPickValue(values=["a", "b"])})
+    assert held.changed(typed) == []
+    assert typed.changed(held) == []

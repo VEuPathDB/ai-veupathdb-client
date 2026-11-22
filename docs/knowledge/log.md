@@ -1,5 +1,21 @@
 # Knowledge log
 
+## 2026-11-22 - A missing recording names the state QA does not hold
+
+- A test that waits for a cached AI expression summary skips with
+  `QA_HOLDS_NO_AI_SUMMARY`, and one that waits for a crashed VDI import with
+  `QA_HOLDS_NO_CRASHED_IMPORT`; `NEEDS_QA_RECORDING` is left for a body nobody has recorded
+  yet. A `FixtureRequest` carries its own `unrecorded` reason, which `fixtures verify`
+  prints for a missing body.
+
+## 2026-11-22 - The boolean search names are published
+
+- `veupathdb.wdk` exports `BOOLEAN_SEARCH_PREFIX` (`boolean_question`),
+  `BOOLEAN_OPERATOR_PARAM` (`bq_operator`) and the operand prefixes
+  `BOOLEAN_LEFT_OPERAND_PREFIX` and `BOOLEAN_RIGHT_OPERAND_PREFIX` (`bq_left_op`,
+  `bq_right_op`). `boolean_search` finds the site's boolean question and its parameters
+  by them, and a host that reads a boolean step reads the same names.
+
 ## 2026-11-22 - A step write carries its filters
 
 - `create_step`, `create_transform_step` and `create_combined_step` send the filters their
@@ -29,7 +45,10 @@
   WDK added on create (`filters_wdk_added`), or none. WDK publishes no always-applied
   default, so the first read back is the only source.
 - `ColocationParams.from_wdk_params` reads a span logic step's parameters back; a
-  missing key or an unknown value is a `DataParsingError` that names it.
+  missing key, an unknown value or a value the model refuses (an offset that is not a
+  number) is a `DataParsingError` that names it. `span_output` is read through its own
+  vocabulary, `a` and `b`: the `none` the site's form starts on is refused by the span
+  plugin and is refused here by name ([WDK-STEP-010](wdk/rules/strategies-and-steps.md)).
 
 ## 2026-11-23 - 0.9.0b16: entries that share a name are one name
 

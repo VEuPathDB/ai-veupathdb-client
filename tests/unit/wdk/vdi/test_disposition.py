@@ -11,7 +11,11 @@ import copy
 import pytest
 from tests.unit.wdk.vdi._wire import recorded
 
-from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
+from veupathdb.testing import (
+    NEEDS_QA_RECORDING,
+    QA_HOLDS_NO_CRASHED_IMPORT,
+    needs_qa_recording,
+)
 from veupathdb.wdk.vdi.models import (
     VdiDatasetDetails,
     VdiDatasetStatus,
@@ -41,7 +45,14 @@ def _edited(name: str, **axes: object) -> VdiDatasetStatus:
         ("rnaseqrc_data_running", VdiInstallDisposition.CONTINUE),
         ("rnaseqrc_installed", VdiInstallDisposition.INSTALLED),
         ("rnaseqrc_import_invalid", VdiInstallDisposition.FAILED),
-        ("rnaseqrc_import_failed", VdiInstallDisposition.FAILED),
+        pytest.param(
+            "rnaseqrc_import_failed",
+            VdiInstallDisposition.FAILED,
+            marks=pytest.mark.skipif(
+                needs_qa_recording("vdi/rnaseqrc_import_failed.json"),
+                reason=QA_HOLDS_NO_CRASHED_IMPORT,
+            ),
+        ),
         ("dataset_import_queued", VdiInstallDisposition.CONTINUE),
         ("dataset_installed", VdiInstallDisposition.INSTALLED),
     ],
@@ -159,7 +170,8 @@ def test_an_invalid_import_reports_the_plugins_message_byte_for_byte() -> None:
 
 
 @pytest.mark.skipif(
-    needs_qa_recording("vdi/rnaseqrc_import_failed.json"), reason=NEEDS_QA_RECORDING
+    needs_qa_recording("vdi/rnaseqrc_import_failed.json"),
+    reason=QA_HOLDS_NO_CRASHED_IMPORT,
 )
 def test_a_failed_import_reports_every_message_in_order() -> None:
     messages = _status("rnaseqrc_import_failed").failure_messages(PROJECT)

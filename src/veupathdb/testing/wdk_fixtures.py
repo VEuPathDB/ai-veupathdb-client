@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, JsonValue, model_validator
 
 from veupathdb.json_types import JSONObject
 from veupathdb.testing.fixture_store import FIXTURE_ROOT
+from veupathdb.testing.qa_sites import NEEDS_QA_RECORDING, QA_HOLDS_NO_AI_SUMMARY
 from veupathdb.wdk.ai_expression import AI_EXPRESSION_REPORT_PATH
 
 FIXTURE_DIR = FIXTURE_ROOT / "wdk"
@@ -39,6 +40,7 @@ class FixtureRequest(BaseModel):
     body: JSONObject | None = None
     in_schema: str | None = None
     out_schema: str | None = None
+    unrecorded: str = NEEDS_QA_RECORDING
 
     @model_validator(mode="after")
     def _an_in_schema_needs_a_body(self) -> FixtureRequest:
@@ -177,6 +179,7 @@ FIXTURES: tuple[FixtureRequest, ...] = (
             "reportConfig": {"populateIfNotPresent": False},
         },
         reads="WDK-ANS-009",
+        unrecorded=QA_HOLDS_NO_AI_SUMMARY,
     ),
     FixtureRequest(
         name="search_genes_by_molecular_weight",
@@ -293,6 +296,12 @@ FIXTURES: tuple[FixtureRequest, ...] = (
         path=f"{_TRANSCRIPT}/GenesByExonCount",
         params={"expandParams": "true"},
         reads="WDK-PARAM-003",
+    ),
+    FixtureRequest(
+        name="search_genes_by_span_logic",
+        path=f"{_TRANSCRIPT}/GenesBySpanLogic",
+        params={"expandParams": "true"},
+        reads="WDK-STEP-010",
     ),
     FixtureRequest(
         name="search_under_the_wrong_record_type",

@@ -57,6 +57,12 @@ def search_definitions_read_once() -> Iterator[None]:
         _read_definitions.reset(reset)
 
 
+BOOLEAN_SEARCH_PREFIX = "boolean_question"
+BOOLEAN_OPERATOR_PARAM = "bq_operator"
+BOOLEAN_LEFT_OPERAND_PREFIX = "bq_left_op"
+BOOLEAN_RIGHT_OPERAND_PREFIX = "bq_right_op"
+
+
 @dataclass(frozen=True)
 class BooleanSearch:
     search_name: str
@@ -137,7 +143,7 @@ class SearchEndpoints:
             (
                 search.url_segment
                 for search in await self.get_searches(record_type)
-                if search.url_segment.startswith("boolean_question")
+                if search.url_segment.startswith(BOOLEAN_SEARCH_PREFIX)
             ),
             None,
         )
@@ -149,9 +155,9 @@ class SearchEndpoints:
         ).search_data.param_names
         found = BooleanSearch(
             search_name=name,
-            left_param=_named(params, "bq_left_op", record_type),
-            right_param=_named(params, "bq_right_op", record_type),
-            operator_param=_named(params, "bq_operator", record_type),
+            left_param=_named(params, BOOLEAN_LEFT_OPERAND_PREFIX, record_type),
+            right_param=_named(params, BOOLEAN_RIGHT_OPERAND_PREFIX, record_type),
+            operator_param=_named(params, BOOLEAN_OPERATOR_PARAM, record_type),
         )
         self._boolean_searches[record_type] = found
         return found

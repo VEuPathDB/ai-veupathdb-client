@@ -1,7 +1,7 @@
 ---
 type: Backlog
 title: Two states QA does not hold on request are recorded
-description: A cached AI expression summary and a crashed VDI import have no QA recording, so the tests that read them are skipped with NEEDS_QA_RECORDING.
+description: A cached AI expression summary and a crashed VDI import have no QA recording, so the tests that read them are skipped with QA_HOLDS_NO_AI_SUMMARY and QA_HOLDS_NO_CRASHED_IMPORT.
 tags: [testing, recording, sites]
 status: draft
 ---
@@ -15,8 +15,10 @@ demand; an upload the importer rejects is `import_invalid`, a different state.
 
 # What it blocks
 
-The five AI expression tests in `tests/unit/wdk/test_ai_expression.py` and the three VDI
-tests that read a crashed import (`uv run pytest tests/unit -rs` lists them).
+The five AI expression tests in `tests/unit/wdk/test_ai_expression.py`, skipped with
+`QA_HOLDS_NO_AI_SUMMARY`, and the three VDI tests that read a crashed import, skipped with
+`QA_HOLDS_NO_CRASHED_IMPORT` (`uv run pytest tests/unit -rs` lists them). `fixtures verify`
+prints the AI summary reason beside the missing `ai_expression_summary_present`.
 
 # How to finish
 

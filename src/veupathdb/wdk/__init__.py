@@ -5,7 +5,13 @@ from veupathdb.wdk._failures import (
     validation_bundle,
     wdk_failure,
 )
-from veupathdb.wdk._searches import search_definitions_read_once
+from veupathdb.wdk._searches import (
+    BOOLEAN_LEFT_OPERAND_PREFIX,
+    BOOLEAN_OPERATOR_PARAM,
+    BOOLEAN_RIGHT_OPERAND_PREFIX,
+    BOOLEAN_SEARCH_PREFIX,
+    search_definitions_read_once,
+)
 from veupathdb.wdk.ai_expression import (
     AI_EXPRESSION_REPORT_PATH,
     AiExpressionReport,
@@ -193,6 +199,10 @@ from veupathdb.wdk.wdk_parameters import (
 
 __all__ = [
     "AI_EXPRESSION_REPORT_PATH",
+    "BOOLEAN_LEFT_OPERAND_PREFIX",
+    "BOOLEAN_OPERATOR_PARAM",
+    "BOOLEAN_RIGHT_OPERAND_PREFIX",
+    "BOOLEAN_SEARCH_PREFIX",
     "EDA_USER_DATASET_PREFIX",
     "GENELIST_PLUGIN_NAME",
     "GENELIST_PLUGIN_VERSION",

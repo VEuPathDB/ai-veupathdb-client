@@ -4,7 +4,11 @@ from pathlib import Path
 import pytest
 
 from veupathdb.devtools import eda_schemas, fixtures
-from veupathdb.testing import NEEDS_QA_RECORDING, wdk_fixtures
+from veupathdb.testing import (
+    NEEDS_QA_RECORDING,
+    QA_HOLDS_NO_AI_SUMMARY,
+    wdk_fixtures,
+)
 
 
 @pytest.fixture
@@ -23,8 +27,23 @@ def test_the_wdk_verify_names_every_missing_recording(
 
     out = capsys.readouterr().out
     for request in wdk_fixtures.FIXTURES:
-        assert f"{request.name:44} MISSING {NEEDS_QA_RECORDING}" in out
+        assert f"{request.name:44} MISSING {request.unrecorded}" in out
     assert f"{len(wdk_fixtures.FIXTURES)} missing" in out
+
+
+def test_a_state_qa_does_not_hold_is_named_as_the_reason(
+    empty_stores: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    del empty_stores
+
+    fixtures.main(["verify"])
+
+    out = capsys.readouterr().out
+    assert (
+        f"{'ai_expression_summary_present':44} MISSING {QA_HOLDS_NO_AI_SUMMARY}" in out
+    )
+    assert "QA holds no cached AI expression summary" in QA_HOLDS_NO_AI_SUMMARY
+    assert "start the site's summary job" in QA_HOLDS_NO_AI_SUMMARY
 
 
 def test_the_wdk_verify_still_fails_a_recording_its_schema_refuses(

@@ -1,0 +1,985 @@
+{
+  "provenance": {
+    "site": "plasmodb",
+    "method": "GET",
+    "url": "https://qa.plasmodb.org/plasmo.qa/service/record-types/transcript/searches/GenesBySpanLogic?expandParams=true",
+    "status": 200,
+    "content_type": "application/json",
+    "recorded_at": "2026-11-22",
+    "reads": "WDK-STEP-010"
+  },
+  "body": {
+    "searchData": {
+      "summary": "Filter genes with span logic operation against other results",
+      "urlSegment": "GenesBySpanLogic",
+      "dynamicAttributes": [
+        {
+          "isInReport": true,
+          "formats": [],
+          "truncateTo": 100,
+          "displayName": "Match Count",
+          "name": "matched_count",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "align": "center",
+          "columnDataType": "NUMBER",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "isInReport": true,
+          "formats": [],
+          "truncateTo": 100,
+          "displayName": "Region",
+          "name": "feature_region",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "align": "center",
+          "columnDataType": "STRING",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "isInReport": true,
+          "formats": [],
+          "truncateTo": 4000,
+          "displayName": "Matched Regions",
+          "name": "matched_regions",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "columnDataType": "STRING",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        },
+        {
+          "help": "The *search result weight*. This is the sum of the weights you specified for individual searches that found this record.   The more searches that found this record the higher will be its weight.  To give a search a weight, click \"Use Weights\" on the search page, and provide the desired weight.",
+          "isInReport": true,
+          "formats": [
+            {
+              "isInReport": true,
+              "displayName": "Histogram",
+              "name": "wdk_weight-histogram",
+              "description": "Display a histogram of weight distribution",
+              "scopes": [],
+              "type": "histogram"
+            }
+          ],
+          "truncateTo": 100,
+          "displayName": "Search Weight",
+          "name": "wdk_weight",
+          "isSortable": true,
+          "isDisplayable": true,
+          "isRemovable": true,
+          "columnDataType": "NUMBER",
+          "tools": {
+            "reports": [],
+            "filters": []
+          },
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          }
+        }
+      ],
+      "defaultSorting": [
+        {
+          "attributeName": "organism",
+          "direction": "ASC"
+        },
+        {
+          "attributeName": "location_text",
+          "direction": "ASC"
+        }
+      ],
+      "isAnalyzable": true,
+      "displayName": "Genes by Relative Location",
+      "allowedPrimaryInputRecordClassNames": [
+        "transcript",
+        "variation",
+        "genomic-segment"
+      ],
+      "fullName": "SpanQuestions.GenesBySpanLogic",
+      "description": "Filter genes with span logic operation against other results",
+      "defaultAttributes": [
+        "primary_key",
+        "organism",
+        "location_text",
+        "gene_product",
+        "matched_count",
+        "feature_region",
+        "matched_regions"
+      ],
+      "groups": [
+        {
+          "displayType": "empty",
+          "displayName": "",
+          "name": "empty",
+          "description": "",
+          "isVisible": true,
+          "parameters": [
+            "span_sentence",
+            "span_operation",
+            "span_strand",
+            "span_output",
+            "region_a",
+            "region_b",
+            "span_begin_a",
+            "span_begin_direction_a",
+            "span_begin_offset_a",
+            "span_end_a",
+            "span_end_direction_a",
+            "span_end_offset_a",
+            "span_begin_b",
+            "span_begin_direction_b",
+            "span_begin_offset_b",
+            "span_end_b",
+            "span_end_direction_b",
+            "span_end_offset_b"
+          ]
+        },
+        {
+          "displayType": "hidden",
+          "displayName": "",
+          "name": "_hidden",
+          "description": "",
+          "isVisible": false,
+          "parameters": [
+            "span_a",
+            "span_b"
+          ]
+        }
+      ],
+      "filters": [
+        {
+          "isViewOnly": false,
+          "name": "organismFilter"
+        },
+        {
+          "displayName": "Transcripts",
+          "isViewOnly": false,
+          "name": "matched_transcript_filter_array"
+        },
+        {
+          "isViewOnly": false,
+          "name": "genesByPathway"
+        }
+      ],
+      "shortDisplayName": "Genes by Rel Loc",
+      "paramNames": [
+        "span_sentence",
+        "span_operation",
+        "span_strand",
+        "span_output",
+        "region_a",
+        "region_b",
+        "span_a",
+        "span_begin_a",
+        "span_begin_direction_a",
+        "span_begin_offset_a",
+        "span_end_a",
+        "span_end_direction_a",
+        "span_end_offset_a",
+        "span_b",
+        "span_begin_b",
+        "span_begin_direction_b",
+        "span_begin_offset_b",
+        "span_end_b",
+        "span_end_direction_b",
+        "span_end_offset_b"
+      ],
+      "isCacheable": true,
+      "allowedSecondaryInputRecordClassNames": [
+        "transcript",
+        "variation",
+        "genomic-segment"
+      ],
+      "outputRecordClassName": "transcript",
+      "noSummaryOnSingleRecord": false,
+      "queryName": "TranscriptsBySpanLogic",
+      "defaultSummaryView": "_default",
+      "parameters": [
+        {
+          "displayName": "sentence",
+          "length": 0,
+          "isVisible": true,
+          "isMultiLine": false,
+          "type": "string",
+          "help": "The span sentence for param display",
+          "dependentParams": [],
+          "isReadOnly": false,
+          "isNumber": false,
+          "allowEmptyValue": false,
+          "name": "span_sentence",
+          "initialDisplayValue": "",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "Span Operation",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "The Span Operation",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "overlap",
+              "overlaps",
+              null
+            ],
+            [
+              "a_contain_b",
+              "contains",
+              null
+            ],
+            [
+              "b_contain_a",
+              "is contained in",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "span_operation",
+          "initialDisplayValue": "overlap",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "Select strand",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "Select the strand(s) where the feature is located.",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "Both strands",
+              "either strand",
+              null
+            ],
+            [
+              "same strand",
+              "same strand",
+              null
+            ],
+            [
+              "opposite strand",
+              "opposite strand",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "span_strand",
+          "initialDisplayValue": "Both strands",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "Span Output Type",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "The Span Operation",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "none",
+              "select...",
+              null
+            ],
+            [
+              "a",
+              "Current result",
+              null
+            ],
+            [
+              "b",
+              "New step",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "span_output",
+          "initialDisplayValue": "none",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "Region for Set A",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "The desired region for set A",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "exact",
+              "Exact",
+              null
+            ],
+            [
+              "upstream",
+              "Upstream",
+              null
+            ],
+            [
+              "downstream",
+              "Downstream",
+              null
+            ],
+            [
+              "custom",
+              "Custom",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "region_a",
+          "initialDisplayValue": "exact",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "Region for Set B",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "The desired region for set B",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "exact",
+              "Exact",
+              null
+            ],
+            [
+              "upstream",
+              "Upstream",
+              null
+            ],
+            [
+              "downstream",
+              "Downstream",
+              null
+            ],
+            [
+              "custom",
+              "Custom",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "region_b",
+          "initialDisplayValue": "exact",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "help": "Select a result set as the input A of the Span Logic operation",
+          "dependentParams": [],
+          "isReadOnly": true,
+          "displayName": "Input result A of Span Logic",
+          "allowEmptyValue": true,
+          "name": "span_a",
+          "isVisible": false,
+          "type": "input-step",
+          "initialDisplayValue": "",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "_hidden"
+        },
+        {
+          "displayName": "begins at",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "The anchor of the begin location",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "start",
+              "start",
+              null
+            ],
+            [
+              "stop",
+              "stop",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "span_begin_a",
+          "initialDisplayValue": "start",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "direction",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "direction from the begin location",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "+",
+              "+",
+              null
+            ],
+            [
+              "-",
+              "-",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "span_begin_direction_a",
+          "initialDisplayValue": "+",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "begin offset",
+          "length": 0,
+          "isVisible": true,
+          "isMultiLine": false,
+          "type": "string",
+          "help": "The offset from the begin",
+          "dependentParams": [],
+          "isReadOnly": false,
+          "isNumber": true,
+          "allowEmptyValue": false,
+          "name": "span_begin_offset_a",
+          "initialDisplayValue": "0",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "ends at",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "The anchor of the end location",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "start",
+              "start",
+              null
+            ],
+            [
+              "stop",
+              "stop",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "span_end_a",
+          "initialDisplayValue": "stop",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "direction",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "direction from the end location",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "+",
+              "+",
+              null
+            ],
+            [
+              "-",
+              "-",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "span_end_direction_a",
+          "initialDisplayValue": "+",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "end offset",
+          "length": 0,
+          "isVisible": true,
+          "isMultiLine": false,
+          "type": "string",
+          "help": "The offset from the begin",
+          "dependentParams": [],
+          "isReadOnly": false,
+          "isNumber": true,
+          "allowEmptyValue": false,
+          "name": "span_end_offset_a",
+          "initialDisplayValue": "0",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "help": "Select a result set as the input B of the Span Logic operation",
+          "dependentParams": [],
+          "isReadOnly": true,
+          "displayName": "Input result B of Span Logic",
+          "allowEmptyValue": true,
+          "name": "span_b",
+          "isVisible": false,
+          "type": "input-step",
+          "initialDisplayValue": "",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "_hidden"
+        },
+        {
+          "displayName": "begins at",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "The anchor of the begin location",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "start",
+              "start",
+              null
+            ],
+            [
+              "stop",
+              "stop",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "span_begin_b",
+          "initialDisplayValue": "start",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "direction",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "direction from the begin location",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "+",
+              "+",
+              null
+            ],
+            [
+              "-",
+              "-",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "span_begin_direction_b",
+          "initialDisplayValue": "+",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "begin offset",
+          "length": 0,
+          "isVisible": true,
+          "isMultiLine": false,
+          "type": "string",
+          "help": "The offset from the begin",
+          "dependentParams": [],
+          "isReadOnly": false,
+          "isNumber": true,
+          "allowEmptyValue": false,
+          "name": "span_begin_offset_b",
+          "initialDisplayValue": "0",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "ends at",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "The anchor of the end location",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "start",
+              "start",
+              null
+            ],
+            [
+              "stop",
+              "stop",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "span_end_b",
+          "initialDisplayValue": "stop",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "direction",
+          "minSelectedCount": 1,
+          "maxSelectedCount": 1,
+          "isVisible": true,
+          "type": "single-pick-vocabulary",
+          "help": "direction from the end location",
+          "dependentParams": [],
+          "displayType": "select",
+          "isReadOnly": false,
+          "vocabulary": [
+            [
+              "+",
+              "+",
+              null
+            ],
+            [
+              "-",
+              "-",
+              null
+            ]
+          ],
+          "allowEmptyValue": false,
+          "name": "span_end_direction_b",
+          "initialDisplayValue": "+",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        },
+        {
+          "displayName": "end offset",
+          "length": 0,
+          "isVisible": true,
+          "isMultiLine": false,
+          "type": "string",
+          "help": "The offset from the begin",
+          "dependentParams": [],
+          "isReadOnly": false,
+          "isNumber": true,
+          "allowEmptyValue": false,
+          "name": "span_end_offset_b",
+          "initialDisplayValue": "0",
+          "properties": {
+            "organisms": [
+              "P. falciparum",
+              "P. vivax",
+              "P. yoelii",
+              "P. berghei",
+              "P. chabaudi",
+              "P. knowlesi"
+            ],
+            "specificAttribution": []
+          },
+          "group": "empty"
+        }
+      ],
+      "properties": {
+        "organisms": [
+          "P. falciparum",
+          "P. vivax",
+          "P. yoelii",
+          "P. berghei",
+          "P. chabaudi",
+          "P. knowlesi"
+        ],
+        "specificAttribution": []
+      },
+      "summaryViewPlugins": [
+        {
+          "displayName": "Gene Results",
+          "name": "_default",
+          "description": "View transcripts."
+        },
+        {
+          "displayName": "Genome View",
+          "name": "genomic-view",
+          "description": "View your hits mapped to their corresponding largest assembled genomic DNA segment, often a chromosome, but\n sometimes a contig or scaffold."
+        }
+      ]
+    },
+    "validation": {
+      "level": "DISPLAYABLE",
+      "isValid": true
+    }
+  }
+}

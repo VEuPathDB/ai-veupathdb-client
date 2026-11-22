@@ -11,7 +11,11 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
-from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
+from veupathdb.testing import (
+    NEEDS_QA_RECORDING,
+    QA_HOLDS_NO_AI_SUMMARY,
+    needs_qa_recording,
+)
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk.ai_expression import (
     AI_EXPRESSION_REPORT_PATH,
@@ -86,7 +90,7 @@ class TestTheRecordedSummarizedGene:
 
     @pytest.mark.skipif(
         needs_qa_recording("wdk/ai_expression_summary_present.json"),
-        reason=NEEDS_QA_RECORDING,
+        reason=QA_HOLDS_NO_AI_SUMMARY,
     )
     async def test_the_summary_and_its_topics_parse(
         self, monkeypatch: pytest.MonkeyPatch
@@ -123,7 +127,7 @@ class TestTheRecordedSummarizedGene:
 
     @pytest.mark.skipif(
         needs_qa_recording("wdk/ai_expression_summary_present.json"),
-        reason=NEEDS_QA_RECORDING,
+        reason=QA_HOLDS_NO_AI_SUMMARY,
     )
     async def test_every_summary_line_names_its_experiment_and_assay(
         self, monkeypatch: pytest.MonkeyPatch
@@ -146,7 +150,7 @@ class TestTheRecordedSummarizedGene:
 
     @pytest.mark.skipif(
         needs_qa_recording("wdk/ai_expression_summary_present.json"),
-        reason=NEEDS_QA_RECORDING,
+        reason=QA_HOLDS_NO_AI_SUMMARY,
     )
     async def test_the_absent_counts_read_none_and_not_zero(
         self, monkeypatch: pytest.MonkeyPatch
@@ -160,7 +164,7 @@ class TestTheRecordedSummarizedGene:
 
     @pytest.mark.skipif(
         needs_qa_recording("wdk/ai_expression_summary_present.json"),
-        reason=NEEDS_QA_RECORDING,
+        reason=QA_HOLDS_NO_AI_SUMMARY,
     )
     async def test_it_states_that_the_summary_covers_every_experiment(
         self, monkeypatch: pytest.MonkeyPatch
@@ -172,7 +176,7 @@ class TestTheRecordedSummarizedGene:
 
     @pytest.mark.skipif(
         needs_qa_recording("wdk/ai_expression_summary_present.json"),
-        reason=NEEDS_QA_RECORDING,
+        reason=QA_HOLDS_NO_AI_SUMMARY,
     )
     async def test_the_report_names_only_the_gene_that_was_asked_for(
         self, monkeypatch: pytest.MonkeyPatch
