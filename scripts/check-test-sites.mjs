@@ -97,23 +97,69 @@ export function scannedPaths(root, ignored) {
 
 export const FIXTURE_STORE = "src/veupathdb/testing/fixtures/";
 
-function recordingOf(text) {
+function isRecording(text) {
   try {
     const parsed = JSON.parse(text);
-    const isRecording =
-      parsed !== null && typeof parsed === "object" && "provenance" in parsed && "body" in parsed;
-    return isRecording ? parsed : null;
+    return parsed !== null && typeof parsed === "object" && "provenance" in parsed && "body" in parsed;
   } catch {
-    return null;
+    return false;
   }
 }
 
+function stringEnd(text, open) {
+  let index = open + 1;
+  while (text[index] !== '"') index += text[index] === "\\" ? 2 : 1;
+  return index + 1;
+}
+
+function bodySpan(text) {
+  let depth = 0;
+  let index = 0;
+  while (index < text.length) {
+    const char = text[index];
+    if (char === '"') {
+      const end = stringEnd(text, index);
+      const isBodyKey = depth === 1 && JSON.parse(text.slice(index, end)) === "body";
+      const colon = text.slice(end).search(/\S/) + end;
+      if (isBodyKey && text[colon] === ":") return [colon + 1, valueEnd(text, colon + 1)];
+      index = end;
+      continue;
+    }
+    if (char === "{" || char === "[") depth += 1;
+    if (char === "}" || char === "]") depth -= 1;
+    index += 1;
+  }
+  return null;
+}
+
+function valueEnd(text, from) {
+  let depth = 0;
+  let index = from;
+  while (index < text.length) {
+    const char = text[index];
+    if (char === '"') {
+      index = stringEnd(text, index);
+      if (depth === 0) return index;
+      continue;
+    }
+    if (char === "{" || char === "[") depth += 1;
+    if (char === "}" || char === "]") {
+      if (depth === 0) return index;
+      depth -= 1;
+      if (depth === 0) return index + 1;
+    }
+    if (depth === 0 && char === ",") return index;
+    index += 1;
+  }
+  return index;
+}
+
 export function scannedText(path, text) {
-  if (!path.startsWith(FIXTURE_STORE) || !path.endsWith(".json")) return text;
-  const recording = recordingOf(text);
-  if (recording === null) return text;
-  const { body, ...called } = recording;
-  return JSON.stringify(called, null, 2);
+  if (!path.startsWith(FIXTURE_STORE) || !path.endsWith(".json") || !isRecording(text)) {
+    return text;
+  }
+  const [start, end] = bodySpan(text);
+  return text.slice(0, start) + text.slice(start, end).replace(/[^\n]/g, " ") + text.slice(end);
 }
 
 export function offencesIn(files) {

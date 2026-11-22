@@ -122,3 +122,20 @@ test("a fixture that is not a recording is read whole", () => {
   const path = "src/veupathdb/testing/fixtures/wdk/schema-pin.json";
   assert.equal(offencesIn([[path, `{"url": "https://${host("plasmodb")}/"}`]]).length, 1);
 });
+
+test("an offence in a recording names the file's own line", () => {
+  const path = "src/veupathdb/testing/fixtures/wdk/search.json";
+  const text = [
+    "{",
+    `  "body": {"description": "https://${host("orthomcl")}/ and \\"}\\" text"},`,
+    `  "provenance": {`,
+    `    "site": "plasmodb",`,
+    "",
+    `    "url": "https://${host("plasmodb")}/plasmo/service"`,
+    "  }",
+    "}",
+  ].join("\n");
+  assert.deepEqual(offencesIn([[path, text]]), [
+    `${path}:6: names the production host ${host("plasmodb")}; a test, a recorder and a default reach the QA sites only`,
+  ]);
+});
