@@ -230,6 +230,12 @@ FIXTURES: tuple[FixtureRequest, ...] = (
         reads="WDK-PARAM-020",
     ),
     FixtureRequest(
+        name="search_genes_by_ortholog_pattern",
+        path=f"{_TRANSCRIPT}/GenesByOrthologPattern",
+        params={"expandParams": "true"},
+        reads="WDK-PARAM-020",
+    ),
+    FixtureRequest(
         name="refresh_interpro_domain_pfam_on_dal972",
         site="tritrypdb",
         path=f"{_TRANSCRIPT}/GenesByInterproDomain/refreshed-dependent-params",

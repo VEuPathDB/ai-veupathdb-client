@@ -1,5 +1,12 @@
 # Knowledge log
 
+## 2026-11-22 - A recording is read by the address it called
+
+- `check-test-sites.mjs` reads a recording in the fixture store by its `provenance` and
+  not its `body`, so a production link in WDK's own text passes and a production
+  address a recorder called is still refused
+  ([decision](decisions/tests-run-against-qa-and-a-deployment-names-its-sites.md)).
+
 ## 2026-11-22 - An empty value is read as its parameter allows it
 
 - [WDK-PARAM-019](wdk/rules/parameters-and-vocabularies.md) records that an empty value is

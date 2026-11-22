@@ -88,3 +88,37 @@ test("the walk skips caches, ignored names and the allowlist, and reads everythi
     "tests/unit/test_a.py",
   ]);
 });
+
+const recording = (url, text) =>
+  JSON.stringify({ provenance: { site: "plasmodb", url }, body: { description: text } }, null, 2);
+
+test("a recording is read by the address it called", () => {
+  const path = "src/veupathdb/testing/fixtures/wdk/search.json";
+  assert.deepEqual(
+    offencesIn([[path, recording(`https://${host("plasmodb")}/plasmo/service`, "")]]),
+    [
+      `${path}:4: names the production host ${host("plasmodb")}; a test, a recorder and a default reach the QA sites only`,
+    ],
+  );
+});
+
+test("a production link inside a recorded body passes", () => {
+  const text = recording(
+    `https://${host("qa", "plasmodb")}/plasmo.qa/service`,
+    `<a href="https://${host("orthomcl")}/">OrthoMCL</a>`,
+  );
+  assert.deepEqual(offencesIn([["src/veupathdb/testing/fixtures/wdk/search.json", text]]), []);
+});
+
+test("a body outside the fixture store is read whole", () => {
+  const text = recording(
+    `https://${host("qa", "plasmodb")}/plasmo.qa/service`,
+    `https://${host("plasmodb")}/`,
+  );
+  assert.equal(offencesIn([["tests/unit/recording.json", text]]).length, 1);
+});
+
+test("a fixture that is not a recording is read whole", () => {
+  const path = "src/veupathdb/testing/fixtures/wdk/schema-pin.json";
+  assert.equal(offencesIn([[path, `{"url": "https://${host("plasmodb")}/"}`]]).length, 1);
+});

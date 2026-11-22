@@ -32,7 +32,9 @@ status: stable
   domain whose nearest label is not `qa` or `q2`: bare, `www.`, `beta.`, a numbered
   server, any other subdomain or a mail domain) in any file outside `docs/`, the backup
   directory and `src/veupathdb/settings.py`, whose OAuth default names the one server
-  that signs every site's tokens. CI and pre-commit run it with its test. The consuming
+  that signs every site's tokens. A recording in the fixture store is read by its
+  `provenance`, the address the recorder called; its `body` is the text WDK returned
+  and can link a production page. CI and pre-commit run it with its test. The consuming
   tool server runs the same script with its own allowlist.
 
 # Rejected

@@ -95,10 +95,31 @@ export function scannedPaths(root, ignored) {
   return paths;
 }
 
+export const FIXTURE_STORE = "src/veupathdb/testing/fixtures/";
+
+function recordingOf(text) {
+  try {
+    const parsed = JSON.parse(text);
+    const isRecording =
+      parsed !== null && typeof parsed === "object" && "provenance" in parsed && "body" in parsed;
+    return isRecording ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function scannedText(path, text) {
+  if (!path.startsWith(FIXTURE_STORE) || !path.endsWith(".json")) return text;
+  const recording = recordingOf(text);
+  if (recording === null) return text;
+  const { body, ...called } = recording;
+  return JSON.stringify(called, null, 2);
+}
+
 export function offencesIn(files) {
   const offences = [];
   for (const [path, text] of files) {
-    for (const { line, host } of productionHosts(text)) {
+    for (const { line, host } of productionHosts(scannedText(path, text))) {
       offences.push(`${path}:${line}: names the production host ${host}; a test, a recorder and a default reach the QA sites only`);
     }
   }
