@@ -81,6 +81,11 @@ from veupathdb.domain.parameters.value_codec import (
     to_wire,
     wire_map,
 )
+from veupathdb.domain.parameters.value_equality import (
+    param_value_key,
+    same_as_wire,
+    same_param_value,
+)
 from veupathdb.domain.parameters.values import (
     HeldValue,
     InputDatasetValue,
@@ -227,11 +232,14 @@ __all__ = [
     "leading_accession_token",
     "leaf_terms",
     "match_exact_option",
+    "param_value_key",
     "rank_entries",
     "read_census",
     "read_options",
     "read_stated_values",
     "restates",
+    "same_as_wire",
+    "same_param_value",
     "same_value",
     "shown_stated",
     "shown_stated_text",

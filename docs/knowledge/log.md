@@ -4,7 +4,12 @@
 
 - `same_value` compares two values of one parameter as WDK reads them: a multi-pick as its
   set of terms, a filter as its set of clauses
-  ([WDK-PARAM-021](wdk/rules/parameters-and-vocabularies.md)).
+  ([WDK-PARAM-021](wdk/rules/parameters-and-vocabularies.md)). `same_param_value`,
+  `same_as_wire` and `param_value_key` are the same rule with the parameter's name (an
+  expression compares as parsed), against a wire, and as a hashable key. A value of another
+  kind is read in the held value's kind before it is compared.
+- `from_wire` reads a single pick's internal stable value, a JSON array of at most one term
+  (`AbstractEnumParam.standardizeStableValue`), as the term its external form names.
 
 ## 2026-11-22 - A value given back is the held value, and no filter goes out as WDK spells it
 

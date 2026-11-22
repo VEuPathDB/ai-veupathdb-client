@@ -1106,6 +1106,10 @@ answer nor its cache key. `FilterParamNewStableValue` sorts its filters
 so the order of clauses is not part of a filter value either.
 
 `same_value` is the one equality a caller compares two values with: a multi-pick by its
-set of terms, a filter by its `clause_set`, every other kind by its fields. The tests
+set of terms, a filter by its `clause_set`, every other kind by its fields.
+`same_param_value` adds the one parameter that is not its kind's text, `phyletic_expression`,
+compared as its parsed and rendered expression; `same_as_wire` reads a wire in the held
+value's kind and compares through it, so a wire no kind reads is another value; and
+`param_value_key` is the hashable form of the same equality for a cache or a grouping key. The tests
 check it over permutations and repeats and over every kind read back from its wire.
 

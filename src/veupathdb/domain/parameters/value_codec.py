@@ -4,6 +4,7 @@ import json
 from collections.abc import Callable
 
 from pydantic import JsonValue, TypeAdapter
+from pydantic import ValidationError as PydanticValidationError
 
 from veupathdb.domain.parameters.values import (
     HeldValue,
@@ -32,6 +33,23 @@ def _multi_pick_payload(w: str) -> dict[str, JsonValue]:
         "type": "multi-pick-vocabulary",
         "values": list(json.loads(w)) if w else [],
     }
+
+
+_ONE_TERM: TypeAdapter[list[str]] = TypeAdapter(list[str])
+
+
+def _single_pick_payload(w: str) -> dict[str, JsonValue]:
+    try:
+        terms = _ONE_TERM.validate_json(w) if w.startswith("[") else [w]
+    except PydanticValidationError:
+        terms = [w]
+    match terms:
+        case []:
+            return {"type": "single-pick-vocabulary", "value": ""}
+        case [term]:
+            return {"type": "single-pick-vocabulary", "value": term}
+        case _:
+            return {"type": "single-pick-vocabulary", "value": w}
 
 
 def _number_range_payload(w: str) -> dict[str, JsonValue]:
@@ -67,6 +85,7 @@ def _input_step_payload(w: str) -> dict[str, JsonValue]:
 
 _WIRE_BUILDERS: dict[ParamKind, Callable[[str], dict[str, JsonValue]]] = {
     "multi-pick-vocabulary": _multi_pick_payload,
+    "single-pick-vocabulary": _single_pick_payload,
     "number-range": _number_range_payload,
     "date-range": _date_range_payload,
     "filter": _filter_payload,

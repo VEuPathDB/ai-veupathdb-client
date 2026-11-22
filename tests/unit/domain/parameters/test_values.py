@@ -11,6 +11,7 @@ from __future__ import annotations
 import pytest
 from hypothesis import assume, given, settings
 from hypothesis import strategies as st
+from pydantic import TypeAdapter
 from pydantic import ValidationError as PydanticValidationError
 
 from veupathdb.domain.parameters.filter_clause import FilterValue
@@ -41,6 +42,17 @@ def _round_trip(name: str, value: ParamValue, kind: ParamKind) -> ParamValue:
 
 _TEXT = st.text(min_size=1, max_size=40)
 _TERM = st.text(min_size=1, max_size=30)
+_TERMS_ADAPTER: TypeAdapter[list[str]] = TypeAdapter(list[str])
+
+
+def _stable_array(text: str) -> bool:
+    try:
+        return len(_TERMS_ADAPTER.validate_json(text)) <= 1
+    except PydanticValidationError:
+        return False
+
+
+_SINGLE_TERM = _TERM.filter(lambda text: not _stable_array(text))
 # A range bound is an ISO date or WDK cannot parse it (WDK-PARAM-006).
 _ISO_DATE = st.dates().map(lambda d: d.isoformat())
 
@@ -99,7 +111,7 @@ class TestVocabulariesRoundTrip:
         assert restored != MultiPickValue(values=["[]"])
 
     @settings(max_examples=200)
-    @given(_TERM)
+    @given(_SINGLE_TERM)
     def test_single_pick(self, value: str) -> None:
         assert _round_trip(
             "p", SinglePickValue(value=value), "single-pick-vocabulary"
