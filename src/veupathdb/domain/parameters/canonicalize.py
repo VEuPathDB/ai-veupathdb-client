@@ -27,11 +27,7 @@ from veupathdb.domain.parameters.values import (
     SinglePickValue,
     empty_value,
 )
-from veupathdb.domain.parameters.vocab_lookup import (
-    SHOWN_CANDIDATES,
-    VocabularyEntryError,
-    exact_or_candidates,
-)
+from veupathdb.domain.parameters.vocab_lookup import entries_or_refusal
 from veupathdb.domain.parameters.wdk_vocab import (
     FAKE_ALL_SENTINEL,
     WDKVocabulary,
@@ -164,14 +160,7 @@ class ParameterCanonicalizer:
             raise _refuse(
                 spec, f"does not accept '{FAKE_ALL_SENTINEL}'", FAKE_ALL_SENTINEL
             )
-        if not spec.vocabulary:
-            return values
-        options = flatten_vocab(spec.vocabulary)
-        resolved = [exact_or_candidates(options, v, SHOWN_CANDIDATES) for v in values]
-        faults = [(spec.name, r) for r in resolved if r.value is None]
-        if faults:
-            raise VocabularyEntryError(faults)
-        return [r.value for r in resolved if r.value is not None]
+        return entries_or_refusal(spec.name, flatten_vocab(spec.vocabulary), values)
 
     # -- leaf enforcement (canonicalizer-only) --------------------------------
 

@@ -41,7 +41,9 @@ from veupathdb.domain.parameters.values import (
     TimestampValue,
     empty_value,
 )
+from veupathdb.domain.parameters.vocab_lookup import entries_or_refusal
 from veupathdb.domain.parameters.wdk_vocab import (
+    VocabOption,
     WDKFilterOntologyTerm,
     WDKVocabulary,
     flatten_vocab,
@@ -120,6 +122,7 @@ class _Declared:
     low_date: str | None
     high_date: str | None
     terms: tuple[str, ...] | None
+    entries: tuple[tuple[str, str], ...]
     first_term: str
     facets: tuple[str, ...]
 
@@ -131,8 +134,12 @@ class StatedReading:
     shape: str
     example: JsonValue
     refused_empties: tuple[JsonValue, ...]
+    entries: tuple[tuple[str, str], ...]
 
     def read(self, raw: JsonValue) -> Stated:
+        return self.named(self.read_shape(raw))
+
+    def read_shape(self, raw: JsonValue) -> Stated:
         if raw in self.refused_empties:
             raise empty_refusal(self.name, raw)
         try:
@@ -140,6 +147,20 @@ class StatedReading:
         except pydantic.ValidationError:
             text = f"{self.name} takes {self.shape}, for example {self.example!r}; it read {raw!r}."
             raise StatedValuesError([StatedFault(self.name, raw, text)]) from None
+
+    def named(self, read: Stated) -> Stated:
+        match read:
+            case SinglePickValue(value=term) if term:
+                [entry] = self._entries([term])
+                return SinglePickValue(value=entry)
+            case MultiPickValue(values=terms) if terms:
+                return MultiPickValue(values=self._entries(terms))
+            case _:
+                return read
+
+    def _entries(self, terms: list[str]) -> list[str]:
+        options = [VocabOption(value=v, display=d) for v, d in self.entries]
+        return entries_or_refusal(self.name, options, terms)
 
 
 def empty_refusal(name: str, raw: JsonValue) -> StatedValuesError:
@@ -285,19 +306,9 @@ def _timestamp(_: _Declared) -> _Shape:
 def _term(d: _Declared) -> tuple[Any, str]:
     if d.terms is None:
         return Annotated[str, Field(min_length=1)], ""
-    terms = d.terms
-
-    def member(term: str) -> str:
-        if term not in terms:
-            msg = f"{term!r} is not a term"
-            raise ValueError(msg)
-        return term
-
     return (
-        Annotated[
-            str, Field(json_schema_extra={"enum": list(terms)}), AfterValidator(member)
-        ],
-        ", ".join(repr(term) for term in terms),
+        Annotated[str, Field(json_schema_extra={"enum": list(d.terms)})],
+        ", ".join(repr(term) for term in d.terms),
     )
 
 
@@ -413,7 +424,7 @@ def _reading(d: _Declared) -> StatedReading:
         if d.kind == "multi-pick-vocabulary"
         else ("",)
     )
-    return StatedReading(d.name, adapter, shape.text, shape.example, empties)
+    return StatedReading(d.name, adapter, shape.text, shape.example, empties, d.entries)
 
 
 def _enum_terms(param: StatedDeclaration) -> tuple[str, ...] | None:
@@ -444,6 +455,7 @@ def stated_reading(param: StatedDeclaration) -> StatedReading:
             low_date=param.min_date,
             high_date=param.max_date,
             terms=_enum_terms(param),
+            entries=tuple((o.value, o.display) for o in options),
             first_term=options[0].value if options else "term",
             facets=tuple(
                 dict.fromkeys(
@@ -465,9 +477,13 @@ def read_stated_values(
         if param.name not in stated:
             continue
         try:
-            read[param.name] = stated_reading(param).read(stated[param.name])
+            read[param.name] = stated_reading(param).read_shape(stated[param.name])
         except StatedValuesError as refusal:
             faults.extend(refusal.faults)
     if faults:
         raise StatedValuesError(faults)
-    return read
+    return {
+        param.name: stated_reading(param).named(read[param.name])
+        for param in params
+        if param.name in read
+    }

@@ -8,11 +8,8 @@ from typing import Literal, NoReturn
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from veupathdb.domain.parameters.wdk_vocab import (
-    VocabOption,
-    WDKVocabTerm,
-    match_exact_option,
-)
+from veupathdb.domain.parameters.vocab_lookup import exact_entry
+from veupathdb.domain.parameters.wdk_vocab import VocabOption, WDKVocabTerm
 from veupathdb.errors import ValidationError, param_message_rows
 
 PHYLETIC_PARAM_NAMES = frozenset(
@@ -263,7 +260,8 @@ class PhyleticTree(BaseModel):
         codes: list[str] = []
         unknown: list[str] = []
         for token in _split_proposal(proposal):
-            code = token if token in exact else match_exact_option(labels, token)
+            named = None if token in exact else exact_entry(labels, token)
+            code = token if token in exact else None if named is None else named.value
             if code is None:
                 if token not in unknown:
                     unknown.append(token)

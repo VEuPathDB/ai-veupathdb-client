@@ -258,7 +258,7 @@ def rank_entries(
     return list(ranked.values())[:limit]
 
 
-def _exact(options: Sequence[VocabOption], phrase: str) -> VocabOption | None:
+def exact_entry(options: Sequence[VocabOption], phrase: str) -> VocabOption | None:
     value = match_exact_option(options, phrase)
     if value is None and looks_numeric(phrase.strip()):
         value = next(
@@ -276,7 +276,7 @@ def _exact(options: Sequence[VocabOption], phrase: str) -> VocabOption | None:
 def exact_or_candidates(
     options: Sequence[VocabOption], phrase: str, limit: int
 ) -> Resolution:
-    exact = _exact(options, phrase)
+    exact = exact_entry(options, phrase)
     if exact is not None:
         return Resolution(
             phrase=phrase,
@@ -291,6 +291,18 @@ def exact_or_candidates(
         how="unsettled" if candidates else "none",
         candidates=candidates,
     )
+
+
+def entries_or_refusal(
+    name: str, options: Sequence[VocabOption], terms: Sequence[str]
+) -> list[str]:
+    if not options:
+        return list(terms)
+    read = [exact_or_candidates(options, t, SHOWN_CANDIDATES) for t in terms]
+    faults = [(name, r) for r in read if r.value is None]
+    if faults:
+        raise VocabularyEntryError(faults)
+    return [r.value for r in read if r.value is not None]
 
 
 def entry_name(option: VocabOption) -> str:

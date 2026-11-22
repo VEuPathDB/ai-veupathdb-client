@@ -1,5 +1,18 @@
 # Knowledge log
 
+## 2026-11-22 - A stated pick is read by the one exact step
+
+- `read_stated_values` and `read_stated` read a pick's shape first, then name every term
+  through `entries_or_refusal`: `snp_class: "missense"` reads as `Missense`, and a term
+  no entry names is refused with `VocabularyEntryError` and its ranked candidates. The
+  stated schema still lists the terms of a short flat vocabulary as an `enum`, and no
+  longer decides membership itself. Every shape fault of a call is one
+  `StatedValuesError`, raised before any term is named.
+- `exact_entry` is the exact step alone; `exact_or_candidates` and `PhyleticTree.resolve_terms`
+  read it. `entries_or_refusal` is the bind-or-refuse step the stated reader and the
+  canonicalizer share ([WDK-PARAM-020](wdk/rules/parameters-and-vocabularies.md)).
+- `veupathdb-py` is 0.9.0b11.
+
 ## 2026-11-22 - A shown value is a value the reader reads back
 
 - [WDK-PARAM-017](wdk/rules/parameters-and-vocabularies.md) records `stated_form`, the

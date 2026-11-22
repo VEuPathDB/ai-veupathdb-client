@@ -12,6 +12,7 @@ from veupathdb.domain.parameters import (
     FilterValue,
     ParameterCanonicalizer,
     StatedValuesError,
+    VocabularyEntryError,
     decimal_text,
     fill_site_set_defaults,
     read_stated_values,
@@ -133,7 +134,12 @@ class TestASmallMultiPick:
     def test_a_term_outside_the_vocabulary_is_refused(self) -> None:
         param = _param("search_metrics_awstats", "projectIdSelect")
 
-        assert "projectIdSelect takes" in _refused(param, ["PlasmoDB", "NotADB"])
+        with pytest.raises(VocabularyEntryError) as refused:
+            param.read_stated(["PlasmoDB", "NotADB"])
+
+        assert [(n, r.phrase) for n, r in refused.value.faults] == [
+            ("projectIdSelect", "NotADB")
+        ]
 
     def test_terms_read(self) -> None:
         param = _param("search_metrics_awstats", "projectIdSelect")
@@ -193,7 +199,7 @@ class TestNgsSnpsVocabularies:
     def test_every_fault_of_a_search_is_one_refusal(self) -> None:
         stated: dict[str, JsonValue] = {
             "MinPercentMinorAlleles": "x",
-            "ReadFrequencyPercent": "10%",
+            "ReadFrequencyPercent": 10,
         }
 
         with pytest.raises(StatedValuesError) as refusal:

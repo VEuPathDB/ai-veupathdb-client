@@ -746,10 +746,13 @@ declared on `string`, multi-pick, `input-dataset` and `timestamp` parameters onl
 `AbstractEnumParam.validateValue` refuses each selected term that
 `vocab.getTerms().contains(term)` does not hold, with `Invalid value '<term>'.`, so
 `protein coding` is a term and `Protein Coding` is not. A text a caller
-states names a term by one exact step, `match_exact_option`: the term or its label equal
-after case and whitespace folding, else the leading accession of exactly one entry, else
-(for a numeric text) a numerically equal term. `ParameterCanonicalizer.canonicalize` and
-`PhyleticTree.resolve_terms` read that step, so `Protein Coding`, `missense`,
+states names a term by one exact step, `exact_entry`: the term or its label equal
+after case and whitespace folding (`match_exact_option`), else the leading accession of
+exactly one entry, else (for a numeric text) a numerically equal term. `entries_or_refusal`
+binds every term of a parameter through it or refuses the ones it does not name.
+`read_stated_values` (and `read_stated`), `ParameterCanonicalizer.canonicalize` and
+`PhyleticTree.resolve_terms` read that step, and the stated schema's `enum` only lists the
+entries a reader may see, so `Protein Coding`, `missense`,
 `glycolysis`, `pf00069` and `Plasmodium  falciparum 3D7` (two spaces) go out as
 `protein coding`, `Missense`, `Glycolysis`, `PF00069` and `Plasmodium falciparum 3D7`.
 
