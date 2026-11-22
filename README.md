@@ -250,6 +250,7 @@ to the host, and `tests/unit/test_package_boundary.py` reads that as a fact.
 uv run ruff check . && uv run ruff format --check .
 uv run mypy --strict src tests
 uv run pyright src tests
+uv run python -m veupathdb.devtools.param_equality src --allow scripts/param-equality-allowed.txt
 uv run pytest tests/unit          # hermetic: respx doubles, recorded WDK and EDA bodies
 WDK_TEST_EMAIL=... WDK_TEST_PASSWORD=... \
   uv run pytest tests/live -m live_wdk --override-ini addopts=''   # nightly

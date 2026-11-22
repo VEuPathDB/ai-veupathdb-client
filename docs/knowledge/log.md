@@ -1,5 +1,15 @@
 # Knowledge log
 
+## 2026-11-22 - A gate keeps the one equality
+
+- `python -m veupathdb.devtools.param_equality <roots> --allow <file>` fails on a comparison
+  of parameter values outside `value_equality.py` and `values.py`: `==` or `!=` on
+  `to_wire()`, `json.dumps()` or `encode_wdk_params()` text, on a parameter map or one of its
+  entries, or on a value constructor. Each repository lists its allowed text comparisons by
+  `path:scope`, and an allowance that compares nothing fails too. This repository allows
+  `filter_clause._sent_as`, which picks a member's spelling. `ClauseKey` is no longer
+  exported.
+
 ## 2026-11-22 - A value is compared by what WDK reads
 
 - `same_value` compares two values of one parameter as WDK reads them: a multi-pick as its
