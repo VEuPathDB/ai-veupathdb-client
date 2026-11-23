@@ -343,7 +343,7 @@ class TestARefusalNamesTheParameter:
         with pytest.raises(ValidationError) as err:
             census_states("nonsense")
 
-        assert "lookup_phyletic_codes()" in str(err.value.detail)
+        assert "the phyletic tree carries" in str(err.value.detail)
 
 
 class TestATreeFromTaxa:

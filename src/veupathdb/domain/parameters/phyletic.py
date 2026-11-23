@@ -407,8 +407,9 @@ def census_states(pattern: str) -> dict[str, TriState]:
             "profile_pattern is not a census pattern",
             f"{pattern!r} is not built from census tokens.",
             "Use '%code:Y%' for present and '%code:N%' for absent, in "
-            "ascending code order, or '%' for no constraint. Call "
-            "lookup_phyletic_codes() for the codes.",
+            "ascending code order, or '%' for no constraint. The codes are the "
+            "clade and genome codes the phyletic tree carries, such as 'pfal' "
+            "for P. falciparum or 'hsap' for H. sapiens.",
         )
     return read.states
 
@@ -453,8 +454,8 @@ def validate_phyletic_codes(
             param_name,
             f"Invalid species codes in {param_name}",
             f"Unknown codes: {', '.join(invalid_codes[:5])}.",
-            "Use lookup_phyletic_codes() to find valid codes "
-            "(e.g. 'pfal' for P. falciparum, 'hsap' for H. sapiens).",
+            "Use the clade and genome codes the phyletic tree carries, such as "
+            "'pfal' for P. falciparum or 'hsap' for H. sapiens.",
         )
 
 
