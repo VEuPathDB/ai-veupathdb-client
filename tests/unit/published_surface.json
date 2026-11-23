@@ -522,6 +522,7 @@
     "WDKGoEnrichmentRow",
     "WDKIdentifier",
     "WDKLinkAttribute",
+    "WDKModel",
     "WDKNumberParam",
     "WDKOntologyTermSummary",
     "WDKOntologyTermValueCount",

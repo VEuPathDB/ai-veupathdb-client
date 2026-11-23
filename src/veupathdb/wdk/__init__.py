@@ -146,6 +146,7 @@ from veupathdb.wdk.vdi.rnaseqrc import (
     RnaSeqCountFile,
     RnaSeqRcUpload,
 )
+from veupathdb.wdk.wdk_base import WDKModel
 from veupathdb.wdk.wdk_models import (
     ColumnNotCountableError,
     CombinedStepSpec,
@@ -284,6 +285,7 @@ __all__ = [
     "WDKGoEnrichmentRow",
     "WDKIdentifier",
     "WDKLinkAttribute",
+    "WDKModel",
     "WDKNumberParam",
     "WDKOntologyTermSummary",
     "WDKOntologyTermValueCount",
