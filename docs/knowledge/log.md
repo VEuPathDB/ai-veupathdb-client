@@ -1,5 +1,12 @@
 # Knowledge log
 
+## 2026-11-23 - 0.9.0b15: a phyletic refusal names no host tool
+
+- A phyletic refusal states where the codes come from (the clade and genome codes the phyletic
+  tree carries, such as 'pfal' or 'hsap') and names no tool, because the client cannot know
+  which tools its host holds.
+- `veupathdb-py` is 0.9.0b15.
+
 ## 2026-11-23 - 0.9.0b14: a refusal names every problem once
 
 - This release carries the refusal work since 0.9.0b13: a read names every miss once, a
