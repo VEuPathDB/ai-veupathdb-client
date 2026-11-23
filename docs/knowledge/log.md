@@ -1,5 +1,13 @@
 # Knowledge log
 
+## 2026-11-24 - 0.9.0b17: one model holds a step's settings
+
+- This release carries the step settings work since 0.9.0b16: `StepSettings` and
+  `settings_of`, `filters_to_put` and `departures_from`, filters on the step write, span and
+  boolean steps read by WDK's own search and parameters, `filters_wdk_added`, and an
+  unstated span field that takes the site's value.
+- `veupathdb-py` is 0.9.0b17.
+
 ## 2026-11-22 - A step carries what WDK added, and no weight is None
 
 - `StrategyStep` and `StrategyStepNode` carry `filters_wdk_added`, the filters WDK
