@@ -1,0 +1,156 @@
+{
+  "provenance": "cedar ~/proto/ec-release/apps/api/runs/e1 (ec-release-check, plasmodb Build: In Pf3D7, find genes with a serine/threonine protein kinase InterPro domain), tools/06-get_parameter_options.json return: allowedValues and vocabLookup",
+  "parameter": "domain_typeahead",
+  "query": [
+    "serine/threonine protein kinase",
+    "protein kinase"
+  ],
+  "allowedValues": [
+    {
+      "value": "IPR050205",
+      "display": "IPR050205 : SERINE/THREONINE-PROTEIN KINASE"
+    },
+    {
+      "value": "IPR051681",
+      "display": "IPR051681 : SERINE/THREONINE-PROTEIN KINASE TNNI3K-RELATED"
+    },
+    {
+      "value": "IPR030616",
+      "display": "IPR030616 : SERINE/THREONINE-PROTEIN KINASE IAL-RELATED"
+    },
+    {
+      "value": "IPR045269",
+      "display": "IPR045269 : SERINE/THREONINE-PROTEIN KINASE UNC-51-RELATED"
+    },
+    {
+      "value": "IPR051272",
+      "display": "IPR051272 : SERINE/THREONINE-PROTEIN KINASE RIO1"
+    },
+    {
+      "value": "IPR050167",
+      "display": "IPR050167 : SERINE-THREONINE PROTEIN KINASE"
+    },
+    {
+      "value": "IPR051175",
+      "display": "IPR051175 : SERINE/THREONINE-PROTEIN KINASE DOA-RELATED"
+    },
+    {
+      "value": "IPR050660",
+      "display": "IPR050660 : SERINE/THREONINE-PROTEIN KINASE NEK"
+    },
+    {
+      "value": "IPR050236",
+      "display": "IPR050236 : SERINE/THREONINE-PROTEIN KINASE"
+    },
+    {
+      "value": "IPR011009",
+      "display": "IPR011009 : Protein kinase-like (PK-like)"
+    },
+    {
+      "value": "IPR011641",
+      "display": "IPR011641 : Tyrosine-protein kinase ephrin type A/B receptor-like"
+    },
+    {
+      "value": "IPR050108",
+      "display": "IPR050108 : CELL DIVISION PROTEIN KINASE"
+    },
+    {
+      "value": "IPR051131",
+      "display": "IPR051131 : CAMK FAMILY PROTEIN KINASE"
+    },
+    {
+      "value": "IPR016149",
+      "display": "IPR016149 : protein kinase ck2 holoenzyme, chain C, domain 1"
+    },
+    {
+      "value": "IPR050494",
+      "display": "IPR050494 : DUAL SPECIFICITY PROTEIN KINASE"
+    },
+    {
+      "value": "IPR050117",
+      "display": "IPR050117 : MITOGEN-ACTIVATED PROTEIN KINASE"
+    },
+    {
+      "value": "IPR045223",
+      "display": "IPR045223 : RECEPTOR FOR ACTIVATED PROTEIN KINASE C  RACK1"
+    },
+    {
+      "value": "IPR051177",
+      "display": "IPR051177 : SCY1-RELATED S/T PROTEIN KINASE-LIKE"
+    },
+    {
+      "value": "IPR050503",
+      "display": "IPR050503 : CAMP-DEPENDENT PROTEIN KINASE REGULATORY CHAIN"
+    },
+    {
+      "value": "IPR051334",
+      "display": "IPR051334 : PROTEIN KINASE DOMAIN-CONTAINING PROTEIN-RELATED"
+    },
+    {
+      "value": "IPR052945",
+      "display": "IPR052945 : ACTIVATOR OF C KINASE PROTEIN 1-RELATED"
+    },
+    {
+      "value": "IPR013926",
+      "display": "IPR013926 : Kinase binding protein CGI-121"
+    }
+  ],
+  "vocabLookup": {
+    "terms": [
+      "serine/threonine protein kinase",
+      "protein kinase"
+    ],
+    "matches": [
+      {
+        "term": "serine/threonine protein kinase",
+        "phrasing": "serine threonine protein kinase",
+        "reach": "phrase",
+        "values": [
+          "IPR050205",
+          "IPR051681",
+          "IPR030616",
+          "IPR045269",
+          "IPR051272",
+          "IPR050167",
+          "IPR051175",
+          "IPR050660",
+          "IPR050236"
+        ]
+      },
+      {
+        "term": "protein kinase",
+        "phrasing": "protein kinase",
+        "reach": "phrase",
+        "values": [
+          "IPR011009",
+          "IPR011641",
+          "IPR050108",
+          "IPR051131",
+          "IPR016149",
+          "IPR050494",
+          "IPR050117",
+          "IPR045223",
+          "IPR051177",
+          "IPR050503",
+          "IPR051334"
+        ]
+      },
+      {
+        "term": "protein kinase",
+        "phrasing": "protein kinase",
+        "reach": "every_word",
+        "values": [
+          "IPR052945",
+          "IPR013926"
+        ]
+      }
+    ],
+    "requestTerms": [],
+    "requestMatches": [],
+    "accession": {
+      "entries": 4717,
+      "oneToken": 1166,
+      "nameless": 321
+    }
+  }
+}

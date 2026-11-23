@@ -128,6 +128,8 @@ from veupathdb.domain.parameters.wdk_vocab import (
     leading_accession_token,
     leaf_terms,
     match_exact_option,
+    name_past_accession,
+    same_named_groups,
     vocab_keys,
 )
 
@@ -225,11 +227,13 @@ __all__ = [
     "leading_accession_token",
     "leaf_terms",
     "match_exact_option",
+    "name_past_accession",
     "rank_entries",
     "read_census",
     "read_options",
     "read_stated_values",
     "restates",
+    "same_named_groups",
     "same_param_value",
     "shown_stated",
     "shown_stated_text",

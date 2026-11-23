@@ -16,7 +16,11 @@ from typing import Literal, Self
 from pydantic import ConfigDict, Field, model_validator
 
 from veupathdb.domain.parameters.vocab_utils import looks_numeric, numeric_equivalent
-from veupathdb.domain.parameters.wdk_vocab import VocabOption, match_exact_option
+from veupathdb.domain.parameters.wdk_vocab import (
+    VocabOption,
+    match_exact_option,
+    same_named_groups,
+)
 from veupathdb.errors import ValidationError
 from veupathdb.json_types import JSONObject
 from veupathdb.model import CamelModel, computed
@@ -80,6 +84,7 @@ class VocabLookup(CamelModel):
     request_terms: list[str] = Field(default_factory=list)
     request_matches: list[PhrasingMatch] = Field(default_factory=list)
     accession: AccessionNames | None = None
+    same_named: list[list[str]] = Field(default_factory=list)
 
     def request_values(self) -> list[str]:
         """The kept entries that carry the request's words, in rank order."""
@@ -203,6 +208,7 @@ def read_options(
             request_terms=list(request_terms),
             request_matches=_matched(by_request),
             accession=accession_names(options),
+            same_named=same_named_groups(kept),
         ),
         phrasings=tuple(phrasings),
     )

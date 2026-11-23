@@ -129,21 +129,42 @@ def accession_matches(options: Iterable[VocabOption], value: str) -> list[str]:
     ]
 
 
+def name_past_accession(option: VocabOption) -> str:
+    token = leading_accession_token(option.display)
+    if token is None:
+        return option.display
+    rest = option.display[len(token) :].lstrip()
+    return rest.lstrip(" :") if rest.startswith(":") else option.display
+
+
+def same_named_groups(options: Iterable[VocabOption]) -> list[list[str]]:
+    by_name: dict[str, list[str]] = {}
+    for option in options:
+        held = by_name.setdefault(normalize_vocab_key(name_past_accession(option)), [])
+        if option.value not in held:
+            held.append(option.value)
+    return [values for values in by_name.values() if len(values) > 1]
+
+
 def match_exact_option(options: Iterable[VocabOption], value: str) -> str | None:
     """The option whose term or label is this text, ignoring case and spacing.
 
     A tree parent term is an option and selects its children. A substring is a
-    different entry, so it does not match. A text that is the leading accession
-    of exactly one entry names that entry; two entries make it ambiguous.
+    different entry, so it does not match. A label several entries share names
+    none of them. A text that is the leading accession of exactly one entry names
+    that entry; two entries make it ambiguous.
     """
     entries = list(options)
     key = normalize_vocab_key(value)
     for option in entries:
-        if key in (
-            normalize_vocab_key(option.value),
-            normalize_vocab_key(option.display),
-        ):
+        if key == normalize_vocab_key(option.value):
             return option.value
+    grouped = {value for group in same_named_groups(entries) for value in group}
+    for option in entries:
+        if key == normalize_vocab_key(option.display):
+            shared = option.value in grouped
+            named = key == normalize_vocab_key(name_past_accession(option))
+            return None if shared and named else option.value
     by_accession = accession_matches(entries, value)
     return by_accession[0] if len(by_accession) == 1 else None
 
