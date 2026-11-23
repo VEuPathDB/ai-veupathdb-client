@@ -5,11 +5,13 @@ from pathlib import Path
 
 from veupathdb.domain.parameters import (
     VocabOption,
+    WDKVocabulary,
     exact_or_candidates,
     flatten_vocab,
     match_exact_option,
     read_options,
     same_named_groups,
+    vocab_paths,
 )
 from veupathdb.testing.wdk_fixtures import load_recorded
 from veupathdb.wdk import WDKSearchResponse
@@ -62,3 +64,45 @@ def test_the_lookup_marks_the_kept_entries_that_share_a_name() -> None:
 
     assert read.lookup is not None
     assert read.lookup.same_named == [["IPR050205", "IPR050236"]]
+
+
+def _assay_tree() -> WDKVocabulary:
+    body = load_recorded("search_genes_by_mass_spec").json_body()
+    search = WDKSearchResponse.model_validate(body).search_data
+    [assay] = [p for p in search.parameters or [] if p.name == "ms_assay"]
+    assert assay.vocabulary is not None
+    return assay.vocabulary
+
+
+def test_entries_under_different_organisms_are_not_one_name() -> None:
+    tree = _assay_tree()
+
+    read = read_options(
+        flatten_vocab(tree),
+        ["female gametocytes"],
+        request_terms=[],
+        under=vocab_paths(tree),
+    )
+
+    assert read.lookup is not None
+    assert read.lookup.same_named == []
+
+
+def test_entries_no_parent_tells_apart_stay_one_name() -> None:
+    read = read_options(
+        _e1_options(), _E1["query"], request_terms=[], under=vocab_paths(None)
+    )
+
+    assert read.lookup is not None
+    assert read.lookup.same_named == [["IPR050205", "IPR050236"]]
+
+
+def test_a_path_names_the_labels_above_an_entry() -> None:
+    paths = vocab_paths(_assay_tree())
+
+    assert paths["female gametocytes_Plasmodium falciparum 3D7"] == (
+        "<b>Plasmodium</b>",
+        "<b>Plasmodium falciparum</b>",
+        "<b>Plasmodium falciparum 3D7</b>",
+        "Gametocyte proteomics (Lasonder et al.)",
+    )

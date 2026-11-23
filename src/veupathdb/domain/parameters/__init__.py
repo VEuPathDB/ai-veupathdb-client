@@ -131,6 +131,7 @@ from veupathdb.domain.parameters.wdk_vocab import (
     name_past_accession,
     same_named_groups,
     vocab_keys,
+    vocab_paths,
 )
 
 __all__ = [
@@ -244,5 +245,6 @@ __all__ = [
     "validate_phyletic_codes",
     "value_kind",
     "vocab_keys",
+    "vocab_paths",
     "wire_map",
 ]

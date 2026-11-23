@@ -207,6 +207,7 @@
     "validate_phyletic_codes",
     "value_kind",
     "vocab_keys",
+    "vocab_paths",
     "wire_map"
   ],
   "veupathdb.domain.strategy": [

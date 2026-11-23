@@ -4,7 +4,8 @@ lists, tree-box trees, filter ontologies, and dataset parsers."""
 from __future__ import annotations
 
 import re
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
+from types import MappingProxyType
 from typing import Literal
 
 from pydantic import Field, RootModel
@@ -137,10 +138,21 @@ def name_past_accession(option: VocabOption) -> str:
     return rest.lstrip(" :") if rest.startswith(":") else option.display
 
 
-def same_named_groups(options: Iterable[VocabOption]) -> list[list[str]]:
-    by_name: dict[str, list[str]] = {}
+type EntryPaths = Mapping[str, tuple[str, ...]]
+
+NO_PATHS: EntryPaths = MappingProxyType({})
+
+
+def same_named_groups(
+    options: Iterable[VocabOption], under: EntryPaths = NO_PATHS
+) -> list[list[str]]:
+    """The entries that share a name past their accessions and sit under the
+    same labels of the tree in ``under``; the tree tells the others apart."""
+    by_name: dict[tuple[tuple[str, ...], str], list[str]] = {}
     for option in options:
-        held = by_name.setdefault(normalize_vocab_key(name_past_accession(option)), [])
+        path = tuple(normalize_vocab_key(p) for p in under.get(option.value, ()))
+        name = normalize_vocab_key(name_past_accession(option))
+        held = by_name.setdefault((path, name), [])
         if option.value not in held:
             held.append(option.value)
     return [values for values in by_name.values() if len(values) > 1]
@@ -193,6 +205,28 @@ def flatten_vocab(vocab: WDKVocabulary | None) -> list[VocabOption]:
             if opt.value and opt.value != FAKE_ALL_SENTINEL
         ]
     return [VocabOption(value=t.term, display=t.display or t.term) for t in vocab]
+
+
+def _paths(
+    node: WDKTreeBoxVocabNode, above: tuple[str, ...]
+) -> dict[str, tuple[str, ...]]:
+    paths = {node.data.term: above}
+    below = (*above, node.data.display or node.data.term)
+    for child in node.children:
+        paths |= _paths(child, below)
+    return paths
+
+
+def vocab_paths(vocab: WDKVocabulary | None) -> dict[str, tuple[str, ...]]:
+    """Each term of a tree and the labels of the nodes above it, the synthetic
+    root left out. A list has no paths."""
+    if not isinstance(vocab, WDKTreeBoxVocabNode):
+        return {}
+    return {
+        term: path
+        for child in vocab.children
+        for term, path in _paths(child, ()).items()
+    }
 
 
 def collect_leaf_terms(node: WDKTreeBoxVocabNode) -> list[str]:

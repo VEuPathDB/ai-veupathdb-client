@@ -783,7 +783,9 @@ after case and whitespace folding (`match_exact_option`), else the leading acces
 exactly one entry, else (for a numeric text) a numerically equal term. A label that several
 entries share past their accessions (`same_named_groups`) names none of them, so the text
 is refused with those entries among the candidates, and `VocabLookup.same_named` lists the
-groups among the entries a lookup kept. `entries_or_refusal`
+groups among the entries a lookup kept. A lookup over a tree passes each entry's path
+(`vocab_paths`), so entries the tree places under different nodes (the mass-spec
+`female gametocytes` assays under four organisms) are not one name. `entries_or_refusal`
 binds every term of a parameter through it or refuses the ones it does not name.
 `read_stated_values` (and `read_stated`), `ParameterCanonicalizer.canonicalize` and
 `PhyleticTree.resolve_terms` read that step, and the stated schema's `enum` only lists the

@@ -17,6 +17,8 @@ from pydantic import ConfigDict, Field, model_validator
 
 from veupathdb.domain.parameters.vocab_utils import looks_numeric, numeric_equivalent
 from veupathdb.domain.parameters.wdk_vocab import (
+    NO_PATHS,
+    EntryPaths,
     VocabOption,
     match_exact_option,
     same_named_groups,
@@ -184,11 +186,14 @@ def read_options(
     terms: Sequence[str],
     *,
     request_terms: Sequence[str],
+    under: EntryPaths = NO_PATHS,
 ) -> VocabRead:
     """Keep the entries any phrasing of the terms matches, ranked by reach.
 
     ``request_terms`` are the concept in the request's own words. They are read
     as a term is, and the kept entries they match rank first. They keep no entry.
+    ``under`` gives each entry's place in its tree, which tells same-named
+    entries apart.
     """
     if not terms:
         return VocabRead(options=options, lookup=None)
@@ -208,7 +213,7 @@ def read_options(
             request_terms=list(request_terms),
             request_matches=_matched(by_request),
             accession=accession_names(options),
-            same_named=same_named_groups(kept),
+            same_named=same_named_groups(kept, under),
         ),
         phrasings=tuple(phrasings),
     )
