@@ -1,5 +1,16 @@
 # Knowledge log
 
+## 2026-11-23 - 0.9.0b16: entries that share a name are one name
+
+- `same_named_groups` groups the entries whose names past their accessions
+  (`name_past_accession`) fold equal. `match_exact_option`, and with it `exact_entry` and
+  `exact_or_candidates`, names none of them for that shared name, so "female gametocytes" on
+  the mass-spec assays of three organisms is a candidate list, not the first organism's entry.
+  A term or an accession still names its entry.
+- `VocabLookup.same_named` lists those groups among the entries a lookup kept, such as
+  IPR050205 and IPR050236, both "SERINE/THREONINE-PROTEIN KINASE".
+- `veupathdb-py` is 0.9.0b16.
+
 ## 2026-11-23 - 0.9.0b15: a phyletic refusal names no host tool
 
 - A phyletic refusal states where the codes come from (the clade and genome codes the phyletic
