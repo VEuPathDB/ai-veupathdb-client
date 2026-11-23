@@ -1,5 +1,12 @@
 # Knowledge log
 
+## 2026-11-23 - 0.9.0b14: a refusal names every problem once
+
+- This release carries the refusal work since 0.9.0b13: a read names every miss once, a
+  mixed refusal keeps its entry rows in call order, a per-parameter row carries its detail,
+  and a page in place of JSON is a typed WDK error.
+- `veupathdb-py` is 0.9.0b14.
+
 ## 2026-11-22 - A page in place of JSON is a typed WDK error
 
 - A 2xx service answer whose body is not JSON (a login page) raises `WDKError` (502) that
