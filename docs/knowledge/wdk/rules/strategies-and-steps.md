@@ -299,6 +299,21 @@ and `b` there and throws `Invalid span_output: none` for anything else. A step t
 `none` therefore never produces an answer, and `ColocationParams.from_wdk_params` refuses it
 by name instead of giving it a meaning.
 
+### WDK-STEP-011 - An unstated span field takes the default the site's span form starts on
+
+- class: CONTRACT
+- upstream: https://github.com/VEuPathDB/ApiCommonModel/blob/0ce647115f1c78e4f038465984a88cfdc91b17b0/Model/lib/wdk/model/questions/params/spanParams.xml
+- anchor: src/veupathdb/domain/strategy/ops.py:ColocationParams
+- status: ENFORCED by tests/unit/domain/strategy/test_a_span_step_reads_by_the_site_definition.py::test_wdk_step_011_an_unstated_span_field_takes_the_sites_default
+
+The `SpanParams` param set in `spanParams.xml` is shared by every genomics site, and the
+recorded `GenesBySpanLogic` search answers its defaults as `initialDisplayValue`: both
+regions exact, every offset 0 and every direction `+`. A `ColocationParams` field a caller
+does not state takes that default, so a colocation stated in part means the region the
+site's own form starts on. `span_output` is the exception: its default `none` never runs
+(WDK-STEP-010), and the model takes `a`, which the site's form also sets when the step is
+added after the first one.
+
 ### WDK-STRAT-001 - A step tree node carries a step id and nothing else
 
 - class: CONTRACT

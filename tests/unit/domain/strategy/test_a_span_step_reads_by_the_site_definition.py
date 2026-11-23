@@ -60,3 +60,17 @@ def test_wdk_step_010_the_output_placeholder_the_site_offers_is_refused() -> Non
     params = ColocationParams().to_wdk_params() | {"span_output": _PLACEHOLDER}
     with pytest.raises(DataParsingError, match="span_output 'none' is not one of a, b"):
         ColocationParams.from_wdk_params(params)
+
+
+def test_wdk_step_011_an_unstated_span_field_takes_the_sites_default() -> None:
+    search = _Search.model_validate(
+        load_recorded("search_genes_by_span_logic").json_body()
+    )
+    model = ColocationParams().to_wdk_params()
+    site = {
+        p.name: p.initial_display_value
+        for p in search.search_data.parameters
+        if p.name in model and p.name not in {"span_output", "span_sentence"}
+    }
+    assert {name: model[name] for name in site} == site
+    assert len(site) == len(model) - 2

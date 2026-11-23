@@ -66,10 +66,10 @@ class ColocationParams(CamelModel):
     output: Literal["a", "b"] = "a"
 
     # Region A is the gene result set.
-    region_a: Literal["exact", "upstream", "downstream", "custom"] = "custom"
+    region_a: Literal["exact", "upstream", "downstream", "custom"] = "exact"
     begin_a: Literal["start", "stop"] = "start"
-    begin_direction_a: Literal["+", "-"] = "-"
-    begin_offset_a: int = Field(default=1000, ge=0)
+    begin_direction_a: Literal["+", "-"] = "+"
+    begin_offset_a: int = Field(default=0, ge=0)
     end_a: Literal["start", "stop"] = "stop"
     end_direction_a: Literal["+", "-"] = "+"
     end_offset_a: int = Field(default=0, ge=0)
