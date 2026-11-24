@@ -137,11 +137,18 @@ def _query(request: http.Request) -> list[tuple[str, str]]:
 
 
 class WireAddon:
-    def __init__(self, mode: WireMode, store: WireStore, hosts: frozenset[str]) -> None:
+    def __init__(
+        self,
+        mode: WireMode,
+        store: WireStore,
+        hosts: frozenset[str],
+        *,
+        oauth_url: str = DEFAULT_OAUTH_URL,
+    ) -> None:
         self.mode = mode
         self.store = store
         self.hosts = hosts
-        self.oauth_host = urlsplit(DEFAULT_OAUTH_URL).hostname or ""
+        self.oauth_host = urlsplit(oauth_url).hostname or ""
         self.key = SigningKey.generate()
         self._played: dict[str, Played] = {}
         self._misses: dict[str, list[Miss]] = {}

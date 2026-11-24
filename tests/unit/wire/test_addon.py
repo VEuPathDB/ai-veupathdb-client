@@ -275,3 +275,12 @@ def test_a_recorded_write_never_sent_fails_the_end(store: WireStore) -> None:
     outcome = answered_json(end)
     assert isinstance(outcome, dict)
     assert [u["path"] for u in outcome["unsent"]] == [f"{STEPS}/7"]
+
+
+def test_the_jwks_is_answered_on_the_configured_oauth_host(store: WireStore) -> None:
+    addon = WireAddon("replay", store, HOSTS, oauth_url="https://auth.wire.test")
+    made = flow("GET", "https://auth.wire.test/jwks")
+    addon.request(made)
+    keys = answered_json(made)
+    assert isinstance(keys, dict)
+    assert [key["kty"] for key in keys["keys"]] == ["EC"]

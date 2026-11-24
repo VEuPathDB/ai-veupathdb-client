@@ -8,8 +8,7 @@ from typing import cast
 from mitmproxy import options
 from mitmproxy.tools.dump import DumpMaster
 
-from veupathdb.testing.wire.addon import WireAddon, WireMode, site_hosts
-from veupathdb.testing.wire.store import WireStore
+from veupathdb.testing.wire.addon import WireAddon
 
 
 def proxy_master(addon: WireAddon, host: str, port: int, confdir: Path) -> DumpMaster:
@@ -26,8 +25,5 @@ async def _run(addon: WireAddon, host: str, port: int, confdir: Path) -> None:
     await proxy_master(addon, host, port, confdir).run()
 
 
-def serve(
-    mode: WireMode, wire: Path, sites: Path, *, host: str, port: int, confdir: Path
-) -> None:
-    addon = WireAddon(mode, WireStore(wire), site_hosts(sites))
+def serve(addon: WireAddon, *, host: str, port: int, confdir: Path) -> None:
     asyncio.run(_run(addon, host, port, confdir))
