@@ -67,6 +67,9 @@ class Played:
         before = [e for e in recorded if e.epoch < self.epoch]
         return before[-1] if before else None
 
+    def knows(self, key: str) -> bool:
+        return key in self._writes or key in self._reads
+
     def unsent_writes(self) -> list[Exchange]:
         return sorted(
             (
