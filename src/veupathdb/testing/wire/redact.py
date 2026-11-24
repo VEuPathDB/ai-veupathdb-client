@@ -20,7 +20,12 @@ _JWT = re.compile(rb"eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*")
 _AUTHORIZATION = re.compile(
     rb"(?i)(authorization[\"']?\s*:\s*)(?:\"[^\"]*\"|'[^']*'|[^\r\n]*)"
 )
-_COOKIE_HEADER = re.compile(rb"(?i)((?:set-)?cookie[\"']?\s*:\s*[\"']?)([^\"'\r\n]*)")
+_COOKIE_HEADER = re.compile(
+    rb"(?i)((?:set-)?cookie[\"']?\s*[:=]\s*[\"']?)([^\"'\r\n]*)"
+)
+_AUTH_KEY = re.compile(
+    rb"(?i)(auth[_-]?key[\"']?\s*[:=]\s*)(?:\"[^\"]*\"|'[^']*'|[^\s;,&\"'\r\n]+)"
+)
 _PAIR = re.compile(rb"([^=;,\s]+)=([^;,\"'\r\n]*)")
 _NAMED_COOKIE = re.compile(rb"(?i)\b(jsessionid|authorization|auth_tkt)=([^;\s\"',&]+)")
 _BEARER = re.compile(rb"(?i)\b(bearer\s+)([A-Za-z0-9._~+/=-]+)")
@@ -133,6 +138,7 @@ class Redactor:
             body = secret.sub(REDACTED.encode(), body)
         body = _JWT.sub(REDACTED.encode(), body)
         body = _AUTHORIZATION.sub(rb'\1"' + REDACTED.encode() + b'"', body)
+        body = _AUTH_KEY.sub(rb'\1"' + REDACTED.encode() + b'"', body)
         body = _COOKIE_HEADER.sub(_redact_pairs, body)
         body = _NAMED_COOKIE.sub(rb"\1=" + REDACTED.encode(), body)
         body = _BEARER.sub(rb"\1" + REDACTED.encode(), body)

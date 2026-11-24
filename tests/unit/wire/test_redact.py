@@ -57,6 +57,11 @@ VARIANTS = [
     b'{"v": "k3y/v4lue+tail=="}',
     b'{"v": "k3y\\/v4lue+tail=="}',
     b"v=k3y%2Fv4lue%2Btail%3D%3D&w=1",
+    b'{"auth_key": "opaque-token-value"}',
+    b"Auth-Key: opaque-token-value",
+    b"auth-key=opaque-token-value&x=1",
+    b"set-cookie=JSESSIONID=" + SESSION.encode() + b"; theme=opaque-token-value",
+    b'{"Set-Cookie": "JSESSIONID=' + SESSION.encode() + b'; x=opaque-token-value"}',
 ]
 
 
