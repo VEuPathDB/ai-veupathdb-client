@@ -17,6 +17,7 @@ from veupathdb.testing.wire.redact import (
     ACCOUNT_ORGANIZATION,
     REDACTED,
     Identity,
+    LeakError,
     Redactor,
 )
 from veupathdb.testing.wire.replay import (
@@ -43,6 +44,7 @@ __all__ = [
     "Exchange",
     "HostRecordings",
     "Identity",
+    "LeakError",
     "Manifest",
     "Miss",
     "MissReason",

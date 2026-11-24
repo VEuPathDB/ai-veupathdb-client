@@ -14,14 +14,16 @@ from veupathdb.testing.wire.models import (
     HostRecordings,
     Manifest,
 )
+from veupathdb.testing.wire.redact import Redactor
 
 _SUFFIX = ".jsonl"
 _MANIFEST = "manifest.json"
 
 
 class WireStore:
-    def __init__(self, root: Path) -> None:
+    def __init__(self, root: Path, guard: Redactor | None = None) -> None:
         self.root = root
+        self._guard = guard
 
     def _cassette_path(self, cassette: str) -> Path:
         if cassette == STACK:
@@ -32,6 +34,8 @@ class WireStore:
         return self.root / "bodies" / sha[:2] / f"{sha}.gz"
 
     def put_body(self, body: bytes) -> str:
+        if self._guard is not None:
+            self._guard.refuse_leaks(body, "A response body")
         sha = hashlib.sha256(body).hexdigest()
         path = self._body_path(sha)
         if not path.exists():
@@ -53,11 +57,14 @@ class WireStore:
         )
 
     def write_cassette(self, cassette: Cassette) -> None:
-        path = self._cassette_path(cassette.header.cassette)
-        path.parent.mkdir(parents=True, exist_ok=True)
         lines = [cassette.header.model_dump_json()]
         lines.extend(exchange.model_dump_json() for exchange in cassette.exchanges)
-        path.write_text("\n".join(lines) + "\n")
+        text = "\n".join(lines) + "\n"
+        if self._guard is not None:
+            self._guard.refuse_leaks(text.encode(), cassette.header.cassette)
+        path = self._cassette_path(cassette.header.cassette)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text)
 
     def cassette_ids(self) -> list[str]:
         root = self.root / "cassettes"
