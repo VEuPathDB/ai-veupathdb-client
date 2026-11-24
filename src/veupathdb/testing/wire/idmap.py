@@ -4,7 +4,7 @@ import contextlib
 import json
 from urllib.parse import unquote
 
-from pydantic import BaseModel, ConfigDict, ValidationError
+from pydantic import BaseModel, ConfigDict, TypeAdapter, ValidationError
 
 from veupathdb.json_types import JSONValue
 from veupathdb.testing.wire.models import Exchange
@@ -29,10 +29,15 @@ class UnmappedIdError(ValueError):
     pass
 
 
-class _Minted(BaseModel):
-    model_config = ConfigDict(extra="ignore")
+_ID_TEXT: TypeAdapter[str] = TypeAdapter(
+    str, config=ConfigDict(coerce_numbers_to_str=True)
+)
 
-    id: int | str | None = None
+
+class _Minted(BaseModel):
+    model_config = ConfigDict(extra="ignore", coerce_numbers_to_str=True)
+
+    id: str | None = None
     analysisId: str | None = None
     datasetId: str | None = None
     stepTree: JSONValue = None
@@ -40,7 +45,7 @@ class _Minted(BaseModel):
     def minted(self) -> str | None:
         for value in (self.id, self.analysisId, self.datasetId):
             if value is not None:
-                return str(value)
+                return value
         return None
 
 
@@ -55,7 +60,7 @@ def _step_ids(tree: JSONValue) -> list[str]:
     match tree:
         case dict() if "stepId" in tree:
             return [
-                str(tree["stepId"]),
+                _ID_TEXT.validate_python(tree["stepId"]),
                 *_step_ids(tree.get("primaryInput")),
                 *_step_ids(tree.get("secondaryInput")),
             ]
@@ -105,7 +110,7 @@ def _created_kind(parts: list[str]) -> str | None:
 
 class IdMap:
     def __init__(self, user_id: int) -> None:
-        self._user = str(user_id)
+        self._user = _ID_TEXT.validate_python(user_id)
         self._map: dict[Minted, str] = {}
         self._minted: list[tuple[str, str, str, str]] = []
         self._deleted: set[Minted] = set()
@@ -155,8 +160,8 @@ class IdMap:
         match value:
             case bool():
                 return value
-            case int() if (kind, str(value)) in self._map:
-                return int(self._map[kind, str(value)])
+            case int() if (kind, _ID_TEXT.validate_python(value)) in self._map:
+                return int(self._map[kind, _ID_TEXT.validate_python(value)])
             case str() if (kind, value) in self._map:
                 return self._map[kind, value]
             case _:
@@ -207,7 +212,7 @@ class IdMap:
             case bool() | None:
                 return []
             case int() | str() if key in _ID_KINDS:
-                return [(_ID_KINDS[key], str(item))]
+                return [(_ID_KINDS[key], _ID_TEXT.validate_python(item))]
             case _:
                 return self._named_in(item)
 

@@ -30,6 +30,7 @@ from veupathdb.testing.wire.addon import WireAddon, cassette_email
 from veupathdb.wdk import validate_oauth_token
 
 CASSETTE = "feature@plasmodb/a.spec.ts/one-1"
+OAUTH = "https://auth.wire.test"
 HOSTS = frozenset({PLASMO})
 STEPS = f"{SERVICE}/users/{FAKE_USER_ID}/steps"
 
@@ -216,8 +217,8 @@ def test_the_account_email_becomes_the_cassettes_own(store: WireStore) -> None:
 
 
 async def test_the_jwks_verifies_a_token_the_key_signed(store: WireStore) -> None:
-    addon = _replay(store)
-    jwks = flow("GET", "https://auth.veupathdb.org/jwks")
+    addon = WireAddon("replay", store, HOSTS, oauth_url=OAUTH)
+    jwks = flow("GET", f"{OAUTH}/jwks")
     addon.request(jwks)
     key = flow("GET", "http://localhost:8080/__wire/signing-key")
     addon.request(key)
@@ -227,10 +228,10 @@ async def test_the_jwks_verifies_a_token_the_key_signed(store: WireStore) -> Non
 
     token = addon.key.sign({"sub": "e2e", "is_guest": False, "exp": 4102444800})
     with respx.mock:
-        respx.get("https://auth.veupathdb.org/jwks").mock(
+        respx.get(f"{OAUTH}/jwks").mock(
             return_value=Response(200, content=answer(jwks).content)
         )
-        claims = await validate_oauth_token(token, "https://auth.veupathdb.org")
+        claims = await validate_oauth_token(token, OAUTH)
 
     assert claims is not None
     assert claims.is_guest is False
@@ -278,8 +279,8 @@ def test_a_recorded_write_never_sent_fails_the_end(store: WireStore) -> None:
 
 
 def test_the_jwks_is_answered_on_the_configured_oauth_host(store: WireStore) -> None:
-    addon = WireAddon("replay", store, HOSTS, oauth_url="https://auth.wire.test")
-    made = flow("GET", "https://auth.wire.test/jwks")
+    addon = WireAddon("replay", store, HOSTS, oauth_url=OAUTH)
+    made = flow("GET", f"{OAUTH}/jwks")
     addon.request(made)
     keys = answered_json(made)
     assert isinstance(keys, dict)
