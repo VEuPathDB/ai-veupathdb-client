@@ -1,5 +1,14 @@
 # Knowledge log
 
+## 2026-11-24 - 0.9.0b18: the tree tells same-named entries apart
+
+- `read_options` takes `under`, each entry's place in its tree (`vocab_paths`), and
+  `same_named_groups` groups only the entries that share a name and a place. The mass-spec
+  `female gametocytes` assays under four organisms are four names; the e1 InterPro pair in a
+  list is still one.
+- `WDKModel` is published on `veupathdb.wdk`.
+- `veupathdb-py` is 0.9.0b18.
+
 ## 2026-11-24 - 0.9.0b17: one model holds a step's settings
 
 - This release carries the step settings work since 0.9.0b16: `StepSettings` and
