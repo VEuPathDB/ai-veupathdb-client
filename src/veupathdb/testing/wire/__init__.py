@@ -19,6 +19,13 @@ from veupathdb.testing.wire.redact import (
     Identity,
     Redactor,
 )
+from veupathdb.testing.wire.replay import (
+    Miss,
+    MissReason,
+    Played,
+    nearest_difference,
+    render_misses,
+)
 from veupathdb.testing.wire.store import WireStore
 
 __all__ = [
@@ -37,9 +44,14 @@ __all__ = [
     "HostRecordings",
     "Identity",
     "Manifest",
+    "Miss",
+    "MissReason",
+    "Played",
     "Redactor",
     "WireStore",
     "canonical_body",
     "exchange_key",
+    "nearest_difference",
+    "render_misses",
     "stored_body",
 ]
