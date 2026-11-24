@@ -1,5 +1,12 @@
 # Knowledge log
 
+## 2026-11-24 - the wire replays what WDK answered
+
+- `veupathdb.testing.wire` and the `wire` extra: the recording store, the key, the write epoch
+  replay, the redactor and its independent leak guard, the mitmproxy addon (`serve`), and the
+  `refresh` and `merge` commands (`decisions/a-wire-replays-what-wdk-answered.md`).
+- `changes_user_state` sits beside `runs_a_search` in `wdk/_http.py`.
+
 ## 2026-11-24 - 0.9.0b18: the tree tells same-named entries apart
 
 - `read_options` takes `under`, each entry's place in its tree (`vocab_paths`), and

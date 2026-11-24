@@ -21,6 +21,7 @@ PACKAGES = (
     "veupathdb.eda",
     "veupathdb.jbrowse",
     "veupathdb.testing",
+    "veupathdb.testing.wire",
     "veupathdb.wdk",
 )
 
