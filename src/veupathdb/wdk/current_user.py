@@ -16,6 +16,9 @@ IDENTITY_READ_TIMEOUT_SECONDS = 10.0
 _TOKEN_REFUSED = frozenset({401, 403})
 
 
+CURRENT_USER_PATH = "/users/current"
+
+
 async def fetch_current_user(site_id: str) -> WDKUserInfo | None:
     """The WDK user the request's token names.
 
@@ -28,9 +31,9 @@ async def fetch_current_user(site_id: str) -> WDKUserInfo | None:
     client = get_wdk_client(site_id)
     try:
         async with asyncio.timeout(IDENTITY_READ_TIMEOUT_SECONDS):
-            raw = await client.get("/users/current", attempts=1)
+            raw = await client.get(CURRENT_USER_PATH, attempts=1)
     except TimeoutError as error:
-        msg = f"GET /users/current did not answer in {IDENTITY_READ_TIMEOUT_SECONDS} s"
+        msg = f"GET {CURRENT_USER_PATH} did not answer in {IDENTITY_READ_TIMEOUT_SECONDS} s"
         raise WDKError(msg, status=502) from error
     except WDKError as error:
         if error.status in _TOKEN_REFUSED:

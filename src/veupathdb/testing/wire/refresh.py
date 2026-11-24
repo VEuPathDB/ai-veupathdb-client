@@ -25,6 +25,7 @@ from veupathdb.testing.wire.models import (
 from veupathdb.testing.wire.redact import ACCOUNT_EMAIL, Identity, LeakError, Redactor
 from veupathdb.testing.wire.store import WireStore
 from veupathdb.wdk.auth_login import extract_auth_cookie
+from veupathdb.wdk.current_user import CURRENT_USER_PATH
 
 PARALLEL_CASSETTES = 4
 _FAKE = re.compile(rf"(?<!\d){FAKE_USER_ID}(?!\d)")
@@ -92,7 +93,7 @@ class WdkSession:
             raise PermissionError(msg)
         self._registered = token
         self.secrets |= {token, password}
-        current = await self._get(f"{service}/users/current", token)
+        current = await self._get(f"{service}{CURRENT_USER_PATH}", token)
         user = _User.model_validate_json(current.content)
         return Identity(
             user_id=user.id,

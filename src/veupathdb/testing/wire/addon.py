@@ -47,6 +47,7 @@ from veupathdb.testing.wire.signing import SigningKey, token_claims
 from veupathdb.testing.wire.stack import merge_stack
 from veupathdb.testing.wire.store import WireStore
 from veupathdb.wdk._http import changes_user_state
+from veupathdb.wdk.current_user import CURRENT_USER_PATH
 from veupathdb.wdk.site_router import load_sites_config
 
 logger = logging.getLogger(__name__)
@@ -61,7 +62,7 @@ _OPENAI_REFUSAL: JSONObject = {
         "code": "invalid_api_key",
     }
 }
-_CURRENT_USER = re.compile(r"/users/current$")
+_CURRENT_USER = re.compile(f"{re.escape(CURRENT_USER_PATH)}$")
 _JSON = {"content-type": "application/json"}
 _METHOD: TypeAdapter[Method] = TypeAdapter(Method)
 
@@ -447,7 +448,7 @@ class WireAddon:
     def _write(self, cassette: str) -> None:
         seen = self._recorded.pop(cassette, [])
         if self._identity is None:
-            msg = "the recorder saw no /users/current answer, so it cannot redact"
+            msg = "the recorder saw no answer naming the account, so it cannot redact"
             raise LeakError(msg)
         redactor = Redactor(self._identity, self._secrets)
         store = WireStore(self.store.root, guard=redactor)
