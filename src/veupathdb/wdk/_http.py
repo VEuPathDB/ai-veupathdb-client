@@ -94,6 +94,22 @@ def runs_a_search(method: str, path: str) -> bool:
     return method == "GET" and bool(_ANSWERED_RESOURCE.match(path))
 
 
+_EDITS = frozenset({"PUT", "PATCH", "DELETE"})
+_CREATES = re.compile(
+    r"(?:/users/[^/]+/(?:steps|strategies|datasets)"
+    r"|/users/[^/]+/strategies/[^/]+/duplicated-step-tree"
+    r"|/users/[^/]+/steps/[^/]+/analyses"
+    r"|/eda/users/[^/]+/analyses/[^/]+"
+    r"|/vdi/datasets)$"
+)
+
+
+def changes_user_state(method: str, path: str) -> bool:
+    if method in _EDITS:
+        return True
+    return method == "POST" and bool(_CREATES.search(path))
+
+
 def _cause(error: BaseException | None) -> str:
     """The error's text, or its class name when the text is empty."""
     return str(error) or type(error).__name__

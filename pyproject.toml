@@ -20,6 +20,8 @@ otel = ["opentelemetry-api>=1.44.0"]
 # The two schema readers `veupathdb.devtools` imports. The wheel ships those
 # modules, so what they import is an extra and never a dependency group.
 devtools = ["jsonschema>=4.26.0", "referencing>=0.37.0"]
+# The e2e replay proxy `veupathdb.testing.wire` runs in, and the key it signs with.
+wire = ["mitmproxy>=12.3.1", "cryptography>=50.0.1"]
 
 [build-system]
 requires = ["hatchling"]
@@ -34,7 +36,7 @@ packages = ["src/veupathdb"]
 [dependency-groups]
 # This checkout runs the devtools, so the group resolves their extra.
 dev = [
-    "veupathdb-py[devtools]",
+    "veupathdb-py[devtools,wire]",
     "cryptography>=50.0.1",
     "hypothesis>=6.167.1",
     "mypy>=2.3.1",
