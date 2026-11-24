@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import gzip
 import hashlib
+import re
 from collections.abc import Iterable
 from importlib.metadata import version
 from pathlib import Path
@@ -17,6 +18,7 @@ from veupathdb.testing.wire.models import (
 from veupathdb.testing.wire.redact import Redactor
 
 _SUFFIX = ".jsonl"
+_HASH = re.compile(r"[0-9a-f]{64}")
 _MANIFEST = "manifest.json"
 
 
@@ -31,6 +33,9 @@ class WireStore:
         return self.root / "cassettes" / f"{cassette}{_SUFFIX}"
 
     def _body_path(self, sha: str) -> Path:
+        if not _HASH.fullmatch(sha):
+            msg = f"{sha!r} is not a body hash"
+            raise ValueError(msg)
         return self.root / "bodies" / sha[:2] / f"{sha}.gz"
 
     def put_body(self, body: bytes) -> str:

@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import AfterValidator, BaseModel, ConfigDict, Field
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field, StringConstraints
 
 from veupathdb.testing.wire.key import exchange_key
 from veupathdb.wdk._http import changes_user_state
@@ -26,6 +26,7 @@ def _inside_the_tree(cassette: str) -> str:
 
 
 CassetteId = Annotated[str, AfterValidator(_inside_the_tree)]
+BodyHash = Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
 
 
 class Exchange(BaseModel):
@@ -43,7 +44,7 @@ class Exchange(BaseModel):
     status: int
     content_type: str = ""
     set_cookies: list[str] = Field(default_factory=list)
-    response: str | None = None
+    response: BodyHash | None = None
     ms: float = 0.0
 
     def request_bytes(self) -> bytes:

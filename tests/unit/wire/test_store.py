@@ -115,3 +115,14 @@ def test_the_manifest_counts_builds_and_dates_per_host(tmp_path: Path) -> None:
     assert plasmo.builds == {69: 1, 70: 1}
     assert (plasmo.oldest, plasmo.newest) == (RECORDED_AT, later)
     assert store.read_manifest() == manifest
+
+
+@pytest.mark.parametrize("sha", ["../../etc/passwd", "ab", "A" * 64, "g" * 64])
+def test_a_response_names_a_body_by_its_hash_only(sha: str) -> None:
+    with pytest.raises(ValidationError):
+        _exchange(0, sha)
+
+
+def test_a_body_read_takes_only_a_hash(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="hash"):
+        WireStore(tmp_path).read_body("../../x")

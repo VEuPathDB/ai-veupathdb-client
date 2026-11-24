@@ -6,6 +6,7 @@ import re
 import time
 from datetime import UTC, datetime
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import httpx
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -28,6 +29,22 @@ from veupathdb.wdk.auth_login import extract_auth_cookie
 
 PARALLEL_CASSETTES = 4
 _FAKE = re.compile(rf"(?<!\d){FAKE_USER_ID}(?!\d)")
+
+
+class UnsafeRequestError(ValueError):
+    pass
+
+
+def _safe_path(path: str) -> str:
+    unsafe = (
+        not path.startswith("/")
+        or any(mark in path for mark in ("@", "//", "://", "\\"))
+        or ".." in path.split("/")
+    )
+    if unsafe:
+        msg = f"{path!r} is not a plain service path"
+        raise UnsafeRequestError(msg)
+    return path
 
 
 class _User(BaseModel):
@@ -95,8 +112,16 @@ class WdkSession:
         self.client.cookies.clear()
         return response
 
-    async def sweep(self, url: str) -> None:
-        await self.request("DELETE", url, self._registered)
+    def url(self, host: str, path: str) -> str:
+        service = self.services.get(host)
+        if service is None:
+            msg = f"{host} is not a configured service"
+            raise UnsafeRequestError(msg)
+        origin = urlsplit(service)
+        return f"{origin.scheme}://{origin.netloc}{_safe_path(path)}"
+
+    async def sweep(self, host: str, path: str) -> None:
+        await self.request("DELETE", self.url(host, path), self._registered)
 
     async def read_builds(self) -> None:
         for host, service in self.services.items():
@@ -127,9 +152,10 @@ class WdkSession:
             headers["content-type"] = "application/json"
         query: list[tuple[str, str | int | float | bool | None]] = list(exchange.query)
         started = time.monotonic()
+        url = self.url(exchange.host, path)
         response = await self.client.request(
             exchange.method,
-            f"https://{exchange.host}{path}",
+            url,
             params=query,
             content=body or None,
             headers=headers,
@@ -177,7 +203,7 @@ class _Run:
 
     async def one(self, cassette: Cassette) -> _Refreshed:
         name = cassette.header.cassette
-        ids = IdMap()
+        ids = IdMap(self.identity.user_id)
         sent: list[tuple[Exchange, Answer, bytes]] = []
         compared: list[Compared] = []
         try:
@@ -190,16 +216,25 @@ class _Run:
                         if body
                         else b""
                     )
-                ids.check(path, body.decode(errors="replace") if body else None)
+                query = ids.rewrite_query(exchange.query)
+                ids.check(
+                    exchange.method,
+                    path,
+                    query,
+                    body.decode(errors="replace") if body else None,
+                )
                 answer = await self.session.send(
-                    exchange, path, body, exchange.credential
+                    exchange.model_copy(update={"query": query}),
+                    path,
+                    body,
+                    exchange.credential,
                 )
                 old = (
                     self.store.read_body(exchange.response)
                     if exchange.response
                     else b""
                 )
-                rewritten = exchange.model_copy(update={"path": path})
+                rewritten = exchange.model_copy(update={"path": path, "query": query})
                 ids.learn(rewritten, old, answer.body)
                 if exchange.method == "DELETE":
                     ids.forget(path)
@@ -213,14 +248,23 @@ class _Run:
                         answer.body,
                     )
                 )
-        except (UnmappedIdError, httpx.HTTPError) as error:
-            return _Refreshed(
-                cassette=None, row=DriftRow(cassette=name), error=f"{name}: {error}"
-            )
-        finally:
-            for leftover in ids.sweep_urls():
-                await self.session.sweep(leftover)
+        except (UnmappedIdError, UnsafeRequestError, httpx.HTTPError) as error:
+            failure = f"{name}: {error}"
+        else:
+            failure = ""
+        failure = "; ".join(filter(None, [failure, *await self._sweep(ids)]))
+        if failure:
+            return _Refreshed(cassette=None, row=DriftRow(cassette=name), error=failure)
         return self._written(cassette, sent, compared)
+
+    async def _sweep(self, ids: IdMap) -> list[str]:
+        failures = []
+        for host, leftover in ids.sweep_paths():
+            try:
+                await self.session.sweep(host, leftover)
+            except (UnsafeRequestError, httpx.HTTPError) as error:
+                failures.append(f"the sweep of {leftover} failed: {error}")
+        return failures
 
     def _written(
         self,

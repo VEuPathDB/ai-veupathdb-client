@@ -15,7 +15,7 @@ from veupathdb.testing.wire import (
     Played,
     WireStore,
 )
-from veupathdb.testing.wire.refresh import WdkSession, refresh
+from veupathdb.testing.wire.refresh import UnsafeRequestError, WdkSession, refresh
 
 HOST = "qa.plasmodb.org"
 SERVICE = "/plasmo.qa/service"
@@ -178,3 +178,48 @@ async def test_a_refused_sign_in_stops_the_refresh(tmp_path: Path) -> None:
     )
     with pytest.raises(PermissionError, match="refused"):
         await refresh(tmp_path, session, EMAIL, "pw", HOST)
+
+
+@pytest.mark.parametrize(
+    ("host", "path"),
+    [
+        ("evil.example.org", FAKE_STEPS),
+        (HOST, "steps"),
+        (HOST, "//evil.example.org/x"),
+        (HOST, "/x@evil.example.org/y"),
+        (HOST, "/https://evil.example.org/y"),
+        (HOST, f"{SERVICE}/../../x"),
+    ],
+)
+async def test_a_cassette_off_the_configured_services_is_refused_unsent(
+    tmp_path: Path, host: str, path: str
+) -> None:
+    store = WireStore(tmp_path)
+    crafted = _exchange(0, "GET", FAKE_STEPS, 0, store, b'{"id": 1}').model_copy(
+        update={"host": host, "path": path}
+    )
+    _write(store, CASSETTE, crafted)
+    upstream = Upstream()
+
+    result = await refresh(tmp_path, _session(upstream), EMAIL, "pw", HOST)
+
+    assert len(result.errors) == 1
+    assert CASSETTE in result.errors[0]
+    assert [
+        sent for sent in upstream.sent if "evil" in sent or sent.endswith("/x")
+    ] == []
+    assert upstream.sent == [
+        f"POST {SERVICE}/login",
+        f"GET {SERVICE}/users/current",
+        f"GET {SERVICE}",
+    ]
+
+
+async def test_a_sweep_off_the_configured_services_is_refused() -> None:
+    upstream = Upstream()
+    session = _session(upstream)
+    with pytest.raises(UnsafeRequestError, match=r"evil\.example\.org"):
+        await session.sweep("evil.example.org", f"{SERVICE}/users/{REAL_ID}/steps/1")
+    with pytest.raises(UnsafeRequestError, match="plain service path"):
+        await session.sweep(HOST, "//evil.example.org/steps/1")
+    assert upstream.sent == []
