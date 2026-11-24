@@ -79,6 +79,17 @@ class WireStore:
             if found is not None:
                 yield found
 
+    def prune_bodies(self) -> None:
+        held = {
+            exchange.response
+            for cassette in self.cassettes()
+            for exchange in cassette.exchanges
+            if exchange.response
+        }
+        for path in (self.root / "bodies").rglob("*.gz"):
+            if path.stem not in held:
+                path.unlink()
+
     def read_manifest(self) -> Manifest:
         path = self.root / _MANIFEST
         if not path.is_file():
