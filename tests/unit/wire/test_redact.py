@@ -24,7 +24,10 @@ IDENTITY = Identity(
 )
 JWT = "eyJhbGciOiJFUzUxMiJ9.eyJzdWIiOiIxIn0.c2lnbmF0dXJl"
 SESSION = "9F3A7C1E55B0D2E4"
-REDACTOR = Redactor(IDENTITY, secrets=[JWT, SESSION])
+SLASHED = "k3y/v4lue+tail=="
+OPAQUE = ["opaque-token-value", "b3BhcXVlLXRva2VuLXZhbHVl"]
+REDACTOR = Redactor(IDENTITY, secrets=[JWT, SESSION, SLASHED])
+GUARD = Redactor(IDENTITY, secrets=[JWT, SESSION, SLASHED, *OPAQUE])
 
 VARIANTS = [
     b'{"email": "Researcher.One@Example.org"}',
@@ -42,6 +45,18 @@ VARIANTS = [
     b'{"header": "Authorization: Bearer opaque-token-value"}',
     b'{"cookie": "JSESSIONID=' + SESSION.encode() + b'; Path=/"}',
     b'{"cookie": "Authorization=opaque-token-value"}',
+    b'{"email": "researcher.one&#64;example.org"}',
+    b'{"email": "researcher.one&#x40;example.org"}',
+    b"Authorization: Basic b3BhcXVlLXRva2VuLXZhbHVl",
+    b'authorization: Digest username="opaque-token-value", realm="x"',
+    b'{"Authorization": "Token opaque-token-value"}',
+    b"Authorization: Negotiate opaque-token-value",
+    b"Cookie: theme=dark; JSESSIONID=" + SESSION.encode() + b"; x=opaque-token-value",
+    b"Set-Cookie: JSESSIONID=" + SESSION.encode() + b"; Path=/; HttpOnly",
+    b'{"v": "k3y%2Fv4lue%2Btail%3D%3D"}',
+    b'{"v": "k3y/v4lue+tail=="}',
+    b'{"v": "k3y\\/v4lue+tail=="}',
+    b"v=k3y%2Fv4lue%2Btail%3D%3D&w=1",
 ]
 
 
@@ -49,12 +64,14 @@ VARIANTS = [
 def test_redaction_removes_every_account_value(body: bytes) -> None:
     redacted = REDACTOR.body(body)
 
-    assert REDACTOR.leaks(redacted) == []
+    assert GUARD.leaks(redacted) == []
     lowered = redacted.lower()
     for secret in (b"researcher", b"lovelace", b"analytical", b"376543210"):
         assert secret not in lowered
     assert b"opaque-token-value" not in redacted
+    assert b"b3BhcXVlLXRva2VuLXZhbHVl" not in redacted
     assert SESSION.encode() not in redacted
+    assert b"v4lue" not in redacted
 
 
 def test_the_placeholders_replace_the_account() -> None:
@@ -81,7 +98,7 @@ def test_a_name_inside_other_words_is_kept() -> None:
 
 @pytest.mark.parametrize("body", VARIANTS)
 def test_a_leak_names_what_it_found(body: bytes) -> None:
-    assert REDACTOR.leaks(body) != []
+    assert GUARD.leaks(body) != []
 
 
 def _cassette(body: str) -> Cassette:
@@ -123,3 +140,40 @@ def test_a_guarded_store_writes_a_clean_cassette(tmp_path: Path) -> None:
     store = WireStore(tmp_path, guard=REDACTOR)
     store.write_cassette(_cassette('{"searchName": "GenesByTaxon"}'))
     assert store.read_cassette("feature@plasmodb/a.spec.ts/one-1") is not None
+
+
+def test_every_cookie_pair_loses_its_value() -> None:
+    redacted = REDACTOR.body(b"Cookie: theme=dark; lang=en; JSESSIONID=abc")
+    assert redacted == (
+        b"Cookie: theme=wire-redacted; lang=wire-redacted; JSESSIONID=wire-redacted"
+    )
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        b'{"n": "researcher.one%40example.org"}',
+        b'{"n": "researcher.one\\u0040example.org"}',
+        b'{"n": "LOVELACE"}',
+        b'{"n": "ana&#108;ytical engines"}',
+        b'{"n": "k3y\\/v4lue+tail=="}',
+        b'{"n": "k3y%2fv4lue%2btail%3d%3d"}',
+        b'{"step": 13765432101}',
+    ],
+)
+def test_the_guard_reads_every_encoding(body: bytes) -> None:
+    assert GUARD.leaks(body) != []
+
+
+@pytest.mark.parametrize(
+    "body", [*VARIANTS, b'{"v": "&#x6b;&#x33;&#x79;&#x2f;v4lue+tail=="}']
+)
+def test_a_recording_of_each_variant_is_redacted_or_refused(
+    tmp_path: Path, body: bytes
+) -> None:
+    store = WireStore(tmp_path, guard=GUARD)
+    try:
+        sha = store.put_body(REDACTOR.body(body))
+    except LeakError:
+        return
+    assert GUARD.leaks(store.read_body(sha)) == []
