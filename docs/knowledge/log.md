@@ -1,11 +1,13 @@
 # Knowledge log
 
-## 2026-11-24 - the wire replays what WDK answered
+## 2026-11-24 - 0.9.0b19: the wire replays what WDK answered
 
 - `veupathdb.testing.wire` and the `wire` extra: the recording store, the key, the write epoch
   replay, the redactor and its independent leak guard, the mitmproxy addon (`serve`), and the
   `refresh` and `merge` commands (`decisions/a-wire-replays-what-wdk-answered.md`).
-- `changes_user_state` sits beside `runs_a_search` in `wdk/_http.py`.
+- `changes_user_state` sits beside `runs_a_search` in `wdk/_http.py`, and
+  `CURRENT_USER_PATH` is the one place the current-user alias is written.
+- `veupathdb-py` is 0.9.0b19.
 
 ## 2026-11-24 - 0.9.0b18: the tree tells same-named entries apart
 
