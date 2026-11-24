@@ -11,7 +11,7 @@ from typing import Literal
 from urllib.parse import urlsplit
 
 from mitmproxy import http
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
 
 from veupathdb.json_types import JSONObject
 from veupathdb.settings import DEFAULT_OAUTH_URL
@@ -23,6 +23,7 @@ from veupathdb.testing.wire.models import (
     CassetteHeader,
     Credential,
     Exchange,
+    Method,
     stored_body,
 )
 from veupathdb.testing.wire.redact import (
@@ -62,6 +63,7 @@ _OPENAI_REFUSAL: JSONObject = {
 }
 _CURRENT_USER = re.compile(r"/users/current$")
 _JSON = {"content-type": "application/json"}
+_METHOD: TypeAdapter[Method] = TypeAdapter(Method)
 
 
 def cassette_email(cassette: str) -> str:
@@ -394,7 +396,7 @@ class WireAddon:
         exchange = Exchange(
             seq=len(seen),
             host=request.pretty_host,
-            method=request.method,
+            method=_METHOD.validate_python(request.method),
             path=path,
             query=_query(request),
             body=body,

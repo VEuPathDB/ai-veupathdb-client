@@ -6,7 +6,6 @@ import re
 import time
 from datetime import UTC, datetime
 from pathlib import Path
-from urllib.parse import urlsplit
 
 import httpx
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -38,7 +37,7 @@ class UnsafeRequestError(ValueError):
 def _safe_path(path: str) -> str:
     unsafe = (
         not path.startswith("/")
-        or any(mark in path for mark in ("@", "//", "://", "\\"))
+        or any(mark in path for mark in ("@", "//", "://", "\\", "?", "#"))
         or ".." in path.split("/")
     )
     if unsafe:
@@ -106,19 +105,30 @@ class WdkSession:
     async def _get(self, url: str, token: str = "") -> httpx.Response:
         return await self.request("GET", url, token)
 
-    async def request(self, method: str, url: str, token: str = "") -> httpx.Response:
+    async def request(
+        self, method: str, url: httpx.URL | str, token: str = ""
+    ) -> httpx.Response:
         headers = {"cookie": f"Authorization={token}"} if token else {}
         response = await self.client.request(method, url, headers=headers)
         self.client.cookies.clear()
         return response
 
-    def url(self, host: str, path: str) -> str:
+    def url(self, host: str, path: str) -> httpx.URL:
         service = self.services.get(host)
         if service is None:
             msg = f"{host} is not a configured service"
             raise UnsafeRequestError(msg)
-        origin = urlsplit(service)
-        return f"{origin.scheme}://{origin.netloc}{_safe_path(path)}"
+        origin = httpx.URL(service)
+        url = httpx.URL(
+            scheme=origin.scheme,
+            host=origin.host,
+            port=origin.port,
+            path=_safe_path(path),
+        )
+        if url.path != path or url.query or url.fragment or url.host != host:
+            msg = f"{path!r} does not parse back as itself on {host}"
+            raise UnsafeRequestError(msg)
+        return url
 
     async def sweep(self, host: str, path: str) -> None:
         await self.request("DELETE", self.url(host, path), self._registered)
@@ -140,7 +150,7 @@ class WdkSession:
         return self._guest
 
     async def send(
-        self, exchange: Exchange, path: str, body: bytes, credential: Credential
+        self, exchange: Exchange, url: httpx.URL, body: bytes, credential: Credential
     ) -> Answer:
         token = ""
         if credential == "registered":
@@ -152,7 +162,6 @@ class WdkSession:
             headers["content-type"] = "application/json"
         query: list[tuple[str, str | int | float | bool | None]] = list(exchange.query)
         started = time.monotonic()
-        url = self.url(exchange.host, path)
         response = await self.client.request(
             exchange.method,
             url,
@@ -217,6 +226,8 @@ class _Run:
                         else b""
                     )
                 query = ids.rewrite_query(exchange.query)
+                url = self.session.url(exchange.host, path)
+                path = url.path
                 ids.check(
                     exchange.method,
                     path,
@@ -225,7 +236,7 @@ class _Run:
                 )
                 answer = await self.session.send(
                     exchange.model_copy(update={"query": query}),
-                    path,
+                    url,
                     body,
                     exchange.credential,
                 )

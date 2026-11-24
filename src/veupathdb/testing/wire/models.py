@@ -11,6 +11,7 @@ from veupathdb.testing.wire.key import exchange_key
 from veupathdb.wdk._http import changes_user_state
 
 Credential = Literal["registered", "guest", "none"]
+Method = Literal["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
 
 STACK = "stack"
 
@@ -34,7 +35,7 @@ class Exchange(BaseModel):
 
     seq: int
     host: str
-    method: str
+    method: Method
     path: str
     query: list[tuple[str, str]] = Field(default_factory=list)
     body: str | None = None

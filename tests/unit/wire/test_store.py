@@ -126,3 +126,11 @@ def test_a_response_names_a_body_by_its_hash_only(sha: str) -> None:
 def test_a_body_read_takes_only_a_hash(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="hash"):
         WireStore(tmp_path).read_body("../../x")
+
+
+@pytest.mark.parametrize("method", ["get", "BREW", "CONNECT"])
+def test_an_exchange_takes_only_an_uppercase_verb(method: str) -> None:
+    with pytest.raises(ValidationError):
+        _exchange(0, None).model_copy(update={}).model_validate(
+            {**_exchange(0, None).model_dump(), "method": method}
+        )

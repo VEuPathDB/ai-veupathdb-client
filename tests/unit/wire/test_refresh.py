@@ -15,6 +15,7 @@ from veupathdb.testing.wire import (
     Played,
     WireStore,
 )
+from veupathdb.testing.wire.models import Method
 from veupathdb.testing.wire.refresh import UnsafeRequestError, WdkSession, refresh
 
 HOST = "qa.plasmodb.org"
@@ -63,7 +64,7 @@ class Upstream:
 
 
 def _exchange(
-    seq: int, method: str, path: str, epoch: int, store: WireStore, body: bytes
+    seq: int, method: Method, path: str, epoch: int, store: WireStore, body: bytes
 ) -> Exchange:
     return Exchange(
         seq=seq,
@@ -189,6 +190,9 @@ async def test_a_refused_sign_in_stops_the_refresh(tmp_path: Path) -> None:
         (HOST, "/x@evil.example.org/y"),
         (HOST, "/https://evil.example.org/y"),
         (HOST, f"{SERVICE}/../../x"),
+        (HOST, f"{SERVICE}/x?token=1"),
+        (HOST, f"{SERVICE}/x#frag"),
+        (HOST, f"{SERVICE}/x%2F%2Fevil.example.org"),
     ],
 )
 async def test_a_cassette_off_the_configured_services_is_refused_unsent(
@@ -223,3 +227,9 @@ async def test_a_sweep_off_the_configured_services_is_refused() -> None:
     with pytest.raises(UnsafeRequestError, match="plain service path"):
         await session.sweep(HOST, "//evil.example.org/steps/1")
     assert upstream.sent == []
+
+
+def test_a_url_is_built_from_the_configured_service() -> None:
+    url = _session(Upstream()).url(HOST, f"{SERVICE}/users/1/steps")
+    assert str(url) == f"https://{HOST}{SERVICE}/users/1/steps"
+    assert url.query == b""

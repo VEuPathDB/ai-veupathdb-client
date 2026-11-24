@@ -9,6 +9,7 @@ from veupathdb.testing.wire import (
     nearest_difference,
     render_misses,
 )
+from veupathdb.testing.wire.models import Method
 
 HOST = "qa.plasmodb.org"
 STEPS = "/plasmo.qa/service/users/900000001/steps"
@@ -16,7 +17,9 @@ STRATEGY = "/plasmo.qa/service/users/900000001/strategies/9"
 CASSETTE = "turns@plasmodb/uat/a.spec.ts/s1-3f2a"
 
 
-def _exchange(seq: int, method: str, path: str, epoch: int, body: str = "") -> Exchange:
+def _exchange(
+    seq: int, method: Method, path: str, epoch: int, body: str = ""
+) -> Exchange:
     return Exchange(
         seq=seq,
         host=HOST,
