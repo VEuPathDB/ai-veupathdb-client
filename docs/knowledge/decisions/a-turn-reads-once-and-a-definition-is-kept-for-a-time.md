@@ -27,6 +27,10 @@ kept only when it parses as that model, so an empty or unreadable answer is read
   when no key points to it. A vocabulary built for one user (WDK-VOCAB-008) differs in its
   bytes, so it is never shared: a login reads another login's copy only when WDK answered
   both with the same bytes. A site router reset empties the store.
+  The hour is the user's ruling, chosen over fifteen minutes. Its WDK-VOCAB-008
+  consequence: a vocabulary built for one user, such as a list of that user's own
+  uploads, can show a new upload to that same user up to an hour late. No gene search
+  has such a vocabulary today.
 - **A turn's site reads, for the turn.** Inside `turn_reads()`, a search's context read
   (`POST .../searches/{name}`), its refreshed dependent parameters and its standard report
   are sent once for each body. Their answers depend on the body and the site, not on the
@@ -49,6 +53,9 @@ the same site and login is in flight, so it is never answered from before that w
 parsed again for each caller, so no caller changes another's.
 
 # What was rejected
+
+- **Fifteen minutes.** The user ruled for an hour: a definition changes only with a site
+  release, and an hour reads each one a quarter as often.
 
 - **A timed strategy cache.** A strategy changes with every edit on the website, so a
   read that outlives the turn can be wrong.
