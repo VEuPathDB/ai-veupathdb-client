@@ -82,11 +82,14 @@ class StrategiesMixin(StrategyAPIBase):
         return WDKIdentifier.model_validate(raw)
 
     async def get_strategy(
-        self, strategy_id: int, user_id: str | None = None
+        self, strategy_id: int, user_id: str | None = None, *, fresh: bool = False
     ) -> WDKStrategyDetails:
-        """Get a strategy by ID."""
+        """Get a strategy by ID. Inside a turn, a ``fresh`` read is sent even where
+        the turn holds the strategy, and it is the turn's copy from then on."""
         uid = await self._get_user_id(user_id)
-        raw = await self.client.get(f"/users/{uid}/strategies/{strategy_id}")
+        raw = await self.client.get(
+            f"/users/{uid}/strategies/{strategy_id}", fresh=fresh
+        )
         return validate_response(
             WDKStrategyDetails, raw, f"WDK strategy response for {strategy_id}"
         )

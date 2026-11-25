@@ -10,7 +10,6 @@ from veupathdb.wdk._searches import (
     BOOLEAN_OPERATOR_PARAM,
     BOOLEAN_RIGHT_OPERAND_PREFIX,
     BOOLEAN_SEARCH_PREFIX,
-    search_definitions_read_once,
 )
 from veupathdb.wdk.ai_expression import (
     AI_EXPRESSION_REPORT_PATH,
@@ -40,6 +39,7 @@ from veupathdb.wdk.factory import (
     get_wdk_client,
     list_sites,
 )
+from veupathdb.wdk.held_reads import turn_reads
 from veupathdb.wdk.phyletic_tree import (
     ORTHO_TAXONOMY_RECORD_TYPE,
     ORTHO_TAXONOMY_REPORT,
@@ -344,12 +344,12 @@ __all__ = [
     "resolve_record_type",
     "resolve_registered_email",
     "runs_an_expensive_search",
-    "search_definitions_read_once",
     "search_gate",
     "search_turn",
     "strategy_gate",
     "strip_internal_wdk_strategy_name",
     "tag_internal_wdk_strategy_name",
+    "turn_reads",
     "use_search_gate",
     "use_strategy_gate",
     "validate_oauth_token",

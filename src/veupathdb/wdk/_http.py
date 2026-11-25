@@ -1,12 +1,12 @@
 """Core HTTP transport for VEuPathDB WDK REST API with retries and cookies."""
 
 import asyncio
-import hashlib
 import re
 import time
 import urllib.request
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import dataclass
+from functools import partial
 from http.cookiejar import Cookie, CookieJar, DefaultCookiePolicy
 from urllib.parse import urlparse
 
@@ -38,6 +38,14 @@ from veupathdb.wdk._searches import BooleanSearch
 from veupathdb.wdk.delayed_result import (
     WDKDelayedResultError,
     is_delayed_result,
+)
+from veupathdb.wdk.held_reads import (
+    Definitions,
+    ReadKey,
+    Scope,
+    current_turn_reads,
+    kept_as,
+    login_key,
 )
 from veupathdb.wdk.probe import WDKProbe
 from veupathdb.wdk.search_load import (
@@ -80,10 +88,6 @@ _ANSWERED_RESOURCE = re.compile(r"^/users/[^/]+/(?:steps|strategies)/[^/]+$")
 
 
 _KEPT_USER_IDS = 4096
-
-
-def _token_key(token: str) -> str:
-    return hashlib.sha256(token.encode()).hexdigest()
 
 
 def runs_a_search(method: str, path: str) -> bool:
@@ -253,6 +257,7 @@ class HTTPClient:
         self._client_lock = asyncio.Lock()
         self._user_ids: dict[str, str] = {}
         self._boolean_searches: dict[str, BooleanSearch] = {}
+        self._definitions = Definitions()
         # The JSESSIONID cookie in the shared jar is scoped to one identity.
         # A change of token requires a new session.
         self._initialized_for_token: str | None = None
@@ -323,7 +328,7 @@ class HTTPClient:
         token = veupathdb_auth_token_ctx.get()
         if not token:
             return await read()
-        key = _token_key(token)
+        key = login_key(token)
         held = self._user_ids.get(key)
         if held is not None:
             return held
@@ -522,13 +527,42 @@ class HTTPClient:
         attempts: int = _ATTEMPTS,
         budget_seconds: float | None = None,
     ) -> JsonValue:
+        call = _Call(method, path, params, json, attempts, budget_seconds)
+        turn = current_turn_reads()
+        if changes_user_state(method, path):
+            try:
+                return await self._requested(call)
+            finally:
+                self._forget_the_account()
+        key = ReadKey.of(self._scope(), method, path, params, json)
+        match kept_as(method, path):
+            case "definition":
+                return await self._definitions.answer(
+                    key, partial(self._requested, call)
+                )
+            case None:
+                return await self._requested(call)
+            case _ if turn is None:
+                return await self._requested(call)
+            case kept:
+                return await turn.answer(key, kept, partial(self._requested, call))
+
+    def _scope(self) -> Scope:
+        token = veupathdb_auth_token_ctx.get()
+        return (self.base_url, None if token is None else login_key(token))
+
+    def _forget_the_account(self) -> None:
+        turn = current_turn_reads()
+        if turn is not None:
+            turn.forget_the_account(self._scope())
+
+    async def _requested(self, call: _Call) -> JsonValue:
         """Make an HTTP request with retries, and record telemetry.
 
         A guest token answered with 401 is minted again and the request sent
         once more. A guest refused with 401 or 403 needs a registered user.
         """
-        call = _Call(method, path, params, json, attempts, budget_seconds)
-        credential = await self._credential(path)
+        credential = await self._credential(call.path)
         if not credential.guest:
             return await self._send(call, credential)
         try:
@@ -623,8 +657,12 @@ class HTTPClient:
         params: JSONObject | None = None,
         *,
         attempts: int = _ATTEMPTS,
+        fresh: bool = False,
     ) -> JsonValue:
-        """GET request. ``attempts`` bounds the retries of this one read."""
+        """GET request. ``attempts`` bounds the retries of this one read, and a
+        ``fresh`` read is sent even where the turn holds its answer."""
+        if fresh:
+            self._forget_the_account()
         return await self._request("GET", path, params=params, attempts=attempts)
 
     async def post(

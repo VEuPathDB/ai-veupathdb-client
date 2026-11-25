@@ -15,3 +15,4 @@ Choices with a real alternative, each naming what was rejected and why.
 - [A search waits in line, and the host owns the gate](a-search-waits-in-line-and-the-host-owns-the-gate.md) - the turn line, the host gate and the site slots, the High Speed SNP list, and why no limit refuses
 - [The organism scope of a combine folds both of its inputs](a-combine-scope-folds-both-inputs.md) - each operator's rule, why an INTERSECT takes the union, and the step organisms a host supplies
 - [A wire proxy replays what WDK answered, and refuses what it never saw](a-wire-replays-what-wdk-answered.md) - the key, the write epoch, the 418, the redaction guard, the refresh, and why a client transport was rejected
+- [A turn reads once, and a definition is kept for fifteen minutes](a-turn-reads-once-and-a-definition-is-kept-for-a-time.md) - what the site client gives again, for how long, what a write forgets, and the fresh read before a write
