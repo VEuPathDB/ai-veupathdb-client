@@ -2,12 +2,13 @@
 
 ## 2026-11-25 - 0.9.0b20: a turn reads once
 
-- A site client keeps each search definition and record type for fifteen minutes, and
+- A site client keeps each search definition and record type for an hour, and
   `turn_reads()` sends a turn's strategy reads, step reports and search context reads once
   (`decisions/a-turn-reads-once-and-a-definition-is-kept-for-a-time.md`).
 - `get_strategy` takes `fresh`, the read before a write. An answer is kept only when it
-  parses as its model, the definitions are bounded at 32 MiB of text, and an account read
-  waits for a write in flight on the same login.
+  parses as its model, one store per process keeps the definitions under a 64 MiB bound
+  (least recently used dropped first, byte-identical answers of two logins stored once),
+  and an account read waits for a write in flight on the same login.
 - `search_definitions_read_once` is deleted.
 - `veupathdb-py` is 0.9.0b20.
 

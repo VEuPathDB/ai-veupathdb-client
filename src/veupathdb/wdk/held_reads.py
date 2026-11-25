@@ -5,6 +5,7 @@ import asyncio
 import hashlib
 import json
 import re
+from collections import OrderedDict
 from collections.abc import AsyncIterator, Awaitable, Callable, Iterator
 from contextlib import asynccontextmanager, contextmanager
 from contextvars import ContextVar
@@ -23,8 +24,8 @@ from veupathdb.wdk.wdk_models import (
 )
 from veupathdb.wdk.wdk_parameters import WDKParameter
 
-DEFINITION_SECONDS = 15 * 60
-DEFINITION_BYTES = 32 * 1024 * 1024
+DEFINITION_SECONDS = 60 * 60
+DEFINITION_BYTES = 64 * 1024 * 1024
 
 _RECORD_TYPE = re.compile(r"^/record-types/[^/]+$")
 _SEARCH = re.compile(r"^/record-types/[^/]+/searches/[^/]+$")
@@ -107,37 +108,60 @@ def _given(kept: str) -> JsonValue:
 
 @dataclass
 class Definitions:
-    _held: dict[ReadKey, tuple[float, str]] = field(default_factory=dict)
-    _bytes: int = 0
+    _keys: OrderedDict[ReadKey, tuple[float, str]] = field(default_factory=OrderedDict)
+    _texts: dict[str, str] = field(default_factory=dict)
+    _uses: dict[str, int] = field(default_factory=dict)
+    held_bytes: int = 0
 
     async def answer(
         self, key: ReadKey, read: HeldRead, send: Callable[[], Awaitable[JsonValue]]
     ) -> JsonValue:
         now = asyncio.get_running_loop().time()
-        held = self._held.get(key)
+        held = self._keys.get(key)
         if held is not None and now - held[0] < DEFINITION_SECONDS:
-            return _given(held[1])
+            self._keys.move_to_end(key)
+            return _given(self._texts[held[1]])
         value = await send()
         self._drop(key)
         if read.readable(value):
             self._keep(key, now, _kept(value))
         return value
 
+    def clear(self) -> None:
+        self._keys.clear()
+        self._texts.clear()
+        self._uses.clear()
+        self.held_bytes = 0
+
     def _drop(self, key: ReadKey) -> None:
-        held = self._held.pop(key, None)
-        if held is not None:
-            self._bytes -= len(held[1])
+        held = self._keys.pop(key, None)
+        if held is None:
+            return
+        digest = held[1]
+        self._uses[digest] -= 1
+        if self._uses[digest] == 0:
+            self.held_bytes -= len(self._texts.pop(digest).encode())
+            del self._uses[digest]
 
     def _keep(self, key: ReadKey, now: float, text: str) -> None:
-        if len(text) > DEFINITION_BYTES:
+        size = len(text.encode())
+        if size > DEFINITION_BYTES:
             return
-        for older, (read_at, _) in list(self._held.items()):
-            fresh = now - read_at < DEFINITION_SECONDS
-            if fresh and self._bytes + len(text) <= DEFINITION_BYTES:
-                break
-            self._drop(older)
-        self._held[key] = (now, text)
-        self._bytes += len(text)
+        digest = hashlib.sha256(text.encode()).hexdigest()
+        if digest not in self._texts:
+            self._texts[digest] = text
+            self.held_bytes += size
+        self._uses[digest] = self._uses.get(digest, 0) + 1
+        self._keys[key] = (now, digest)
+        while self.held_bytes > DEFINITION_BYTES:
+            self._drop(next(iter(self._keys)))
+
+
+_DEFINITIONS = Definitions()
+
+
+def definitions() -> Definitions:
+    return _DEFINITIONS
 
 
 @dataclass

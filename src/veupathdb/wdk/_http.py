@@ -40,11 +40,11 @@ from veupathdb.wdk.delayed_result import (
     is_delayed_result,
 )
 from veupathdb.wdk.held_reads import (
-    Definitions,
     HeldRead,
     ReadKey,
     Scope,
     current_turn_reads,
+    definitions,
     held_read,
     login_key,
 )
@@ -258,7 +258,6 @@ class HTTPClient:
         self._client_lock = asyncio.Lock()
         self._user_ids: dict[str, str] = {}
         self._boolean_searches: dict[str, BooleanSearch] = {}
-        self._definitions = Definitions()
         # The JSESSIONID cookie in the shared jar is scoped to one identity.
         # A change of token requires a new session.
         self._initialized_for_token: str | None = None
@@ -542,7 +541,7 @@ class HTTPClient:
             case None:
                 return await self._requested(call)
             case HeldRead(kept="definition"):
-                return await self._definitions.answer(key, read, send)
+                return await definitions().answer(key, read, send)
             case _ if turn is None:
                 return await self._requested(call)
             case _:

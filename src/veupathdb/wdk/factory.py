@@ -3,6 +3,7 @@
 import threading
 
 from veupathdb.wdk.client import VEuPathDBClient
+from veupathdb.wdk.held_reads import definitions
 from veupathdb.wdk.site_router import SiteInfo, get_site_router, on_site_router_reset
 from veupathdb.wdk.strategy_api.api import StrategyAPI
 from veupathdb.wdk.temporary_results import TemporaryResultsAPI
@@ -12,6 +13,7 @@ _vdi_clients: dict[str, VdiClient] = {}
 _vdi_lock = threading.Lock()
 
 on_site_router_reset(_vdi_clients.clear)
+on_site_router_reset(definitions().clear)
 
 
 def get_wdk_client(site_id: str) -> VEuPathDBClient:

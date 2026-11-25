@@ -1075,7 +1075,7 @@ the search reads as one the site does not have.
 - class: SILENT
 - upstream: https://github.com/VEuPathDB/WDK/blob/599395d6aadaa1ff9ebaafdd55083f8148890f09/Model/src/main/java/org/gusdb/wdk/model/query/spec/ParameterContainerInstanceSpecBuilder.java#L105-L110
 - anchor: src/veupathdb/wdk/held_reads.py:Definitions
-- status: ENFORCED by tests/unit/wdk/test_a_definition_is_kept_for_fifteen_minutes.py::test_each_login_reads_its_own_definition
+- status: ENFORCED by tests/unit/wdk/test_a_definition_is_kept_for_an_hour.py::test_each_login_reads_its_own_definition
 
 `GET /record-types/{type}/searches/{name}` builds the search's parameters for the
 requesting user (`QuestionService.getQuestionNew`). Any query a parameter reads,
@@ -1099,11 +1099,12 @@ your workspace", reads [`datasetVQ.geneListUserDataset`](https://github.com/VEuP
 takes `InternalParams.user_id` and is not cacheable. A step analysis form uses it,
 not a gene search, but a site release can add one.
 
-So a client may keep a definition only for one login. A site client keeps each
-definition and record type it reads for fifteen minutes (`held_reads.Definitions`),
-keyed by site, login token, record type, search and the expand flag. A definition
+So a client may keep a definition only for one login. The process keeps each
+definition and record type a site client reads for an hour (`held_reads.Definitions`),
+keyed by site, login token, record type, search and the expand flag; two logins share a
+stored copy only when WDK answered both with the same bytes. A definition
 changes with a site release, and a vocabulary that lists the user's own data can lag
-that data by up to fifteen minutes. The search list and a parameter's name are the
+that data by up to an hour. The search list and a parameter's name are the
 model's and the same for every user, so the combine search the client keeps once per
 record type is safe.
 

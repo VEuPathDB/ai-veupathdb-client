@@ -1,5 +1,5 @@
-"""A site client keeps each search definition and record type it reads for fifteen
-minutes, under the login that asked."""
+"""A site client keeps each search definition and record type it reads for an
+hour, under the login that asked."""
 
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ from veupathdb.auth_context import veupathdb_auth_token_ctx
 from veupathdb.json_types import JSONObject
 from veupathdb.testing import NEEDS_QA_RECORDING, needs_qa_recording
 from veupathdb.testing.wdk_fixtures import load_recorded
+from veupathdb.wdk import held_reads
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.strategy_api.api import StrategyAPI
 from veupathdb.wdk.wdk_models import NewStepSpec, WDKSearchConfig
@@ -28,10 +29,11 @@ pytestmark = pytest.mark.skipif(
 
 _PLASMO = "https://qa.plasmodb.org/plasmo.qa/service"
 _TOXO = "https://qa.toxodb.org/toxo.qa/service"
+_CRYPTO = "https://qa.cryptodb.org/cryptodb.qa/service"
 _SEARCH = "GenesByMolecularWeight"
 _DEFINITION = f"/record-types/transcript/searches/{_SEARCH}"
 _RECORD_TYPE = "/record-types/transcript"
-_FIFTEEN_MINUTES = 15 * 60
+_ONE_HOUR = 60 * 60
 _PARAMS = {
     "organism": '["Plasmodium"]',
     "min_molecular_weight": "10000",
@@ -102,7 +104,7 @@ async def _read(client: VEuPathDBClient, *, expand: bool = True) -> str:
     return details.search_data.display_name
 
 
-def test_a_second_read_inside_fifteen_minutes_sends_nothing() -> None:
+def test_a_second_read_inside_an_hour_sends_nothing() -> None:
     site = _Site(_PLASMO)
     client = site.client(_PLASMO)
     seen: list[str] = []
@@ -110,7 +112,7 @@ def test_a_second_read_inside_fifteen_minutes_sends_nothing() -> None:
     async def scenario() -> None:
         with _as("ada"):
             seen.append(await _read(client))
-            await asyncio.sleep(_FIFTEEN_MINUTES - 1)
+            await asyncio.sleep(_ONE_HOUR - 1)
             seen.append(await _read(client))
 
     on_the_virtual_clock(scenario())
@@ -119,14 +121,14 @@ def test_a_second_read_inside_fifteen_minutes_sends_nothing() -> None:
     assert site.sent[(_DEFINITION, "true")] == 1
 
 
-def test_a_read_after_fifteen_minutes_sends_one() -> None:
+def test_a_read_after_an_hour_sends_one() -> None:
     site = _Site(_PLASMO)
     client = site.client(_PLASMO)
 
     async def scenario() -> None:
         with _as("ada"):
             await _read(client)
-            await asyncio.sleep(_FIFTEEN_MINUTES)
+            await asyncio.sleep(_ONE_HOUR)
             await _read(client)
             await _read(client)
 
@@ -135,14 +137,14 @@ def test_a_read_after_fifteen_minutes_sends_one() -> None:
     assert site.sent[(_DEFINITION, "true")] == 2
 
 
-def test_a_record_type_is_kept_for_fifteen_minutes() -> None:
+def test_a_record_type_is_kept_for_an_hour() -> None:
     site = _Site(_PLASMO)
     api = StrategyAPI(site.client(_PLASMO))
     names: list[str] = []
 
     async def scenario() -> None:
         with _as("ada"):
-            for wait in (0, 60, _FIFTEEN_MINUTES - 61, 1, 0):
+            for wait in (0, 60, _ONE_HOUR - 61, 1, 0):
                 await asyncio.sleep(wait)
                 names.append(
                     (await api.get_record_type_info("transcript")).display_name
@@ -214,23 +216,112 @@ async def test_steps_written_one_after_another_read_the_definition_once() -> Non
     assert site.sent[(_DEFINITION, "true")] == 1
 
 
-async def test_a_client_keeps_at_most_32_mib_of_definitions() -> None:
-    sent: list[str] = []
-    padding = "x" * (4 * 1024 * 1024 - 100)
+def _padded_site(sent: list[str], size: int) -> httpx.MockTransport:
+    padding = "x" * size
 
     def handle(request: httpx.Request) -> httpx.Response:
         if request.url.path.endswith("/app"):
             return httpx.Response(200, text="")
-        sent.append(request.url.path.rsplit("/", 1)[-1])
-        return httpx.Response(200, json={"urlSegment": "t", "displayName": padding})
+        sent.append(f"{request.url.host}{request.url.path.rsplit('/', 1)[-1]}")
+        name = f"{request.url.host}/{request.url.path.rsplit('/', 1)[-1]}"
+        return httpx.Response(200, json={"urlSegment": name, "displayName": padding})
 
-    client = VEuPathDBClient(_PLASMO, transport=httpx.MockTransport(handle))
+    return httpx.MockTransport(handle)
+
+
+async def test_the_process_keeps_at_most_64_mib_dropping_the_least_used() -> None:
+    sent: list[str] = []
+    size = 8 * 1024 * 1024 - 100
+    plasmo = StrategyAPI(
+        VEuPathDBClient(_PLASMO, transport=_padded_site(sent, size)), user_id="1"
+    )
+    toxo = StrategyAPI(
+        VEuPathDBClient(_TOXO, transport=_padded_site(sent, size)), user_id="1"
+    )
+    with _as("ada"):
+        for n in range(4):
+            await plasmo.get_record_type_info(f"type{n}")
+            await toxo.get_record_type_info(f"type{n}")
+        await plasmo.get_record_type_info("type0")
+        await toxo.get_record_type_info("type4")
+        await plasmo.get_record_type_info("type0")
+        await toxo.get_record_type_info("type0")
+
+    assert sent[8:] == ["qa.toxodb.orgtype4", "qa.toxodb.orgtype0"]
+    assert held_reads.definitions().held_bytes <= held_reads.DEFINITION_BYTES
+
+
+async def test_two_logins_reading_one_definition_hold_one_copy() -> None:
+    sent: list[str] = []
+    client = VEuPathDBClient(_PLASMO, transport=_padded_site(sent, 1000))
     api = StrategyAPI(client, user_id="1")
     with _as("ada"):
-        for n in [*range(9), 8, 1, 0]:
-            await api.get_record_type_info(f"type{n}")
+        await api.get_record_type_info("transcript")
+    one = held_reads.definitions().held_bytes
+    with _as("bea"):
+        await api.get_record_type_info("transcript")
 
-    assert sent == [f"type{n}" for n in [*range(9), 0]]
+    assert len(sent) == 2
+    assert held_reads.definitions().held_bytes == one
+
+
+async def test_two_logins_with_different_answers_each_read_their_own() -> None:
+    site = _Site(_PLASMO)
+    client = site.client(_PLASMO)
+
+    with _as("ada"):
+        ada = await _read(client)
+    with _as("bea"):
+        bea = await _read(client)
+    with _as("ada"):
+        ada_again = await _read(client)
+    with _as("bea"):
+        bea_again = await _read(client)
+
+    assert (ada, bea, ada_again, bea_again) == (
+        "seen by ada",
+        "seen by bea",
+        "seen by ada",
+        "seen by bea",
+    )
+
+
+async def test_a_dropped_key_leaves_the_text_another_key_holds() -> None:
+    sent: list[str] = []
+    mib = 1024 * 1024
+    shared = StrategyAPI(
+        VEuPathDBClient(_PLASMO, transport=_padded_site(sent, 30 * mib)), user_id="1"
+    )
+    large = StrategyAPI(
+        VEuPathDBClient(_TOXO, transport=_padded_site(sent, 30 * mib)), user_id="1"
+    )
+    small = StrategyAPI(
+        VEuPathDBClient(_CRYPTO, transport=_padded_site(sent, 10 * mib)),
+        user_id="1",
+    )
+    with _as("ada"):
+        await shared.get_record_type_info("transcript")
+    with _as("bea"):
+        await shared.get_record_type_info("transcript")
+    with _as("ada"):
+        await large.get_record_type_info("gene")
+    with _as("bea"):
+        await shared.get_record_type_info("transcript")
+    with _as("ada"):
+        await small.get_record_type_info("gene")
+    with _as("bea"):
+        await shared.get_record_type_info("transcript")
+    with _as("ada"):
+        await shared.get_record_type_info("transcript")
+
+    assert sent == [
+        "qa.plasmodb.orgtranscript",
+        "qa.plasmodb.orgtranscript",
+        "qa.toxodb.orggene",
+        "qa.cryptodb.orggene",
+        "qa.plasmodb.orgtranscript",
+    ]
+    assert held_reads.definitions().held_bytes < held_reads.DEFINITION_BYTES
 
 
 @pytest.mark.parametrize(
