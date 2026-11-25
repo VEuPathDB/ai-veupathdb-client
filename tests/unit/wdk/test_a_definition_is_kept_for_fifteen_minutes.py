@@ -212,3 +212,21 @@ async def test_steps_written_one_after_another_read_the_definition_once() -> Non
         )
 
     assert site.sent[(_DEFINITION, "true")] == 1
+
+
+async def test_a_client_keeps_the_last_256_definitions() -> None:
+    sent: list[str] = []
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/app"):
+            return httpx.Response(200, text="")
+        sent.append(request.url.path.rsplit("/", 1)[-1])
+        return httpx.Response(200, json={"urlSegment": "t", "displayName": "t"})
+
+    client = VEuPathDBClient(_PLASMO, transport=httpx.MockTransport(handle))
+    api = StrategyAPI(client, user_id="1")
+    with _as("ada"):
+        for n in [*range(257), 256, 1, 0]:
+            await api.get_record_type_info(f"type{n}")
+
+    assert sent == [f"type{n}" for n in [*range(257), 0]]

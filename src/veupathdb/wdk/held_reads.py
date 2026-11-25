@@ -2,7 +2,6 @@
 definitions for a time, and the reads of one turn until the turn changes them."""
 
 import asyncio
-import copy
 import hashlib
 import json
 import re
@@ -17,7 +16,7 @@ from pydantic import JsonValue
 from veupathdb.json_types import JSONObject
 
 DEFINITION_SECONDS = 15 * 60
-_KEPT_DEFINITIONS = 512
+_KEPT_DEFINITIONS = 256
 
 _DEFINITION = re.compile(r"^/record-types/[^/]+(?:/searches/[^/]+)?$")
 _SITE_READ = re.compile(
@@ -69,14 +68,18 @@ class ReadKey:
         return cls(scope, method, path, asked)
 
 
-@dataclass(frozen=True)
-class _Answer:
-    value: JsonValue
+def _kept(value: JsonValue) -> str:
+    return json.dumps(value)
+
+
+def _given(kept: str) -> JsonValue:
+    answer: JsonValue = json.loads(kept)
+    return answer
 
 
 @dataclass
 class Definitions:
-    _held: dict[ReadKey, tuple[float, _Answer]] = field(default_factory=dict)
+    _held: dict[ReadKey, tuple[float, str]] = field(default_factory=dict)
 
     async def answer(
         self, key: ReadKey, send: Callable[[], Awaitable[JsonValue]]
@@ -84,18 +87,26 @@ class Definitions:
         now = asyncio.get_running_loop().time()
         held = self._held.get(key)
         if held is not None and now - held[0] < DEFINITION_SECONDS:
-            return copy.deepcopy(held[1].value)
+            return _given(held[1])
         value = await send()
         self._held.pop(key, None)
-        if len(self._held) >= _KEPT_DEFINITIONS:
-            self._held.pop(next(iter(self._held)))
-        self._held[key] = (now, _Answer(copy.deepcopy(value)))
+        self._drop_the_oldest(now)
+        self._held[key] = (now, _kept(value))
         return value
+
+    def _drop_the_oldest(self, now: float) -> None:
+        for key, (read_at, _) in list(self._held.items()):
+            if (
+                now - read_at < DEFINITION_SECONDS
+                and len(self._held) < _KEPT_DEFINITIONS
+            ):
+                return
+            del self._held[key]
 
 
 @dataclass
 class TurnReads:
-    _held: dict[ReadKey, _Answer] = field(default_factory=dict)
+    _held: dict[ReadKey, str] = field(default_factory=dict)
     _account: dict[Scope, set[ReadKey]] = field(default_factory=dict)
     _changes: dict[Scope, int] = field(default_factory=dict)
     _sending: dict[ReadKey, asyncio.Lock] = field(default_factory=dict)
@@ -111,11 +122,11 @@ class TurnReads:
         async with self._sending.setdefault(key, asyncio.Lock()):
             held = self._held.get(key)
             if held is not None:
-                return copy.deepcopy(held.value)
+                return _given(held)
             changes = self._changes.get(key.scope, 0)
             value = await send()
             if changes == self._changes.get(key.scope, 0):
-                self._held[key] = _Answer(copy.deepcopy(value))
+                self._held[key] = _kept(value)
                 if kept == "account":
                     self._account.setdefault(key.scope, set()).add(key)
             return value

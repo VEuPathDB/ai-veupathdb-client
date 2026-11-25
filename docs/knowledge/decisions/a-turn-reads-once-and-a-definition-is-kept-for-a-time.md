@@ -17,7 +17,8 @@ the path and the exact parameters and body.
 - **Definitions, for fifteen minutes.** `GET /record-types/{type}` and
   `GET /record-types/{type}/searches/{name}` change only with a site release. Each site
   client keeps what it read for `DEFINITION_SECONDS` on its event loop's clock, under the
-  login that asked ([WDK-VOCAB-008](../wdk/rules/parameters-and-vocabularies.md)).
+  login that asked ([WDK-VOCAB-008](../wdk/rules/parameters-and-vocabularies.md)), and at
+  most the last 256; an older answer is dropped when the next one is kept.
 - **A turn's site reads, for the turn.** Inside `turn_reads()`, a search's context read
   (`POST .../searches/{name}`), its refreshed dependent parameters and its standard report
   are sent once for each body. Their answers depend on the body and the site, not on the
@@ -35,8 +36,8 @@ the path and the exact parameters and body.
   made on the website, or in another process, is read and not overwritten.
 
 Reads sent at once with one key are sent once: the second waits for the first. A read
-still in flight when a write lands is not kept. An answer is copied for each caller, so no
-caller changes another's.
+still in flight when a write lands is not kept. An answer is kept as its JSON text and
+parsed again for each caller, so no caller changes another's.
 
 # What was rejected
 
