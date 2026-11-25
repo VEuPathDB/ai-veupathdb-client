@@ -214,19 +214,47 @@ async def test_steps_written_one_after_another_read_the_definition_once() -> Non
     assert site.sent[(_DEFINITION, "true")] == 1
 
 
-async def test_a_client_keeps_the_last_256_definitions() -> None:
+async def test_a_client_keeps_at_most_32_mib_of_definitions() -> None:
     sent: list[str] = []
+    padding = "x" * (4 * 1024 * 1024 - 100)
 
     def handle(request: httpx.Request) -> httpx.Response:
         if request.url.path.endswith("/app"):
             return httpx.Response(200, text="")
         sent.append(request.url.path.rsplit("/", 1)[-1])
-        return httpx.Response(200, json={"urlSegment": "t", "displayName": "t"})
+        return httpx.Response(200, json={"urlSegment": "t", "displayName": padding})
 
     client = VEuPathDBClient(_PLASMO, transport=httpx.MockTransport(handle))
     api = StrategyAPI(client, user_id="1")
     with _as("ada"):
-        for n in [*range(257), 256, 1, 0]:
+        for n in [*range(9), 8, 1, 0]:
             await api.get_record_type_info(f"type{n}")
 
-    assert sent == [f"type{n}" for n in [*range(257), 0]]
+    assert sent == [f"type{n}" for n in [*range(9), 0]]
+
+
+@pytest.mark.parametrize(
+    "answer",
+    [
+        httpx.Response(200, text=""),
+        httpx.Response(200, json={"searchData": {}}),
+        httpx.Response(200, json=["not", "a", "definition"]),
+    ],
+)
+async def test_an_empty_or_unreadable_definition_is_not_kept(
+    answer: httpx.Response,
+) -> None:
+    sent: list[str] = []
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/app"):
+            return httpx.Response(200, text="")
+        sent.append(request.url.path)
+        return answer
+
+    client = VEuPathDBClient(_PLASMO, transport=httpx.MockTransport(handle))
+    with _as("ada"):
+        for _ in range(2):
+            await client.get(_DEFINITION, params={"expandParams": "true"})
+
+    assert len(sent) == 2

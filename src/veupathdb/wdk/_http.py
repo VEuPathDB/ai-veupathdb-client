@@ -41,10 +41,11 @@ from veupathdb.wdk.delayed_result import (
 )
 from veupathdb.wdk.held_reads import (
     Definitions,
+    HeldRead,
     ReadKey,
     Scope,
     current_turn_reads,
-    kept_as,
+    held_read,
     login_key,
 )
 from veupathdb.wdk.probe import WDKProbe
@@ -530,22 +531,22 @@ class HTTPClient:
         call = _Call(method, path, params, json, attempts, budget_seconds)
         turn = current_turn_reads()
         if changes_user_state(method, path):
-            try:
+            if turn is None:
                 return await self._requested(call)
-            finally:
-                self._forget_the_account()
+            async with turn.writing(self._scope()):
+                return await self._requested(call)
         key = ReadKey.of(self._scope(), method, path, params, json)
-        match kept_as(method, path):
-            case "definition":
-                return await self._definitions.answer(
-                    key, partial(self._requested, call)
-                )
+        read = held_read(method, path)
+        send = partial(self._requested, call)
+        match read:
             case None:
                 return await self._requested(call)
+            case HeldRead(kept="definition"):
+                return await self._definitions.answer(key, read, send)
             case _ if turn is None:
                 return await self._requested(call)
-            case kept:
-                return await turn.answer(key, kept, partial(self._requested, call))
+            case _:
+                return await turn.answer(key, read, send)
 
     def _scope(self) -> Scope:
         token = veupathdb_auth_token_ctx.get()

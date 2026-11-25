@@ -14,7 +14,7 @@ import httpx
 import pytest
 
 from veupathdb.auth_context import veupathdb_auth_token_ctx
-from veupathdb.errors import WDKError
+from veupathdb.errors import DataParsingError, WDKError
 from veupathdb.wdk import turn_reads
 from veupathdb.wdk.client import VEuPathDBClient
 from veupathdb.wdk.strategy_api.api import StrategyAPI
@@ -35,8 +35,11 @@ class _Site:
         self.name = "Genes with a PF00069 domain"
         self.size = 1234
         self.refuse_next: set[str] = set()
+        self.garble_next: set[str] = set()
         self.landed = asyncio.Event()
         self.hold_reads = False
+        self.write_lands = asyncio.Event()
+        self.write_lands.set()
 
     async def handle(self, request: httpx.Request) -> httpx.Response:
         path = request.url.path.removeprefix("/plasmo.qa/service")
@@ -44,6 +47,11 @@ class _Site:
             return httpx.Response(200, text="")
         kind = f"{request.method} {path}"
         self.sent[kind] += 1
+        if request.method in {"PUT", "DELETE"} or path.endswith("/steps"):
+            return await self._written(request)
+        if kind in self.garble_next:
+            self.garble_next.discard(kind)
+            return httpx.Response(200, json={"strategyId": "not a strategy"})
         if kind in self.refuse_next:
             self.refuse_next.discard(kind)
             return httpx.Response(422, json={"message": "refused"})
@@ -52,6 +60,13 @@ class _Site:
             await self.landed.wait()
             return httpx.Response(200, json=body)
         return self._answer(request, path)
+
+    async def _written(self, request: httpx.Request) -> httpx.Response:
+        await self.write_lands.wait()
+        self.size = 7
+        if request.method == "POST":
+            return httpx.Response(200, json={"id": 9})
+        return httpx.Response(204)
 
     def _answer(self, request: httpx.Request, path: str) -> httpx.Response:
         if request.method == "PATCH":
@@ -281,3 +296,71 @@ async def test_a_caller_that_changes_its_answer_changes_no_other(
 
     assert list(second.steps) == [str(_STEP)]
     assert site.sent[_STRATEGY_READ] == 1
+
+
+_WRITES = [
+    ("PUT", f"/users/{_USER}/strategies/{_STRATEGY}/step-tree"),
+    ("PUT", f"/users/{_USER}/steps/{_STEP}/search-config"),
+    ("DELETE", f"/users/{_USER}/steps/{_STEP}"),
+    ("DELETE", f"/users/{_USER}/strategies/{_STRATEGY}"),
+    ("POST", f"/users/{_USER}/steps"),
+]
+
+
+async def _write(api: StrategyAPI, method: str, path: str) -> None:
+    match method:
+        case "PUT":
+            await api.client.put(path, json={})
+        case "DELETE":
+            await api.client.delete(path)
+        case _:
+            await api.client.post(path, json={})
+
+
+@pytest.mark.parametrize(("method", "path"), _WRITES)
+async def test_a_write_makes_the_next_account_read_go_to_the_site(
+    api: StrategyAPI, site: _Site, method: str, path: str
+) -> None:
+    with turn_reads():
+        await api.get_strategy(_STRATEGY)
+        await api.get_step_count(_STEP)
+        await _write(api, method, path)
+        strategy = await api.get_strategy(_STRATEGY)
+        counted = await api.get_step_count(_STEP)
+
+    assert (strategy.estimated_size, counted) == (7, 7)
+    assert (site.sent[_STRATEGY_READ], site.sent[_STEP_REPORT]) == (2, 2)
+
+
+async def test_a_held_read_waits_for_a_write_in_flight(
+    api: StrategyAPI, site: _Site
+) -> None:
+    with turn_reads():
+        await api.get_strategy(_STRATEGY)
+        site.write_lands.clear()
+        writing = asyncio.create_task(
+            api.client.put(f"/users/{_USER}/strategies/{_STRATEGY}/step-tree", json={})
+        )
+        await asyncio.sleep(0)
+        reading = asyncio.create_task(api.get_strategy(_STRATEGY))
+        await asyncio.sleep(0)
+        waited = not reading.done()
+        site.write_lands.set()
+        await writing
+        read = await reading
+
+    assert (waited, read.estimated_size) == (True, 7)
+    assert site.sent[_STRATEGY_READ] == 2
+
+
+async def test_an_unreadable_strategy_is_not_kept(
+    api: StrategyAPI, site: _Site
+) -> None:
+    site.garble_next.add(_STRATEGY_READ)
+    with turn_reads():
+        with pytest.raises(DataParsingError):
+            await api.get_strategy(_STRATEGY)
+        names = [(await api.get_strategy(_STRATEGY)).name for _ in range(2)]
+
+    assert names == ["Genes with a PF00069 domain"] * 2
+    assert site.sent[_STRATEGY_READ] == 2
