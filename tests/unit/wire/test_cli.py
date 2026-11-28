@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from veupathdb.testing import QA_SITES_FILE
 from veupathdb.testing.wire import Cassette, CassetteHeader, WireStore
 from veupathdb.testing.wire.__main__ import main
 
@@ -36,5 +37,20 @@ def test_refresh_needs_the_account_in_the_shell(
                 str(tmp_path),
                 f"--sites={sites}",
                 f"--report={tmp_path / 'r.md'}",
+            ]
+        )
+
+
+def test_serve_hands_the_upstream_to_the_proxy(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="takes no upstream"):
+        main(
+            [
+                "serve",
+                "--mode=replay",
+                f"--wire={tmp_path / 'wire'}",
+                f"--sites={QA_SITES_FILE}",
+                "--host=127.0.0.1",
+                f"--confdir={tmp_path / 'ca'}",
+                "--upstream=http://127.0.0.1:1",
             ]
         )

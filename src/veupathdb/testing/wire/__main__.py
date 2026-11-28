@@ -32,6 +32,7 @@ def _parser() -> argparse.ArgumentParser:
     serving.add_argument("--port", type=int, default=8080)
     serving.add_argument("--confdir", type=Path, required=True)
     serving.add_argument("--oauth-url", default=DEFAULT_OAUTH_URL)
+    serving.add_argument("--upstream", default=None)
     refreshing = commands.add_parser("refresh")
     refreshing.add_argument("wire", type=Path)
     refreshing.add_argument("--sites", type=Path, required=True)
@@ -71,7 +72,13 @@ def main(argv: list[str] | None = None) -> None:
                 site_hosts(args.sites),
                 oauth_url=args.oauth_url,
             )
-            serve(addon, host=args.host, port=args.port, confdir=args.confdir)
+            serve(
+                addon,
+                host=args.host,
+                port=args.port,
+                confdir=args.confdir,
+                upstream=args.upstream,
+            )
         case "refresh":
             email = os.environ.get("WDK_TEST_EMAIL", "")
             password = os.environ.get("WDK_TEST_PASSWORD", "")

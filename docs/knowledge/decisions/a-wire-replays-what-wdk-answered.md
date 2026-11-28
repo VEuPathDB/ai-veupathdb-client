@@ -13,6 +13,9 @@ status: stable
 `veupathdb.testing.wire` is the replay a host's end-to-end suite runs against. It installs with
 the `wire` extra (`mitmproxy`, `cryptography`) and runs as
 `python -m veupathdb.testing.wire serve --mode replay|record`.
+A recording proxy takes `--upstream <proxy URL>` and forwards every request through that
+HTTP proxy, so a host outside a site's network records through a machine inside it; a
+replaying proxy refuses one.
 
 | part | what it holds |
 |---|---|

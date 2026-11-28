@@ -1,5 +1,11 @@
 # Knowledge log
 
+## 2026-11-28 - 0.9.0b21: a recording proxy takes an upstream
+
+- `serve --upstream <proxy URL>` forwards a recording proxy's requests through that HTTP
+  proxy; a replaying proxy refuses one (`decisions/a-wire-replays-what-wdk-answered.md`).
+- `veupathdb-py` is 0.9.0b21.
+
 ## 2026-11-25 - 0.9.0b20: a turn reads once
 
 - A site client keeps each search definition and record type for an hour, and
